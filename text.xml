@@ -39,7 +39,7 @@
 			return;
 		}
 		prefs.set("cityname",cityName);
-		displayHeader();
+		run();
 	}
 	function displayHeader() {
 		var element = document.getElementById('header');  
