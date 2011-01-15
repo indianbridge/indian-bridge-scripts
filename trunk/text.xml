@@ -25,11 +25,11 @@
 			var calendarService = null;
 			var tabName = "recent-results";
 			var tabs = new gadgets.TabSet(__MODULE_ID__, tabName); 
-			tabs.addTab(tabName,tabName);
+			var rr = tabs.addTab(tabName,tabName);
 			tabName = "upcoming-events";
-			tabs.addTab(tabName,tabName);
+			var ue = tabs.addTab(tabName,tabName);
 			tabName = "recurring-events";
-			tabs.addTab(tabName,tabName);
+			var re = tabs.addTab(tabName,tabName);
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
@@ -46,11 +46,11 @@
 				} else {
 					html = "<h2>no events are matched from the query</h2>";
 				}
-				document.getElementById('recent-results').innerHTML = html;
+				document.getElementById(rr).innerHTML = html;
 				displayHeader();
 			}
 			function handleError(error) {
-				document.getElementById('recent-results').innerHTML = '<h2>'+error+'</h2>';
+				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
@@ -101,9 +101,9 @@
 			<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
 		</FORM>
 		<hr/>
-		<div id="recent-results">Loading...</div>
-		<div id="upcoming-events">Loading...</div>
-		<div id="recurring-events">Loading...</div>
+		<div id="recent-results" style="display:none">Loading...</div>
+		<div id="upcoming-events" style="display:none">>Loading...</div>
+		<div id="recurring-events" style="display:none">>Loading...</div>
 		]]>
 	</Content> 
 </Module>
