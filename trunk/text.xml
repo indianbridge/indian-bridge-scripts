@@ -30,7 +30,16 @@
 			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 			function handleSuccess(root) {
-				document.getElementById('content').innerHTML="Success";  
+				document.getElementById('content').innerHTML="<h2>Success</h2>";  
+			}			
+			function handleError(error) {
+				document.getElementById('content').innerHTML = "<h2>Error</h2>";
+			}
+			function createQuery(cityName) {
+				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+				if(cityName!="") query.setFullTextQuery(cityName);
+				query.setFutureEvents(true);
+				query.setSingleEvents(false);
 			}			
 			function update(form) {
 				var cityName = trim(form.cityname.value);
