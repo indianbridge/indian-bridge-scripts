@@ -42,7 +42,7 @@
 				displayHeader();
 			}
 			function handleError(error) {
-				document.getElementById('content').innerHTML = '<h2>'+error+'</h2>';
+				document.getElementById('content').innerHTML = '<h2>Test :'+error+'</h2>';
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
