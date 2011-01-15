@@ -19,6 +19,7 @@
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
+			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
 		
 			function runJSAPI() {
 				jsapiLoaded=true;
@@ -44,8 +45,7 @@
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
-					var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-					var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
+					if(!calendarService) calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 					var cityName = prefs.getString("cityname");
 					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
