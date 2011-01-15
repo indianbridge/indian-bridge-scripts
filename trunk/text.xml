@@ -18,36 +18,37 @@
 			google.setOnLoadCallback(runJSAPI);
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
-			//var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
 			gadgets.util.registerOnLoadHandler(pageLoaded);
-var callback = function(result) {       
-  
-  // Obtain the array of CalendarEventEntry
-  var entries = result.feed.entry;    
-  
-  // Print the total number of events
-  msg.createDismissibleMessage('Total of ' + entries.length + ' event(s)');
-  
-}
-
-// Error handler to be invoked when getEventsFeed() produces an error
-var handleError = function(error) {
-msg.createDismissibleMessage(error);
-}		
+		
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
 			}
-			
+			function handleSuccess(root) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						html += ('<ol>Event title = ' + event.getTitle().getText()+'</ol>');
+					}
+				} else {
+					html = "<h2>no events are matched from the query</h2>";
+				}
+				document.getElementById('content').innerHTML = html;
+				displayHeader();
+			}
+			function handleError(error) {
+				document.getElementById('content').innerHTML = '<h2>'+error+'</h2>';
+			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
+					var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+					var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
 					var cityName = prefs.getString("cityname");
 					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
-					//var params = opt_params || {};
-					//params["CONTENT_TYPE"] = gadgets.io.ContentType.FEED;
-					_IG_FetchFeedAsJSON(feedUri, callback);
+					calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
 				}
 			}
 			function createQuery(cityName) {
