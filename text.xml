@@ -29,6 +29,20 @@
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
+			function handleSuccess(root) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						html += ('<ol>Event title = ' + event.getTitle().getText()+'</ol>');
+					}
+				} else {
+					html = '<h2>no events are matched from the query!</h2>');
+				}
+				document.getElementById('header').innerHTML = html;
+				displayHeader();
+			}			
 			function update(form) {
 				var cityName = trim(form.cityname.value);
 				if(cityName!="" && cityName.length<4) {
