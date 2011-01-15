@@ -45,7 +45,7 @@
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
-					if(!calendarService) calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+					if(typeof(calendarService)=="undefined") calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 					var cityName = prefs.getString("cityname");
 					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
