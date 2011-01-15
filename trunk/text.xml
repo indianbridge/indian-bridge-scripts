@@ -18,7 +18,7 @@
 			google.setOnLoadCallback(runJSAPI);
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
-			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+			//var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
 			gadgets.util.registerOnLoadHandler(pageLoaded);
 var callback = function(result) {       
@@ -45,9 +45,9 @@ msg.createDismissibleMessage(error);
 					var cityName = prefs.getString("cityname");
 					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
-					var params = opt_params || {};
-					params["CONTENT_TYPE"] = gadgets.io.ContentType.FEED;
-					gadgets.io.makeRequest(feedUri, callback, params);
+					//var params = opt_params || {};
+					//params["CONTENT_TYPE"] = gadgets.io.ContentType.FEED;
+					_IG_FetchFeedAsJSON(feedUri, callback);
 				}
 			}
 			function createQuery(cityName) {
