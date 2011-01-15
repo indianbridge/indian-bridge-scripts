@@ -15,6 +15,14 @@
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
    <script type="text/javascript">
    // Get userprefs
+   var jsapiLoaded = false;
+   var pageLoaded = false;
+   google.load("gdata", "1");
+   google.setOnLoadCallback(runJSAPI);
+   function runJSAPI() {
+	jsapiLoaded=true;
+	msg.createDismissibleMessage("Google Loaded");
+   }
    var prefs = new gadgets.Prefs();
    var msg = new gadgets.MiniMessage(__MODULE_ID__);
    function update(form) {
