@@ -55,8 +55,9 @@
 			function createQuery(feedUri,cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setFutureEvents(true);
-				query.setSingleEvents(false);
+				//query.setFutureEvents(true);
+				//query.setSingleEvents(false);
+				return query;
 			}			
 			function update(form) {
 				var cityName = trim(form.cityname.value);
