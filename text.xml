@@ -21,24 +21,31 @@
 			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 			gadgets.util.registerOnLoadHandler(pageLoaded);
+var callback = function(result) {       
+  
+  // Obtain the array of CalendarEventEntry
+  var entries = result.feed.entry;    
+  
+  // Print the total number of events
+  msg.createDismissibleMessage('Total of ' + entries.length + ' event(s)');
+  
+}
+
+// Error handler to be invoked when getEventsFeed() produces an error
+var handleError = function(error) {
+msg.createDismissibleMessage(error);
+}		
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
 			}
-			function handleSuccess(root) {
-				msg.createDismissibleMessage("Success");
-				document.getElementById('content').innerHTML="<h2>Success</h2>";  
-			}			
-			function handleError(error) {
-				msg.createDismissibleMessage("Error");
-				document.getElementById('content').innerHTML = "<h2>Error</h2>";
-			}
+			
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
 					var cityName = prefs.getString("cityname");
 					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
-					calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
+					calendarService.getEventsFeed(feedUri, callback, handleError);
 				}
 			}
 			function createQuery(cityName) {
