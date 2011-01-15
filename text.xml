@@ -16,9 +16,20 @@
 		<script type="text/javascript">
 			google.load("gdata", "1");
 			google.setOnLoadCallback(runJSAPI);
+			var prefs = new gadgets.Prefs();
+			var msg = new gadgets.MiniMessage(__MODULE_ID__);
+			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
+			gadgets.util.registerOnLoadHandler(pageLoaded);
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
+			}
+			function handleSuccess(root) {
+				document.getElementById('content').innerHTML="<h2>Success</h2>";  
+			}			
+			function handleError(error) {
+				document.getElementById('content').innerHTML = "<h2>Error</h2>";
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
@@ -27,16 +38,6 @@
 					displayHeader();
 					calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
 				}
-			}
-			var prefs = new gadgets.Prefs();
-			var msg = new gadgets.MiniMessage(__MODULE_ID__);
-			var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
-			function handleSuccess(root) {
-				document.getElementById('content').innerHTML="<h2>Success</h2>";  
-			}			
-			function handleError(error) {
-				document.getElementById('content').innerHTML = "<h2>Error</h2>";
 			}
 			function createQuery(cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
@@ -64,7 +65,6 @@
 			function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
 			function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
 			function rtrim(stringToTrim) {return stringToTrim.replace(/\s+$/,"");}
-			gadgets.util.registerOnLoadHandler(pageLoaded);
 			function pageLoaded() {
 				pageLoaded=true;
 				run();
