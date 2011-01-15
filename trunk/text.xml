@@ -1,68 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 <Module>
-  <ModulePrefs title="Custom City Calendar" title_url="" 
-  description="Customized calendar for selected city" author="Indian Bridge" 
-  author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
-  height="200">
-    <Require feature="tabs" />
-    <Require feature="setprefs" />
-    <Require feature="dynamic-height"/>
-    <Require feature="minimessage"/>
-   </ModulePrefs> 
-  <UserPref name="cityname" display_name="Customize for City" default_value="" />
-  <Content type="html">
-  <![CDATA[
-	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-	<script type="text/javascript">
-	google.load("gdata", "1");
-	google.setOnLoadCallback(runJSAPI);
-	function runJSAPI() {
-		jsapiLoaded=true;
-		run();
-	}
-	function run() {
-		if(jsapiLoaded&&pageLoaded) {
-			displayHeader();
-		}
-	}
-    var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-    var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
-	var prefs = new gadgets.Prefs();
-	var msg = new gadgets.MiniMessage(__MODULE_ID__);
-	function update(form) {
-		var cityName = trim(form.cityname.value);
-		if(cityName!="" && cityName.length<4) {
-			var statusMsg = msg.createDismissibleMessage("Please specify at least 4 characters for the cityname or leave blank for all india");
-			statusMsg.style.backgroundColor = "red";
-			statusMsg.style.color = "white";
-			return;
-		}
-		prefs.set("cityname",cityName);
-		run();
-	}
-	function displayHeader() {
-		var element = document.getElementById('header');  
-		var cityName = prefs.getString("cityname");
-		var displayCityName = (cityName==""?"All India":cityName);
-		element.innerHTML = "Showing events for "+displayCityName;
-	}
-	function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
-	function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
-	function rtrim(stringToTrim) {return stringToTrim.replace(/\s+$/,"");}
-	gadgets.util.registerOnLoadHandler(pageLoaded);
-	function pageLoaded() {
-		pageLoaded=true;
-		run();
-	}
-   </script> 
-   <div id="header">Showing events for </div> 
-	<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
-	Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
-	<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
-	</FORM>
-	<hr/>
-	<div id="content"></div>
-  
-     ]]>
-  </Content> 
+	<ModulePrefs title="Custom City Calendar" title_url="" 
+		description="Customized calendar for selected city" author="Indian Bridge" 
+		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
+		height="200">
+		<Require feature="tabs" />
+		<Require feature="setprefs" />
+		<Require feature="dynamic-height"/>
+		<Require feature="minimessage"/>
+	</ModulePrefs> 
+	<UserPref name="cityname" display_name="Customize for City" default_value="" />
+	<Content type="html">
+	<![CDATA[
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("gdata", "1");
+			google.setOnLoadCallback(runJSAPI);
+			function runJSAPI() {
+				jsapiLoaded=true;
+				run();
+			}
+			function run() {
+				if(jsapiLoaded&&pageLoaded) {
+					displayHeader();
+				}
+			}
+			var prefs = new gadgets.Prefs();
+			var msg = new gadgets.MiniMessage(__MODULE_ID__);
+			function update(form) {
+				var cityName = trim(form.cityname.value);
+				if(cityName!="" && cityName.length<4) {
+					var statusMsg = msg.createDismissibleMessage("Please specify at least 4 characters for the cityname or leave blank for all india");
+					statusMsg.style.backgroundColor = "red";
+					statusMsg.style.color = "white";
+					return;
+				}
+				prefs.set("cityname",cityName);
+				run();
+			}
+			function displayHeader() {
+				var element = document.getElementById('header');  
+				var cityName = prefs.getString("cityname");
+				var displayCityName = (cityName==""?"All India":cityName);
+				element.innerHTML = "Showing events for "+displayCityName;
+			}
+			function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
+			function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
+			function rtrim(stringToTrim) {return stringToTrim.replace(/\s+$/,"");}
+			gadgets.util.registerOnLoadHandler(pageLoaded);
+			function pageLoaded() {
+				pageLoaded=true;
+				run();
+			}
+		</script>
+		<div id="header">Showing events for </div> 
+		<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
+			Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
+			<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
+		</FORM>
+		<hr/>
+		<div id="content"></div>
+		]]>
+	</Content> 
 </Module>
