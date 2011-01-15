@@ -14,12 +14,11 @@
   <![CDATA[
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	<script type="text/javascript">
-	var jsapiLoaded = false;
-	var pageLoaded = false;
 	google.load("gdata", "1");
 	google.setOnLoadCallback(runJSAPI);
 	function runJSAPI() {
 		jsapiLoaded=true;
+		msg.createDismissibleMessage("Google Loaded");
 		run();
 	}
 	function run() {
@@ -54,6 +53,7 @@
 	gadgets.util.registerOnLoadHandler(pageLoaded);
 	function pageLoaded() {
 		pageLoaded=true;
+		msg.createDismissibleMessage("Page Loaded");
 		run();
 	}
    </script> 
