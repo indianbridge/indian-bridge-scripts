@@ -19,7 +19,7 @@
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
-			var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
+			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
 			function runJSAPI() {
