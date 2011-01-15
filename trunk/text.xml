@@ -19,7 +19,7 @@
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
-			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full?alt=json';	
+			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
 			function runJSAPI() {
@@ -42,7 +42,7 @@
 				displayHeader();
 			}
 			function handleError(error) {
-				document.getElementById('content').innerHTML = '<h2>Test :'+error+'</h2>';
+				document.getElementById('content').innerHTML = '<h2>Test Sriram :'+error+'</h2>';
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
