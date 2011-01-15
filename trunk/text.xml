@@ -26,9 +26,11 @@
 				run();
 			}
 			function handleSuccess(root) {
+				msg.createDismissibleMessage("Success");
 				document.getElementById('content').innerHTML="<h2>Success</h2>";  
 			}			
 			function handleError(error) {
+				msg.createDismissibleMessage("Error");
 				document.getElementById('content').innerHTML = "<h2>Error</h2>";
 			}
 			function run() {
