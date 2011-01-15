@@ -23,8 +23,9 @@
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
 					var cityName = prefs.getString("cityname");
-					calendarService.getEventsFeed(createQuery(cityName), handleSuccess, handleError);
+					msg.createDismissibleMessage("Fetching for city : "+cityName);
 					displayHeader();
+					calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
 				}
 			}
 			var prefs = new gadgets.Prefs();
