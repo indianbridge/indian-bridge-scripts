@@ -22,6 +22,8 @@
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
+					var cityName = prefs.getString("cityname");
+					calendarService.getEventsFeed(createQuery(cityName), handleSuccess, handleError);
 					displayHeader();
 				}
 			}
