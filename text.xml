@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+  <ModulePrefs title="Custom City Calendar" title_url="" 
+  description="Customized calendar for selected city" author="Indian Bridge" 
+  author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
+  height="200">
+    <Require feature="tabs" />
+    <Require feature="setprefs" />
+    <Require feature="dynamic-height"/>
+    <Require feature="minimessage"/>
+   </ModulePrefs> 
+  <UserPref name="cityname" display_name="Customize for City" default_value="" />
+  <Content type="html">
+     <![CDATA[ 
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+   <script type="text/javascript">
+   var jsapiLoaded = false;
+   var pageLoaded = false;
+   google.load("gdata", "1");
+   google.setOnLoadCallback(runJSAPI);
+   var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+   var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
+   // Get userprefs
+   var prefs = new gadgets.Prefs();
+   var msg = new gadgets.MiniMessage(__MODULE_ID__);
+   function runJSAPI() {
+     jsapiLoaded = true; run();
+   }
+   function runPageLoaded() {
+     pageLoaded = true; run();
+   }
+   function run() {
+     if(pageLoaded and jsapiLoaded) {
+       var cityName = prefs.getString("cityname");
+       calendarService.getEventsFeed(query, handleSuccess, handleError);
+     }
+   }
+   function handleSuccess(root) {
+    var html = "<ul>";
+	var eventEntries = root.feed.getEntries();
+	if (eventEntries.length > 0) {
+		for (var i = 0; i < eventEntries.length; i++) {
+			var event = eventEntries[i];
+			html += ('<ol>Event title = ' + event.getTitle().getText()+'</ol>');
+		}
+	} else {
+		html = '<h2>no events are matched from the query!</h2>');
+	}
+	document.getElementById('header').innerHTML = html;
+	displayHeader();
+   }
+   function handleError(error) {
+	document.getElementById('header').innerHTML = '<h2>'+error+'</h2>';
+   }
+   function createQuery(cityName) {
+     var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+     if(cityName!="") query.setFullTextQuery(cityName);
+     query.setFutureEvents(true);
+	 query.setSingleEvents(false);
+   }
+   function update(form) {
+     var cityName = trim(form.cityname.value);
+     if(cityName!="" && cityName.length<4) {
+       var statusMsg = msg.createDismissibleMessage("Please specify at least 4 characters for the cityname or leave blank for all india");
+       statusMsg.style.backgroundColor = "red";
+       statusMsg.style.color = "white";
+       return;
+     }
+     prefs.set("cityname",cityName);
+	 run();
+   }
+   function displayHeader() {
+     var element = document.getElementById('header');  
+     var cityName = prefs.getString("cityname");
+     var displayCityName = (cityName==""?"All India":cityName);
+     element.innerHTML = "Showing events for "+displayCityName;
+   }
+   
+   function trim(stringToTrim) {
+     return stringToTrim.replace(/^\s+|\s+$/g,""); 
+   }
+   function ltrim(stringToTrim) {
+     return stringToTrim.replace(/^\s+/,"");
+   }
+   function rtrim(stringToTrim) {
+     return stringToTrim.replace(/\s+$/,"");
+   }
+   
+   // Pass the userprefs for this module instance to the function
+   // (allows users to include multiple module instances on their page)
+   gadgets.util.registerOnLoadHandler(runPageLoaded); 
+  
+   </script> 
+   <div id="header">Showing events for </div> 
+	<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
+	Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
+	<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
+	</FORM>
+	<hr/>
+	<div id="content"></div>
+  
+     ]]>
+  </Content> 
+</Module>
