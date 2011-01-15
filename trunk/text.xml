@@ -25,11 +25,11 @@
 			var calendarService = null;
 			var tabName = "recent-results";
 			var tabs = new gadgets.TabSet(__MODULE_ID__, tabName); 
-			tabs.addTab(tabName);
+			tabs.addTab(tabName,tabName);
 			tabName = "upcoming-events";
-			tabs.addTab(tabName);
+			tabs.addTab(tabName,tabName);
 			tabName = "recurring-events";
-			tabs.addTab(tabName);
+			tabs.addTab(tabName,tabName);
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
