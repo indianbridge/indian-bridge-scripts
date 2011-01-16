@@ -87,20 +87,20 @@
 			function handleError(error) {
 				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
 			}
+			function createTabs(tabs) {
+				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
+				for(tab in tabs) {
+					tabSet.addTab(tabs[tab].title, {
+						contentContainer: document.getElementById(tabs[tab].container),
+						callback: tabs[tab].callback,
+						tooltip: tabs[tab].tooltip
+					});
+				}
+				return tabSet;
+			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
 					var tabSet = createTabs(tabs);
-					function createTabs(tabs) {
-						var tabSet = new gadgets.TabSet(__MODULE_ID__); 
-						for(tab in tabs) {
-							tabSet.addTab(tab.title, {
-								contentContainer: document.getElementById(tab.container),
-								callback: tab.callback,
-								tooltip: tab.tooltip
-							});
-						}
-						return tabSet;
-					}
 				
 					/*if(!calendarServiceLoaded) {
 						calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
