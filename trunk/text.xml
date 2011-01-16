@@ -55,10 +55,17 @@
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
 			}			
 			var changeCity = function(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  //var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}						
+			var runTest = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
@@ -87,6 +94,13 @@
 			function handleError(error) {
 				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
 			}
+			var tabs = {
+				'recent-results':{title:'Recent Results',container:'recent-results',callback:getRecentResults,tooltip:'Recent Results'},
+				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
+				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
+				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
+				'change-city':{title:'Change City',container:'change-city',callback:changeCity,tooltip:'Change City'}
+			};
 			function createTabs(tabs) {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
 				for(tab in tabs) {
@@ -96,6 +110,7 @@
 						tooltip: tabs[tab].tooltip
 					});
 				}
+				tabSet.addTab('test',{contentContainer:document.getElementById('test'),callback:runTest});
 				return tabSet;
 			}
 			function run() {
@@ -149,7 +164,8 @@
 		<div id="recent-results" style="display:none">Loading...</div>
 		<div id="recent-updates" style="display:none">Loading...</div>
 		<div id="upcoming-events" style="display:none">Loading...</div>
-		<div id="recurring-events" style="display:none">Loading...</div>
+		<div id="recurring-events" style="display:none">Loading...</div>		
+		<div id="test" style="display:none">Loading...</div>
 		<div id="change-city" style="display:none">
 			<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
 				Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
