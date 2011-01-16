@@ -23,13 +23,48 @@
 			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
-			var tabName = "recent-results";
-			var tabs = new gadgets.TabSet(__MODULE_ID__, tabName); 
-			var rr = tabs.addTab(tabName,tabName);
-			tabName = "upcoming-events";
-			var ue = tabs.addTab(tabName,tabName);
-			tabName = "recurring-events";
-			var re = tabs.addTab(tabName,tabName);
+			var tabs = {
+				'recent-results':{title:'Recent Results',container:'recent-results',callback:'getRecentResults',tooltip:'Recent Results'},
+				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:'getRecentUpdates',tooltip:'Recent Updates'},
+				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:'getUpcomingEvents',tooltip:'Upcoming Events'},
+				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:'getRecurringEvents',tooltip:'Recurring Events'},
+				'change-city':{title:'Change City',container:'change-city',callback:'changeCity',tooltip:'Change City'}
+			};
+			function getRecentResults(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}			
+			function getRecentUpdates(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}			
+			function getUpcomingEvents(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}			
+			function getRecurringEvents(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}			
+			function changeCity(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  document.getElementById(tabId).appendChild(p);
+			}						
 			function runJSAPI() {
 				jsapiLoaded=true;
 				run();
@@ -54,13 +89,26 @@
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
-					if(!calendarServiceLoaded) {
+					var tabSet = createTabs(tabs);
+					function createTabs(tabs) {
+						var tabSet = new gadgets.TabSet(__MODULE_ID__); 
+						for(tab in tabs) {
+							tabSet.addTab(tab.title, {
+								contentContainer: document.getElementById(tab.container),
+								callback: tab.callback,
+								tooltip: tab.tooltip
+							});
+						}
+						return tabSet;
+					}
+				
+					/*if(!calendarServiceLoaded) {
 						calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 						calendarServiceLoaded=true;
 					}
 					var cityName = prefs.getString("cityname");
 					displayHeader();
-					calendarService.getEventsFeed(createQuery(feedUri,cityName), handleSuccess, handleError);
+					calendarService.getEventsFeed(createQuery(feedUri,cityName), handleSuccess, handleError);*/
 				}
 			}
 			function createQuery(feedUri,cityName) {
@@ -79,13 +127,15 @@
 					return;
 				}
 				prefs.set("cityname",cityName);
-				run();
+				var displayCityName = "Showing Events for "+(cityName==""?"All India":cityName);
+				gadgets.window.setTitle(displayCityName);
+				//run();
 			}
 			function displayHeader() {
-				var element = document.getElementById('header');  
+				//var element = document.getElementById('header');  
 				var cityName = prefs.getString("cityname");
 				var displayCityName = (cityName==""?"All India":cityName);
-				element.innerHTML = "Showing events for "+displayCityName;
+				//element.innerHTML = "Showing events for "+displayCityName;
 			}
 			function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
 			function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
@@ -95,15 +145,16 @@
 				run();
 			}
 		</script>
-		<div id="header">Showing events for </div> 
-		<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
-			Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
-			<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
-		</FORM>
-		<hr/>
 		<div id="recent-results" style="display:none">Loading...</div>
+		<div id="recent-updates" style="display:none">Loading...</div>
 		<div id="upcoming-events" style="display:none">>Loading...</div>
 		<div id="recurring-events" style="display:none">>Loading...</div>
+		<div id="change-city" style="display:none">
+			<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
+				Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
+				<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
+			</FORM>
+		</div>
 		]]>
 	</Content> 
 </Module>
