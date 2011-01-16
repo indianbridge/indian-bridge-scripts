@@ -110,7 +110,7 @@
 						tooltip: tabs[tab].tooltip
 					});
 				}
-				tabSet.addTab('test',{contentContainer:document.getElementById('test'),callback:runTest});
+				//tabSet.addTab('test',{contentContainer:document.getElementById('test'),callback:runTest});
 				return tabSet;
 			}
 			function run() {
