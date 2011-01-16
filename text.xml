@@ -33,22 +33,22 @@
 			var getRecentResults = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
-			  var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  //var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
 			}			
 			var getRecentUpdates = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
 			}			
 			var getUpcomingEvents = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
 			}			
 			var getRecurringEvents = function(tabId) {
@@ -62,14 +62,14 @@
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
 			}						
 			var runTest = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " + selectedTab.getName();
+			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
 			}						
 			function runJSAPI() {
@@ -95,11 +95,11 @@
 				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
 			}
 			var tabs = {
-				'recent-results':{title:'Recent Results',container:'recent-results',callback:getRecentResults,tooltip:'Recent Results'},
-				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
-				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
-				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
-				'change-city':{title:'Change City',container:'change-city',callback:changeCity,tooltip:'Change City'}
+				'recent-results':{title:'Recent Results',container:'recent-results',callback:'getRecentResults',tooltip:'Recent Results'},
+				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:'getRecentUpdates',tooltip:'Recent Updates'},
+				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:'getUpcomingEvents',tooltip:'Upcoming Events'},
+				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:'getRecurringEvents',tooltip:'Recurring Events'},
+				'change-city':{title:'Change City',container:'change-city',callback:'changeCity',tooltip:'Change City'}
 			};
 			function createTabs(tabs) {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
