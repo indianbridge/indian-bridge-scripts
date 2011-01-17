@@ -23,7 +23,8 @@
 			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
-			var getRecentResults = function(tabId) {
+			var callbacks = {};
+			callbacks.getRecentResults = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
@@ -66,7 +67,7 @@
 			  document.getElementById(tabId).appendChild(p);
 			}						
 			var tabs = {
-				'recent-results':{title:'Recent Results',container:'recent-results',callback:getRecentResults,tooltip:'Recent Results'},
+				'recent-results':{title:'Recent Results',container:'recent-results',callback:callbacks.getRecentResults,tooltip:'Recent Results'},
 				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
 				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
 				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
