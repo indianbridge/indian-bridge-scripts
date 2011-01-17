@@ -87,7 +87,7 @@
 				if (eventEntries.length > 0) {
 					for (var i = 0; i < eventEntries.length; i++) {
 						var event = eventEntries[i];
-						html += ('<li>'+event.getTitle().getText()+'</li>');
+						if(event.getRecurrence()) html += ('<li>'+event.getTitle().getText()+'</li>');
 					}
 					html+='</ul>';
 				} else {
