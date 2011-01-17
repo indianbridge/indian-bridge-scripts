@@ -29,7 +29,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
-			  gadgets.window.adjustHeight();
+			  //gadgets.window.adjustHeight();
 			}			
 			var getRecentUpdates = function(tabId) {
 			  var p = document.createElement("p");
@@ -37,7 +37,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
-			  gadgets.window.adjustHeight();
+			  //gadgets.window.adjustHeight();
 			}			
 			var getUpcomingEvents = function(tabId) {
 			  var p = document.createElement("p");
@@ -45,7 +45,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
-			  gadgets.window.adjustHeight();
+			  //gadgets.window.adjustHeight();
 			}			
 			var getRecurringEvents = function(tabId) {
 			  var p = document.createElement("p");
@@ -53,7 +53,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
-			  gadgets.window.adjustHeight();
+			  //gadgets.window.adjustHeight();
 			}			
 			var changeCity = function(tabId) {
 			  var p = document.createElement("p");
@@ -61,7 +61,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
-			  gadgets.window.adjustHeight();;
+			  //gadgets.window.adjustHeight();;
 			}						
 			var runTest = function(tabId) {
 			  var p = document.createElement("p");
@@ -93,7 +93,7 @@
 				} else {
 					html = "<h2>no events are matched from the query</h2>";
 				}
-				document.getElementById(rr).innerHTML = html;
+				document.getElementById(tabs['recurring-events'].tabID).innerHTML = html;
 				displayHeader();
 			}
 			function handleError(error) {
@@ -102,33 +102,32 @@
 			function createTabs(tabs) {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
 				for(tab in tabs) {
-					tabSet.addTab(tabs[tab].title, {
+					tabs[tab].tabID = tabSet.addTab(tabs[tab].title, {
 						contentContainer: document.getElementById(tabs[tab].container),
 						callback: tabs[tab].callback,
 						tooltip: tabs[tab].tooltip
 					});
 				}
-				tabSet.addTab('test',{contentContainer:document.getElementById('test'),callback:runTest});
 				return tabSet;
 			}
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
 					var tabSet = createTabs(tabs);
 				
-					/*if(!calendarServiceLoaded) {
+					if(!calendarServiceLoaded) {
 						calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 						calendarServiceLoaded=true;
 					}
 					var cityName = prefs.getString("cityname");
 					displayHeader();
-					calendarService.getEventsFeed(createQuery(feedUri,cityName), handleSuccess, handleError);*/
+					calendarService.getEventsFeed(createQuery(feedUri,cityName), handleSuccess, handleError);
 				}
 			}
 			function createQuery(feedUri,cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				if(cityName!="") query.setFullTextQuery(cityName);
-				//query.setFutureEvents(true);
-				//query.setSingleEvents(false);
+				query.setFutureEvents(true);
+				query.setSingleEvents(false);
 				return query;
 			}			
 			function update(form) {
