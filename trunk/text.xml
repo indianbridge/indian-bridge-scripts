@@ -3,7 +3,7 @@
 	<ModulePrefs title="Custom City Calendar" title_url="" 
 		description="Customized calendar for selected city" author="Indian Bridge" 
 		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
-		height="200">
+		height="400" scrolling="true">
 		<Require feature="tabs" />
 		<Require feature="setprefs" />
 		<Require feature="dynamic-height"/>
@@ -23,13 +23,13 @@
 			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
-			var callbacks = {};
-			callbacks.getRecentResults = function(tabId) {
+			var getRecentResults = function(tabId) {
 			  var p = document.createElement("p");
 			  // Get selected tab
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
+			  gadgets.window.adjustHeight();
 			}			
 			var getRecentUpdates = function(tabId) {
 			  var p = document.createElement("p");
@@ -37,6 +37,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
+			  gadgets.window.adjustHeight();
 			}			
 			var getUpcomingEvents = function(tabId) {
 			  var p = document.createElement("p");
@@ -44,6 +45,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
 			  document.getElementById(tabId).appendChild(p);
+			  gadgets.window.adjustHeight();
 			}			
 			var getRecurringEvents = function(tabId) {
 			  var p = document.createElement("p");
@@ -51,6 +53,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
+			  gadgets.window.adjustHeight();
 			}			
 			var changeCity = function(tabId) {
 			  var p = document.createElement("p");
@@ -58,6 +61,7 @@
 			  //var selectedTab = tabs.getSelectedTab();
 			  p.innerHTML = "This is dynamic content generated in callback for tab ";
 			  document.getElementById(tabId).appendChild(p);
+			  gadgets.window.adjustHeight();;
 			}						
 			var runTest = function(tabId) {
 			  var p = document.createElement("p");
@@ -67,7 +71,7 @@
 			  document.getElementById(tabId).appendChild(p);
 			}						
 			var tabs = {
-				'recent-results':{title:'Recent Results',container:'recent-results',callback:callbacks.getRecentResults,tooltip:'Recent Results'},
+				'recent-results':{title:'Recent Results',container:'recent-results',callback:getRecentResults,tooltip:'Recent Results'},
 				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
 				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
 				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
