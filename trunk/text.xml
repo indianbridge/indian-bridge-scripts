@@ -94,13 +94,6 @@
 			function handleError(error) {
 				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
 			}
-			var tabs = {
-				'recent-results':{title:'Recent Results',container:'recent-results',callback:'getRecentResults',tooltip:'Recent Results'},
-				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:'getRecentUpdates',tooltip:'Recent Updates'},
-				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:'getUpcomingEvents',tooltip:'Upcoming Events'},
-				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:'getRecurringEvents',tooltip:'Recurring Events'},
-				'change-city':{title:'Change City',container:'change-city',callback:'changeCity',tooltip:'Change City'}
-			};
 			function createTabs(tabs) {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
 				for(tab in tabs) {
