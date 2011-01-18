@@ -50,7 +50,7 @@
 				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
 				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
 				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
-				'change-city':{title:'Change City Test',container:'change-city',callback:changeCity,tooltip:'Change City'}
+				'change-city':{title:'Change City',container:'change-city',callback:changeCity,tooltip:'Change City'}
 			};
 			function runJSAPI() {
 				jsapiLoaded=true;
@@ -180,8 +180,8 @@
 			function loadUpcomingEvents(cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setFutureEvents(true);
-				query.setSingleEvents(true);
+				//query.setFutureEvents(true);
+				//query.setSingleEvents(true);
 				query.setMaxResults(10);
 				var tabName = "upcoming-events";
 				calendarService.getEventsFeed(query, function(root) {handleUpcomingEvents(root,tabName);}, function(error) {handleError(error,tabName);});
@@ -189,8 +189,8 @@
 			function loadRecurringEvents(cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setFutureEvents(true);
-				query.setSingleEvents(false);
+				//query.setFutureEvents(true);
+				//query.setSingleEvents(false);
 				var tabName = "recurring-events";
 				calendarService.getEventsFeed(query, function(root) {handleRecurringEvents(root,tabName);}, function(error) {handleError(error,tabName);});
 			}			
