@@ -99,11 +99,11 @@
 					//if(cityName!="") query.setFullTextQuery(cityName);
 					//query.setFutureEvents(true);
 					//query.setSingleEvents(false);
-					calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
-					//loadRecentResults(cityName);
-					//loadRecentUpdates(cityName);
-					//loadupcomingEvents(cityName);
-					//loadRecurringEvents(cityName);
+					//calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
+					loadRecentResults(cityName);
+					loadRecentUpdates(cityName);
+					loadupcomingEvents(cityName);
+					loadRecurringEvents(cityName);
 				}
 			}
 			function handleRecentResults(root,tabName) {
