@@ -102,7 +102,7 @@
 					//calendarService.getEventsFeed(feedUri, handleSuccess, handleError);
 					loadRecentResults(cityName);
 					loadRecentUpdates(cityName);
-					loadupcomingEvents(cityName);
+					loadUpcomingEvents(cityName);
 					loadRecurringEvents(cityName);
 				}
 			}
