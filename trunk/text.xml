@@ -50,7 +50,7 @@
 				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
 				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
 				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
-				'change-city':{title:'Change City Sr',container:'change-city',callback:changeCity,tooltip:'Change City'}
+				'change-city':{title:'Change City S',container:'change-city',callback:changeCity,tooltip:'Change City'}
 			};
 			function runJSAPI() {
 				jsapiLoaded=true;
