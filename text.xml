@@ -24,44 +24,14 @@
 		    var calendarServiceLoaded = false;
 			var calendarService = null;
 			var getRecentResults = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
-			  document.getElementById(tabId).appendChild(p);
-			  //gadgets.window.adjustHeight();
 			}			
 			var getRecentUpdates = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
-			  document.getElementById(tabId).appendChild(p);
-			  //gadgets.window.adjustHeight();
 			}			
 			var getUpcomingEvents = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab " ;
-			  document.getElementById(tabId).appendChild(p);
-			  //gadgets.window.adjustHeight();
 			}			
 			var getRecurringEvents = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab ";
-			  document.getElementById(tabId).appendChild(p);
-			  //gadgets.window.adjustHeight();
 			}			
 			var changeCity = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab ";
-			  document.getElementById(tabId).appendChild(p);
-			  //gadgets.window.adjustHeight();;
 			}						
 			var runTest = function(tabId) {
 			  var p = document.createElement("p");
@@ -96,8 +66,8 @@
 				document.getElementById(tabs['recurring-events'].tabID).innerHTML = html;
 				displayHeader();
 			}
-			function handleError(error) {
-				document.getElementById(rr).innerHTML = '<h2>'+error+'</h2>';
+			function handleError(error,tabName) {
+				document.getElementById(tabs[tabName].tabID).innerHTML = '<h2>'+error+'</h2>';
 			}
 			function createTabs(tabs) {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
@@ -110,25 +80,108 @@
 				}
 				return tabSet;
 			}
+			var tabSet = null;
 			function run() {
 				if(jsapiLoaded&&pageLoaded) {
-					var tabSet = createTabs(tabs);
-				
+					if(tabSet == null) tabSet = createTabs(tabs);				
 					if(!calendarServiceLoaded) {
 						calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 						calendarServiceLoaded=true;
 					}
 					var cityName = prefs.getString("cityname");
 					displayHeader();
-					calendarService.getEventsFeed(createQuery(feedUri,cityName), handleSuccess, handleError);
+					loadRecentResults(cityName);
+					loadRecentUpdates(cityName);
+					loadupcomingEvents(cityName);
+					loadRecurringEvents(cityName);
 				}
 			}
-			function createQuery(feedUri,cityName) {
+			function handleRecentResults(root,tabName) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						html += ('<li>'+event.getTitle().getText()+'</li>');
+					}
+					html+='</ul>';
+				} else {
+					html = "<h2>no events are matched from the query</h2>";
+				}
+				document.getElementById(tabs[tabName].tabID).innerHTML = html;
+			}
+			function handleRecentUpdates(root,tabName) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						html += ('<li>'+event.getTitle().getText()+'</li>');
+					}
+					html+='</ul>';
+				} else {
+					html = "<h2>no events are matched from the query</h2>";
+				}
+				document.getElementById(tabs[tabName].tabID).innerHTML = html;
+			}
+			function handleUpcomingEvents(root,tabName) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						html += ('<li>'+event.getTitle().getText()+'</li>');
+					}
+					html+='</ul>';
+				} else {
+					html = "<h2>no events are matched from the query</h2>";
+				}
+				document.getElementById(tabs[tabName].tabID).innerHTML = html;
+			}
+			function handleRecurringEvents(root,tabName) {
+				var html = "<ul>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+						if(event.getRecurrence()) html += ('<li>'+event.getTitle().getText()+'</li>');
+					}
+					html+='</ul>';
+				} else {
+					html = "<h2>no events are matched from the query</h2>";
+				}
+				document.getElementById(tabs[tabName].tabID).innerHTML = html;
+			}
+			function loadRecentResults(cityName) {
+				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+				if(cityName!="") query.setFullTextQuery(cityName);
+				var tabName = "recent-results";
+				query.setMaxResults(10);
+				calendarService.getEventsFeed(query, function(root) {handleRecentResults(root,tabName);}, function(error) {handleError(error,tabName);});
+			}
+			function loadRecentUpdates(cityName) {
+				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+				if(cityName!="") query.setFullTextQuery(cityName);
+				query.setMaxResults(10);
+				var tabName = "recent-updates";
+				calendarService.getEventsFeed(query, function(root) {handleRecentUpdates(root,tabName);}, function(error) {handleError(error,tabName);});
+			}
+			function loadUpcomingEvents(cityName) {
+				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+				if(cityName!="") query.setFullTextQuery(cityName);
+				query.setFutureEvents(true);
+				query.setSingleEvents(true);
+				query.setMaxResults(10);
+				var tabName = "upcoming-events";
+				calendarService.getEventsFeed(query, function(root) {handleUpcomingEvents(root,tabName);}, function(error) {handleError(error,tabName);});
+			}
+			function loadRecurringEvents(cityName) {
 				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				if(cityName!="") query.setFullTextQuery(cityName);
 				query.setFutureEvents(true);
 				query.setSingleEvents(false);
-				return query;
+				var tabName = "recurring-events";
+				calendarService.getEventsFeed(query, function(root) {handleRecurringEvents(root,tabName);}, function(error) {handleError(error,tabName);});
 			}			
 			function update(form) {
 				var cityName = trim(form.cityname.value);
@@ -142,13 +195,12 @@
 				var displayCityName = "Showing Events for "+(cityName==""?"All India":cityName);
 				msg.createDismissibleMessage("Display name = "+displayCityName);
 				gadgets.window.setTitle(displayCityName);
-				//run();
+				run();
 			}
 			function displayHeader() {
-				//var element = document.getElementById('header');  
 				var cityName = prefs.getString("cityname");
 				var displayCityName = (cityName==""?"All India":cityName);
-				//element.innerHTML = "Showing events for "+displayCityName;
+				gadgets.window.setTitle("Showing events for "+displayCityName);
 			}
 			function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
 			function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
