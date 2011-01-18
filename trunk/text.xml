@@ -26,6 +26,11 @@
 			var getRecentResults = function(tabId) {
 			}			
 			var getRecentUpdates = function(tabId) {
+			  var p = document.createElement("p");
+			  // Get selected tab
+			  //var selectedTab = tabs.getSelectedTab();
+			  p.innerHTML = "This is dynamic content generated in callback for tab "+tabID;
+			  document.getElementById(tabId).appendChild(p);
 			}			
 			var getUpcomingEvents = function(tabId) {
 			}			
@@ -45,7 +50,7 @@
 				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
 				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
 				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
-				'change-city':{title:'Change City 1',container:'change-city',callback:changeCity,tooltip:'Change City'}
+				'change-city':{title:'Change City',container:'change-city',callback:changeCity,tooltip:'Change City'}
 			};
 			function runJSAPI() {
 				jsapiLoaded=true;
