@@ -26,10 +26,16 @@
 				run();
 			}     
 			function run() {
+          var statusMsg = msg.createDismissibleMessage("In Run");
+					statusMsg.style.backgroundColor = "red";
+					statusMsg.style.color = "white";
 				if(jsapiLoaded&&pageLoaded) {		
 			    var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
           var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 					var cityName = prefs.getString("cityname");
+          var statusMsg = msg.createDismissibleMessage("Cityname is "+cityName);
+					statusMsg.style.backgroundColor = "red";
+					statusMsg.style.color = "white";
 				  var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				  if(cityName!="") query.setFullTextQuery(cityName);
           query.setOrderBy("starttime");
@@ -39,6 +45,9 @@
           var startDate = new Date(today.getTime()-(30*24*3600000));
           query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate),true);
           query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today),true);
+          var statusMsg = msg.createDismissibleMessage("Sending Query");
+					statusMsg.style.backgroundColor = "red";
+					statusMsg.style.color = "white";
 				  calendarService.getEventsFeed(query, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
 				}
 			}     
