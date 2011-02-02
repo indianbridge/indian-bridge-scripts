@@ -4,35 +4,36 @@
 		description="Recent results (last month) for custom city" author="Indian Bridge" 
 		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
 		height="400" scrolling="true">
+    <Require feature="setprefs" />
   </ModulePrefs> 
 	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
 	<Content type="html">
 	<![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-		<script type="text/javascript">
+		<div id="recent-results">Loading Recent Events...</div>    
+		<script type="text/javascript">    
 			google.load("gdata", "1");
 			google.setOnLoadCallback(runJSAPI);
 			var prefs = new gadgets.Prefs();
-			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
-      msg.createDismissibleMessage("test2");
+      document.getElementById('recent-results').innerHTML = "test2";
 			function pageLoaded() {
 				pageLoaded=true;
-        msg.createDismissibleMessage("Page Loaded");
+        document.getElementById('recent-results').innerHTML = "Page Loaded";
 				run();
 			}  
 			function runJSAPI() {
-      msg.createDismissibleMessage("JSAPI loaded");
+      document.getElementById('recent-results').innerHTML = "JSAPI loaded";
 				jsapiLoaded=true;
 				run();
 			}     
 			function run() {
-          msg.createDismissibleMessage("In Run");
+          document.getElementById('recent-results').innerHTML = "In Run";
 				if(jsapiLoaded&&pageLoaded) {		
 			    var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
           var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 					var cityName = prefs.getString("cityname");
-          msg.createDismissibleMessage("Cityname is "+cityName);
+          document.getElementById('recent-results').innerHTML = "Cityname is "+cityName;
 				  var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				  if(cityName!="") query.setFullTextQuery(cityName);
           query.setOrderBy("starttime");
@@ -42,7 +43,7 @@
           var startDate = new Date(today.getTime()-(30*24*3600000));
           query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate)),true);
           query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today)),true);
-          msg.createDismissibleMessage("Sending Query");
+          document.getElementById('recent-results').innerHTML = "Sending Query";
 				  calendarService.getEventsFeed(feedUri, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
 				}
 			}     
@@ -95,7 +96,6 @@
           return regexp.test(s);
       };      
 		</script>
-		<div id="recent-results">Loading Recent Events...</div>
 		]]>
 	</Content> 
 </Module>
