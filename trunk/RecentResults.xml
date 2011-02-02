@@ -100,7 +100,7 @@
           return regexp.test(s);
       };      
 		</script>
-		<div id="recent-results">Loading...</div>
+		<div id="recent-results">Loading Events...</div>
 		]]>
 	</Content> 
 </Module>
