@@ -39,14 +39,14 @@
 				  var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				  if(cityName!="") query.setFullTextQuery(cityName);
           query.setOrderBy("starttime");
-          query.setSortOrder("desc");
+          query.setSortOrder("descending");
 				  query.setMaxResults(null);
           var today = new Date();
           var startDate = new Date(today.getTime()-(30*24*3600000));
           query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate)),true);
           query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today)),true);
           msg.createDismissibleMessage("Sending Query");
-				  calendarService.getEventsFeed(query, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
+				  calendarService.getEventsFeed(feedUri, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
 				}
 			}     
       function calcIST_(dStr) {
