@@ -98,7 +98,7 @@
           return regexp.test(s);
       };      
 		</script>
-		<div id="recent-results">Loading Events...</div>
+		<div id="recent-results">Loading Recent Events...</div>
 		]]>
 	</Content> 
 </Module>
