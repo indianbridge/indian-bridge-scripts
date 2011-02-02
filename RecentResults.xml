@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+	<ModulePrefs title="Recent Results for Custom City" title_url="" 
+		description="Recent results (last month) for custom city" author="Indian Bridge" 
+		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
+		height="400" scrolling="true">
+		<Require feature="dynamic-height"/>
+	</ModulePrefs> 
+	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
+	<Content type="html">
+	<![CDATA[
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+			google.load("gdata", "1");
+			google.setOnLoadCallback(runJSAPI);
+			var prefs = new gadgets.Prefs();
+			var msg = new gadgets.MiniMessage(__MODULE_ID__);
+			gadgets.util.registerOnLoadHandler(pageLoaded);
+			function pageLoaded() {
+				pageLoaded=true;
+				run();
+			}  
+			function runJSAPI() {
+				jsapiLoaded=true;
+				run();
+			}     
+			function run() {
+				if(jsapiLoaded&&pageLoaded) {		
+			    var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
+          var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+					var cityName = prefs.getString("cityname");
+				  var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
+				  if(cityName!="") query.setFullTextQuery(cityName);
+          query.setOrderBy("starttime");
+          query.setSortOrder("desc");
+				  query.setMaxResults(null);
+          var today = new date();
+          var startDate = new Date(today.getTime()-(30*24*3600000));
+          query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate),true);
+          query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today),true);
+				  calendarService.getEventsFeed(query, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
+				}
+			}     
+      function calcIST_(dStr) {
+        if(!dStr) return null;
+        var d = (typeof(dStr)=="string"?new Date(Date.parse(dStr)):dStr);
+        utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+        nd = new Date(utc + (3600000*5.5));
+        return nd;
+      }      
+			function handleSuccess(root,cityName) {
+				var html = "<h4>Events held in the last 30 days in "+cityName+"</h4><u1>";
+				var eventEntries = root.feed.getEntries();
+				if (eventEntries.length > 0) {
+					for (var i = 0; i < eventEntries.length; i++) {
+						var event = eventEntries[i];
+            var resultsLink = getResultsURL(event);
+            html += ('<li>'+event.getTitle().getText()+' - '+(resultsLink?'<a href="'+resultsLink+'">Results</a>':'Results not available')+'</li>');
+					}
+					html+='</ul>';
+				} else {
+					html = "<h2>No Events found in Indian Bridge Calendar!!!</h2>";
+				}
+				document.getElementById('recent-results').innerHTML = html;
+			}
+			function handleError(error) {
+				document.getElementById('recent-results').innerHTML = '<h4>Error : '+error+'</h4>';
+			}
+      function getResultsURL(event) {
+        var text = event.getContent().getText();
+	      var patternString = "(result|results)\\s*:\\s*([^\\s\\n\\t\\f\\v\\0]*)";
+	      var pattern = new RegExp(patternString,"i");
+	      var match = pattern.exec(text);
+	      if(match!=null) return (isURL(match[1])?match[1]:event.getHtmlLink().getHref());
+	      var patt1Str = "<a([^>]+)>\\s*(results|result)\\s*</a>";
+	      var patt1 = new RegExp(patt1Str,"i");
+	      var match = patt1.exec(text);
+	      if(match==null) return null;
+	      var patt2Str = "href\\s*=\\s*(\"([^\"]*)\"|'([^']*)'|([^'\">\\s]+))";
+	      var patt2 = new RegExp(patt2Str,"i");
+	      match = patt2.exec(match[1]);	
+	      if(match==null) return null;
+	      if(typeof(match[3]) != "undefined") return match[3];
+	      if(typeof(match[2]) != "undefined") return match[2];
+	      if(typeof(match[1]) != "undefined") return match[1];
+	      return null;   
+      };    
+      function isURL(s) {
+          var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+          return regexp.test(s);
+      };      
+		</script>
+		<div id="recent-results">Loading...</div>
+		]]>
+	</Content> 
+</Module>
