@@ -32,7 +32,7 @@
 			function run() {
           msg.createDismissibleMessage("In Run");
 				if(jsapiLoaded&&pageLoaded) {		
-			    var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
+			    var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
           var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 					var cityName = prefs.getString("cityname");
           msg.createDismissibleMessage("Cityname is "+cityName);
@@ -41,10 +41,10 @@
           query.setOrderBy("starttime");
           query.setSortOrder("desc");
 				  query.setMaxResults(null);
-          var today = new date();
+          var today = new Date();
           var startDate = new Date(today.getTime()-(30*24*3600000));
-          query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate),true);
-          query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today),true);
+          query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate)),true);
+          query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today)),true);
           msg.createDismissibleMessage("Sending Query");
 				  calendarService.getEventsFeed(query, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
 				}
@@ -98,7 +98,7 @@
           return regexp.test(s);
       };      
 		</script>
-		<div id="recent-results">Loading Recent Events...</div>
+		<div id="recent-results">Loading Events...</div>
 		]]>
 	</Content> 
 </Module>
