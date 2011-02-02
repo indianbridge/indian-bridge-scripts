@@ -28,23 +28,22 @@
 				run();
 			}     
 			function run() {
-          document.getElementById('recent-results').innerHTML = "In Run";
-				if(jsapiLoaded&&pageLoaded) {		
-			    var feedUri = 'http://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
-          var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+				if(jsapiLoaded&&pageLoaded) {
+				    var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
+				    var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
+				    //var cityName = "chennai";
 					var cityName = prefs.getString("cityname");
-          document.getElementById('recent-results').innerHTML = "Cityname is "+cityName;
 				  var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
 				  if(cityName!="") query.setFullTextQuery(cityName);
           query.setOrderBy("starttime");
           query.setSortOrder("descending");
+          query.setSingleEvents(true);
 				  query.setMaxResults(null);
           var today = new Date();
           var startDate = new Date(today.getTime()-(30*24*3600000));
           query.setMinimumStartTime(new google.gdata.DateTime(calcIST_(startDate)),true);
           query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(today)),true);
-          document.getElementById('recent-results').innerHTML = "Sending Query";
-				  calendarService.getEventsFeed(feedUri, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
+				  calendarService.getEventsFeed(query, function(root) {handleSuccess(root,cityName);}, function(error) {handleError(error);});
 				}
 			}     
       function calcIST_(dStr) {
@@ -55,15 +54,20 @@
         return nd;
       }      
 			function handleSuccess(root,cityName) {
-				var html = "<h4>Events held in the last 30 days in "+cityName+"</h4><u1>";
-				var eventEntries = root.feed.getEntries();
+				var html = "<h4>Events held in the last 30 days in "+cityName+"</h4>";
+                html+=makeTablePreamble_();
+                html += "<thead>";
+                html += makeTableHeader_(["Event Name", "Event Date", "Results Link"]);
+                html += "</thead><tbody>";
+ 				var eventEntries = root.feed.getEntries();
 				if (eventEntries.length > 0) {
 					for (var i = 0; i < eventEntries.length; i++) {
 						var event = eventEntries[i];
-            var resultsLink = getResultsURL(event);
-            html += ('<li>'+event.getTitle().getText()+' - '+(resultsLink?'<a href="'+resultsLink+'">Results</a>':'Results not available')+'</li>');
-					}
-					html+='</ul>';
+						var resultsLink = getResultsURL(event);
+						html += "<tr>"+makeTableCell_([event.getTitle().getText(), event.getTimes()[0].getStartTime().getDate().toDateString(), (resultsLink ? '<a href="' + resultsLink + '">Results</a>' : 'Results not available')], i)+"</tr>";
+            //html += ('<tr><td>' + event.getTitle().getText() + '</td><td>' + event.getTimes()[0].getStartTime().getDate().toDateString() + '</td><td>' + (resultsLink ? '<a href="' + resultsLink + '">Results</a>' : 'Results not available') + '</td></tr>');
+        }
+					html+='</tbody></table>';
 				} else {
 					html = "<h2>No Events found in Indian Bridge Calendar!!!</h2>";
 				}
@@ -71,13 +75,21 @@
 			}
 			function handleError(error) {
 				document.getElementById('recent-results').innerHTML = '<h4>Error : '+error+'</h4>';
-			}
+}
+
+function makeTablePreamble_() { return "<table style=\'border: 1px solid #cef;text-align: left;\'>"; }
+function makeTableHeader_(text) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableHeader_(text[i]); return retVal; } else return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;padding: 4px 5px;\'>" + text + "</th>"; }
+function makeTableCell_(text, row) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableCell_(text[i], row); return retVal; } if (row % 2 == 0) return "<td style=\'padding: 4px 5px;background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>"; else return "<td style=\'padding: 4px 5px;\'>" + text + "</td>"; }
+
       function getResultsURL(event) {
-        var text = event.getContent().getText();
+          var text = event.getContent().getText();
 	      var patternString = "(result|results)\\s*:\\s*([^\\s\\n\\t\\f\\v\\0]*)";
 	      var pattern = new RegExp(patternString,"i");
 	      var match = pattern.exec(text);
-	      if(match!=null) return (isURL(match[1])?match[1]:event.getHtmlLink().getHref());
+	      if (match != null) {
+	          var ret = (isURL(match[2]) ? match[2] : event.getHtmlLink().getHref());
+	          return ret;
+	      }
 	      var patt1Str = "<a([^>]+)>\\s*(results|result)\\s*</a>";
 	      var patt1 = new RegExp(patt1Str,"i");
 	      var match = patt1.exec(text);
