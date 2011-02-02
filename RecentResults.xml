@@ -77,9 +77,9 @@
 				document.getElementById('recent-results').innerHTML = '<h4>Error : '+error+'</h4>';
 }
 
-function makeTablePreamble_() { return "<table style=\'font-size:x-small; border: 1px solid #cef;text-align: left;\'>"; }
-function makeTableHeader_(text) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableHeader_(text[i]); return retVal; } else return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;padding: 4px 5px;\'>" + text + "</th>"; }
-function makeTableCell_(text, row) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableCell_(text[i], row); return retVal; } if (row % 2 == 0) return "<td style=\'padding: 4px 5px;background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>"; else return "<td style=\'padding: 4px 5px;\'>" + text + "</td>"; }
+function makeTablePreamble_() { return "<table style=\'border: 1px solid #cef;text-align: left;\'>"; }
+function makeTableHeader_(text) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableHeader_(text[i]); return retVal; } else return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;padding: 0;\'>" + text + "</th>"; }
+function makeTableCell_(text, row) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableCell_(text[i], row); return retVal; } if (row % 2 == 0) return "<td style=\'padding: 0;background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>"; else return "<td style=\'padding: 0;\'>" + text + "</td>"; }
 
       function getResultsURL(event) {
           var text = event.getContent().getText();
