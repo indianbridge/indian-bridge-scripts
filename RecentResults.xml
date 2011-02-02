@@ -10,6 +10,7 @@
 	<Content type="html">
 	<![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    
 		<div id="recent-results">Loading Recent Events...</div>    
 		<script type="text/javascript">    
 			google.load("gdata", "1");
@@ -64,7 +65,7 @@
 					for (var i = 0; i < eventEntries.length; i++) {
 						var event = eventEntries[i];
 						var resultsLink = getResultsURL(event);
-						html += "<tr>"+makeTableCell_([event.getTitle().getText(), event.getTimes()[0].getStartTime().getDate().toDateString(), (resultsLink ? '<a href="' + resultsLink + '">Results</a>' : 'Results not available')], i)+"</tr>";
+						html += "<tr>" + makeTableCell_([event.getTitle().getText(), event.getTimes()[0].getStartTime().getDate().toDateString(), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
             //html += ('<tr><td>' + event.getTitle().getText() + '</td><td>' + event.getTimes()[0].getStartTime().getDate().toDateString() + '</td><td>' + (resultsLink ? '<a href="' + resultsLink + '">Results</a>' : 'Results not available') + '</td></tr>');
         }
 					html+='</tbody></table>';
