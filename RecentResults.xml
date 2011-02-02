@@ -4,8 +4,6 @@
 		description="Recent results (last month) for custom city" author="Indian Bridge" 
 		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
 		height="400" scrolling="true">
-		<Require feature="dynamic-height"/>
-    <Require feature="minimessage"/>
   </ModulePrefs> 
 	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
 	<Content type="html">
@@ -14,7 +12,6 @@
 		<script type="text/javascript">
 			google.load("gdata", "1");
 			google.setOnLoadCallback(runJSAPI);
-      msg.createDismissibleMessage("Test1");
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
@@ -98,7 +95,7 @@
           return regexp.test(s);
       };      
 		</script>
-		<div id="recent-results">Loading Events...</div>
+		<div id="recent-results">Loading Recent Events...</div>
 		]]>
 	</Content> 
 </Module>
