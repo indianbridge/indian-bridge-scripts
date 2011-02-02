@@ -5,7 +5,8 @@
 		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
 		height="400" scrolling="true">
 		<Require feature="dynamic-height"/>
-	</ModulePrefs> 
+    <Require feature="minimessage"/>
+  </ModulePrefs> 
 	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
 	<Content type="html">
 	<![CDATA[
