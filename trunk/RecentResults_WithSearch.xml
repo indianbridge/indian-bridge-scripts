@@ -14,7 +14,7 @@
 			<form id="search-form" NAME="myform" ACTION="" METHOD="GET"><BR>
 				Search for Event with Name: <INPUT TYPE="text" NAME="searcheventname" VALUE="">
                 between 
-				Start Date: <INPUT id="searchstartdate" TYPE="text" NAME="searchstartdate" VALUE="">
+				Start Date: <INPUT id="searchstartdate" TYPE="text" NAME="searchstartdate" VALUE=""> and
 				End Date: <INPUT id="searchenddate" TYPE="text" NAME="searchenddate" VALUE="">
 				<INPUT TYPE="button" NAME="button" Value="Find Events" onclick="loadEventsWithDate(this.form);return false;">
 			</FORM>
