@@ -11,11 +11,11 @@
 	<![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <div style="font-size:small;" id="search-parameters">
-			<form id="search-form" NAME="myform" ACTION="" METHOD="GET"><BR>
-				Search for Event with Name: <INPUT TYPE="text" NAME="searcheventname" VALUE="">
+			<form id="search-form" name="myform" action="" method="GET">
+				Search for Event with Name: <INPUT TYPE="text" NAME="searcheventname" VALUE=""><br/>
                 between 
-				Start Date: <INPUT id="searchstartdate" TYPE="text" NAME="searchstartdate" VALUE=""> and
-				End Date: <INPUT id="searchenddate" TYPE="text" NAME="searchenddate" VALUE="">
+				Start Date: <INPUT id="searchstartdate" TYPE="text" NAME="searchstartdate" VALUE=""><br/> and
+				End Date: <INPUT id="searchenddate" TYPE="text" NAME="searchenddate" VALUE=""><br/>
 				<INPUT TYPE="button" NAME="button" Value="Find Events" onclick="loadEventsWithDate(this.form);return false;">
 			</FORM>
     </div>
@@ -28,8 +28,8 @@
 		    new JsDatePick({ useMode: 2, target: "searchenddate", dateFormat: "%M %j %Y" });
 		    var today = new Date();
 		    var startDate = new Date(today.getTime() - (30 * 24 * 3600000));
-		    document.getElementById("searchstartdate").value = dateToString(startDate);
-		    document.getElementById("searchenddate").value = dateToString(today);
+		    document.getElementById("searchstartdate").value = dateToString(calcIST_(startDate));
+		    document.getElementById("searchenddate").value = dateToString(calcIST_(today));
 		    google.load("gdata", "1");
 		    google.setOnLoadCallback(runJSAPI);
 		    var prefs = new gadgets.Prefs();
