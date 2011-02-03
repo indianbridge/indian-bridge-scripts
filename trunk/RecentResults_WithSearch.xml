@@ -19,7 +19,8 @@
 				<INPUT TYPE="button" NAME="button" Value="Find Events" onclick="document.getElementById('recent-results').innerHTML='Loading Events...';loadEventsWithDate(this.form);return false;">
 			</FORM>
     </div>
-		<div id="recent-results">Loading Recent Events...</div>   
+    <hr/>
+		<div id="recent-results">Loading Events...</div>   
     <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
     <script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>         
 		<script type="text/javascript">
@@ -86,7 +87,7 @@
 		        return nd;
 		    }
 		    function handleSuccess(root, cityName, eventName) {
-		        var html = "<h4>Events held in the last 30 days in " + cityName + "</h4>";
+		        var html = "<h4>Showing events held in " + cityName + " filtered by above query.</h4>";
 		        html += makeTablePreamble_();
 		        html += "<thead>";
 		        html += makeTableHeader_(["Event Name", "Event Date", "Results Link"]);
