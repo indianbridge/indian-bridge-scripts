@@ -9,7 +9,7 @@
 	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
 	<Content type="html">
 	<![CDATA[
-<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <div id="search-parameters">
 			<form id="search-form" NAME="myform" ACTION="" METHOD="GET"><BR>
 				Search for Event with Name: <INPUT TYPE="text" NAME="searcheventname" VALUE="">
@@ -20,14 +20,16 @@
 			</FORM>
     </div>
 		<div id="recent-results">Loading Recent Events...</div>   
-<link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
-<script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>         
+    <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
+    <script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>         
 		<script type="text/javascript">
-		    new JsDatePick({ useMode: 2, target: "searchstartdate", dateFormat: "%Y-%m-%d" });
+		    var months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+		    new JsDatePick({ useMode: 2, target: "searchstartdate", dateFormat: "%M %j %Y" });
+		    new JsDatePick({ useMode: 2, target: "searchenddate", dateFormat: "%M %j %Y" });
 		    var today = new Date();
 		    var startDate = new Date(today.getTime() - (30 * 24 * 3600000));
-		    //document.getElementById("searchstartdate").value = startDate.toDateString();
-		    //document.getElementById("searchenddate").value = today.toDateString();
+		    document.getElementById("searchstartdate").value = dateToString(startDate);
+		    document.getElementById("searchenddate").value = dateToString(today);
 		    google.load("gdata", "1");
 		    google.setOnLoadCallback(runJSAPI);
 		    var prefs = new gadgets.Prefs();
@@ -38,7 +40,8 @@
 		        if (!jsapiLoaded || !pageLoaded) return;
                 loadEvents(document.getElementById('search-form'));
 
-		    }
+            }
+            function dateToString(date) {return "" + months[date.getMonth()] + " " + date.getDate() + " " + date.getFullYear();};
 		    function loadEvents(form) {
 		        var eventName = form.searcheventname.value;
 		        var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
@@ -101,7 +104,12 @@
 		                var event = filteredEvents[i];
 		                var re = new RegExp(eventName, "i");
 		                var resultsLink = getResultsURL(event);
-		                html += "<tr>" + makeTableCell_([event.getTitle().getText(), event.getTimes()[0].getStartTime().getDate().toDateString(), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
+                    var startDate = event.getTimes()[0].getStartTime().getDate();
+                    var endDate = event.getTimes()[0].getEndTime().getDate();
+                    if(dateToString(startDate) == dateToString(endDate)) 
+		                  html += "<tr>" + makeTableCell_([event.getTitle().getText(), dateToString(startDate), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
+                    else
+		                  html += "<tr>" + makeTableCell_([event.getTitle().getText(), dateToString(startDate)+" - "+dateToString(endDate), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
 		            }
 		            html += '</tbody></table>';
 		        } else {
