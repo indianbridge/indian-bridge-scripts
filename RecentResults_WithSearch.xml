@@ -10,7 +10,7 @@
 	<Content type="html">
 	<![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <div id="search-parameters">
+    <div style="font-size:small;" id="search-parameters">
 			<form id="search-form" NAME="myform" ACTION="" METHOD="GET"><BR>
 				Search for Event with Name: <INPUT TYPE="text" NAME="searcheventname" VALUE="">
                 between 
