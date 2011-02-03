@@ -23,7 +23,7 @@
     <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
     <script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>         
 		<script type="text/javascript">
-		    var months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+		    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 		    new JsDatePick({ useMode: 2, target: "searchstartdate", dateFormat: "%M %j %Y" });
 		    new JsDatePick({ useMode: 2, target: "searchenddate", dateFormat: "%M %j %Y" });
 		    var today = new Date();
@@ -118,7 +118,7 @@
 		        document.getElementById('recent-results').innerHTML = html;
 		    }
 		    function handleError(error) { document.getElementById('recent-results').innerHTML = '<h4>' + error + '</h4>'; }
-		    function makeTablePreamble_() { return "<table style=\'font-size:small;border: 1px solid #cef;text-align: left;\'>"; }
+		    function makeTablePreamble_() { return "<table style=\'font-size:small;width:100%;border: 1px solid #cef;text-align: left;\'>"; }
 		    function makeTableHeader_(text) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableHeader_(text[i]); return retVal; } else return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;padding: 0;\'>" + text + "</th>"; }
 		    function makeTableCell_(text, row) { if (typeof (text) == "object") { var retVal = ""; for (var i = 0; i < text.length; ++i) retVal += makeTableCell_(text[i], row); return retVal; } if (row % 2 == 0) return "<td style=\'padding: 0;background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>"; else return "<td style=\'padding: 0;\'>" + text + "</td>"; }
 		    function getResultsURL(event) {
