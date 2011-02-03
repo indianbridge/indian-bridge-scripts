@@ -16,7 +16,7 @@
                 between 
 				Start Date: <INPUT id="searchstartdate" TYPE="text" NAME="searchstartdate" VALUE=""><br/> and
 				End Date: <INPUT id="searchenddate" TYPE="text" NAME="searchenddate" VALUE=""><br/>
-				<INPUT TYPE="button" NAME="button" Value="Find Events" onclick="loadEventsWithDate(this.form);return false;">
+				<INPUT TYPE="button" NAME="button" Value="Find Events" onclick="document.getElementById('recent-results').innerHTML="Loading Events...";loadEventsWithDate(this.form);return false;">
 			</FORM>
     </div>
 		<div id="recent-results">Loading Recent Events...</div>   
