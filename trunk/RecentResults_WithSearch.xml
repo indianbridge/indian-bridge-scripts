@@ -87,7 +87,7 @@
 		        return nd;
 		    }
 		    function handleSuccess(root, cityName, eventName) {
-		        var html = "<h4>Showing events held in " + cityName + " filtered by above query.</h4>";
+		        var html = "<h4>Showing events held in " + (cityName?cityName:"India") + " filtered by above query.</h4>";
 		        html += makeTablePreamble_();
 		        html += "<thead>";
 		        html += makeTableHeader_(["Event Name", "Event Date", "Results Link"]);
