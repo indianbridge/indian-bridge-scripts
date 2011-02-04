@@ -10,8 +10,6 @@
   <Content type="html">
     <![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <div style="font-size:small;" id="events-header">Last 10 Events held in</div>
-    <hr/>
 		<div id="events">Loading Events...</div>        
 	  <script type="text/javascript">
 	    gadgets.util.registerOnLoadHandler(init);
@@ -42,7 +40,7 @@
 		    calendarService.getEventsFeed(query, function (root) { handleSuccess(root, cityName); }, function (error) { handleError(error); });
 		}
 		function handleSuccess(root, cityName) {
-		    var html = "<div style='font-size:small'>Showing events held in " + (cityName ? cityName : "India") + " filtered by above query.</div>";
+		    var html = "";
 		    html += makeTablePreamble_();
 		    html += "<thead>";
 		    html += makeTableHeader_(["Event Name", "Event Date", "Event Location"]);
