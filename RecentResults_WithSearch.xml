@@ -70,8 +70,7 @@
 			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
 		}
 		function handleSuccess(root, cityName, eventName) {
-		    var html = "<h4>Showing events held in " + (cityName ? cityName : "India") + " filtered by above query.</h4>";
-		    html += "<h4>Click an event name below to continue to Results Submission for that event or search for more events using form above.</h4>";
+		    var html = "<div style='font-size:small'>Showing events held in " + (cityName ? cityName : "India") + " filtered by above query.</div>";
 		    html += makeTablePreamble_();
 		    html += "<thead>";
 		    html += makeTableHeader_(["Event Name", "Event Date", "Event Location"]);
