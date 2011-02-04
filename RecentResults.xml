@@ -7,6 +7,7 @@
     <Require feature="setprefs" />
   </ModulePrefs>
   <UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
+  <UserPref name="linktodetails" display_name="Page where more events can be searched for" default_value="" />
   <Content type="html">
     <![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -66,6 +67,8 @@
 		    } else {
 		        html = "<h2>No Events found matching selected criteria in Indian Bridge Calendar!!!</h2>";
 		    }
+        var linkToMore = prefs.getString("linktodetails");
+        if(linkToMore) html+="<a href='"+linkToMore+"'>View More Events & Results</a>";
 		    document.getElementById('events').innerHTML = html;
 		}
 		function getDateString(event) {
