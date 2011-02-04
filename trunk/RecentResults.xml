@@ -12,9 +12,7 @@
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <div style="font-size:small;" id="events-header">Last 10 Events held in</div>
     <hr/>
-		<div id="events">Loading Events...</div>   
-    <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
-    <script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>       
+		<div id="events">Loading Events...</div>        
 	  <script type="text/javascript">
 	    gadgets.util.registerOnLoadHandler(init);
 	    function init() {
@@ -22,9 +20,7 @@
           prefs = new gadgets.Prefs();
           var cityName = prefs.getString("cityname");
 	        var startDate = new Date(today.getTime() - (30 * 24 * 3600000));
-          document.getElementById("events-header").innerHtml = "Last 10 Events held in "+cityName;
-	        new JsDatePick({ useMode: 2, target: "searchstartdate", dateFormat: "%M %j %Y" });
-	        new JsDatePick({ useMode: 2, target: "searchenddate", dateFormat: "%M %j %Y" });
+          document.getElementById("events-header").innerHtml = "Last 10 Events held in "+(cityName?cityName:"India");
 	    }
 	    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 	    function dateToString(date) { return "" + months[date.getMonth()] + " " + date.getDate() + " " + date.getFullYear(); };
