@@ -68,7 +68,8 @@
 		        html = "<h2>No Events found matching selected criteria in Indian Bridge Calendar!!!</h2>";
 		    }
         var linkToMore = prefs.getString("linktodetails");
-        if(linkToMore) html+="<a onclick=\"self.parent.location.href='"+linkToMore+"'\" href="">View More Events & Results</a>";
+        var linkStr = "self.parent.location.href='"+linkToMore+"'";
+        if(linkToMore) html+="<a onclick='"+linkStr+"' href=''>View More Events & Results</a>";
 		    document.getElementById('events').innerHTML = html;
 		}
 		function getDateString(event) {
