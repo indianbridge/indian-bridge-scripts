@@ -33,12 +33,11 @@
 		    var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
 		    var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
 		    var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-		    if (cityName) query.setFullTextQuery(ciytName.toLowerCase());
+		    if (cityName) query.setFullTextQuery(cityName.toLowerCase());
 		    query.setOrderBy("starttime");
 		    query.setSortOrder("descending");
 		    query.setSingleEvents(true);
 		    query.setMaxResults(10);
-		    var sd = new google.gdata.DateTime(endDate, true);
 		    if(endDate) query.setMaximumStartTime(new google.gdata.DateTime(calcIST_(endDate)));
 		    calendarService.getEventsFeed(query, function (root) { handleSuccess(root, cityName); }, function (error) { handleError(error); });
 		}

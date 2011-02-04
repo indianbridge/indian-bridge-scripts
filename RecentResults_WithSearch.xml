@@ -62,7 +62,6 @@
 		    query.setSortOrder("descending");
 		    query.setSingleEvents(true);
 		    query.setMaxResults(10);
-		    var sd = new google.gdata.DateTime(endDate, true);
 		    if (startDate) query.setMinimumStartTime(new google.gdata.DateTime(calcLocalDate_(startDate)));
 		    if(endDate) query.setMaximumStartTime(new google.gdata.DateTime(calcLocalDate_(endDate)));
 		    calendarService.getEventsFeed(query, function (root) { handleSuccess(root, cityName, eventName); }, function (error) { handleError(error); });
