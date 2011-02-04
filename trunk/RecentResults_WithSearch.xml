@@ -14,7 +14,7 @@
 			    <form id="search-form" name="myform" action="" method="get">
                     <table>
                         <thead>
-                            <tr><th colspan="2">Search for Events using following parameters (Specify any or all of these parameters. Note that search will return first 10 matches only)</th></tr>
+                            <tr><th colspan="2">Search for Events using following parameters (Specify any or all of these parameters. Note that search will return first 10 matches only sorted in descending order of start date.)</th></tr>
                         </thead>
                         <tbody>
                             <tr><td>Event Name</td><td><input id="searcheventname" type="text" name="searcheventname" value=""/></td></tr>
@@ -34,7 +34,7 @@
 	    function init() {
 	        var today = new Date();
           prefs = new gadgets.Prefs();
-	        var startDate = new Date(today.getTime() - (7 * 24 * 3600000));
+	        var startDate = new Date(today.getTime() - (30 * 24 * 3600000));
 	        document.getElementById("searchcityname").value = prefs.getString("cityname");;
 	        document.getElementById("searchstartdate").value = dateToString(calcIST_(startDate));
 	        document.getElementById("searchenddate").value = dateToString(calcIST_(today));
