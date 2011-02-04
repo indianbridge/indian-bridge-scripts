@@ -70,7 +70,7 @@
 		    var html = "<div style='font-size:small'>Showing events held in " + (cityName ? cityName : "India") + " filtered by above query.</div>";
 		    html += makeTablePreamble_();
 		    html += "<thead>";
-		    html += makeTableHeader_(["Event Name", "Event Date", "Event Location"]);
+		    html += makeTableHeader_(["Event Name", "Event Date", "Results Link"]);
 		    html += "</thead><tbody>";
 		    var eventEntries = root.feed.getEntries();
 		    filteredEvents = new Array();

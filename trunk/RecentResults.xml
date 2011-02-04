@@ -44,7 +44,7 @@
 		    var html = "";
 		    html += makeTablePreamble_();
 		    html += "<thead>";
-		    html += makeTableHeader_(["Event Name", "Event Date", "Event Location"]);
+		    html += makeTableHeader_(["Event Name", "Event Date", "Results Link"]);
 		    html += "</thead><tbody>";
 		    var eventEntries = root.feed.getEntries();
 		    filteredEvents = new Array();
