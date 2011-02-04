@@ -11,20 +11,19 @@
 	<![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
     <div style="font-size:small;" id="search-parameters">
-			    <form id="search-form" name="myform" action="" method="get">
-                    <table>
-                        <thead>
-                            <tr><th colspan="2">Search for Events using following parameters (Specify any or all of these parameters. Note that search will return first 10 matches only sorted in descending order of start date.)</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Event Name</td><td><input id="searcheventname" type="text" name="searcheventname" value=""/></td></tr>
-                            <tr><td>City Name</td><td><input id="searchcityname" type="text" name="searchcityname" value=""/></td></tr>
-                            <tr><td>Start Date</td><td><input id="searchstartdate" type="text" name="searchstartdate" value=""/></td></tr>
-                            <tr><td>End Date</td><td><input id="searchenddate" type="text" name="searchenddate" value="" /></td></tr>
-                            <tr><td colspan="2"><input type="button" name="button" value="Find Events" onclick="fetchEvents();return false;"/></td></tr>
-                        </tbody>
-                    </table>			    
-			    </form>    </div>
+    <div>Search for Events using following parameters (Specify any or all of these parameters. Note that search will return first 10 matches only sorted in descending order of start date.)</div>
+	    <form id="search-form" name="myform" action="" method="get">
+        <table>
+            <tbody>
+                <tr><td>Event Name</td><td><input id="searcheventname" type="text" name="searcheventname" value=""/></td></tr>
+                <tr><td>City Name</td><td><input id="searchcityname" type="text" name="searchcityname" value=""/></td></tr>
+                <tr><td>Start Date</td><td><input id="searchstartdate" type="text" name="searchstartdate" value=""/></td></tr>
+                <tr><td>End Date</td><td><input id="searchenddate" type="text" name="searchenddate" value="" /></td></tr>
+                <tr><td colspan="2"><input type="button" name="button" value="Find Events" onclick="fetchEvents();return false;"/></td></tr>
+            </tbody>
+        </table>			    
+			</form>    
+    </div>
     <hr/>
 		<div id="events">Loading Events...</div>   
     <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
