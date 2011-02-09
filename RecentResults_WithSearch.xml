@@ -148,9 +148,9 @@
 		        var patt2 = new RegExp(patt2Str, "i");
 		        match = patt2.exec(match[1]);
 		        if (match == null) return null;
-		        if (typeof (match[3]) != "undefined") return match[3];
-		        if (typeof (match[2]) != "undefined") return match[2];
-		        if (typeof (match[1]) != "undefined") return match[1];
+		        if (typeof (match[3]) != "undefined" && isURL(match[3])) return match[3];
+		        if (typeof (match[2]) != "undefined" && isURL(match[2])) return match[2];
+		        if (typeof (match[1]) != "undefined" && isURL(match[1])) return match[1];
 		        return null;
 		    };
 		    function isURL(s) {
