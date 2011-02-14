@@ -25,7 +25,14 @@
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
       function pageLoaded() {pageLoadedFlag=true;run();}
-			function run() { if(googleLoadedFlag&&pageLoadedFlag) {createTabs();runRegularEvents(); runRecentResults(); runUpcomingEvents();} }
+			function run() { 
+        if(googleLoadedFlag&&pageLoadedFlag) {
+          //createTabs();
+          runRegularEvents(); 
+          runRecentResults(); 
+          runUpcomingEvents();
+        } 
+      }
       function createTabs() {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
         tabSet.addTab("Recent Results", {contentContainer: "recent-results",tooltip: "Recent Results"});        
@@ -81,9 +88,9 @@
 			}     
       
 		</script>
-		<div id="recent-results" style="display:none">Loading Events...</div>
-		<div id="regular-events" style="display:none">Loading Events...</div>
-		<div id="upcoming-events" style="display:none">Loading Events...</div>
+		<div id="recent-results">Loading Events...</div>
+		<div id="regular-events">Loading Events...</div>
+		<div id="upcoming-events">Loading Events...</div>
 		]]>
   </Content>
 </Module>
