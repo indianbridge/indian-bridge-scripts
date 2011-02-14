@@ -17,7 +17,7 @@
 		<script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/utilities.js"></script>
 		<script type="text/javascript">
 			google.load("gdata", "1");
-      var googleLoadedFlag = false;
+      var googleLoadedFlag = false; 
       var pageLoadedFlag = false;
 			google.setOnLoadCallback(googleLoaded);
       function googleLoaded() {googleLoadedFlag=true;run();}
