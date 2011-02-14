@@ -30,7 +30,7 @@
           runRegularEvents(); 
           runRecentResults(); 
           runUpcomingEvents();
-          createTabs();
+          //createTabs();
           var statusMsg = msg.createDismissibleMessage("query = "+document.location.search);
         } 
       }
