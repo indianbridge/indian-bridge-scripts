@@ -14,7 +14,7 @@
   <Content type="html">
     <![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-		<script type="text/javascript" src="utilities.js"></script>
+		<script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/utilities.js"></script>
 		<script type="text/javascript">
 			google.load("gdata", "1");
       var googleLoadedFlag = false;
