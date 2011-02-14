@@ -27,10 +27,10 @@
       function pageLoaded() {pageLoadedFlag=true;run();}
 			function run() { 
         if(googleLoadedFlag&&pageLoadedFlag) {
-          //createTabs();
-          //runRegularEvents(); 
+          createTabs();
+          runRegularEvents(); 
           runRecentResults(); 
-          //runUpcomingEvents();
+          runUpcomingEvents();
         } 
       }
       function createTabs() {
@@ -88,9 +88,9 @@
 			}     
       
 		</script>
-		<div id="recent-results">Loading Events ...</div>
-		<div id="regular-events">Loading Events ...</div>
-		<div id="upcoming-events">Loading Events ...</div>
+		<div id="recent-results">Loading Events</div>
+		<div id="regular-events">Loading Events</div>
+		<div id="upcoming-events">Loading Events</div>
 		]]>
   </Content>
 </Module>
