@@ -14,7 +14,7 @@
   <Content type="html">
     <![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-		<script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/utilities.js"></script>
+		<script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/Utilities.js"></script>
 		<script type="text/javascript">
 			google.load("gdata", "1");
       var googleLoadedFlag = false; 
@@ -28,9 +28,9 @@
 			function run() { 
         if(googleLoadedFlag&&pageLoadedFlag) {
           //createTabs();
-          runRegularEvents(); 
+          //runRegularEvents(); 
           runRecentResults(); 
-          runUpcomingEvents();
+          //runUpcomingEvents();
         } 
       }
       function createTabs() {
@@ -88,9 +88,9 @@
 			}     
       
 		</script>
-		<div id="recent-results">Loading Events...</div>
-		<div id="regular-events">Loading Events...</div>
-		<div id="upcoming-events">Loading Events...</div>
+		<div id="recent-results">Loading Events ...</div>
+		<div id="regular-events">Loading Events ...</div>
+		<div id="upcoming-events">Loading Events ...</div>
 		]]>
   </Content>
 </Module>
