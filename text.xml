@@ -1,226 +1,89 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Module>
-	<ModulePrefs title="Custom City Calendar" title_url="" 
-		description="Customized calendar for selected city" author="Indian Bridge" 
+  <ModulePrefs title="Custom City Calendar" title_url=""
+		description="Customized calendar for selected city" author="Indian Bridge"
 		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
 		height="400" scrolling="true">
-		<Require feature="tabs" />
-		<Require feature="setprefs" />
-		<Require feature="dynamic-height"/>
-		<Require feature="minimessage"/>
-	</ModulePrefs> 
-	<UserPref name="cityname" display_name="Customize for City" default_value="" />
-	<UserPref name="selectedTab" datatype="hidden"/>
-	<Content type="html">
-	<![CDATA[
+    <Require feature="tabs" />
+    <Require feature="setprefs" />
+    <Require feature="dynamic-height"/>
+    <Require feature="minimessage"/>
+  </ModulePrefs>
+  <UserPref name="cityname" display_name="Customize for City" default_value="" />
+  <UserPref name="selectedTab" datatype="hidden"/>
+  <Content type="html">
+    <![CDATA[
 		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="utilities.js"></script>
 		<script type="text/javascript">
 			google.load("gdata", "1");
-			google.setOnLoadCallback(runJSAPI);
+      var googleLoadedFlag = false;
+      var pageLoadedFlag = false;
+			google.setOnLoadCallback(googleLoaded);
+      function googleLoaded() {googleLoadedFlag=true;run();}
 			var prefs = new gadgets.Prefs();
 			var msg = new gadgets.MiniMessage(__MODULE_ID__);
 			gadgets.util.registerOnLoadHandler(pageLoaded);
-			var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';	
-		    var calendarServiceLoaded = false;
-			var calendarService = null;
-			var getRecentResults = function(tabId) {
-			}			
-			var getRecentUpdates = function(tabId) {
-			}			
-			var getUpcomingEvents = function(tabId) {
-			}			
-			var getRecurringEvents = function(tabId) {
-			}			
-			var changeCity = function(tabId) {
-			}						
-			var runTest = function(tabId) {
-			  var p = document.createElement("p");
-			  // Get selected tab
-			  //var selectedTab = tabs.getSelectedTab();
-			  p.innerHTML = "This is dynamic content generated in callback for tab ";
-			  document.getElementById(tabId).appendChild(p);
-			}						
-			var tabs = {
-				'recent-results':{title:'Recent Results',container:'recent-results',callback:getRecentResults,tooltip:'Recent Results'},
-				'recent-updates':{title:'Recent Updates',container:'recent-updates',callback:getRecentUpdates,tooltip:'Recent Updates'},
-				'upcoming-events':{title:'Upcoming Events',container:'upcoming-events',callback:getUpcomingEvents,tooltip:'Upcoming Events'},
-				'recurring-events':{title:'Recurring Events',container:'recurring-events',callback:getRecurringEvents,tooltip:'Recurring Events'},
-				'change-city':{title:'Change City Vijay',container:'change-city',callback:changeCity,tooltip:'Change City'}
-			};
-			function runJSAPI() {
-				jsapiLoaded=true;
-				run();
-			}
-			function handleSuccess(root) {
-				var html = "<ul>";
-				var eventEntries = root.feed.getEntries();
-				if (eventEntries.length > 0) {
-					for (var i = 0; i < eventEntries.length; i++) {
-						var event = eventEntries[i];
-						if(event.getRecurrence()) html += ('<li>'+event.getTitle().getText()+'</li>');
-					}
-					html+='</ul>';
-				} else {
-					html = "<h2>no events are matched from the query</h2>";
-				}
-				document.getElementById(tabs['recurring-events'].tabID).innerHTML = html;
-				displayHeader();
-			}
-			function handleError(error,tabName) {
-				document.getElementById(tabs[tabName].tabID).innerHTML = '<h2>'+error+'</h2>';
-			}
-			function createTabs(tabs) {
+      function pageLoaded() {pageLoadedFlag=true;run();}
+			function run() { if(googleLoadedFlag&&pageLoadedFlag) {createTabs();runRegularEvents(); runRecentResults(); runUpcomingEvents();} }
+      function createTabs() {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
-				for(tab in tabs) {
-					tabs[tab].tabID = tabSet.addTab(tabs[tab].title, {
-						contentContainer: document.getElementById(tabs[tab].container),
-						callback: tabs[tab].callback,
-						tooltip: tabs[tab].tooltip
-					});
-				}
-				return tabSet;
+        tabSet.addTab("Recent Results", {contentContainer: "recent-results",tooltip: "Recent Results"});        
+        tabSet.addTab("Regular Events", {contentContainer: "regular-events",tooltip: "Regular Events"});        
+        tabSet.addTab("Upcoming Events", {contentContainer: "upcoming-events",tooltip: "Upcoming Events"});        
+      }
+			function runRegularEvents() {
+			    var queryParameters = {};
+			    var otherParameters = {};
+			    otherParameters.cityName = "chennai";
+			    otherParameters.divId = "regular-events";
+			    otherParameters.recurring = true;
+			    queryParameters.OrderBy = "starttime";
+			    queryParameters.SortOrder = "ascending";
+			    queryParameters.SingleEvents = false;
+			    queryParameters.MaxResults = 30;
+			    var today = new Date();
+			    var endDate = new Date(today.getTime() + (31 * 24 * 3600000));
+			    queryParameters.MinimumStartTime = convertToGoogleDateTime(today);
+			    queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
+			    otherParameters.columns = ["Event Name","Recurrence"];
+			    otherParameters.title = "Regular Events in India";
+			    getEvents(queryParameters, otherParameters);
 			}
-			var tabSet = null;
-			function run() {
-				if(jsapiLoaded&&pageLoaded) {
-					if(tabSet == null) tabSet = createTabs(tabs);				
-					if(!calendarServiceLoaded) {
-						calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-						calendarServiceLoaded=true;
-					}
-					var cityName = prefs.getString("cityname");
-					displayHeader();
-					loadRecentResults(cityName);
-					loadRecentUpdates(cityName);
-					loadUpcomingEvents(cityName);
-					loadRecurringEvents(cityName);
-				}
-			}
-			function handleRecentResults(root,tabName) {
-				var html = "<ul>";
-				var eventEntries = root.feed.getEntries();
-				if (eventEntries.length > 0) {
-					for (var i = 0; i < eventEntries.length; i++) {
-						var event = eventEntries[i];
-						html += ('<li>'+event.getTitle().getText()+'</li>');
-					}
-					html+='</ul>';
-				} else {
-					html = "<h2>no events are matched from the query</h2>";
-				}
-				document.getElementById(tabs[tabName].tabID).innerHTML = html;
-			}
-			function handleRecentUpdates(root,tabName) {
-				var html = "<ul>";
-				var eventEntries = root.feed.getEntries();
-				if (eventEntries.length > 0) {
-					for (var i = 0; i < eventEntries.length; i++) {
-						var event = eventEntries[i];
-						html += ('<li>'+event.getTitle().getText()+'</li>');
-					}
-					html+='</ul>';
-				} else {
-					html = "<h2>no events are matched from the query</h2>";
-				}
-				document.getElementById(tabs[tabName].tabID).innerHTML = html;
-			}
-			function handleUpcomingEvents(root,tabName) {
-				var html = "<ul>";
-				var eventEntries = root.feed.getEntries();
-				if (eventEntries.length > 0) {
-					for (var i = 0; i < eventEntries.length; i++) {
-						var event = eventEntries[i];
-						html += ('<li>'+event.getTitle().getText()+'</li>');
-					}
-					html+='</ul>';
-				} else {
-					html = "<h2>no events are matched from the query</h2>";
-				}
-				document.getElementById(tabs[tabName].tabID).innerHTML = html;
-			}
-			function handleRecurringEvents(root,tabName) {
-				var html = "<ul>";
-				var eventEntries = root.feed.getEntries();
-				if (eventEntries.length > 0) {
-					for (var i = 0; i < eventEntries.length; i++) {
-						var event = eventEntries[i];
-						if(event.getRecurrence()) html += ('<li>'+event.getTitle().getText()+'</li>');
-					}
-					html+='</ul>';
-				} else {
-					html = "<h2>no events are matched from the query</h2>";
-				}
-				document.getElementById(tabs[tabName].tabID).innerHTML = html;
-			}
-			function loadRecentResults(cityName) {
-				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-				if(cityName!="") query.setFullTextQuery(cityName);
-				var tabName = "recent-results";
-				query.setMaxResults(10);
-				calendarService.getEventsFeed(query, function(root) {handleRecentResults(root,tabName);}, function(error) {handleError(error,tabName);});
-			}
-			function loadRecentUpdates(cityName) {
-				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setMaxResults(10);
-				var tabName = "recent-updates";
-				calendarService.getEventsFeed(query, function(root) {handleRecentUpdates(root,tabName);}, function(error) {handleError(error,tabName);});
-			}
-			function loadUpcomingEvents(cityName) {
-				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setFutureEvents(true);
-				query.setOrderBy("starttime");
-				query.setMaxResults(10);
-				var tabName = "upcoming-events";
-				calendarService.getEventsFeed(query, function(root) {handleUpcomingEvents(root,tabName);}, function(error) {handleError(error,tabName);});
-			}
-			function loadRecurringEvents(cityName) {
-				var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-				if(cityName!="") query.setFullTextQuery(cityName);
-				query.setFutureEvents(true);
-				query.setSingleEvents(false);
-				var tabName = "recurring-events";
-				calendarService.getEventsFeed(query, function(root) {handleRecurringEvents(root,tabName);}, function(error) {handleError(error,tabName);});
-			}			
-			function update(form) {
-				var cityName = trim(form.cityname.value);
-				if(cityName!="" && cityName.length<4) {
-					var statusMsg = msg.createDismissibleMessage("Please specify at least 4 characters for the cityname or leave blank for all india");
-					statusMsg.style.backgroundColor = "red";
-					statusMsg.style.color = "white";
-					return;
-				}
-				prefs.set("cityname",cityName);
-				var displayCityName = "Showing Events for "+(cityName==""?"All India":cityName);
-				msg.createDismissibleMessage("Display name = "+displayCityName);
-				gadgets.window.setTitle(displayCityName);
-				run();
-			}
-			function displayHeader() {
-				var cityName = prefs.getString("cityname");
-				var displayCityName = (cityName==""?"All India":cityName);
-				//gadgets.window.setTitle("Showing events for "+displayCityName);
-			}
-			function trim(stringToTrim) {return stringToTrim.replace(/^\s+|\s+$/g,"");}
-			function ltrim(stringToTrim) {return stringToTrim.replace(/^\s+/,"");}
-			function rtrim(stringToTrim) {return stringToTrim.replace(/\s+$/,"");}
-			function pageLoaded() {
-				pageLoaded=true;
-				run();
-			}
+			function runRecentResults() {
+          var queryParameters = {};
+          var otherParameters = {};
+          otherParameters.divId = "recent-results";
+          queryParameters.MaxResults = 10;
+          queryParameters.OrderBy = "starttime";
+          queryParameters.SortOrder = "ascending";
+          var endDate = new Date();
+          var startDate = new Date(endDate.getTime() - (31 * 24 * 3600000));
+          queryParameters.MinimumStartTime = convertToGoogleDateTime(startDate);
+          queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
+          queryParameters.SingleEvents = true;
+          otherParameters.columns = ["Event Name", "Event Date", "Results Link"];
+          otherParameters.title = "Recent Results in Chennai";
+          getEvents(queryParameters, otherParameters);
+      }
+			function runUpcomingEvents() {
+			    var queryParameters = {};
+			    var otherParameters = {};
+			    otherParameters.divId = "upcoming-events";
+			    queryParameters.MaxResults = 10;
+			    queryParameters.OrderBy = "lastmodified";
+			    queryParameters.SortOrder = "descending";
+			    queryParameters.SingleEvents = true;
+			    queryParameters.FutureEvents = true;
+			    otherParameters.columns = ["Event Name", "Event Date"];
+			    otherParameters.title = "Upcoming Events in Chennai";
+			    getEvents(queryParameters, otherParameters);
+			}     
+      
 		</script>
-		<div id="recent-results" style="display:none">Loading...</div>
-		<div id="recent-updates" style="display:none">Loading...</div>
-		<div id="upcoming-events" style="display:none">Loading...</div>
-		<div id="recurring-events" style="display:none">Loading...</div>		
-		<div id="test" style="display:none">Loading...</div>
-		<div id="change-city" style="display:none">
-			<FORM NAME="myform" ACTION="" METHOD="GET"><BR>
-				Select City (Blank for all India): <INPUT TYPE="text" NAME="cityname" VALUE="">
-				<INPUT TYPE="button" NAME="button" Value="Customize" onclick="update(this.form);return false;">
-			</FORM>
-		</div>
+		<div id="recent-results" style="display:none">Loading Events...</div>
+		<div id="regular-events" style="display:none">Loading Events...</div>
+		<div id="upcoming-events" style="display:none">Loading Events...</div>
 		]]>
-	</Content> 
+  </Content>
 </Module>
