@@ -1,0 +1,57 @@
+<html>
+<head>
+    <style type='text/css'>.hide{display:none;visibility:hidden;} .show{display:block;visibility:visible;}</style>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("gdata", "2");
+        google.setOnLoadCallback(run);
+        function hidediv(id) {
+            if (document.getElementById) { // DOM3 = IE5, NS6
+                document.getElementById(id).style.display = 'none';
+                document.getElementById(id).style.visibility = 'hidden';
+            }
+            else {
+                if (document.layers) { // Netscape 4
+                    document.id.display = 'none';
+                    document.id.visibility = 'hidden';
+                }
+                else { // IE 4
+                    document.all.id.style.display = 'none';
+                    document.all.id.style.visibility = 'hidden';
+                }
+            }
+        }
+        function showdiv(id) {
+            if (document.getElementById) { // DOM3 = IE5, NS6
+                document.getElementById(id).style.display = 'block';
+                document.getElementById(id).style.visibility = 'visible';
+            }
+            else {
+                if (document.layers) { // Netscape 4
+                    document.id.display = 'block';
+                    document.id.visibility = 'visible';
+                }
+                else { // IE 4
+                    document.all.id.style.display = 'block';
+                    document.all.id.style.visibility = 'visible';
+                }
+            }
+        }
+        function run() {
+            showdiv("login-button");
+            document.getElementById("status").innerHTML = "Waiting to Login...";
+        }
+        function doLogin() {
+            document.getElementById("status").innerHTML = "Checking if Logged in...";
+            var scope = "http://www.google.com/calendar/feeds/indianbridge/private/full";
+            var token = google.accounts.user.checkLogin(scope);
+            document.getElementById("status").innerHTML = "Login Status is : " + token;
+        }
+    </script>
+    </head>
+<body>
+<div id="status">Loading Google Data</div>
+<button id="login-button" style="display:none;visibility:hidden;" onclick="doLogin();return false;">Login</button>
+</body>
+</html>
+
