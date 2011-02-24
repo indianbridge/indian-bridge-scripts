@@ -44,7 +44,7 @@
         function doLogin() {
             document.getElementById("status").innerHTML = "Checking if Logged in...";
             var scope = "http://www.google.com/calendar/feeds/indianbridge/private/full";
-            var token = google.accounts.user.checkLogin(scope);
+            var token = google.accounts.user.login(scope);
             document.getElementById("status").innerHTML = "Login Status is : " + token;
         }
     </script>
