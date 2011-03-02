@@ -44,6 +44,7 @@
 			    var queryParameters = {};
 			    var otherParameters = {};
 			    otherParameters.cityName = cityName;
+          queryParameters.FullTextQuery = cityName;
 			    otherParameters.divId = "regular-events";
 			    otherParameters.recurring = true;
 			    queryParameters.OrderBy = "starttime";
@@ -62,10 +63,11 @@
           var queryParameters = {};
           var otherParameters = {};
           otherParameters.cityName = cityName;
+          queryParameters.FullTextQuery = cityName;
           otherParameters.divId = "recent-results";
           queryParameters.MaxResults = 10;
           queryParameters.OrderBy = "starttime";
-          queryParameters.SortOrder = "ascending";
+          queryParameters.SortOrder = "descending";
           var endDate = new Date();
           var startDate = new Date(endDate.getTime() - (31 * 24 * 3600000));
           queryParameters.MinimumStartTime = convertToGoogleDateTime(startDate);
@@ -79,6 +81,7 @@
 			    var queryParameters = {};
 			    var otherParameters = {};
           otherParameters.cityName = cityName;
+          queryParameters.FullTextQuery = cityName;
 			    otherParameters.divId = "upcoming-events";
 			    queryParameters.MaxResults = 10;
 			    queryParameters.OrderBy = "starttime";
