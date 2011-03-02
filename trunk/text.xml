@@ -81,7 +81,7 @@
           otherParameters.cityName = cityName;
 			    otherParameters.divId = "upcoming-events";
 			    queryParameters.MaxResults = 10;
-			    queryParameters.OrderBy = "starttitme";
+			    queryParameters.OrderBy = "starttime";
 			    queryParameters.SortOrder = "ascending";
 			    queryParameters.SingleEvents = true;
 			    queryParameters.FutureEvents = true;
