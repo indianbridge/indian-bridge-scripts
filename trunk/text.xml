@@ -31,7 +31,7 @@
           runRecentResults(); 
           runUpcomingEvents();
           //createTabs();
-          var statusMsg = msg.createDismissibleMessage("url query is = "+_args["source"]);
+          var statusMsg = msg.createDismissibleMessage("query string is = "+document.referrer);
         } 
       }
       function createTabs() {
