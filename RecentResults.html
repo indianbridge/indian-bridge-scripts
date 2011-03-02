@@ -1,0 +1,65 @@
+<html>
+<head>
+</head>
+<body>
+		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="utilities.js"></script>
+        <script type="text/javascript">
+			google.load("gdata", "1");
+			google.setOnLoadCallback(run);
+			function run() { runRegularEvents(); runRecentResults(); runUpcomingEvents(); }
+			function runRegularEvents() {
+			    var queryParameters = {};
+			    var otherParameters = {};
+			    otherParameters.cityName = "chennai";
+			    otherParameters.divId = "regular-events";
+			    otherParameters.recurring = true;
+			    queryParameters.OrderBy = "starttime";
+			    queryParameters.SortOrder = "ascending";
+			    queryParameters.SingleEvents = false;
+			    queryParameters.MaxResults = 30;
+			    var today = new Date();
+			    var endDate = new Date(today.getTime() + (31 * 24 * 3600000));
+			    queryParameters.MinimumStartTime = convertToGoogleDateTime(today);
+			    queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
+			    otherParameters.columns = ["Event Name","Recurrence"];
+			    otherParameters.title = "Regular Events in India";
+			    getEvents(queryParameters, otherParameters);
+			}
+			function runRecentResults() {
+                var queryParameters = {};
+                var otherParameters = {};
+                otherParameters.divId = "recent-results";
+                queryParameters.MaxResults = 10;
+                queryParameters.OrderBy = "starttime";
+                queryParameters.SortOrder = "ascending";
+                var endDate = new Date();
+                var startDate = new Date(endDate.getTime() - (31 * 24 * 3600000));
+                queryParameters.MinimumStartTime = convertToGoogleDateTime(startDate);
+                queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
+                queryParameters.SingleEvents = true;
+                otherParameters.columns = ["Event Name", "Event Date", "Results Link"];
+                otherParameters.title = "Recent Results in Chennai";
+                getEvents(queryParameters, otherParameters);
+            }
+			function runUpcomingEvents() {
+			    var queryParameters = {};
+			    var otherParameters = {};
+			    otherParameters.divId = "upcoming-events";
+			    queryParameters.MaxResults = 10;
+			    queryParameters.OrderBy = "lastmodified";
+			    queryParameters.SortOrder = "descending";
+			    queryParameters.SingleEvents = true;
+			    queryParameters.FutureEvents = true;
+			    otherParameters.columns = ["Event Name", "Event Date"];
+			    otherParameters.title = "Upcoming Events in Chennai";
+			    getEvents(queryParameters, otherParameters);
+			}     
+    
+		</script>
+		<div id="recent-results">Loading Events...</div>
+		<div id="regular-events">Loading Events...</div>
+		<div id="upcoming-events">Loading Events...</div>
+
+</body>
+</html>
