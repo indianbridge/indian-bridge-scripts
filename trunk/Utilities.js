@@ -34,9 +34,17 @@ function getResultsURL(event) {
     if (typeof (match[1]) != "undefined" && isURL(match[1])) return match[1];
     return null;
 };
+function makeCityTitle(title, cityName) {
+    var html = "";
+    html += stringExists(title) ? title : "Events in";
+    html += " ";
+    var displayCityName = (stringExists(cityName) ? capitalize(cityName) : "India");
+    html += displayCityName;
+    return html;
+}
 function displayEvents(events, otherParameters) {
     var functionObjects = { "Event Name": getEventName, "Event Date": getEventDate, "Results Link": getResultsLink, "Recurrence": getRecurrence };
-    var html = (stringExists(otherParameters.title)?otherParameters.title:"Dummy Title");
+    var html = makeCityTitle(otherParameters.title,otherParameters.cityName);
     html+=makeTablePreamble_("font-size:small;");
     html += "<thead>";
     html += makeTableHeader_(otherParameters.columns);
@@ -72,17 +80,6 @@ function getEvents(queryParameters, otherParameters) {
     if (typeof (otherParameters) == "undefined") otherParameters = {};
     if (typeof (otherParameters.eventName) == "undefined" && otherParameters.eventName) queryParameters.FullTextQuery = otherParameters.eventName;
     else if (typeof (otherParameters.cityName) == "undefined" && otherParameters.cityName) queryParameters.FullTextQuery = otherParameters.cityName;
-    //if (typeof (queryParameters.eventName) == "undefined") queryParameters.eventName = "";
-    //if (typeof (queryParameters.cityName) == "undefined") queryParameters.cityName = "";
-    //var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-    /*if (typeof (queryParameters.FullTextQuery) != "undefined") query.setFullTextQuery(queryParameters.FullTextQuery);
-    if (typeof (queryParameters.OrderBy) != "undefined") query.setOrderBy(queryParameters.OrderBy);
-    if (typeof (queryParameters.SortOrder) != "undefined") query.setSortOrder(queryParameters.SortOrder);
-    if (typeof (queryParameters.SingleEvents) != "undefined") query.setSingleEvents(queryParameters.SingleEvents);
-    if (typeof (queryParameters.FutureEvents) != "undefined") query.setFutureEvents(queryParameters.FutureEvents);
-    if (typeof (queryParameters.MaxResults) != "undefined") query.setMaxResults(queryParameters.MaxResults);
-    if (typeof (queryParameters.MinimumStartTime) != "undefined") query.setMinimumStartTime(convertToGoogleDateTime(queryParameters.MinimumStartTime));
-    if (typeof (queryParameters.MaximumStartTime) != "undefined") query.setMaximumStartTime(convertToGoogleDateTime(queryParameters.MaximumStartTime));*/
     var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
     var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
     var query = createGoogleQuery(feedUri,queryParameters);
@@ -225,3 +222,6 @@ function getCityName(href) {
     for (var parameter in queryString) if (parameter.search(re) != -1) return queryString[parameter];
     return "";
 }
+function capitalize(str) {
+    return str.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+};
