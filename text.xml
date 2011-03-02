@@ -31,7 +31,7 @@
           runRecentResults(); 
           runUpcomingEvents();
           //createTabs();
-          var statusMsg = msg.createDismissibleMessage("query = "+parent.location.href);
+          var statusMsg = msg.createDismissibleMessage("query = "+_args()["source"]);
         } 
       }
       function createTabs() {
