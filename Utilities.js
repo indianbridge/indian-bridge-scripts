@@ -214,4 +214,14 @@ var formatTime = function (googleDate) {
     if (googleDate.isDateOnly()) return "All Day"
     return calcIST_(googleDate.getDate()).toLocaleTimeString();
 }
-
+function parseQueryParameters(href) {
+    var queryString = {};
+    href.replace(new RegExp("([^?=&]+)(=([^&]*))?", "g"), function ($0, $1, $2, $3) { queryString[$1] = $3; });
+    return queryString;
+}
+function getCityName(href) {
+    var re = new RegExp("city", "i");
+    var queryString = parseQueryParameters(href);
+    for (var parameter in queryString) if (parameter.search(re) != -1) return queryString[parameter];
+    return "";
+}

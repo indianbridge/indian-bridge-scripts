@@ -27,11 +27,11 @@
       function pageLoaded() {pageLoadedFlag=true;run();}
 			function run() { 
         if(googleLoadedFlag&&pageLoadedFlag) {
+          cityName = getCityName(document.referrer);
           runRegularEvents(); 
           runRecentResults(); 
           runUpcomingEvents();
-          //createTabs();
-          var statusMsg = msg.createDismissibleMessage("query string is = "+document.referrer);
+          createTabs();
         } 
       }
       function createTabs() {
@@ -43,7 +43,7 @@
 			function runRegularEvents() {
 			    var queryParameters = {};
 			    var otherParameters = {};
-			    otherParameters.cityName = "chennai";
+			    otherParameters.cityName = cityName;
 			    otherParameters.divId = "regular-events";
 			    otherParameters.recurring = true;
 			    queryParameters.OrderBy = "starttime";
@@ -61,6 +61,7 @@
 			function runRecentResults() {
           var queryParameters = {};
           var otherParameters = {};
+          otherParameters.cityName = cityName;
           otherParameters.divId = "recent-results";
           queryParameters.MaxResults = 10;
           queryParameters.OrderBy = "starttime";
@@ -77,6 +78,7 @@
 			function runUpcomingEvents() {
 			    var queryParameters = {};
 			    var otherParameters = {};
+          otherParameters.cityName = cityName;
 			    otherParameters.divId = "upcoming-events";
 			    queryParameters.MaxResults = 10;
 			    queryParameters.OrderBy = "lastmodified";
