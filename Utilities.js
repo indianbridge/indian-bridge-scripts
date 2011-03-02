@@ -78,8 +78,6 @@ var getResultsLink = function (event) {
 function getEvents(queryParameters, otherParameters) {
     if (typeof (queryParameters) == "undefined") queryParameters = {};
     if (typeof (otherParameters) == "undefined") otherParameters = {};
-    if (typeof (otherParameters.eventName) == "undefined" && otherParameters.eventName) queryParameters.FullTextQuery = otherParameters.eventName;
-    else if (typeof (otherParameters.cityName) == "undefined" && otherParameters.cityName) queryParameters.FullTextQuery = otherParameters.cityName;
     var feedUri = 'https://www.google.com/calendar/feeds/indianbridge@gmail.com/public/full';
     var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
     var query = createGoogleQuery(feedUri,queryParameters);
