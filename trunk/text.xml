@@ -91,9 +91,9 @@
 			}     
       
 		</script>
-		<div id="recent-results">Loading Events ...1</div>
-		<div id="regular-events">Loading Events ...1</div>
-		<div id="upcoming-events">Loading Events ...1</div>
+		<div id="recent-results">Loading Events...</div>
+		<div id="regular-events">Loading Events...</div>
+		<div id="upcoming-events">Loading Events...</div>
 		]]>
   </Content>
 </Module>
