@@ -55,7 +55,7 @@
 			    queryParameters.MinimumStartTime = convertToGoogleDateTime(today);
 			    queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
 			    otherParameters.columns = ["Event Name","Recurrence"];
-			    otherParameters.title = "Regular Events in India";
+			    otherParameters.title = "Regular Events in";
 			    getEvents(queryParameters, otherParameters);
 			}
 			function runRecentResults() {
@@ -72,7 +72,7 @@
           queryParameters.MaximumStartTime = convertToGoogleDateTime(endDate);
           queryParameters.SingleEvents = true;
           otherParameters.columns = ["Event Name", "Event Date", "Results Link"];
-          otherParameters.title = "Recent Results in Chennai";
+          otherParameters.title = "Recent Results in";
           getEvents(queryParameters, otherParameters);
       }
 			function runUpcomingEvents() {
@@ -81,12 +81,12 @@
           otherParameters.cityName = cityName;
 			    otherParameters.divId = "upcoming-events";
 			    queryParameters.MaxResults = 10;
-			    queryParameters.OrderBy = "lastmodified";
-			    queryParameters.SortOrder = "descending";
+			    queryParameters.OrderBy = "starttitme";
+			    queryParameters.SortOrder = "ascending";
 			    queryParameters.SingleEvents = true;
 			    queryParameters.FutureEvents = true;
 			    otherParameters.columns = ["Event Name", "Event Date"];
-			    otherParameters.title = "Upcoming Events in Chennai";
+			    otherParameters.title = "Upcoming Events in";
 			    getEvents(queryParameters, otherParameters);
 			}     
       
