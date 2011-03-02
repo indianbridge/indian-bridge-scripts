@@ -36,6 +36,7 @@
       }
       function createTabs() {
 				var tabSet = new gadgets.TabSet(__MODULE_ID__); 
+        tabSet.alignTabs("left");
         tabSet.addTab("Recent Results", {contentContainer: document.getElementById("recent-results"),tooltip: "Recent Results"});        
         tabSet.addTab("Regular Events", {contentContainer: document.getElementById("regular-events"),tooltip: "Regular Events"});        
         tabSet.addTab("Upcoming Events", {contentContainer: document.getElementById("upcoming-events"),tooltip: "Upcoming Events"});        
