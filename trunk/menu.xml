@@ -15,6 +15,7 @@
     <![CDATA[
 <link type="text/css" rel="stylesheet" href="style.css" />
 		  <script type="text/javascript" src="functions.js"></script>
+      <div>test</div>
 <div id="navigation">
 
 	<ul id="menu">
