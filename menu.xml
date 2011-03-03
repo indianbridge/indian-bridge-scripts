@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+  <ModulePrefs title="Custom City Calendar" title_url=""
+		description="Customized calendar for selected city" author="Indian Bridge"
+		author_email="indianbridge+calendargadget@gmail.com" screenshot="" thumbnail=""
+		height="400" scrolling="true">
+    <Require feature="tabs" />
+    <Require feature="setprefs" />
+    <Require feature="dynamic-height"/>
+    <Require feature="minimessage"/>
+  </ModulePrefs>
+  <UserPref name="cityname" display_name="Customize for City" default_value="" />
+  <UserPref name="selectedTab" datatype="hidden"/>
+  <Content type="html">
+    <![CDATA[
+      <link type="text/css" rel="stylesheet" href="http://indian-bridge-scripts.googlecode.com/svn/trunk/style.css" />
+		  <script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/functions.js"></script>
+<div id="navigation">
+
+	<ul id="menu">
+		<li><a href="index.html" title="Item">Item</a></li>
+		<li>
+			<a href="#" title="Item with a submenu" class="">Item with 1-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+			</ul>
+		</li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 2-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
+
+			</ul>
+		</li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 3-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">2-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li>
+							<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+							<ul>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
+
+			</ul>
+		</li>
+		<li><a href="index.html" title="Item">Item</a></li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 1-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+			</ul>
+		</li>
+		<li><a href="index.html" title="Item">Item</a></li>
+	</ul>
+
+
+</div>
+
+		]]>
+  </Content>
+</Module>
