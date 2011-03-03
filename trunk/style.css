@@ -1,0 +1,56 @@
+* { margin: 0px; padding: 0px; }
+
+BODY { background-color: #FFFFFF; padding: 0px 0px 10px 0px; color: #000000; }
+
+BODY, H1, H2, H3, DIV, P, UL, LI { font-family: arial,sans-serif; font-size: 10pt; font-weight: normal; }
+
+A { color: #CC0000; background-color: transparent; text-decoration: none; }
+A:visited { color: #000000; background-color: transparent; text-decoration: underline; }
+A:active { color: #CC0000; background-color: transparent; text-decoration: underline; }
+A:hover { color: #CC0000; background-color: transparent; text-decoration: underline; }
+
+DIV.head { color: #FFFFFF; background-color: #CC0000; padding: 16px 20px 16px 20px; }
+
+H1 { font-size: 14pt; font-weight: bold; margin: 20px 0px 0px 0px; }
+H2 { font-size: 12pt; font-weight: bold; margin: 20px 0px 0px 0px; }
+H3 { font-size: 10pt; font-weight: bold; margin: 20px 0px 0px 0px; }
+P { margin: 5px 0px 0px 0px; }
+IMG { border: 0px none; }
+
+UL, OL { margin: 6px 0px 4px 18px; padding-left: 0px; list-style: square outside; }
+LI { padding-bottom: 4px; padding-left: 5px; }
+
+PRE { margin: 6px 0px 15px 30px; padding: 10px 10px 20px 15px; border-left: 1px solid #CC0000; font-size: 9pt; line-height: 110%; color: #000000; background-color: #EEEEEE; width: 90%; overflow: auto; overflow-y: hidden; }
+html>body PRE { padding-bottom: 8px; }
+
+#content { margin: 40px 40px 0px 220px; }
+
+#navigation { position: absolute; top: 150px; left: 15px; width: 165px; }
+
+#menu {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	margin: 6px 0px 2px 0px;
+	padding: 3px 4px 3px 22px;
+	border: 1px solid #000000;
+	color: #FFFFFF;
+	background-color: #CC0000;
+	list-style-type: square;
+}
+
+#menu LI { font-size: 7pt; margin: 0px 0px 1px 0px; padding: 0px 0px 2px 0px; }
+#menu LI UL { margin: 0px 0px 0px 15px; list-style-type: disc; }
+html>body #menu LI UL { margin: 0px 0px 0px 12px; }
+
+#menu A {
+	display: block;
+	line-height: 10pt;
+	font-weight: bold;
+	text-decoration: none;
+	color: #FFFFFF;
+	background-color: transparent;
+}
+#menu A:visited { color: #FFFFFF; background-color: transparent; }
+#menu A:active { color: #FFFFFF; background-color: transparent; }
+#menu A:hover { color: #FFFF99; background-color: transparent; }
