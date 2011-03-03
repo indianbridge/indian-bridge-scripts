@@ -1,146 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html dir="ltr" lang="nl-NL">
+<head>
 
-<html> 
-<head> 
-    <title>Example: AuthSubJS with JQuery</title> 
-    <link rel="stylesheet" type="text/css" href="main.css" /> 
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script> 
-    <script type="text/javascript">
+<title>Accessible fold-out menu using CSS and Javascript by Advies en zo :: Meedenken en -doen</title>
+      
+</head>
+<body>
+<link type="text/css" rel="stylesheet" href="style.css" />
+		  <script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/functions.js"></script>
+<div id="navigation">
 
-        // Load the Google Data JS Client for Blogger.
-        google.load("gdata", "2");
+	<ul id="menu">
+		<li><a href="index.html" title="Item">Item</a></li>
+		<li>
+			<a href="#" title="Item with a submenu" class="">Item with 1-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+			</ul>
+		</li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 2-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
 
-        // Load JQuery
-        google.load('jquery', '1.3.2');
+			</ul>
+		</li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 3-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">2-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li>
+							<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+							<ul>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+								<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li>
+					<a href="#" title="Submenu item with submenu">1-layer submenu</a>
+					<ul>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+						<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+					</ul>
+				</li>
 
-        /**
-        * Fades from one div to another, and calls the opt_callback method once
-        * the fade is done (if opt_callback exists).
-        * @param {Object} fromdiv The div to fade out.
-        * @param {Object} todiv The div to fade in.
-        * @param {Function} opt_callback Optional method to call once the fade is
-        *     done.
-        */
-        function transitionDiv(fromdiv, todiv, opt_callback) {
-            $('#' + fromdiv).fadeOut('fast', function () {
-                $('#' + todiv).fadeIn('fast', function () {
-                    if (opt_callback) {
-                        opt_callback();
-                    }
-                });
-            });
-        }
+			</ul>
+		</li>
+		<li><a href="index.html" title="Item">Item</a></li>
+		<li>
+			<a href="#" title="Item with a submenu">Item with 1-layer submenu</a>
+			<ul>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+				<li><a href="index.html" title="Submenu item">Submenu item</a></li>
+			</ul>
+		</li>
+		<li><a href="index.html" title="Item">Item</a></li>
+	</ul>
 
-        /**
-        * Shows the "loading" div and logs the user out of the application.
-        * Reloads the page after the user has logged out.
-        */
-        function logout() {
-            transitionDiv('divLoggedIn', 'divLoggingIn', function () {
-                google.accounts.user.logout(function () {
-                    window.location.reload();
-                });
-            });
-        }
 
-        /**
-        * Shows the "loading" div and then prompts the user to log in.
-        */
-        function login() {
-            var scope = 'https://www.google.com/calendar/feeds/5bpmp16ghpqlkqnku8j8lihv7c@group.calendar.google.com/private/full';
-            transitionDiv('divLoggedOut', 'divLoggingIn', function () {
-                google.accounts.user.login(scope);
-            });
-        }
-
-        /**
-        * Error handler that gets called if there was an error loading the feed.
-        * The error message is displayed on the page.
-        */
-        function handleError(response) {
-            document.getElementById('divContent').innerHTML =
-            'ERROR: ' + response.message;
-            transitionDiv('divContentLoading', 'divContent');
-        }
-
-        /**
-        * Displays the response from loadData() on the page.
-        */
-        function handleSuccess(response) {
-            document.getElementById('divContent').innerHTML =
-            'SUCCESS: Authorized!!!';
-            transitionDiv('divContentLoading', 'divContent');
-        }
-        function quickCalAdd() {
-            document.getElementById('divContent').innerHTML = "Adding...";
-            var feedUri = 'https://www.google.com/calendar/feeds/5bpmp16ghpqlkqnku8j8lihv7c@group.calendar.google.com/private/full';
-            var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');            // Create an instance of CalendarEventEntry representing the new event
-            var entry = new google.gdata.calendar.CalendarEventEntry();
-            entry.setTitle('Authentication Test event');
-            var when = new google.gdata.When();
-            var startTime = new Date();
-            var endTime = new Date();
-            when.setStartTime(startTime);
-            when.setEndTime(endTime);
-            entry.addTime(when);
-            var handleSuccess2 = function (result) {
-                document.getElementById('divContent').innerHTML = 'event created!';
-                transitionDiv('divContentLoading', 'divContent');
-            }
-            var handleError2 = function (error) {
-                document.getElementById('divContent').innerHTML = error;
-                transitionDiv('divContentLoading', 'divContent');
-            }
-            calendarService.insertEntry(feedUri, entry, handleSuccess2, handleError2, google.gdata.calendar.CalendarEventEntry);
-        }
-
-        /**
-        * Loads a feed from Calendar.
-        */
-        function loadData() {
-            var feedUri = 'https://www.google.com/calendar/feeds/5bpmp16ghpqlkqnku8j8lihv7c@group.calendar.google.com/private/full';
-            var calendarService = new google.gdata.calendar.CalendarService('Indian Bridge Calendar');
-            var query = new google.gdata.calendar.CalendarEventQuery(feedUri);
-            query.setMaxResults(1);
-            calendarService.getEventsFeed(query, function (root) { handleSuccess(root); }, function (error) { handleError(error); });
-        }
-
-        // This method checks the status of the user, and diplays the appropriate
-        // content area.
-        google.setOnLoadCallback(function () {
-            var status = google.accounts.user.getStatus();
-            if (status == google.accounts.AuthSubStatus.LOGGING_IN) {
-                // User is in the process of logging in, do nothing.
-                return;
-            } else if (status == google.accounts.AuthSubStatus.LOGGED_OUT) {
-                // User is logged out, display the "login" link.
-                transitionDiv('divLoggingIn', 'divLoggedOut');
-            } else {
-                // User is logged in, load the user's data.
-                transitionDiv('divLoggingIn', 'divLoggedIn', loadData);
-            }
-        });
- 
-    </script> 
-  </head> 
-  <body> 
- 
-    <h2>Example: AuthSubJS with JQuery</h2> 
-    <div id="container"> 
-    <div id="divLoggingIn"> 
-      <img src="loading.gif" height="32" width="32" /> 
-    </div> 
-    <div id="divLoggedOut" style="display: none;"> 
-      <a href="#" onclick="login(); return false;">login</a> 
-    </div> 
-    <div id="divLoggedIn" style="display: none;"> 
-      <a href="#" onclick="logout(); return false;">logout</a><br /><br /> 
-      <div id="divContentLoading"> 
-        <img src="loading.gif" height="32" width="32" /> 
-      </div> 
-      <div id="divContent" style="display: none; text-align: left;"> 
-      </div> 
-    </div> 
-    </div> 
- 
-  </body> 
-</html> 
+</div>
+</body>
+</html>
