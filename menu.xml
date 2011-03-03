@@ -13,9 +13,9 @@
   <UserPref name="selectedTab" datatype="hidden"/>
   <Content type="html">
     <![CDATA[
-<link type="text/css" rel="stylesheet" href="style.css" />
-		  <script type="text/javascript" src="functions.js"></script>
-      <div>test</div>
+<link type="text/css" rel="stylesheet" href="http://indian-bridge-scripts.googlecode.com/svn/trunk/style.css" />
+		  <script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/functions.js"></script>
+      <div>testing</div>
 <div id="navigation">
 
 	<ul id="menu">
