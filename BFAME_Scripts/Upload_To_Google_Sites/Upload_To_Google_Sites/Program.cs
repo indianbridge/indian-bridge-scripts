@@ -22,7 +22,7 @@ namespace Upload_To_Google_Sites
             try
             {
                 Boolean debug_flag = false;
-                if (args.Length > 3) debug_flag = Boolean.Parse(args[4]);
+                if (args.Length > 3) debug_flag = Boolean.Parse(args[3]);
                 SitesAPI sa = new SitesAPI(args[0],args[1],args[2],debug_flag);
                 sa.uploadDirectory(@"C:\Temp\bfame_test", "/test");
             }
