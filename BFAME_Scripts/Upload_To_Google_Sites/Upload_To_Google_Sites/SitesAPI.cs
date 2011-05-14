@@ -15,7 +15,7 @@ namespace Upload_To_Google_Sites
         static public String APP_NAME = "BridgeTeamEventScoreManager-SitesAPI-v0.1";
         private SitesService service = null;
         private String sitename = null;
-        private Boolean debugFlag = null;
+        private Boolean debugFlag = false;
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
         {
             this.debugFlag = debugFlag;
