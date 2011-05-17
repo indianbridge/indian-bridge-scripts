@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
+using System.Collections;
 
 using Google.GData.Client;
 using Google.GData.Extensions;
@@ -16,6 +17,7 @@ namespace Upload_To_Google_Sites
         private SitesService service = null;
         private String sitename = null;
         private Boolean debugFlag = false;
+        Hashtable lastRunTimes = new Hashtable();
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
         {
             this.debugFlag = debugFlag;
@@ -26,10 +28,18 @@ namespace Upload_To_Google_Sites
             {
                 Google.GData.Client.GDataLoggingRequestFactory factory = new GDataLoggingRequestFactory("jotspot", "SpreadsheetsLoggingTest");
                 factory.MethodOverride = true;
-                factory.CombinedLogFileName = "c:\\Temp\\xmllog.log";
+                factory.CombinedLogFileName = Path.Combine(Directory.GetCurrentDirectory(),"HTTP_Traffic.log");
+                FileStream stream = new FileStream(factory.CombinedLogFileName, FileMode.Create);
+                TextWriter writer = new StreamWriter(stream);
+                writer.WriteLine("");
+                stream.Close();
                 service.RequestFactory = factory;
+                printDebugMessage("All HTTP traffic will be reported in " + factory.CombinedLogFileName);
             }
 
+        }
+        private void printDebugMessage(String message) {
+            if(this.debugFlag) Console.WriteLine(message);
         }
         private String makeIdentifier(String text) { return text.Replace(" ", "-"); }
         public void uploadDirectory(String directory, String siteRoot)
@@ -38,6 +48,7 @@ namespace Upload_To_Google_Sites
             {
                 throw new System.ArgumentException("Only a directory structure can be uploaded");
             }
+            printDebugMessage("Uploading " + directory + " to " + siteRoot);
             uploadPath(directory, siteRoot);
 
         }
@@ -50,7 +61,7 @@ namespace Upload_To_Google_Sites
                     String extension = Path.GetExtension(path).ToLower();
                     if (extension == ".htm" || extension == ".html")
                     {
-                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)));
+                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)),File.GetLastWriteTime(path));
                     }
                     return;
                 } 
@@ -60,7 +71,7 @@ namespace Upload_To_Google_Sites
                     {
                         var dirName = Path.GetFileName(dir);
                         var pageName = makeIdentifier(dirName);
-                        updateWebpage(siteRoot,dirName, getSubPageListing(), pageName);
+                        updateWebpage(siteRoot,dirName, getSubPageListing(), pageName,Directory.GetLastWriteTime(dir));
                         uploadPath(dir, siteRoot + "/" + pageName);
                     }
                     String[] files = Directory.GetFiles(path);
@@ -70,13 +81,15 @@ namespace Upload_To_Google_Sites
             
         }
 
-        private String getValidXml(String html)
+        // Not need anymore. Keep it around just in case.
+        /*private String getValidXml(String html)
         {
+            var newHtml = html.Replace("&nbsp;", " ");
             Sgml.SgmlReader sgmlReader = new Sgml.SgmlReader();
             sgmlReader.DocType = "XHTML";
             sgmlReader.WhitespaceHandling = WhitespaceHandling.All;
             sgmlReader.CaseFolding = Sgml.CaseFolding.ToLower;
-            sgmlReader.InputStream = new StringReader(html);
+            sgmlReader.InputStream = new StringReader(newHtml);
 
             // create document
             XmlDocument doc = new XmlDocument();
@@ -84,7 +97,8 @@ namespace Upload_To_Google_Sites
             doc.XmlResolver = null;
             doc.Load(sgmlReader);
             return doc.OuterXml;
-        }
+        }*/
+
         private String getSubPageListing()
         {
             return "<img src=\"https://www.google.com/chart?chc=sites&amp;cht=d&amp;chdp=sites&amp;chl=%5B%5BPage+listing'%3D16'f%5Cbf%5Chv'a%5C%3D123'0'%3D122'0'dim'%5Cbox1'b%5CDBD9BB'fC%5CDBD9BB'eC%5C15'sk'%5C%5B%22Subpage+Listing%22'%5Dh'a%5CV%5C%3D12'f%5Cbf%5C%5DV%5Cta%5C%3D124'%3D0'%3D123'%3D297'dim'%5C%3D124'%3D0'%3D123'%3D297'vdim'%5Cbox1'b%5Cva%5CFFFEF0'fC%5CDBD9BB'eC%5Csites_toc'i%5Chv-0-0'a%5C%5Do%5CLauto'f%5C&amp;sig=2KUvkDdGLdjMIvbcdbJtj3njQjc\" type=\"subpages\" props=\"align:left;borderTitle:Subpage Listing;displayAs:TOC;maxDepth:1;rootPage:THIS_PAGE;width:250;\" width=\"250\" height=\"300\" style=\"display:block;text-align:left;margin-right:auto;\"/><br/>";
@@ -105,9 +119,10 @@ namespace Upload_To_Google_Sites
             return new XmlExtension(pageNameNode);
         }
 
-        public AtomEntry updateWebpage(String path, String title, String html, String pageName)
+        public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified)
         {
             String url = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path+"/"+pageName;
+            printDebugMessage("Updating Page : " + url);
             try
             {
                 AtomEntry entry = service.Get(url);
@@ -117,13 +132,21 @@ namespace Upload_To_Google_Sites
                 }
                 if (html != "")
                 {
-                    AtomContent newContent = new AtomContent();
-                    newContent.Type = "xhtml";
-                    newContent.Content = getValidXml(html);
-                    entry.Content = newContent;
-                    entry.Title.Text = title;
-                    service.Update(entry);
-                    if (this.debugFlag) Console.WriteLine("Updated " + url + " successfully!!!");
+                    if (!lastRunTimes.ContainsKey(url) || lastModified >= (DateTime)lastRunTimes[url])
+                    {
+                        AtomContent newContent = new AtomContent();
+                        newContent.Type = "html";
+                        newContent.Content = html;
+                        entry.Content = newContent;
+                        entry.Title.Text = title;
+                        service.Update(entry);
+                        lastRunTimes[url] = DateTime.Now;
+                        if (this.debugFlag) Console.WriteLine("Updated " + url + " successfully!!!");
+                    }
+                    else
+                    {
+                        if (this.debugFlag) Console.WriteLine("Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ", so not updating!!!");
+                    }
                 }
                 return entry;
 
@@ -148,6 +171,7 @@ namespace Upload_To_Google_Sites
         public AtomEntry createWebPage(String path,String title, String html, String pageName)
         {
             String parentUrl = "http://sites.google.com/feeds/content/site/" + sitename + "?path=" + path;
+            printDebugMessage("Creating page "+ parentUrl + "/" + pageName);
             AtomEntry parent = service.Get(parentUrl);
             SiteEntry entry = new SiteEntry();
             AtomCategory category = new AtomCategory(SitesService.WEBPAGE_TERM, SitesService.KIND_SCHEME);
@@ -157,8 +181,9 @@ namespace Upload_To_Google_Sites
             link.HRef = parent.EditUri;
             entry.Links.Add(link);
             entry.Title.Text = title;
-            entry.Content.Type = "xhtml";
-            entry.Content.Content = getValidXml(html);
+            entry.Content.Type = "html";
+            //entry.Content.Content = getValidXml(html);
+            entry.Content.Content = html;
             entry.ExtensionElements.Add(makePageNameExtension(pageName));
 
             AtomEntry newEntry = null;
