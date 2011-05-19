@@ -372,7 +372,7 @@ namespace BridgeMateRunningScores
         public string GetBackToRunningScoresLinktext()
         {
             string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresFilename"];
-            return String.Format("<a href='../{0}'>Back to Running Scores</a>", runningScoresRootUrl);
+            return String.Format("<a href='..'>Back to Running Scores</a>", runningScoresRootUrl);
         }
 
     }
