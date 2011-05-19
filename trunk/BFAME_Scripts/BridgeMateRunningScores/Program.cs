@@ -35,6 +35,7 @@ namespace BridgeMateRunningScores
         static string googleButlerScoresRoot = ConfigurationManager.AppSettings["GoogleButlerScoresRoot"];
         static string runningScoresFilename = ConfigurationManager.AppSettings["RunningScoresFileName"];
         static string butlerScoresFilename = ConfigurationManager.AppSettings["ButlerScoresFileName"];
+        static Boolean doUpdates = Boolean.Parse(ConfigurationManager.AppSettings["DoUpdates"]);
 
         #endregion
 
@@ -54,8 +55,9 @@ namespace BridgeMateRunningScores
             if (roundInProgress > 0)
             {
                 NameValueCollection pairNames = magicInterface.GetPairNames(numberOfPairs);
-
-                string boardsOutputFolder = String.Format(@"{0}\runningscores\round{1}", outputFolder, roundInProgress.ToString());
+                String eventFolder = String.Format(@"{0}\runningscores\{1}", outputFolder, runningScoresFilename);
+                if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
+                string boardsOutputFolder = String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
                 if (!Directory.Exists(boardsOutputFolder)) 
                 {
                     Directory.CreateDirectory(boardsOutputFolder);
@@ -94,7 +96,7 @@ namespace BridgeMateRunningScores
                     }
                 }
 
-                if (isEndOfRound)
+                if (isEndOfRound && doUpdates)
                 {
                     SitesAPI sites = new SitesAPI(googleSiteName, username, password, debug);
                     sp.updateScores(roundInProgress,runningScores, debug);
@@ -345,11 +347,22 @@ namespace BridgeMateRunningScores
                 result = result.Replace("[#RoundLinks#]", roundLinksText);
             }
 
-            string butlerRootFolder = outputFolder + "\\butlerscores";
-            string butlerOutputFolder = cumulative ? butlerRootFolder : String.Format(@"{0}\{1}", butlerRootFolder, String.Format("round{0}", roundInProgres.ToString()));
-            if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
-            string outputFileName = String.Format(cumulative?@"{0}\"+butlerScoresFilename+".html":@"{0}\butlerscores.html", butlerOutputFolder);
-            Utility.WriteFile(outputFileName, result);
+            if (cumulative)
+            {
+                string butlerOutputFolder = outputFolder + "\\butlerscores";
+                if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
+                string outputFileName = String.Format(@"{0}\" + butlerScoresFilename + ".html" , butlerOutputFolder);
+                Utility.WriteFile(outputFileName, result);
+            }
+            else
+            {
+                string butlerRootFolder = outputFolder + "\\butlerscores\\"+butlerScoresFilename;
+                if (!Directory.Exists(butlerRootFolder)) Directory.CreateDirectory(butlerRootFolder);
+                string butlerOutputFolder = String.Format(@"{0}\{1}", butlerRootFolder, String.Format("round{0}", roundInProgres.ToString()));
+                if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
+                string outputFileName = String.Format(@"{0}\butlerscores.html.html", butlerOutputFolder);
+                Utility.WriteFile(outputFileName, result);
+            }
         }
 
     }
