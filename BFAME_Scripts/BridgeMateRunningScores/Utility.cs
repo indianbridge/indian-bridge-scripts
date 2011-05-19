@@ -5,6 +5,11 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 using System.Data;
+using System.Collections.Specialized;
+using System.Runtime.Serialization;
+// Note: When building this code, you must reference the
+// System.Runtime.Serialization.Formatters.Soap.dll assembly.
+using System.Runtime.Serialization.Formatters.Soap;
 
 namespace BridgeMateRunningScores
 {
@@ -144,6 +149,57 @@ namespace BridgeMateRunningScores
                 butlerRow["Score"] = score;
                 butlerResults.Rows.Add(butlerRow);
             }
+        }
+
+        // Function to serialize a NameValueCollection to a file
+        public static void Serialize(NameValueCollection names, String filename, Boolean debug=false)
+        {
+            FileStream fs = new FileStream(filename, FileMode.Create);
+
+            // Construct a SoapFormatter and use it 
+            // to serialize the data to the stream.
+            SoapFormatter formatter = new SoapFormatter();
+            try
+            {
+                formatter.Serialize(fs, names);
+            }
+            catch (SerializationException e)
+            {
+                if(debug) Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        // Function to Deserialize from a file to a NameValueCollection
+        public static NameValueCollection Deserialize(String filename, Boolean debug = false)
+        {
+            // Declare the NameValueCollection reference.
+            NameValueCollection names = null;
+
+            // Open the file containing the data that you want to deserialize.
+            FileStream fs = new FileStream(filename, FileMode.Open);
+            try
+            {
+                SoapFormatter formatter = new SoapFormatter();
+
+                // Deserialize the NameValueCollection from the file and 
+                // assign the reference to the local variable.
+                names = (NameValueCollection)formatter.Deserialize(fs);
+            }
+            catch (SerializationException e)
+            {
+                if(debug) Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+            return names;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Data;
+using System.Collections.Specialized;
 
 using Google.GData.Client;
 using Google.GData.Extensions;
@@ -18,21 +19,116 @@ namespace Upload_To_Google_Sites
         static public String APP_NAME = "BridgeTeamEventScoreManager-SpreadsheetAPI-v0.1";
         private SpreadsheetsService service = null;
         private SpreadsheetEntry spreadsheet = null;
-        private Hashtable worksheets = null;
+        private string spreadsheetname = null;
+        private Hashtable worksheets = new Hashtable();
+        private NameValueCollection info = new NameValueCollection();
         private uint numTeams = 0;
         private uint numRounds = 0;
         private uint numMatches = 0;
-        private Boolean debug_flag = false;
         public SpreadSheetAPI(String spreadsheetname,String username, String password, Boolean debug_flag)
         {
             this.service = new SpreadsheetsService(APP_NAME);
             this.service.setUserCredentials(username, password);
-            this.debug_flag = debug_flag;
-            worksheets = new Hashtable();
-            findSpreadsheet(spreadsheetname);
+            this.spreadsheetname = spreadsheetname;
+            initialize(debug_flag);
         }
+        private void initialize(Boolean debug)
+        {
+            findSpreadsheet(debug);
+            getAllWorksheets(debug);
+            info = getInfo(debug);
+            numTeams = uint.Parse(info["Number of Teams"]);
+            numRounds = uint.Parse(info["Number of Rounds"]);
+            numMatches = (uint)(numTeams / 2 + (numTeams % 2 == 0 ? 0 : 1));
+            if (debug)
+            {
+                Console.WriteLine("Event Name = " + info["Event Name"]);
+                Console.WriteLine("Number of Teams = " + numTeams);
+                Console.WriteLine("Number of Rounds = " + numRounds);
+                Console.WriteLine("Number of Matches = " + numMatches);
+            }
+        }
+        public NameValueCollection getInfo(Boolean debug = false)
+        {
+            NameValueCollection parameters = new NameValueCollection();
+            WorksheetEntry entry = (WorksheetEntry)worksheets["Info"];
+            AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
 
-        public void findSpreadsheet(String spreadsheetname)
+            ListQuery query = new ListQuery(listFeedLink.HRef.ToString());
+            ListFeed feed = service.Query(query);
+
+            foreach (ListEntry worksheetRow in feed.Entries)
+            {
+                ListEntry.CustomElementCollection elements = worksheetRow.Elements;
+                parameters.Add(elements[0].Value, elements[1].Value);
+            }
+            return parameters;
+        }
+        public NameValueCollection getTeamNames(Boolean debug_flag=false)
+        {
+            NameValueCollection names = new NameValueCollection();
+            WorksheetEntry entry = (WorksheetEntry)worksheets["Names"];
+            /*AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+            AtomLink link = spreadsheet.Links.FindService(GDataSpreadsheetsNameTable.WorksheetRel, null);
+            WorksheetQuery wquery = new WorksheetQuery(link.HRef.ToString());
+            wquery.Title = "Info";
+            WorksheetFeed wfeed = service.Query(wquery);
+            WorksheetEntry namesSheet = null;
+            WorksheetEntry infoSheet = null;
+            if (wfeed.Entries.Count > 0)
+            {
+                infoSheet = wfeed.Entries[0] as WorksheetEntry;
+            }
+                else
+                {
+                    String message = "Cannot find sheet titled Info!!!";
+                    if (debug_flag) Console.WriteLine(message);
+                    throw new ArgumentNullException(message);
+                }
+
+                wquery.Title = "Names";
+                wfeed = service.Query(wquery);
+                if (wfeed.Entries.Count > 0)
+                {
+                    namesSheet = wfeed.Entries[0] as WorksheetEntry;
+                }
+                else
+                {
+                    String message = "Cannot find sheet titled Names!!!";
+                    if (debug_flag) Console.WriteLine(message);
+                    throw new ArgumentNullException(message);
+                }
+                int numTeams = 0;
+                AtomLink listFeedLink = infoSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                ListQuery iquery = new ListQuery(listFeedLink.HRef.ToString());
+                ListFeed ifeed = service.Query(iquery) as ListFeed;
+                foreach (ListEntry worksheetRow in ifeed.Entries)
+                {
+                    ListEntry.CustomElementCollection elements = worksheetRow.Elements;
+                    String parameterName = elements[0].Value;
+                    if (parameterName.ToLower() == "Number of Teams".ToLower())
+                    {
+                        numTeams = int.Parse(elements[1].Value);
+                        if (debug_flag) Console.WriteLine("Num Teams = " + numTeams);
+                    }
+                }*/
+                AtomLink cellFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
+                CellQuery cquery = new CellQuery(cellFeedLink.HRef.ToString());
+                cquery.ReturnEmpty = ReturnEmptyCells.yes;
+                cquery.MinimumColumn = 1;
+                cquery.MaximumColumn = 2;
+                cquery.MinimumRow = 2;
+                cquery.MaximumRow = (uint)(numTeams+1);
+                CellFeed cfeed = service.Query(cquery);
+                for (int i = 0; i < cfeed.Entries.Count; i += 2)
+                {
+                    CellEntry nameCell = cfeed.Entries[i + 1] as CellEntry;
+                    CellEntry numberCell = cfeed.Entries[i] as CellEntry;
+                    names.Add(nameCell.Cell.Value,numberCell.Cell.Value);
+                }
+            return names;
+        }
+        private void findSpreadsheet(Boolean debug_flag=false)
         {
             SpreadsheetQuery query = new SpreadsheetQuery();
             query.Title = spreadsheetname;
@@ -42,10 +138,6 @@ namespace Upload_To_Google_Sites
             {
                 spreadsheet = (SpreadsheetEntry)feed.Entries[0];
                 if (debug_flag) Console.WriteLine("Found spreadsheet with name " + spreadsheet.Title.Text);
-                // Save all the worksheets
-                getAllWorksheets();
-                // Read the info sheet
-                getInfo();
             }
             else
             {
@@ -53,22 +145,22 @@ namespace Upload_To_Google_Sites
                 throw new ArgumentNullException("Spreadsheet with name " + spreadsheetname+" not found!!!");
             }
         }
-        private void getAllWorksheets()
+        private void getAllWorksheets(Boolean debug_flag=false)
         {
             AtomLink link = spreadsheet.Links.FindService(GDataSpreadsheetsNameTable.WorksheetRel, null);
 
             WorksheetQuery query = new WorksheetQuery(link.HRef.ToString());
             WorksheetFeed feed = service.Query(query);
 
-            if (this.debug_flag) Console.WriteLine("Finding Worksheets. Found...");
+            if (debug_flag) Console.WriteLine("Finding Worksheets. Found...");
             foreach (WorksheetEntry worksheet in feed.Entries)
             {
-                if(this.debug_flag) Console.WriteLine(worksheet.Title.Text);
+                if(debug_flag) Console.WriteLine(worksheet.Title.Text);
                 worksheets.Add(worksheet.Title.Text,worksheet);
             }
 
         }
-        public void updateScores(String filename)
+        public void updateScores(String filename,Boolean debug=false)
         {
             var text = File.ReadAllText(filename);
             var re = new Regex("<pre>(.*?)</pre>", RegexOptions.IgnoreCase|RegexOptions.Singleline);
@@ -85,7 +177,7 @@ namespace Upload_To_Google_Sites
             {
                 readOneScoreLine(lines,i,scoreData);
             }
-            updateScores(roundNumber, scoreData);
+            updateScores(roundNumber, scoreData,debug);
         }
         private void readOneScoreLine(String []lines,int row,int[,]scores)
         {
@@ -102,7 +194,7 @@ namespace Upload_To_Google_Sites
             scores[row - 2, 3] = ((team2VPString.Length == 0) ? 0 : int.Parse(team2VPString));
             //Console.WriteLine(team1Number + " , " + team2Number + " , " + team1VPScore + " , " + team2VPScore);
         }
-        public void updateScores(int roundNumber, DataTable scores)
+        public void updateScores(int roundNumber, DataTable scores,Boolean debug=false)
         {
             var totalRows = scores.Rows.Count;
             if (totalRows != numMatches) throw new ArgumentOutOfRangeException("Number of Rows in scores object should be same as number of matches!!!");
@@ -120,7 +212,7 @@ namespace Upload_To_Google_Sites
                 value = row["AwayTeamNumber"].ToString();
                 computedScores[i, j++] = ((value == "" || value == "bye" || value == "--") ? 0 : int.Parse(value));
                 value = row["VPScore"].ToString();
-                char[] delimiters = new char[] {' ','\t'};
+                char[] delimiters = new char[] {' ','\t','-'};
                 String[] values = value.Split(delimiters);
                 int index = 0;
                 computedScores[i, j++] = ((computedScores[i, 0] == 0) ? 0 : int.Parse(values[index++]));
@@ -129,10 +221,10 @@ namespace Upload_To_Google_Sites
                 computedScores[i, j++] = 0;
                 i++;
             }
-            updateScores(roundNumber, computedScores);
+            updateScores(roundNumber, computedScores,debug);
         }
 
-        public void updateScores(int roundNumber, int[,] scores)
+        public void updateScores(int roundNumber, int[,] scores,Boolean debug=false)
         {
             if (numMatches != scores.GetUpperBound(0) + 1) throw new ArgumentOutOfRangeException("Number of Rows in scores object should be same as number of matches!!!");
             if (6 != scores.GetUpperBound(1) + 1) throw new ArgumentOutOfRangeException("Number of Columns in scores object should be 6!!!");
@@ -160,10 +252,10 @@ namespace Upload_To_Google_Sites
                 }
             }
             CellFeed batchResultFeed = (CellFeed)service.Batch(batchFeed, new Uri(feed.Batch));
-            updateUpdateProgress(roundNumber);
+            updateUpdateProgress(roundNumber,debug);
 
         }
-        private void updateUpdateProgress(int roundNumber)
+        private void updateUpdateProgress(int roundNumber,Boolean debug_flag=false)
         {
             WorksheetEntry entry = (WorksheetEntry)worksheets["Update Progress"];
             AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
@@ -198,7 +290,7 @@ namespace Upload_To_Google_Sites
 
             }
         }
-        private void getInfo()
+        /*private void getInfo()
         {
             WorksheetEntry entry = (WorksheetEntry)worksheets["Info"];
             AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
@@ -224,7 +316,7 @@ namespace Upload_To_Google_Sites
             }
             numMatches = (uint)(numTeams / 2 + (numTeams % 2 == 0 ? 0 : 1));
             if (debug_flag) Console.WriteLine("Num Matches = " + numMatches);
-        }
+        }*/
 
 
     }

@@ -6,6 +6,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Data;
 using System.Configuration;
+using Upload_To_Google_Sites;
 
 namespace BridgeMateRunningScores
 {
@@ -26,6 +27,14 @@ namespace BridgeMateRunningScores
         static string runningScoreFileName = ConfigurationManager.AppSettings["RunningScoreFileName"];
         static string inputFolder = ConfigurationManager.AppSettings["InputFolder"];
         static string butlerFileName = ConfigurationManager.AppSettings["ButlerFileName"];
+        static string username = ConfigurationManager.AppSettings["Username"];
+        static string password = ConfigurationManager.AppSettings["Password"];
+        static string googleSpreadsheetName = ConfigurationManager.AppSettings["GoogleSpreadsheetName"];
+        static string googleSiteName = ConfigurationManager.AppSettings["GoogleSiteName"];
+        static string googleRunningScoresRoot = ConfigurationManager.AppSettings["GoogleRunningScoresRoot"];
+        static string googleButlerScoresRoot = ConfigurationManager.AppSettings["GoogleButlerScoresRoot"];
+        static string runningScoresFilename = ConfigurationManager.AppSettings["RunningScoresFileName"];
+        static string butlerScoresFilename = ConfigurationManager.AppSettings["ButlerScoresFileName"];
 
         #endregion
 
@@ -46,7 +55,7 @@ namespace BridgeMateRunningScores
             {
                 NameValueCollection pairNames = magicInterface.GetPairNames(numberOfPairs);
 
-                string boardsOutputFolder = String.Format(@"{0}\round{1}", outputFolder, roundInProgress.ToString());
+                string boardsOutputFolder = String.Format(@"{0}\runningscores\round{1}", outputFolder, roundInProgress.ToString());
                 if (!Directory.Exists(boardsOutputFolder)) 
                 {
                     Directory.CreateDirectory(boardsOutputFolder);
@@ -61,8 +70,11 @@ namespace BridgeMateRunningScores
 
                 NameValueCollection playedBoards = GetPlayedBoards(numberOfMatchesPerRound, magicInterface.CompletedBoards);
 
+                Boolean debug = true;
+                SpreadSheetAPI sp = new SpreadSheetAPI(googleSpreadsheetName, username, password, debug);
                 //TODO (Sriram): Substitute this call with a call to your spreadsheet function
-                NameValueCollection teamNumbers = GetTeamNumbersNamesMapping();
+                NameValueCollection teamNumbers = sp.getTeamNames(debug);
+                //NameValueCollection teamNumbers = GetTeamNumbersNamesMapping();
                 GenerateRunningScoresHTML(runningScores, roundInProgress, playedBoards, teamNumbers);
 
                 // Perform closure actions at end of round
@@ -82,6 +94,13 @@ namespace BridgeMateRunningScores
                     }
                 }
 
+                if (isEndOfRound)
+                {
+                    SitesAPI sites = new SitesAPI(googleSiteName, username, password, debug);
+                    sp.updateScores(roundInProgress,runningScores, debug);
+                    sites.uploadDirectory(outputFolder + "\\runningscores", googleRunningScoresRoot);
+                    sites.uploadDirectory(outputFolder + "\\butlerscores", googleButlerScoresRoot);
+                }
                 // TODO (Sriram): Make your API calls here
                 // Easiest thing to do is to add your project to this solution and then add a project reference
                 // SitesAPI = new SitesAPI (values for Running scores from config)
@@ -181,7 +200,9 @@ namespace BridgeMateRunningScores
             }
 
             result = result.Replace("[#Boards#]", rowsText);
-            string outputFileName = String.Format(@"{0}\runningscores.html", outputFolder);
+            String runningScoresFolder = outputFolder + "\\runningscores";
+            if (!Directory.Exists(runningScoresFolder)) Directory.CreateDirectory(runningScoresFolder);
+            string outputFileName = String.Format(@"{0}\{1}.html", runningScoresFolder, runningScoresFilename);
             Utility.WriteFile(outputFileName, result);
         }
 
@@ -293,6 +314,7 @@ namespace BridgeMateRunningScores
             scoresTemplate = scoresTemplate.Replace("[#TimeStamp#]", Utility.GetTimeStamp());
             scoresTemplate = scoresTemplate.Replace("[#EventName#]", eventName);
             scoresTemplate = scoresTemplate.Replace("[#Cumulative#]", cumulative ? "Cumulative " : String.Empty);
+            scoresTemplate = scoresTemplate.Replace("[#ButlerScoresRoot#]", "../" + butlerScoresFilename);
             int j = 0;
 
             foreach (DataRow row in butlerScores.Select(String.Empty, "Score Desc"))
@@ -323,8 +345,10 @@ namespace BridgeMateRunningScores
                 result = result.Replace("[#RoundLinks#]", roundLinksText);
             }
 
-            string butlerOutputFolder = cumulative ? outputFolder : String.Format(@"{0}\{1}", outputFolder, String.Format("Round{0}", roundInProgres.ToString()));
-            string outputFileName = String.Format(@"{0}\butlerscores.html", butlerOutputFolder);
+            string butlerRootFolder = outputFolder + "\\butlerscores";
+            string butlerOutputFolder = cumulative ? butlerRootFolder : String.Format(@"{0}\{1}", butlerRootFolder, String.Format("round{0}", roundInProgres.ToString()));
+            if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
+            string outputFileName = String.Format(cumulative?@"{0}\"+butlerScoresFilename+".html":@"{0}\butlerscores.html", butlerOutputFolder);
             Utility.WriteFile(outputFileName, result);
         }
 

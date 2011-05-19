@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +54,16 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SitesAPI\SitesAPI.csproj">
+      <Project>{B28700E0-2767-4C6A-895E-B1ECC5A2ACEB}</Project>
+      <Name>SitesAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SpreadsheetAPI\SpreadsheetAPI.csproj">
+      <Project>{816A6F63-6C29-4CCD-AC99-F815424AD5CD}</Project>
+      <Name>SpreadsheetAPI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
