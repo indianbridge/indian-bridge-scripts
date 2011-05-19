@@ -363,7 +363,7 @@ namespace BridgeMateRunningScores
             }
             else
             {
-                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={2}buttonPrev.png></a></td><td><a href=Board-{1}><img src={2}buttonNext.png></a></td></tr></table></td><td>{3}</td></tr></table>", boardNumber - 1, boardNumber + 1, imagesRootUrl, note);
+                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={2}buttonPrev.png></a></td><td><a href=board-{1}><img src={2}buttonNext.png></a></td></tr></table></td><td>{3}</td></tr></table>", boardNumber - 1, boardNumber + 1, imagesRootUrl, note);
             }
 
             return linksText;
@@ -371,8 +371,8 @@ namespace BridgeMateRunningScores
 
         public string GetBackToRunningScoresLinktext()
         {
-            string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresRoot"];
-            return String.Format("<a href='{0}'>Back to Running Scores</a>", runningScoresRootUrl);
+            string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresFilename"];
+            return String.Format("<a href='../{0}'>Back to Running Scores</a>", runningScoresRootUrl);
         }
 
     }

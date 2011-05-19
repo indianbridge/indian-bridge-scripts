@@ -132,7 +132,7 @@ namespace Upload_To_Google_Sites
             currentScore.Rows.Add("1", "", "", "1", "India", "BYE", "18");
             currentScore.Rows.Add("2", "5", "Delhi", "2", "Pakistan", "28-12", "22 8");
             currentScore.Rows.Add("3", "4", "Sri Lanka", "3", "Bangladesh", "6-11", "13 17");
-            sa.updateScores(15,currentScore);
+            sa.updateScores(4,currentScore);
             //sa.updateScores(@"C:\Documents and Settings\snarasim\My Documents\Downloads\CurrentStanding\magiccontest-o-1.htm");
         }
         static void SitesTest(String sitename,String username,String password,Boolean debug_flag)
