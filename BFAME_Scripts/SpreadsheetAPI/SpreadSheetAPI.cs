@@ -32,7 +32,7 @@ namespace Upload_To_Google_Sites
             this.spreadsheetname = spreadsheetname;
             initialize(debug_flag);
         }
-        public uint getNumberOfTeams() { return numTeams; }
+        public int getNumberOfTeams() { return (int)numTeams; }
         public int getNumberOfBoards() { return int.Parse(info["Number of Boards"]); }
         public String getEventName() { return info["Event Name"]; }
         private void initialize(Boolean debug)
