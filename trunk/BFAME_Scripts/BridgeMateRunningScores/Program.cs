@@ -48,6 +48,7 @@ namespace BridgeMateRunningScores
         static int roundsComputed = 0;
         static NameValueCollection configParameters = null;
         static int totalNumberOfTeams = 0;
+        static int numberOfBoardsPerRound = 0;
         static String eventName = "";
 
         static void Main(string[] args) 
@@ -69,11 +70,13 @@ namespace BridgeMateRunningScores
                 spreadsheetAPI = new SpreadSheetAPI(configParameters["GoogleSpreadsheetName"], configParameters["Username"], configParameters["Password"], debug);
                 totalNumberOfTeams = (int)spreadsheetAPI.getNumberOfTeams();
                 eventName = spreadsheetAPI.getEventName();
+                numberOfBoardsPerRound = spreadsheetAPI.getNumberOfBoards();
                 nameNumberMapping = spreadsheetAPI.getTeamNames(debug);
             }
             else {
                 totalNumberOfTeams = Convert.ToInt16(configParameters["TotalNumberOfTeams"]);
                 eventName = configParameters["EventName"];
+                numberOfBoardsPerRound = int.Parse(configParameters["NumberOfBoardsPerRound"]);
                 // TODO Investigate using NINI
                 /*IConfigSource source = new IniConfigSource("NameNumberMapping.ini");
                 String nameNumberMappingConfig = "NameNumberMapping";
@@ -140,7 +143,7 @@ namespace BridgeMateRunningScores
                 string boardsOutputFolder = String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
                 if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
 
-                for (int i = 1; i <= Convert.ToInt16(configParameters["NumberOfBoardsPerRound"]); i++)
+                for (int i = 1; i <= numberOfBoardsPerRound; i++)
                 {
                     boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables);
                     outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
@@ -193,7 +196,7 @@ namespace BridgeMateRunningScores
             NameValueCollection completedBoards, NameValueCollection teamNumbers)
         {
             bool success;
-            int minPlayedBoards = Convert.ToInt16(configParameters["NumberOfBoardsPerRound"]), playedBoards = 0;
+            int minPlayedBoards = numberOfBoardsPerRound, playedBoards = 0;
             string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RunningScoresTemplate.html"), out success);
             string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RowTemplate.html"), out success);
             string boardTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "BoardTemplate.html"), out success);
@@ -238,7 +241,7 @@ namespace BridgeMateRunningScores
                 j++;
             }
 
-            if (minPlayedBoards == Convert.ToInt16(configParameters["NumberOfBoardsPerRound"]))
+            if (minPlayedBoards == numberOfBoardsPerRound)
             {
                 isEndOfRound = true;
             }
@@ -247,7 +250,7 @@ namespace BridgeMateRunningScores
 
             rowsText = String.Empty;
 
-            for (int i=1;i<=Convert.ToInt16(configParameters["NumberOfBoardsPerRound"]);i++) {
+            for (int i=1;i<=numberOfBoardsPerRound;i++) {
                 // Alternating backgrounds
                 rowText = (i % 2) == 0 ? boardTemplate.Replace("background-color:#def", "background-color:#ddd") : boardTemplate;
                 linkText = configParameters["RunningScoresFileName"]+"/"+configParameters["BoardLinkTemplate"].Replace("[#RoundNumber#]", roundInProgres.ToString());
