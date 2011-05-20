@@ -16,15 +16,16 @@ namespace BridgeMateRunningScores
         const string pairHeadingNew = "<FONT face='Verdana, Arial, Helvetica' size=2><b><b>Pair<br>NS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EW</b></font>";
         const string TABLE_START_TAG = "<TABLE";
         const string TABLE_END_TAG = "</TABLE>";
-        string m_inputFolder, m_runningScoreFileName, m_butlerFileName;
+        string m_inputFolder, m_runningScoreFileName, m_butlerFileName,m_runningScoreRoot;
         static DataTable m_completedBoards, m_butlerResults;
         #endregion
 
-        public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName)
+        public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName, string runningScoreRoot)
         {
             m_inputFolder = folderName;
             m_runningScoreFileName = runningScoreFileName;
             m_butlerFileName = butlerFileName;
+            m_runningScoreRoot = runningScoreRoot;
 
             m_completedBoards = new DataTable();
             m_completedBoards.Columns.Add("Table", typeof(System.String));
@@ -371,8 +372,8 @@ namespace BridgeMateRunningScores
 
         public string GetBackToRunningScoresLinktext()
         {
-            string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresFilename"];
-            return String.Format("<a href='..'>Back to Running Scores</a>", runningScoresRootUrl);
+            //string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresFilename"];
+            return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
         }
 
     }

@@ -32,6 +32,8 @@ namespace Upload_To_Google_Sites
             this.spreadsheetname = spreadsheetname;
             initialize(debug_flag);
         }
+        public uint getNumberOfTeams() { return numTeams; }
+        public String getEventName() { return info["Event Name"]; }
         private void initialize(Boolean debug)
         {
             findSpreadsheet(debug);
@@ -68,50 +70,6 @@ namespace Upload_To_Google_Sites
         {
             NameValueCollection names = new NameValueCollection();
             WorksheetEntry entry = (WorksheetEntry)worksheets["Names"];
-            /*AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-            AtomLink link = spreadsheet.Links.FindService(GDataSpreadsheetsNameTable.WorksheetRel, null);
-            WorksheetQuery wquery = new WorksheetQuery(link.HRef.ToString());
-            wquery.Title = "Info";
-            WorksheetFeed wfeed = service.Query(wquery);
-            WorksheetEntry namesSheet = null;
-            WorksheetEntry infoSheet = null;
-            if (wfeed.Entries.Count > 0)
-            {
-                infoSheet = wfeed.Entries[0] as WorksheetEntry;
-            }
-                else
-                {
-                    String message = "Cannot find sheet titled Info!!!";
-                    if (debug_flag) Console.WriteLine(message);
-                    throw new ArgumentNullException(message);
-                }
-
-                wquery.Title = "Names";
-                wfeed = service.Query(wquery);
-                if (wfeed.Entries.Count > 0)
-                {
-                    namesSheet = wfeed.Entries[0] as WorksheetEntry;
-                }
-                else
-                {
-                    String message = "Cannot find sheet titled Names!!!";
-                    if (debug_flag) Console.WriteLine(message);
-                    throw new ArgumentNullException(message);
-                }
-                int numTeams = 0;
-                AtomLink listFeedLink = infoSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                ListQuery iquery = new ListQuery(listFeedLink.HRef.ToString());
-                ListFeed ifeed = service.Query(iquery) as ListFeed;
-                foreach (ListEntry worksheetRow in ifeed.Entries)
-                {
-                    ListEntry.CustomElementCollection elements = worksheetRow.Elements;
-                    String parameterName = elements[0].Value;
-                    if (parameterName.ToLower() == "Number of Teams".ToLower())
-                    {
-                        numTeams = int.Parse(elements[1].Value);
-                        if (debug_flag) Console.WriteLine("Num Teams = " + numTeams);
-                    }
-                }*/
                 AtomLink cellFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
                 CellQuery cquery = new CellQuery(cellFeedLink.HRef.ToString());
                 cquery.ReturnEmpty = ReturnEmptyCells.yes;
@@ -290,34 +248,6 @@ namespace Upload_To_Google_Sites
 
             }
         }
-        /*private void getInfo()
-        {
-            WorksheetEntry entry = (WorksheetEntry)worksheets["Info"];
-            AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-
-            ListQuery query = new ListQuery(listFeedLink.HRef.ToString());
-            ListFeed feed = service.Query(query);
-
-            foreach (ListEntry worksheetRow in feed.Entries)
-            {
-                ListEntry.CustomElementCollection elements = worksheetRow.Elements;
-                String parameterName = elements[0].Value;
-                if (parameterName.ToLower() == "Number of Teams".ToLower())
-                {
-                    numTeams = uint.Parse(elements[1].Value);
-                    if(debug_flag) Console.WriteLine("Num Teams = " + numTeams);
-                }
-                else if (parameterName.ToLower() == "Number of Rounds".ToLower())
-                {
-                    numRounds = uint.Parse(elements[1].Value);
-                    if (debug_flag) Console.WriteLine("Num Rounds = " + numRounds);
-                }
-
-            }
-            numMatches = (uint)(numTeams / 2 + (numTeams % 2 == 0 ? 0 : 1));
-            if (debug_flag) Console.WriteLine("Num Matches = " + numMatches);
-        }*/
-
 
     }
 }
