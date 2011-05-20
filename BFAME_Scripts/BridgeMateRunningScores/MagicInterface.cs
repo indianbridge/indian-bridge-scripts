@@ -18,6 +18,7 @@ namespace BridgeMateRunningScores
         const string TABLE_END_TAG = "</TABLE>";
         string m_inputFolder, m_runningScoreFileName, m_butlerFileName,m_runningScoreRoot;
         static DataTable m_completedBoards, m_butlerResults;
+        static Dictionary<int, DateTime> m_lastModifiedTimes = new Dictionary<int, DateTime>();
         #endregion
 
         public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName, string runningScoreRoot)
@@ -27,9 +28,12 @@ namespace BridgeMateRunningScores
             m_butlerFileName = butlerFileName;
             m_runningScoreRoot = runningScoreRoot;
 
-            m_completedBoards = new DataTable();
-            m_completedBoards.Columns.Add("Table", typeof(System.String));
-            m_completedBoards.Columns.Add("Board", typeof(System.Int16));
+            if (m_completedBoards == null)
+            {
+                m_completedBoards = new DataTable();
+                m_completedBoards.Columns.Add("Table", typeof(System.String));
+                m_completedBoards.Columns.Add("Board", typeof(System.Int16));
+            }
 
             //m_butlerResults = LoadPreviousButlerResults();
             m_butlerResults = new DataTable();
@@ -180,10 +184,34 @@ namespace BridgeMateRunningScores
             return currentScore;
         }
 
-        public string GetBoardResults(int boardNumber, NameValueCollection pairNames, int numberOfTables)
+        public string GetBoardResults(int boardNumber, NameValueCollection pairNames, 
+            int numberOfTables, out bool hasNewResults)
         {
-            bool success;
-            string fileName = String.Format(@"{0}\{1}-{2}.htm", m_inputFolder, m_butlerFileName, boardNumber.ToString());
+            bool success; DateTime boardLastUpdatedTime;
+            string fileName = String.Format(@"{0}\{1}-{2}.htm", m_inputFolder, 
+                m_butlerFileName, boardNumber.ToString());
+
+            hasNewResults = true;
+
+            // Only create new board results if the corresponding magic file has been updated in the interim
+            DateTime lastModifiedTime = File.GetLastWriteTime(fileName);
+            if (m_lastModifiedTimes.ContainsKey(boardNumber))
+            {
+                boardLastUpdatedTime = m_lastModifiedTimes[boardNumber];
+                if (lastModifiedTime.CompareTo(boardLastUpdatedTime) <= 0)
+                {
+                    hasNewResults = false;
+                    return String.Empty;
+                }
+                else
+                {
+                    m_lastModifiedTimes[boardNumber] = lastModifiedTime;
+                }
+            }
+            else
+            {
+                m_lastModifiedTimes.Add(boardNumber, lastModifiedTime);
+            }
 
             string html = Utility.ReadFile(fileName, out success, true);
             string backLinkText = GetBackToRunningScoresLinktext();
@@ -298,15 +326,17 @@ namespace BridgeMateRunningScores
                             }
                         }
 
-                        if (!isByeTable && cellIndex == 8)
+                        if (!isByeTable)
                         {
-                            nsScore = Convert.ToDecimal(content);
+                            if (cellIndex == 8)
+                            {
+                                nsScore = Convert.ToDecimal(content);
+                            }
+                            if (cellIndex == 9)
+                            {
+                                ewScore = Convert.ToDecimal(content);
+                            }
                         }
-                        if (!isByeTable && cellIndex == 9)
-                        {
-                            ewScore = Convert.ToDecimal(content);
-                        }
-
                         cellIndex++;
                     }
 
@@ -314,9 +344,6 @@ namespace BridgeMateRunningScores
                     if (!isByeTable)
                     {
                         Utility.UpdateButlerResults(m_butlerResults, nsPair, nsScore);
-                    }
-                    if (!isByeTable)
-                    {
                         Utility.UpdateButlerResults(m_butlerResults, ewPair, ewScore);
                     }
                 }
@@ -372,7 +399,6 @@ namespace BridgeMateRunningScores
 
         public string GetBackToRunningScoresLinktext()
         {
-            //string runningScoresRootUrl = ConfigurationManager.AppSettings["RunningScoresFilename"];
             return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
         }
 

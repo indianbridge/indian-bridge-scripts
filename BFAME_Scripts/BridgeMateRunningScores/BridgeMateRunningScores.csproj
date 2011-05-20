@@ -57,8 +57,13 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Templates\CumulativeButlerResults.csv" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{FA0A367F-859A-41E7-8F87-A507D4154E04}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SitesAPI\SitesAPI.csproj">
       <Project>{B28700E0-2767-4C6A-895E-B1ECC5A2ACEB}</Project>
       <Name>SitesAPI</Name>
@@ -68,6 +73,16 @@
       <Name>SpreadsheetAPI</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\BoardTemplate.html" />
+    <Content Include="Templates\ButlerRoundsComputed.txt" />
+    <Content Include="Templates\ButlerRowTemplate.html" />
+    <Content Include="Templates\ButlerScoresTemplate.html" />
+    <Content Include="Templates\CumulativeButlerScoresTemplate.html" />
+    <Content Include="Templates\RowTemplate.html" />
+    <Content Include="Templates\RunningScoresTemplate.html" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

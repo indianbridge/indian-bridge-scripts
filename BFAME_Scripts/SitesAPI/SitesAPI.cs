@@ -18,6 +18,7 @@ namespace Upload_To_Google_Sites
         private String sitename = null;
         private Boolean debugFlag = false;
         Hashtable lastRunTimes = new Hashtable();
+
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
         {
             this.debugFlag = debugFlag;
@@ -38,10 +39,13 @@ namespace Upload_To_Google_Sites
             }
 
         }
+
         private void printDebugMessage(String message) {
             if(this.debugFlag) Console.WriteLine(message);
         }
+
         private String makeIdentifier(String text) { return text.Replace(" ", "-"); }
+
         public void uploadDirectory(String directory, String siteRoot)
         {
             if (!Directory.Exists(directory))
@@ -52,6 +56,7 @@ namespace Upload_To_Google_Sites
             uploadPath(directory, siteRoot);
 
         }
+
         private void uploadPath(String path, String siteRoot)
         {
             if (Directory.Exists(path) || File.Exists(path))
@@ -112,6 +117,7 @@ namespace Upload_To_Google_Sites
 
         public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified)
         {
+            title = IndianBridge.Common.Utility.ToCamelCase(title);
             String url = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path+"/"+pageName;
             printDebugMessage("Updating Page : " + url);
             try
@@ -129,7 +135,7 @@ namespace Upload_To_Google_Sites
                         newContent.Type = "html";
                         newContent.Content = html;
                         entry.Content = newContent;
-                        entry.Title.Text = ToCamelCase(title);
+                        entry.Title.Text = title;
                         service.Update(entry);
                         lastRunTimes[url] = DateTime.Now;
                         if (this.debugFlag) Console.WriteLine("Updated " + url + " successfully!!!");
@@ -147,6 +153,7 @@ namespace Upload_To_Google_Sites
                 return createWebPage(path, title, html, pageName);
             }
         }
+
         public String getCategoryLabel(AtomCategoryCollection categories)
         {
             foreach (AtomCategory cat in categories)
@@ -158,12 +165,6 @@ namespace Upload_To_Google_Sites
             }
             return null;
         }
-
-        public string ToCamelCase(string input)
-        {
-            return String.Format("{0}{1}", input.Substring(0, 1), input.Substring(1).ToLower());
-        }
-
 
         public AtomEntry createWebPage(String path,String title, String html, String pageName)
         {
@@ -177,7 +178,7 @@ namespace Upload_To_Google_Sites
             AtomLink link = new AtomLink("application/atom+xml", "http://schemas.google.com/sites/2008#parent");
             link.HRef = parent.EditUri;
             entry.Links.Add(link);
-            entry.Title.Text = ToCamelCase(title);
+            entry.Title.Text = IndianBridge.Common.Utility.ToCamelCase(title);
             entry.Content.Type = "html";
             //entry.Content.Content = getValidXml(html);
             entry.Content.Content = html;
@@ -190,6 +191,7 @@ namespace Upload_To_Google_Sites
             return newEntry;
         }
     }
+
     class SiteEntry : AbstractEntry
     {
         public SiteEntry() : base() { }
