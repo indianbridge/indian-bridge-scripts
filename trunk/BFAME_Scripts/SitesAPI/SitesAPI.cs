@@ -59,7 +59,7 @@ namespace Upload_To_Google_Sites
                 if (File.Exists(path))
                 {
                     String extension = Path.GetExtension(path).ToLower();
-                    if (extension == ".htm" || extension == ".html")
+                    if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower()!="index")
                     {
                         updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)),File.GetLastWriteTime(path));
                     }
@@ -71,7 +71,16 @@ namespace Upload_To_Google_Sites
                     {
                         var dirName = Path.GetFileName(dir);
                         var pageName = makeIdentifier(dirName);
-                        updateWebpage(siteRoot,dirName, getSubPageListing(), pageName,Directory.GetLastWriteTime(dir));
+                        String html = "";
+                        String indexFileName = String.Format(@"{0}\index.htm", dir);
+                        if (File.Exists(indexFileName)) html = File.ReadAllText(indexFileName);
+                        else
+                        {
+                            indexFileName = String.Format(@"{0}\index.html", dir);
+                            if (File.Exists(indexFileName)) html = File.ReadAllText(indexFileName);
+                            else html = getSubPageListing();
+                        }
+                        updateWebpage(siteRoot,dirName, html, pageName,Directory.GetLastWriteTime(dir));
                         uploadPath(dir, siteRoot + "/" + pageName);
                     }
                     String[] files = Directory.GetFiles(path);
@@ -80,24 +89,6 @@ namespace Upload_To_Google_Sites
             }
             
         }
-
-        // Not need anymore. Keep it around just in case.
-        /*private String getValidXml(String html)
-        {
-            var newHtml = html.Replace("&nbsp;", " ");
-            Sgml.SgmlReader sgmlReader = new Sgml.SgmlReader();
-            sgmlReader.DocType = "XHTML";
-            sgmlReader.WhitespaceHandling = WhitespaceHandling.All;
-            sgmlReader.CaseFolding = Sgml.CaseFolding.ToLower;
-            sgmlReader.InputStream = new StringReader(newHtml);
-
-            // create document
-            XmlDocument doc = new XmlDocument();
-            doc.PreserveWhitespace = true;
-            doc.XmlResolver = null;
-            doc.Load(sgmlReader);
-            return doc.OuterXml;
-        }*/
 
         private String getSubPageListing()
         {
