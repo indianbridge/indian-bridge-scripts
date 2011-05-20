@@ -46,7 +46,7 @@ namespace BridgeMateRunningScores
                 try
                 {
                     spreadsheetAPI = new SpreadSheetAPI(configParameters["GoogleSpreadsheetName"], configParameters["Username"], configParameters["Password"], debug);
-                    totalNumberOfTeams = (int)spreadsheetAPI.getNumberOfTeams();
+                    totalNumberOfTeams = spreadsheetAPI.getNumberOfTeams();
                     eventName = spreadsheetAPI.getEventName();
                     numberOfBoardsPerRound = spreadsheetAPI.getNumberOfBoards();
                     nameNumberMapping = spreadsheetAPI.getTeamNames(debug);
