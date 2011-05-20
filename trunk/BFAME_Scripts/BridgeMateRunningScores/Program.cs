@@ -15,76 +15,58 @@ namespace BridgeMateRunningScores
 {
     class Program
     {
-        #region Config values
-
-        // Consolidated this into a NameValueCollection, this way we can change where we these values from.
-        // For now the NameValueCollection is just ConfigurationManager.AppSettings
-        /*static string eventName = ConfigurationManager.AppSettings["EventName"];
-        static string configParameters["TeamLinkTemplate"] = ConfigurationManager.AppSettings["configParameters["TeamLinkTemplate"]"];
-        static int Convert.ToInt16(configParameters["NumberOfBoardsPerRound"]) = Convert.ToInt16(ConfigurationManager.AppSettings["Convert.ToInt16(configParameters["NumberOfBoardsPerRound"])"]);
-        static string configParameters["BoardLinkTemplate"] = ConfigurationManager.AppSettings["BoardLinkTemplate"];
-        static string configParameters["ButlerRoundLinkTemplate"] = ConfigurationManager.AppSettings["ButlerRoundLinkTemplate"];
-        static string configParameters["OutputFolder"] = ConfigurationManager.AppSettings["configParameters["OutputFolder"]"];
-        static string configParameters["TemplateFolder"] = ConfigurationManager.AppSettings["configParameters["TemplateFolder"]"];
-        static string configParameters["RunningScoreFileName"] = ConfigurationManager.AppSettings["configParameters["RunningScoreFileName"]"];
-        static string configParameters["InputFolder"] = ConfigurationManager.AppSettings["configParameters["InputFolder"]"];
-        static string configParameters["ButlerFileName"] = ConfigurationManager.AppSettings["configParameters["ButlerFileName"]"];
-        static string configParameters["Username"] = ConfigurationManager.AppSettings["configParameters["Username"]"];
-        static string configParameters["Password"] = ConfigurationManager.AppSettings["configParameters["Password"]"];
-        static string configParameters["GoogleSpreadsheetName"] = ConfigurationManager.AppSettings["configParameters["GoogleSpreadsheetName"]"];
-        static string configParameters["GoogleSiteName"] = ConfigurationManager.AppSettings["configParameters["GoogleSiteName"]"];
-        static string configParameters["GoogleRunningScoresRoot"] = ConfigurationManager.AppSettings["configParameters["GoogleRunningScoresRoot"]"];
-        static string configParameters["GoogleButlerScoresRoot"] = ConfigurationManager.AppSettings["configParameters["GoogleButlerScoresRoot"]"];
-        static string configParameters["RunningScoresFileName"] = ConfigurationManager.AppSettings["configParameters["RunningScoresFileName"]"];
-        static string configParameters["ButlerScoresFileName"] = ConfigurationManager.AppSettings["configParameters["ButlerScoresFileName"]"];
-        static Boolean Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"]) = Boolean.Parse(ConfigurationManager.AppSettings["Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"])"]);
-        static Boolean Boolean.Parse(configParameters["RunUpdateGoogleSite"]) = Boolean.Parse(ConfigurationManager.AppSettings["Boolean.Parse(configParameters["RunUpdateGoogleSite"])"]);
-        static long long.Parse(configParameters["UpdateFrequency"]) = long.Parse(ConfigurationManager.AppSettings["long.Parse(configParameters["UpdateFrequency"])"]);*/
-
-        #endregion
+        #region Members
 
         static bool isEndOfRound = false;
         static int roundInProgress = 0;
-        static int roundsComputed = 0;
-        static NameValueCollection configParameters = null;
         static int totalNumberOfTeams = 0;
         static int numberOfBoardsPerRound = 0;
         static String eventName = "";
+        static NameValueCollection configParameters = null;
+        static NameValueCollection pairNames = null;
+
+        #endregion
 
         static void Main(string[] args) 
         {
-            Boolean debug = true;
             // Read all configuration parameters
-            configParameters = readConfigParameters();
-            
+            configParameters = ReadConfigParameters();
+
+            bool debug = Convert.ToBoolean(configParameters["DebugMode"]);
+
             NameValueCollection nameNumberMapping = null;
             SpreadSheetAPI spreadsheetAPI = null;
             SitesAPI sitesAPI = null;
 
-            // Wipe out Butler files
-            Utility.WriteFile(String.Format(@"{0}\CumulativeButlerResults.csv", configParameters["TemplateFolder"]), "");
-
             // Initialize SpreadsheetAPI and gather information
             if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"]))
             {
-                spreadsheetAPI = new SpreadSheetAPI(configParameters["GoogleSpreadsheetName"], configParameters["Username"], configParameters["Password"], debug);
-                totalNumberOfTeams = (int)spreadsheetAPI.getNumberOfTeams();
-                eventName = spreadsheetAPI.getEventName();
-                numberOfBoardsPerRound = spreadsheetAPI.getNumberOfBoards();
-                nameNumberMapping = spreadsheetAPI.getTeamNames(debug);
+                Console.WriteLine("Retrieving event parameter data from spreadsheet");
+                Console.WriteLine();
+                try
+                {
+                    spreadsheetAPI = new SpreadSheetAPI(configParameters["GoogleSpreadsheetName"], configParameters["Username"], configParameters["Password"], debug);
+                    totalNumberOfTeams = (int)spreadsheetAPI.getNumberOfTeams();
+                    eventName = spreadsheetAPI.getEventName();
+                    numberOfBoardsPerRound = spreadsheetAPI.getNumberOfBoards();
+                    nameNumberMapping = spreadsheetAPI.getTeamNames(debug);
+                }
+                catch (Exception)
+                {
+                    if (debug) Console.WriteLine("Spreadsheet call failed. Using parameters from Config");
+                    GetEventParametersFromConfig(out totalNumberOfTeams, out eventName, out numberOfBoardsPerRound,
+                        out nameNumberMapping);
+                }
             }
             else {
-                totalNumberOfTeams = Convert.ToInt16(configParameters["TotalNumberOfTeams"]);
-                eventName = configParameters["EventName"];
-                numberOfBoardsPerRound = int.Parse(configParameters["NumberOfBoardsPerRound"]);
-                // TODO Investigate using NINI
-                /*IConfigSource source = new IniConfigSource("NameNumberMapping.ini");
-                String nameNumberMappingConfig = "NameNumberMapping";
-                string[] keys = source.Configs[nameNumberMappingConfig].GetKeys();
-                foreach (string key in keys) nameNumberMapping.Add(key, source.Configs[nameNumberMappingConfig].Get(key));*/
-                nameNumberMapping = GetTeamNumbersNamesMapping();
+                Console.WriteLine("Retrieving event parameter data from config");
+                Console.WriteLine();
+                GetEventParametersFromConfig(out totalNumberOfTeams, out eventName, out numberOfBoardsPerRound, 
+                    out nameNumberMapping);
             }
 
+            Console.WriteLine("Initializing connection to Google Site");
+            Console.WriteLine();
             // Initialize Google SitesAPI
             if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
             {
@@ -92,23 +74,38 @@ namespace BridgeMateRunningScores
             }
 
             // Run continuously
-            while(true) {
+            while (true) {
                 try
                 {
                     var stopwatch = Stopwatch.StartNew();
                     if (debug) Console.WriteLine("Running at " + DateTime.Now.ToString());
                     // Calculate Scores and Update Files
-                    DataTable runningScores = createButlerAndRunningScoresFiles(totalNumberOfTeams, nameNumberMapping, debug);
+                    Console.WriteLine("Creating Butler, Running scores and Board files");
+                    Console.WriteLine();
+                    DataTable runningScores = CreateButlerAndRunningScoresFiles(totalNumberOfTeams, nameNumberMapping, debug);
+
                     // Upload Running Scores
+                    Console.WriteLine("Uploading running scores");
+                    Console.WriteLine();
+
                     if (Boolean.Parse(configParameters["RunUpdateGoogleSite"])) sitesAPI.uploadDirectory(configParameters["OutputFolder"] + "\\runningscores", configParameters["GoogleRunningScoresRoot"]);
+
                     if (isEndOfRound)
                     {
                         // Upload Butler Scores
+                        Console.WriteLine("Uploading Butler Scores");
+                        Console.WriteLine();
                         if (Boolean.Parse(configParameters["RunUpdateGoogleSite"])) sitesAPI.uploadDirectory(configParameters["OutputFolder"] + "\\butlerscores", configParameters["GoogleButlerScoresRoot"]);
                         // Update Spreadsheet with round scores
+                        Console.WriteLine("Uploading spreadsheet with round scores");
+                        Console.WriteLine();
                         if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"])) spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
                     }
                     long elapsedTime = stopwatch.ElapsedMilliseconds;
+
+                    Console.WriteLine("Done processing...waiting for next cycle");
+                    Console.WriteLine();
+
                     if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
                     if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
                 }
@@ -120,24 +117,44 @@ namespace BridgeMateRunningScores
 
         }
 
-        static NameValueCollection readConfigParameters()
+        static void GetEventParametersFromConfig(out int totalNumberOfTeams, out string eventName,
+            out int numberOfBoardsPerRound, out NameValueCollection nameNumberMapping)
+        {
+            totalNumberOfTeams = Convert.ToInt16(configParameters["TotalNumberOfTeams"]);
+            eventName = configParameters["EventName"];
+            numberOfBoardsPerRound = int.Parse(configParameters["NumberOfBoardsPerRound"]);
+            // TODO Investigate using NINI
+            /*IConfigSource source = new IniConfigSource("NameNumberMapping.ini");
+            String nameNumberMappingConfig = "NameNumberMapping";
+            string[] keys = source.Configs[nameNumberMappingConfig].GetKeys();
+            foreach (string key in keys) nameNumberMapping.Add(key, source.Configs[nameNumberMappingConfig].Get(key));*/
+            nameNumberMapping = GetTeamNumbersNamesMapping();
+        }
+
+        static NameValueCollection ReadConfigParameters()
         {
             return new NameValueCollection(ConfigurationManager.AppSettings);
         }
 
-
-        static DataTable createButlerAndRunningScoresFiles(int totalNumberOfTeams, NameValueCollection nameNumberMapping, Boolean debug = false)
+        static DataTable CreateButlerAndRunningScoresFiles(int totalNumberOfTeams, 
+            NameValueCollection nameNumberMapping, Boolean debug = false)
         {
             int numberOfMatchesPerRound = ((totalNumberOfTeams + 1) / 2);
             int numberOfPairs = 4*(totalNumberOfTeams/2);
             int numberOfTables = 2 * numberOfMatchesPerRound;
             string boardResultText, outputFileName;
+            bool hasNewResults;
 
             MagicInterface magicInterface = new MagicInterface(configParameters["InputFolder"], configParameters["RunningScoreFileName"], configParameters["ButlerFileName"], configParameters["RunningScoresFileName"]);
             DataTable runningScores = magicInterface.GetRunningScores(((totalNumberOfTeams+1) / 2), out roundInProgress);
+
             if (roundInProgress > 0)
             {
-                NameValueCollection pairNames = magicInterface.GetPairNames(numberOfPairs);
+                // Only retrieve pair names if they've not already been retrieved
+                if (pairNames == null || pairNames.Count == 0)
+                {
+                    pairNames = magicInterface.GetPairNames(numberOfPairs);
+                }
                 String eventFolder = String.Format(@"{0}\runningscores\{1}", configParameters["OutputFolder"], configParameters["RunningScoresFileName"]);
                 if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
                 string boardsOutputFolder = String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
@@ -145,9 +162,14 @@ namespace BridgeMateRunningScores
 
                 for (int i = 1; i <= numberOfBoardsPerRound; i++)
                 {
-                    boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables);
-                    outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
-                    Utility.WriteFile(outputFileName, boardResultText);
+                    boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables, out hasNewResults);
+
+                    // only update the file if results have been updated
+                    if (hasNewResults)
+                    {
+                        outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
+                        Utility.WriteFile(outputFileName, boardResultText);
+                    }
                 }
 
                 NameValueCollection playedBoards = GetPlayedBoards(numberOfMatchesPerRound, magicInterface.CompletedBoards);
@@ -158,17 +180,21 @@ namespace BridgeMateRunningScores
                 if (isEndOfRound)
                 {
                     // Only re-compute results if we haven't already generated butler results for this round
-                    /*bool success;
-                    string butlerRoundsFileName = String.Format(@"{0}\ButlerRoundsComputed.txt", configParameters["TemplateFolder"]);
-                    int roundsComputed = Convert.ToInt32(Utility.ReadFile(butlerRoundsFileName, out success));*/
+                    bool success;
+                    string butlerRoundsFileName = String.Format(@"{0}\ButlerRoundsComputed.txt", configParameters["OutputFolder"]);
+                    string content = Utility.ReadFile(butlerRoundsFileName, out success, true);
+                    int roundsComputed = String.IsNullOrEmpty(content) ? 0 : Convert.ToInt32(content);
+
                     if (roundInProgress > roundsComputed)
                     {
+                        if (debug) Console.WriteLine("Generating Butler Results...");
+
                         roundsComputed = roundInProgress;
-                        //Utility.WriteFile(butlerRoundsFileName, roundInProgress.ToString());
                         DataTable cumulativeButlerScores = MergeCurrentButlerScoresIntoCumulativeResults(magicInterface.ButlerResults);
                         WriteButlerScoresToFile(cumulativeButlerScores, true);
                         GenerateButlerScoresHTML(cumulativeButlerScores, roundInProgress, true);
                         GenerateButlerScoresHTML(magicInterface.ButlerResults, roundInProgress, false);
+                        Utility.WriteFile(butlerRoundsFileName, roundInProgress.ToString());
                     }
                 }
 
@@ -178,20 +204,6 @@ namespace BridgeMateRunningScores
 
        }
 
-        //TODO (Sriram): This is a stub for the call to the spreadsheet to get the names-numbers mapping
-        // When you update the code in Main to call that method instead, just delete this method
-        public static NameValueCollection GetTeamNumbersNamesMapping()
-        {
-            NameValueCollection names = new NameValueCollection();
-            names.Add("India", "1");
-            names.Add("Pakistan", "2");
-            names.Add("Bangladesh", "3");
-            names.Add("Srilanka", "4");
-            names.Add("Delhi", "5");
-
-            return names;
-        }
-
         public static void GenerateRunningScoresHTML(DataTable runningScores, int roundInProgres,
             NameValueCollection completedBoards, NameValueCollection teamNumbers)
         {
@@ -200,7 +212,6 @@ namespace BridgeMateRunningScores
             string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RunningScoresTemplate.html"), out success);
             string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RowTemplate.html"), out success);
             string boardTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "BoardTemplate.html"), out success);
-
             string rowText, rowsText = String.Empty, linkText = String.Empty;
             string result, homeTeam, awayTeam;
 
@@ -298,8 +309,7 @@ namespace BridgeMateRunningScores
 
         public static void WriteButlerScoresToFile(DataTable butlerScores, bool cumulative = false)
         {
-            //string configParameters["TemplateFolder"] = ConfigurationManager.AppSettings["configParameters["TemplateFolder"]"];
-            string butlerResultsFileName = String.Format(@"{0}\{1}", configParameters["TemplateFolder"], String.Format("{0}ButlerResults.csv", cumulative ? "Cumulative" : String.Empty));
+            string butlerResultsFileName = String.Format(@"{0}\{1}", configParameters["OutputFolder"], String.Format("{0}ButlerResults.csv", cumulative ? "Cumulative" : String.Empty));
             string content;
 
             content = "Pair, Boards, Score\r\n";
@@ -314,20 +324,30 @@ namespace BridgeMateRunningScores
         public static DataTable LoadCumulativeButlerResults()
         {
             DataTable m_butlerResults;
-            //string configParameters["TemplateFolder"] = ConfigurationManager.AppSettings["configParameters["TemplateFolder"]"];
-            string m_butlerResultsFileName = String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "CumulativeButlerResults.csv");
-            StreamReader fileStream = new StreamReader(m_butlerResultsFileName);
+            string butlerResultsFileName = String.Format(@"{0}\CumulativeButlerResults.csv", configParameters["OutputFolder"]);
+            StreamReader fileStream = null;
+            m_butlerResults = new DataTable();
+            m_butlerResults.Columns.Add("Pair", typeof(System.String));
+            m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
+            m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
+
+
+            // If we couldn't read the file, we return an empty datatable
+            try
+            {
+                fileStream = new StreamReader(butlerResultsFileName);
+            }
+            catch (Exception)
+            {
+                return m_butlerResults;
+            }
+
             string row;
             string[] data;
             DataRow dataRow;
 
             // Skip past the header row
             fileStream.ReadLine();
-
-            m_butlerResults = new DataTable();
-            m_butlerResults.Columns.Add("Pair", typeof(System.String));
-            m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
-            m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
 
             while (true)
             {
@@ -346,6 +366,31 @@ namespace BridgeMateRunningScores
             fileStream.Close();
 
             return m_butlerResults;
+        }
+
+        public static NameValueCollection GetTeamNumbersNamesMapping()
+        {
+            NameValueCollection names = new NameValueCollection();
+            string teamNamesFileName = String.Format(@"{0}\TeamNames.csv", configParameters["InputFolder"]);
+            StreamReader fileStream = new StreamReader(teamNamesFileName);
+            string row;
+            string[] data;
+
+            // Skip past the header row
+            fileStream.ReadLine();
+
+            while (true)
+            {
+                row = fileStream.ReadLine();
+                if (String.IsNullOrEmpty(row)) break;
+                data = row.Split(new char[] { ',' });
+
+                names.Add(data[1], data[0]);
+            }
+
+            fileStream.Close();
+
+            return names;
         }
 
         public static DataTable MergeCurrentButlerScoresIntoCumulativeResults(DataTable currentButlerResults)
