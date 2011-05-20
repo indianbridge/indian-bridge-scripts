@@ -129,7 +129,7 @@ namespace Upload_To_Google_Sites
                         newContent.Type = "html";
                         newContent.Content = html;
                         entry.Content = newContent;
-                        entry.Title.Text = title;
+                        entry.Title.Text = ToCamelCase(title);
                         service.Update(entry);
                         lastRunTimes[url] = DateTime.Now;
                         if (this.debugFlag) Console.WriteLine("Updated " + url + " successfully!!!");
@@ -159,6 +159,12 @@ namespace Upload_To_Google_Sites
             return null;
         }
 
+        public string ToCamelCase(string input)
+        {
+            return String.Format("{0}{1}", input.Substring(0, 1), input.Substring(1).ToLower());
+        }
+
+
         public AtomEntry createWebPage(String path,String title, String html, String pageName)
         {
             String parentUrl = "http://sites.google.com/feeds/content/site/" + sitename + "?path=" + path;
@@ -171,7 +177,7 @@ namespace Upload_To_Google_Sites
             AtomLink link = new AtomLink("application/atom+xml", "http://schemas.google.com/sites/2008#parent");
             link.HRef = parent.EditUri;
             entry.Links.Add(link);
-            entry.Title.Text = title;
+            entry.Title.Text = ToCamelCase(title);
             entry.Content.Type = "html";
             //entry.Content.Content = getValidXml(html);
             entry.Content.Content = html;
