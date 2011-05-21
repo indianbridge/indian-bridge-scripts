@@ -17,7 +17,25 @@ namespace Upload_To_Google_Sites
     {
         static void Main(string[] args)
         {
-            if (args.Length < 1)
+            MediaService service = new MediaService("jotspot", "test");
+            service.setUserCredentials("indianbridge.dummy@gmail.com", "kibitzer");
+            String url = "https://sites.google.com/feeds/content/site/srirambridgetest?path=/open";
+            AtomEntry entry = service.Get(url);
+            if (entry == null)
+            {
+                Console.WriteLine("Not Found");
+                return;
+            }
+            AtomContent newContent = new AtomContent();
+            newContent.Type = "html";
+            newContent.Content = "Updated Content";
+            entry.Content = newContent;
+            string title = IndianBridge.Common.Utility.ToCamelCase("open");
+            entry.Title.Text = title;
+            service.Update(entry);
+
+
+            /*if (args.Length < 1)
             {
                 Console.WriteLine("Usage is Upload_To_Google_Sites sitename username password [debug_flag]. Press any key to exit...");
                 Console.ReadLine();
@@ -30,10 +48,10 @@ namespace Upload_To_Google_Sites
             if (args.Length > 1) debug_flag = Boolean.Parse(args[1]);
             //NameValueCollection test = getTeamNames("Copy of Results_Template");
             //Console.WriteLine("Team Num = "+test["Team 3"]);
-            //SitesTest(sitename, username, password, debug_flag);
-            SpreadsheetTest(sitename, username, password, debug_flag);
+            SitesTest(sitename, username, password, debug_flag);
+            //SpreadsheetTest(sitename, username, password, debug_flag);
             Console.WriteLine("Exitting.");
-            Console.ReadLine();
+            Console.ReadLine();*/
         }
 
         static NameValueCollection getTeamNames(String spreadsheetname,Boolean debug_flag=false)
