@@ -103,21 +103,17 @@ namespace BridgeMateRunningScores
                         Console.WriteLine();
                         if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"])) spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
                     }
-                    elapsedTime = stopwatch.ElapsedMilliseconds;
 
                     Console.WriteLine("Done processing...waiting for next cycle");
                     Console.WriteLine();
-
-                    if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
-                    if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception Encountered : " + e.ToString());
-                    elapsedTime = stopwatch.ElapsedMilliseconds;
-                    if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
-                    if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
                 }
+				elapsedTime = stopwatch.ElapsedMilliseconds;
+				if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
+				if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
             }
 
         }

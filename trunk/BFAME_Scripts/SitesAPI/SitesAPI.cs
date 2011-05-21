@@ -35,7 +35,7 @@ namespace Upload_To_Google_Sites
                 writer.WriteLine("");
                 stream.Close();
                 service.RequestFactory = factory;
-                printDebugMessage("All HTTP traffic will be reported in " + factory.CombinedLogFileName);
+                //printDebugMessage("All HTTP traffic will be reported in " + factory.CombinedLogFileName);
             }
 
         }
@@ -54,7 +54,6 @@ namespace Upload_To_Google_Sites
             }
             printDebugMessage("Uploading " + directory + " to " + siteRoot);
             uploadPath(directory, siteRoot);
-
         }
 
         private void uploadPath(String path, String siteRoot)
@@ -62,7 +61,7 @@ namespace Upload_To_Google_Sites
             DateTime lastUpdateTime = DateTime.Now;
             if (Directory.Exists(path) || File.Exists(path))
             {
-                if (File.Exists(path))
+                 if (File.Exists(path))
                 {
                     String extension = Path.GetExtension(path).ToLower();
                     if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower()!="index")
@@ -127,9 +126,8 @@ namespace Upload_To_Google_Sites
 
         public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified)
         {
-            title = IndianBridge.Common.Utility.ToCamelCase(title);
             String url = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path+"/"+pageName;
-            printDebugMessage("Updating Page : " + url);
+            //printDebugMessage("Updating Page : " + url);
             try
             {
                 AtomEntry entry = service.Get(url);
@@ -145,14 +143,14 @@ namespace Upload_To_Google_Sites
                         newContent.Type = "html";
                         newContent.Content = html;
                         entry.Content = newContent;
-                        entry.Title.Text = title;
+                        entry.Title.Text = IndianBridge.Common.Utility.ToCamelCase(title);
                         service.Update(entry);
                         lastRunTimes[url] = DateTime.Now;
-                        if (this.debugFlag) Console.WriteLine("Updated " + url + " successfully!!!");
+                        if (this.debugFlag) printDebugMessage(url + " - Updated.");
                     }
                     else
                     {
-                        if (this.debugFlag) Console.WriteLine("Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ", so not updating!!!");
+                        if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ")");
                     }
                 }
                 return entry;
@@ -176,10 +174,10 @@ namespace Upload_To_Google_Sites
             return null;
         }
 
-        public AtomEntry createWebPage(String path,String title, String html, String pageName)
+        public AtomEntry createWebPage(String path, String title, String html, String pageName)
         {
             String parentUrl = "http://sites.google.com/feeds/content/site/" + sitename + "?path=" + path;
-            printDebugMessage("Creating page "+ parentUrl + "/" + pageName);
+            //printDebugMessage("Creating page "+ parentUrl + "/" + pageName);
             AtomEntry parent = service.Get(parentUrl);
             SiteEntry entry = new SiteEntry();
             AtomCategory category = new AtomCategory(SitesService.WEBPAGE_TERM, SitesService.KIND_SCHEME);
@@ -190,14 +188,12 @@ namespace Upload_To_Google_Sites
             entry.Links.Add(link);
             entry.Title.Text = IndianBridge.Common.Utility.ToCamelCase(title);
             entry.Content.Type = "html";
-            //entry.Content.Content = getValidXml(html);
             entry.Content.Content = html;
             entry.ExtensionElements.Add(makePageNameExtension(pageName));
-
             AtomEntry newEntry = null;
             String url = "http://sites.google.com/feeds/content/site/" + sitename;
             newEntry = service.Insert(new Uri(url), entry);
-            if (this.debugFlag) Console.WriteLine("Created " + parentUrl + "/" + pageName + " successfully!");
+            if (this.debugFlag) printDebugMessage(parentUrl + "/" + pageName + " - Created.");
             return newEntry;
         }
     }

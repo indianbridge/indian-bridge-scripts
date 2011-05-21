@@ -62,6 +62,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{FA0A367F-859A-41E7-8F87-A507D4154E04}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\SitesAPI\SitesAPI.csproj">
       <Project>{B28700E0-2767-4C6A-895E-B1ECC5A2ACEB}</Project>
       <Name>SitesAPI</Name>
