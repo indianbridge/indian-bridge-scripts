@@ -73,11 +73,13 @@ namespace BridgeMateRunningScores
                 sitesAPI = new SitesAPI(configParameters["GoogleSiteName"], configParameters["Username"], configParameters["Password"], debug);
             }
 
+            long elapsedTime;
+            Stopwatch stopwatch = null;
             // Run continuously
             while (true) {
                 try
                 {
-                    var stopwatch = Stopwatch.StartNew();
+                    stopwatch = Stopwatch.StartNew();
                     if (debug) Console.WriteLine("Running at " + DateTime.Now.ToString());
                     // Calculate Scores and Update Files
                     Console.WriteLine("Creating Butler, Running scores and Board files");
@@ -101,7 +103,7 @@ namespace BridgeMateRunningScores
                         Console.WriteLine();
                         if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"])) spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
                     }
-                    long elapsedTime = stopwatch.ElapsedMilliseconds;
+                    elapsedTime = stopwatch.ElapsedMilliseconds;
 
                     Console.WriteLine("Done processing...waiting for next cycle");
                     Console.WriteLine();
@@ -112,6 +114,9 @@ namespace BridgeMateRunningScores
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception Encountered : " + e.ToString());
+                    elapsedTime = stopwatch.ElapsedMilliseconds;
+                    if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
+                    if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
                 }
             }
 
