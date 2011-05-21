@@ -22,7 +22,7 @@ namespace IndianBridge.Common
 
         public static string ToCamelCase(string input)
         {
-            return String.Format("{0}{1}", input.Substring(0, 1), input.Substring(1).ToLower());
+            return String.Format("{0}{1}", input.Substring(0, 1).ToUpper(), input.Substring(1).ToLower());
         }
 
         // Given row text and a start position, find the next field in the row

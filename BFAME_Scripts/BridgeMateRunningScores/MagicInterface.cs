@@ -19,6 +19,7 @@ namespace BridgeMateRunningScores
         string m_inputFolder, m_runningScoreFileName, m_butlerFileName,m_runningScoreRoot;
         static DataTable m_completedBoards, m_butlerResults;
         static Dictionary<int, DateTime> m_lastModifiedTimes = new Dictionary<int, DateTime>();
+        const string BOARD_RESULT_FONT_TEXT = "<FONT face='Verdana, Arial, Helvetica' size=2>";
         #endregion
 
         public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName, string runningScoreRoot)
@@ -28,14 +29,6 @@ namespace BridgeMateRunningScores
             m_butlerFileName = butlerFileName;
             m_runningScoreRoot = runningScoreRoot;
 
-            if (m_completedBoards == null)
-            {
-                m_completedBoards = new DataTable();
-                m_completedBoards.Columns.Add("Table", typeof(System.String));
-                m_completedBoards.Columns.Add("Board", typeof(System.Int16));
-            }
-
-            //m_butlerResults = LoadPreviousButlerResults();
             m_butlerResults = new DataTable();
             m_butlerResults.Columns.Add("Pair", typeof(System.String));
             m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
@@ -49,34 +42,31 @@ namespace BridgeMateRunningScores
 
             // Get the butler table first
             string text = Utility.GetDataFromHtmlTable(String.Format(@"{0}\{1}.htm", m_inputFolder, m_butlerFileName), 0, true);
-            //MagicInterface.WriteFile("blah.txt", text);
 
             int position, endOfRowPosition = 0;
 
-            // Find the index of the "Team" column header
-            endOfRowPosition = text.IndexOf("Team");
+            // Find the index of the "Count" column header
+            endOfRowPosition = text.IndexOf("Name");
+            position = text.IndexOf("\r\n\r\n", endOfRowPosition) + 4;
             int rank = 1;
 
             while (rank <= numberOfPairs)
             {
-                // Find the index of the "rank" 1
-                position = text.IndexOf(rank.ToString(), endOfRowPosition);
+                // Find 
                 endOfRowPosition = text.IndexOf("\r\n", position);
 
                 rowText = text.Substring(position, endOfRowPosition - position);
-
                 position = 0;
-
-                string currentRank = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
                 string pairNumber = Utility.GetField(rowText, ref position);
-                string score = Utility.GetField(rowText, ref position);
                 string team = Utility.GetField(rowText, ref position);
+                string score = Utility.GetField(rowText, ref position);
                 string player1 = Utility.GetField(rowText, ref position, " - ");
                 position = rowText.IndexOf(" - ", position) + 3;
                 string player2 = rowText.Substring(position).Trim();
 
                 pairNames.Add(pairNumber, String.Format("{0} - {1} ({2})", player1, player2, team));
                 rank++;
+                position = endOfRowPosition + 2;
             }
 
             return pairNames;
@@ -90,6 +80,10 @@ namespace BridgeMateRunningScores
 
             string fileName = String.Format(@"{0}\{1}", m_inputFolder, m_runningScoreFileName);
             string text = Utility.GetDataFromHtmlTable(fileName, 0, true);
+
+            m_completedBoards = new DataTable();
+            m_completedBoards.Columns.Add("Table", typeof(System.String));
+            m_completedBoards.Columns.Add("Board", typeof(System.Int16));
 
             string fileData = Utility.ReadFile(fileName, out success);
 
@@ -122,8 +116,15 @@ namespace BridgeMateRunningScores
             {
                 DataRow row = currentScore.NewRow();
 
-                // Find the index of the "rank" 1
+                // Find the index of the "table" 1
                 position = text.IndexOf(table.ToString(), endOfRowPosition);
+                // If there's no result for this table move on to the next one
+                if (position == -1)
+                {
+                    table++;
+                    continue;
+                }
+
                 endOfRowPosition = text.IndexOf("\r\n", position);
 
                 rowText = text.Substring(position, endOfRowPosition - position);
@@ -135,7 +136,10 @@ namespace BridgeMateRunningScores
                 string team1Name = Utility.GetField(rowText, ref position);
                 string team2Number = Utility.GetField(rowText, ref position);
                 string team2Name = Utility.GetField(rowText, ref position);
-                string impScore = Utility.GetField(rowText, ref position);
+                string imp1Score = Utility.GetField(rowText, ref position, "-");
+                position = rowText.IndexOf("-", position) + 1;
+                string imp2Score = Utility.GetField(rowText, ref position);
+                string impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
 
                 position = Utility.findWhiteSpace(rowText, position);
 
@@ -236,15 +240,15 @@ namespace BridgeMateRunningScores
             boardResultsTable = tableText.Substring(startPosition, endPosition + 8 - startPosition);
 
             tableText = tableText.Replace(boardResultsTable, ReplacePairNumbersWithNames(boardNumber, boardResultsTable, pairNames, numberOfTables));
-            tableText = tableText.Replace("<td width=573 valign=top border=0>", "<td width=623 valign=top border=0>");
-            tableText = tableText.Replace("<table width=573 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>",
-                "<table width=623 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>");
-            tableText = tableText.Replace("<td width=114 align=center", "<td width=164 align=center");
-            tableText = tableText.Replace("<table width=871 border=0>", "<table width=921 border=0>");
-            tableText = tableText.Replace("src='clubs-large.gif'", String.Format("src={0}clubs-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='diamonds-large.gif'", String.Format("src={0}diamonds-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='hearts-large.gif'", String.Format("src={0}hearts-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='spades-large.gif'", String.Format("src={0}spades-large.gif", imagesRootUrl));
+            //tableText = tableText.Replace("<td width=573 valign=top border=0>", "<td width=623 valign=top border=0>");
+            //tableText = tableText.Replace("<table width=573 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>",
+            //    "<table width=623 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>");
+            //tableText = tableText.Replace("<td width=114 align=center", "<td width=164 align=center");
+            //tableText = tableText.Replace("<table width=871 border=0>", "<table width=921 border=0>");
+            tableText = tableText.Replace("src='clubs.gif'", String.Format("src={0}clubs-large.gif", imagesRootUrl));
+            tableText = tableText.Replace("src='diamonds.gif'", String.Format("src={0}diamonds-large.gif", imagesRootUrl));
+            tableText = tableText.Replace("src='hearts.gif'", String.Format("src={0}hearts-large.gif", imagesRootUrl));
+            tableText = tableText.Replace("src='spades.gif'", String.Format("src={0}spades-large.gif", imagesRootUrl));
             tableText = tableText.Replace(pairHeadingOld, pairHeadingNew);
 
             tableText = String.Format(@"<b>Page Updated {0}</b><br/><br/>{1}<br/><br/>{2}", Utility.GetTimeStamp(), backLinkText, tableText);
@@ -289,7 +293,7 @@ namespace BridgeMateRunningScores
                         cellEndPosition = rowText.IndexOf("</td>", cellStartPosition, StringComparison.InvariantCultureIgnoreCase);
                         cellText = rowText.Substring(cellStartPosition, cellEndPosition + 5 - cellStartPosition);
 
-                        contentStartPosition = cellText.IndexOf("<b>", StringComparison.InvariantCultureIgnoreCase) + 3;
+                        contentStartPosition = cellText.IndexOf(BOARD_RESULT_FONT_TEXT, StringComparison.InvariantCultureIgnoreCase) + 46;
                         contentEndPosition = cellText.IndexOf("</font>", contentStartPosition, StringComparison.InvariantCultureIgnoreCase);
                         content = cellText.Substring(contentStartPosition, contentEndPosition - contentStartPosition);
 
@@ -306,7 +310,7 @@ namespace BridgeMateRunningScores
                         {
                             if (content != "--")
                             {
-                                newCellText = cellText.Replace(String.Format("<b>{0}</font>", content), String.Format("<b>{0}</font>", pairNames[content]));
+                                newCellText = cellText.Replace(String.Format("{0}{1}</font>", BOARD_RESULT_FONT_TEXT, content), String.Format("{0}{1}</font>", BOARD_RESULT_FONT_TEXT, pairNames[content]));
                                 boardResultsHtml = boardResultsHtml.Replace(cellText, newCellText);
 
                                 if (cellIndex == 1)

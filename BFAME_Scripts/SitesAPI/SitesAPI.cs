@@ -59,6 +59,7 @@ namespace Upload_To_Google_Sites
 
         private void uploadPath(String path, String siteRoot)
         {
+            DateTime lastUpdateTime = DateTime.Now;
             if (Directory.Exists(path) || File.Exists(path))
             {
                 if (File.Exists(path))
@@ -78,14 +79,23 @@ namespace Upload_To_Google_Sites
                         var pageName = makeIdentifier(dirName);
                         String html = "";
                         String indexFileName = String.Format(@"{0}\index.htm", dir);
-                        if (File.Exists(indexFileName)) html = File.ReadAllText(indexFileName);
+
+                        if (File.Exists(indexFileName))
+                        {
+                            html = File.ReadAllText(indexFileName);
+                            lastUpdateTime = File.GetLastWriteTime(indexFileName);
+                        }
                         else
                         {
                             indexFileName = String.Format(@"{0}\index.html", dir);
-                            if (File.Exists(indexFileName)) html = File.ReadAllText(indexFileName);
+                            if (File.Exists(indexFileName))
+                            {
+                                html = File.ReadAllText(indexFileName);
+                                lastUpdateTime = File.GetLastWriteTime(indexFileName);
+                            }
                             else html = getSubPageListing();
                         }
-                        updateWebpage(siteRoot,dirName, html, pageName,Directory.GetLastWriteTime(dir));
+                        updateWebpage(siteRoot,dirName, html, pageName, lastUpdateTime);
                         uploadPath(dir, siteRoot + "/" + pageName);
                     }
                     String[] files = Directory.GetFiles(path);

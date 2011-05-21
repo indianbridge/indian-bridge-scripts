@@ -57,7 +57,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Templates\CumulativeButlerResults.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -75,7 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates\BoardTemplate.html" />
-    <Content Include="Templates\ButlerRoundsComputed.txt" />
     <Content Include="Templates\ButlerRowTemplate.html" />
     <Content Include="Templates\ButlerScoresTemplate.html" />
     <Content Include="Templates\CumulativeButlerScoresTemplate.html" />
