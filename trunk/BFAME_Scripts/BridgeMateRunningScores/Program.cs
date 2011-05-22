@@ -10,6 +10,7 @@ using System.Threading;
 using System.Diagnostics;
 using Nini.Config;
 using Upload_To_Google_Sites;
+using IndianBridge.Common;
 
 namespace BridgeMateRunningScores
 {
@@ -26,6 +27,9 @@ namespace BridgeMateRunningScores
         static NameValueCollection pairNames = null;
 
         #endregion
+
+
+        #region Methods
 
         static void Main(string[] args) 
         {
@@ -373,23 +377,27 @@ namespace BridgeMateRunningScores
         {
             NameValueCollection names = new NameValueCollection();
             string teamNamesFileName = String.Format(@"{0}\TeamNames.csv", configParameters["InputFolder"]);
-            StreamReader fileStream = new StreamReader(teamNamesFileName);
-            string row;
-            string[] data;
 
-            // Skip past the header row
-            fileStream.ReadLine();
-
-            while (true)
+            if (File.Exists(teamNamesFileName))
             {
-                row = fileStream.ReadLine();
-                if (String.IsNullOrEmpty(row)) break;
-                data = row.Split(new char[] { ',' });
+                StreamReader fileStream = new StreamReader(teamNamesFileName);
+                string row;
+                string[] data;
 
-                names.Add(data[1], data[0]);
+                // Skip past the header row
+                fileStream.ReadLine();
+
+                while (true)
+                {
+                    row = fileStream.ReadLine();
+                    if (String.IsNullOrEmpty(row)) break;
+                    data = row.Split(new char[] { ',' });
+
+                    names.Add(data[1], data[0]);
+                }
+
+                fileStream.Close();
             }
-
-            fileStream.Close();
 
             return names;
         }
@@ -473,6 +481,8 @@ namespace BridgeMateRunningScores
                 Utility.WriteFile(outputFileName, result);
             }
         }
+
+        #endregion
 
     }
 }

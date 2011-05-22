@@ -6,6 +6,7 @@ using System.Data;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
+using IndianBridge.Common;
 
 namespace BridgeMateRunningScores
 {
@@ -22,17 +23,34 @@ namespace BridgeMateRunningScores
         const string BOARD_RESULT_FONT_TEXT = "<FONT face='Verdana, Arial, Helvetica' size=2>";
         #endregion
 
+        #region Properties
+
+        public DataTable CompletedBoards
+        {
+            get
+            {
+                return m_completedBoards;
+            }
+        }
+
+        public DataTable ButlerResults
+        {
+            get
+            {
+                return m_butlerResults;
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
         public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName, string runningScoreRoot)
         {
             m_inputFolder = folderName;
             m_runningScoreFileName = runningScoreFileName;
             m_butlerFileName = butlerFileName;
             m_runningScoreRoot = runningScoreRoot;
-
-            m_butlerResults = new DataTable();
-            m_butlerResults.Columns.Add("Pair", typeof(System.String));
-            m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
-            m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
         }
 
         public NameValueCollection GetPairNames(int numberOfPairs)
@@ -75,16 +93,16 @@ namespace BridgeMateRunningScores
         public DataTable GetRunningScores(int numberOfMatchesPerRound, out int roundInProgress)
         {
             string rowText, result = String.Empty;
-            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition;
+            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, position1;
             bool success;
+            string tableNumber, team1Number, team1Name, team2Number, team2Name, imp1Score, imp2Score, impScore, vpScore;
+            string[] vpScores;
+
+            // Prior to retrieving running scores for a round, initialize the Completed Boards and Butler Results datatables
+            InitializeDataTables();
 
             string fileName = String.Format(@"{0}\{1}", m_inputFolder, m_runningScoreFileName);
             string text = Utility.GetDataFromHtmlTable(fileName, 0, true);
-
-            m_completedBoards = new DataTable();
-            m_completedBoards.Columns.Add("Table", typeof(System.String));
-            m_completedBoards.Columns.Add("Board", typeof(System.Int16));
-
             string fileData = Utility.ReadFile(fileName, out success);
 
             // If we couldn't read the file, we quit
@@ -131,23 +149,24 @@ namespace BridgeMateRunningScores
 
                 position = 0;
 
-                string tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
-                string team1Number = Utility.GetField(rowText, ref position);
-                string team1Name = Utility.GetField(rowText, ref position);
-                string team2Number = Utility.GetField(rowText, ref position);
-                string team2Name = Utility.GetField(rowText, ref position);
-                string imp1Score = Utility.GetField(rowText, ref position, "-");
+                tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
+                team1Number = Utility.GetField(rowText, ref position);
+                team1Name = Utility.GetField(rowText, ref position);
+                team2Number = Utility.GetField(rowText, ref position);
+                team2Name = Utility.GetField(rowText, ref position);
+                imp1Score = Utility.GetField(rowText, ref position, "-");
                 position = rowText.IndexOf("-", position) + 1;
-                string imp2Score = Utility.GetField(rowText, ref position);
-                string impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
+                position1 = Utility.findWhiteSpace(rowText, position);
+                imp2Score = rowText.Substring(position, position1 - position);
+                impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
 
                 position = Utility.findWhiteSpace(rowText, position);
 
                 // Skip past whitespace and find the score
                 position += Utility.skipWhiteSpace(rowText, position);
 
-                string vpScore = rowText.Substring(position).Trim();
-                string[] vpScores = vpScore.Split(new char[] { ' ' });
+                vpScore = rowText.Substring(position).Trim();
+                vpScores = vpScore.Split(new char[] { ' ' });
 
                 if (vpScores.Length > 1)
                 {
@@ -254,6 +273,23 @@ namespace BridgeMateRunningScores
             tableText = String.Format(@"<b>Page Updated {0}</b><br/><br/>{1}<br/><br/>{2}", Utility.GetTimeStamp(), backLinkText, tableText);
 
             return tableText;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void InitializeDataTables()
+        {
+            m_butlerResults = new DataTable();
+            m_butlerResults.Columns.Add("Pair", typeof(System.String));
+            m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
+            m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
+
+            m_completedBoards = new DataTable();
+            m_completedBoards.Columns.Add("Table", typeof(System.String));
+            m_completedBoards.Columns.Add("Board", typeof(System.Int16));
+
         }
 
         private string ReplacePairNumbersWithNames(int boardNumber, string boardResultsHtml, 
@@ -363,23 +399,7 @@ namespace BridgeMateRunningScores
             return result;
         }
 
-        public DataTable CompletedBoards
-        {
-            get
-            {
-                return m_completedBoards;
-            }
-        }
-
-        public DataTable ButlerResults
-        {
-            get
-            {
-                return m_butlerResults;
-            }
-        }
-
-        public string GetNavigationLinksText(int boardNumber, string note)
+        private string GetNavigationLinksText(int boardNumber, string note)
         {
             int numberOfBoardsPerRound = Convert.ToInt16(ConfigurationManager.AppSettings["NumberOfBoardsPerRound"]);
             string imagesRootUrl = ConfigurationManager.AppSettings["ImagesRoot"];
@@ -401,10 +421,11 @@ namespace BridgeMateRunningScores
             return linksText;
         }
 
-        public string GetBackToRunningScoresLinktext()
+        private string GetBackToRunningScoresLinktext()
         {
             return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
         }
 
+        #endregion
     }
 }
