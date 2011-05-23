@@ -20,9 +20,25 @@ namespace IndianBridge.Common
         const string TABLE_START_TAG = "<TABLE";
         const string TABLE_END_TAG = "</TABLE>";
 
-        public static string ToCamelCase(string input)
+        public static string ToCamelCase(string input, string separator = "_")
         {
-            return String.Format("{0}{1}", input.Substring(0, 1).ToUpper(), input.Substring(1).ToLower());
+            string output, firstString, secondString;
+            int position = input.IndexOf(separator);
+            if (position > 0)
+            {
+                firstString = input.Substring(0, position);
+                secondString = input.Substring(position + 1);
+                output = String.Format("{0}{1}{2}",
+                    String.Format("{0}{1}", firstString.Substring(0, 1).ToUpper(), firstString.Substring(1).ToLower()),
+                    separator,
+                    String.Format("{0}{1}", secondString.Substring(0, 1).ToUpper(), secondString.Substring(1).ToLower()));
+            }
+            else
+            {
+                output = String.Format("{0}{1}", input.Substring(0, 1).ToUpper(), input.Substring(1).ToLower());
+            }
+
+            return output;
         }
 
         // Given row text and a start position, find the next field in the row
@@ -133,12 +149,18 @@ namespace IndianBridge.Common
         {
             // Update butler results table for the 2 pairs in question
             DataRow[] butlerRows = butlerResults.Select(String.Format("Pair='{0}'", pair));
+            int newBoards = 0;
             DataRow butlerRow;
+            decimal newScore = 0;
+
             if (butlerRows.Length > 0)
             {
                 butlerRow = butlerRows[0];
-                butlerRow["Boards"] = Convert.ToInt16(butlerRow["Boards"]) + boards;
-                butlerRow["Score"] = Convert.ToDecimal(butlerRow["Score"]) + score;
+                newBoards = Convert.ToInt16(butlerRow["Boards"]) + boards;
+                butlerRow["Boards"] = newBoards;
+                newScore = Convert.ToDecimal(butlerRow["Score"]) + score;
+                butlerRow["Score"] = newScore;
+                butlerRow["AvgScore"] = newScore / newBoards;
                 butlerRow.AcceptChanges();
             }
             else
@@ -147,6 +169,7 @@ namespace IndianBridge.Common
                 butlerRow["Pair"] = pair;
                 butlerRow["Boards"] = boards;
                 butlerRow["Score"] = score;
+                butlerRow["AvgScore"] = score / boards;
                 butlerResults.Rows.Add(butlerRow);
             }
         }
