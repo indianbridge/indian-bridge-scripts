@@ -56,6 +56,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="dev.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -75,6 +76,7 @@
     <Content Include="Templates\BoardTemplate.html" />
     <Content Include="Templates\ButlerRowTemplate.html" />
     <Content Include="Templates\ButlerScoresTemplate.html" />
+    <Content Include="Templates\CrossEventButlerScoresTemplate.html" />
     <Content Include="Templates\CumulativeButlerScoresTemplate.html" />
     <Content Include="Templates\RowTemplate.html" />
     <Content Include="Templates\RunningScoresTemplate.html" />

@@ -63,7 +63,7 @@ namespace BridgeMateRunningScores
 
             int position, endOfRowPosition = 0;
 
-            // Find the index of the "Count" column header
+            // Find the index of the "Name" column header
             endOfRowPosition = text.IndexOf("Name");
             position = text.IndexOf("\r\n\r\n", endOfRowPosition) + 4;
             int rank = 1;
@@ -155,9 +155,12 @@ namespace BridgeMateRunningScores
                 team2Number = Utility.GetField(rowText, ref position);
                 team2Name = Utility.GetField(rowText, ref position);
                 imp1Score = Utility.GetField(rowText, ref position, "-");
+                // Skip beyond the '-'
                 position = rowText.IndexOf("-", position) + 1;
-                position1 = Utility.findWhiteSpace(rowText, position);
-                imp2Score = rowText.Substring(position, position1 - position);
+
+                //position1 = Utility.findWhiteSpace(rowText, position);
+                //imp2Score = rowText.Substring(position, position1 - position);
+                imp2Score = rowText.Substring(position, 3).Trim();
                 impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
 
                 position = Utility.findWhiteSpace(rowText, position);
@@ -285,6 +288,7 @@ namespace BridgeMateRunningScores
             m_butlerResults.Columns.Add("Pair", typeof(System.String));
             m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
             m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
+            m_butlerResults.Columns.Add("AvgScore", typeof(System.Decimal));
 
             m_completedBoards = new DataTable();
             m_completedBoards.Columns.Add("Table", typeof(System.String));

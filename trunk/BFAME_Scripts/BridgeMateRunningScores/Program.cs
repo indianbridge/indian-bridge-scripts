@@ -90,22 +90,33 @@ namespace BridgeMateRunningScores
                     Console.WriteLine();
                     DataTable runningScores = CreateButlerAndRunningScoresFiles(totalNumberOfTeams, nameNumberMapping, debug);
 
-                    // Upload Running Scores
-                    Console.WriteLine("Uploading running scores");
-                    Console.WriteLine();
+                    if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
+                    {
+                        // Upload Running Scores
+                        Console.WriteLine("Uploading running scores");
+                        Console.WriteLine();
 
-                    if (Boolean.Parse(configParameters["RunUpdateGoogleSite"])) sitesAPI.uploadDirectory(configParameters["OutputFolder"] + "\\runningscores", configParameters["GoogleRunningScoresRoot"]);
+                        sitesAPI.uploadDirectory(configParameters["OutputFolder"]
+                            + "\\runningscores", configParameters["GoogleRunningScoresRoot"]);
+                    }
 
                     if (isEndOfRound)
                     {
-                        // Upload Butler Scores
-                        Console.WriteLine("Uploading Butler Scores");
-                        Console.WriteLine();
-                        if (Boolean.Parse(configParameters["RunUpdateGoogleSite"])) sitesAPI.uploadDirectory(configParameters["OutputFolder"] + "\\butlerscores", configParameters["GoogleButlerScoresRoot"]);
-                        // Update Spreadsheet with round scores
-                        Console.WriteLine("Uploading spreadsheet with round scores");
-                        Console.WriteLine();
-                        if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"])) spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
+                        if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
+                        {
+                            // Upload Butler Scores
+                            Console.WriteLine("Uploading Butler Scores");
+                            Console.WriteLine();
+                            sitesAPI.uploadDirectory(configParameters["OutputFolder"] + "\\butlerscores", configParameters["GoogleButlerScoresRoot"]);
+                        }
+
+                        if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"]))
+                        {
+                            // Update Spreadsheet with round scores
+                            Console.WriteLine(String.Format("Uploading spreadsheet with round scores for Round {0}", roundInProgress));
+                            Console.WriteLine();
+                            spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
+                        }
                     }
 
                     Console.WriteLine("Done processing...waiting for next cycle");
@@ -149,6 +160,7 @@ namespace BridgeMateRunningScores
             int numberOfTables = 2 * numberOfMatchesPerRound;
             string boardResultText, outputFileName;
             bool hasNewResults;
+            DataTable cumulativeButlerScores;
 
             MagicInterface magicInterface = new MagicInterface(configParameters["InputFolder"], configParameters["RunningScoreFileName"], configParameters["ButlerFileName"], configParameters["RunningScoresFileName"]);
             DataTable runningScores = magicInterface.GetRunningScores(((totalNumberOfTeams+1) / 2), out roundInProgress);
@@ -195,19 +207,48 @@ namespace BridgeMateRunningScores
                         if (debug) Console.WriteLine("Generating Butler Results...");
 
                         roundsComputed = roundInProgress;
-                        DataTable cumulativeButlerScores = MergeCurrentButlerScoresIntoCumulativeResults(magicInterface.ButlerResults);
+                        cumulativeButlerScores = MergeCurrentButlerScoresIntoCumulativeResults(magicInterface.ButlerResults);
                         WriteButlerScoresToFile(cumulativeButlerScores, true);
                         GenerateButlerScoresHTML(cumulativeButlerScores, roundInProgress, true);
                         GenerateButlerScoresHTML(magicInterface.ButlerResults, roundInProgress, false);
                         Utility.WriteFile(butlerRoundsFileName, roundInProgress.ToString());
                     }
+                    else
+                    {
+                        cumulativeButlerScores = LoadCumulativeButlerResults();
+                    }
+
+                    // Always re-generate cross event butler results so that the file gets updated when any of 
+                    // the butler files are re-generated
+                    CreateCrossEventButlerScores(cumulativeButlerScores, roundInProgress);
                 }
 
             }
 
             return runningScores;
 
-       }
+        }
+
+        public static void CreateCrossEventButlerScores(DataTable currentEventCumulativeResults, int roundInProgress)
+        {
+            string otherEventButlerFiles;
+            DataTable butlerResults;
+            DataTable crossEventButlerResults = CreateNewButlerResultsTable();
+            if (Convert.ToBoolean(configParameters["GenerateCrossEventButlerScore"]))
+            {
+                otherEventButlerFiles = configParameters["CrossEventButlerFilesPath"];
+                string[] butlerFiles = otherEventButlerFiles.Split(new char[] { ';' });
+
+                foreach (string path in butlerFiles)
+                {
+                    butlerResults = LoadCumulativeButlerResults(path);
+                    MergeCurrentButlerScoresIntoCumulativeResults(butlerResults, crossEventButlerResults);
+                }
+                MergeCurrentButlerScoresIntoCumulativeResults(currentEventCumulativeResults, crossEventButlerResults);
+            }
+
+            GenerateButlerScoresHTML(crossEventButlerResults, roundInProgress, false, true);
+        }
 
         public static void GenerateRunningScoresHTML(DataTable runningScores, int roundInProgres,
             NameValueCollection completedBoards, NameValueCollection teamNumbers)
@@ -326,16 +367,16 @@ namespace BridgeMateRunningScores
             Utility.WriteFile(butlerResultsFileName, content);
         }
 
-        public static DataTable LoadCumulativeButlerResults()
+        // Load the Cumulative results thus far into a datatable
+        // The path can be used when the cumulative results have to be loaded for a different event
+        public static DataTable LoadCumulativeButlerResults(string path = "")
         {
-            DataTable m_butlerResults;
-            string butlerResultsFileName = String.Format(@"{0}\CumulativeButlerResults.csv", configParameters["OutputFolder"]);
-            StreamReader fileStream = null;
-            m_butlerResults = new DataTable();
-            m_butlerResults.Columns.Add("Pair", typeof(System.String));
-            m_butlerResults.Columns.Add("Boards", typeof(System.Int16));
-            m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
+            string butlerResultsFileName = String.IsNullOrEmpty(path) ?
+                String.Format(@"{0}\CumulativeButlerResults.csv", configParameters["OutputFolder"]) : path;
 
+            StreamReader fileStream = null;
+
+            DataTable butlerResults = CreateNewButlerResultsTable();
 
             // If we couldn't read the file, we return an empty datatable
             try
@@ -344,7 +385,7 @@ namespace BridgeMateRunningScores
             }
             catch (Exception)
             {
-                return m_butlerResults;
+                return butlerResults;
             }
 
             string row;
@@ -360,17 +401,17 @@ namespace BridgeMateRunningScores
                 if (String.IsNullOrEmpty(row)) break;
                 data = row.Split(new char[] { ',' });
 
-                dataRow = m_butlerResults.NewRow();
+                dataRow = butlerResults.NewRow();
                 dataRow["Pair"] = data[0];
                 dataRow["Boards"] = Convert.ToInt16(data[1]);
                 dataRow["Score"] = Convert.ToDecimal(data[2]);
 
-                m_butlerResults.Rows.Add(dataRow);
+                butlerResults.Rows.Add(dataRow);
             }
 
             fileStream.Close();
 
-            return m_butlerResults;
+            return butlerResults;
         }
 
         public static NameValueCollection GetTeamNumbersNamesMapping()
@@ -402,11 +443,23 @@ namespace BridgeMateRunningScores
             return names;
         }
 
-        public static DataTable MergeCurrentButlerScoresIntoCumulativeResults(DataTable currentButlerResults)
+        private static DataTable CreateNewButlerResultsTable()
         {
-            DataTable cumulativeButlerResults = LoadCumulativeButlerResults();
+            DataTable butlerResults = new DataTable();
+            butlerResults.Columns.Add("Pair", typeof(System.String));
+            butlerResults.Columns.Add("Boards", typeof(System.Int16));
+            butlerResults.Columns.Add("Score", typeof(System.Decimal));
+            butlerResults.Columns.Add("AvgScore", typeof(System.Decimal));
 
-            foreach (DataRow row in currentButlerResults.Rows)
+            return butlerResults;
+        }
+
+        public static DataTable MergeCurrentButlerScoresIntoCumulativeResults(DataTable butlerResults, 
+            DataTable cumulativeResults = null)
+        {
+            DataTable cumulativeButlerResults = cumulativeResults ?? LoadCumulativeButlerResults();
+
+            foreach (DataRow row in butlerResults.Rows)
             {
                 Utility.UpdateButlerResults(cumulativeButlerResults, row["Pair"].ToString(),
                     Convert.ToDecimal(row["Score"]), Convert.ToInt16(row["Boards"]));
@@ -415,31 +468,49 @@ namespace BridgeMateRunningScores
             return cumulativeButlerResults;
         }
 
-        public static void GenerateButlerScoresHTML(DataTable butlerScores, int roundInProgres, bool cumulative)
+        public static void GenerateButlerScoresHTML(DataTable butlerScores, int roundInProgres, bool cumulative, bool acrossEvents = false)
         {
             bool success;
-            string templateFileName = String.Format("{0}ButlerScoresTemplate.html", cumulative ? "Cumulative" : String.Empty);
-            string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], templateFileName), out success);
-            string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "ButlerRowTemplate.html"), out success);
+            string templateFileName, scoresTemplate, rowTemplate;
+            rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "ButlerRowTemplate.html"), out success);
+            if (!acrossEvents)
+            {
+                templateFileName = String.Format("{0}ButlerScoresTemplate.html", cumulative ? "Cumulative" : String.Empty);
+                scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], templateFileName), out success);
+            }
+            else
+            {
+                templateFileName = String.Format("CrossEventButlerScoresTemplate.html");
+                scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], templateFileName), out success);
+            }
 
             string rowText, rowsText = String.Empty, linkText = String.Empty;
             int boards; decimal score; decimal avgScore;
             string result, roundText, roundLinksText = String.Empty, roundLinkTemplate;
 
-            roundText = cumulative ? String.Empty : String.Format(" for Round {0}", roundInProgres.ToString());
+            if (!acrossEvents)
+            {
+                roundText = cumulative ? String.Empty : String.Format(" for Round {0}", roundInProgres.ToString());
+            }
+            else
+            {
+                roundText = String.Format(" after Round {0}", roundInProgres.ToString());
+            }
+
             scoresTemplate = scoresTemplate.Replace("[#RoundNumber#]", roundText);
             scoresTemplate = scoresTemplate.Replace("[#TimeStamp#]", Utility.GetTimeStamp());
+            scoresTemplate = scoresTemplate.Replace("[#TournamentName#]", configParameters["TournamentName"]);
             scoresTemplate = scoresTemplate.Replace("[#EventName#]", eventName);
             scoresTemplate = scoresTemplate.Replace("[#Cumulative#]", cumulative ? "Cumulative " : String.Empty);
             scoresTemplate = scoresTemplate.Replace("[#ButlerScoresRoot#]", "../../"+configParameters["ButlerScoresFilename"]);
             int j = 0;
 
-            foreach (DataRow row in butlerScores.Select(String.Empty, "Score Desc"))
+            foreach (DataRow row in butlerScores.Select(String.Empty, "AvgScore Desc"))
             {
                 rowText = (j % 2) == 0 ? rowTemplate : rowTemplate.Replace("background-color:#def", "background-color:#ddd");
                 boards = Convert.ToInt16(row["Boards"]);
                 score = Convert.ToDecimal(row["Score"]);
-                avgScore = score/boards;
+                avgScore = Convert.ToDecimal(row["AvgScore"]);
 
                 rowText = rowText.Replace("[#Pair#]", row["Pair"].ToString());
                 rowText = rowText.Replace("[#Boards#]", boards.ToString());
@@ -462,22 +533,32 @@ namespace BridgeMateRunningScores
                 result = result.Replace("[#RoundLinks#]", roundLinksText);
             }
 
-            if (cumulative)
+            if (!acrossEvents)
             {
-                string butlerOutputFolder = configParameters["OutputFolder"] + "\\butlerscores";
-                if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
-                String butlerRootFolder = String.Format(@"{0}\{1}",butlerOutputFolder,configParameters["ButlerScoresFileName"]);
-                if(!Directory.Exists(butlerRootFolder)) Directory.CreateDirectory(butlerRootFolder);
-                string outputFileName = String.Format(@"{0}\index.html",butlerRootFolder);
-                Utility.WriteFile(outputFileName, result);
+                if (cumulative)
+                {
+                    string butlerOutputFolder = configParameters["OutputFolder"] + "\\butlerscores";
+                    if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
+                    String butlerRootFolder = String.Format(@"{0}\{1}", butlerOutputFolder, configParameters["ButlerScoresFileName"]);
+                    if (!Directory.Exists(butlerRootFolder)) Directory.CreateDirectory(butlerRootFolder);
+                    string outputFileName = String.Format(@"{0}\index.html", butlerRootFolder);
+                    Utility.WriteFile(outputFileName, result);
+                }
+                else
+                {
+                    string butlerRootFolder = configParameters["OutputFolder"] + "\\butlerscores\\" + configParameters["ButlerScoresFileName"];
+                    if (!Directory.Exists(butlerRootFolder)) Directory.CreateDirectory(butlerRootFolder);
+                    string butlerOutputFolder = String.Format(@"{0}\{1}", butlerRootFolder, String.Format("round{0}", roundInProgres.ToString()));
+                    if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
+                    string outputFileName = String.Format(@"{0}\butlerscores.html", butlerOutputFolder);
+                    Utility.WriteFile(outputFileName, result);
+                }
             }
             else
             {
-                string butlerRootFolder = configParameters["OutputFolder"] + "\\butlerscores\\"+configParameters["ButlerScoresFileName"];
-                if (!Directory.Exists(butlerRootFolder)) Directory.CreateDirectory(butlerRootFolder);
-                string butlerOutputFolder = String.Format(@"{0}\{1}", butlerRootFolder, String.Format("round{0}", roundInProgres.ToString()));
+                string butlerOutputFolder = configParameters["OutputFolder"] + "\\butlerscores";
                 if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
-                string outputFileName = String.Format(@"{0}\butlerscores.html", butlerOutputFolder);
+                string outputFileName = String.Format(@"{0}\index.html", butlerOutputFolder);
                 Utility.WriteFile(outputFileName, result);
             }
         }

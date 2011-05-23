@@ -25,7 +25,8 @@ namespace Upload_To_Google_Sites
         private uint numTeams = 0;
         private uint numRounds = 0;
         private uint numMatches = 0;
-        public SpreadSheetAPI(String spreadsheetname,String username, String password, Boolean debug_flag)
+        private uint numBoards = 0;
+        public SpreadSheetAPI(String spreadsheetname, String username, String password, Boolean debug_flag)
         {
             this.service = new SpreadsheetsService(APP_NAME);
             this.service.setUserCredentials(username, password);
@@ -43,12 +44,14 @@ namespace Upload_To_Google_Sites
             numTeams = uint.Parse(info["Number of Teams"]);
             numRounds = uint.Parse(info["Number of Rounds"]);
             numMatches = (uint)(numTeams / 2 + (numTeams % 2 == 0 ? 0 : 1));
+            numBoards = uint.Parse(info["Number of Boards"]);
             if (debug)
             {
                 Console.WriteLine("Event Name = " + info["Event Name"]);
                 Console.WriteLine("Number of Teams = " + numTeams);
                 Console.WriteLine("Number of Rounds = " + numRounds);
                 Console.WriteLine("Number of Matches = " + numMatches);
+                Console.WriteLine("Number of Boards = " + numBoards);
             }
         }
         public NameValueCollection getInfo(Boolean debug = false)
