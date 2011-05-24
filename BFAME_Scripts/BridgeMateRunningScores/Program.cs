@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.Specialized;
 using System.IO;
 using System.Data;
 using System.Configuration;
 using System.Threading;
 using System.Diagnostics;
-using Nini.Config;
 using Upload_To_Google_Sites;
 using IndianBridge.Common;
 
@@ -22,27 +18,33 @@ namespace BridgeMateRunningScores
         static int roundInProgress = 0;
         static int totalNumberOfTeams = 0;
         static int numberOfBoardsPerRound = 0;
-        static String eventName = "";
+        static String eventName = String.Empty;
         static NameValueCollection configParameters = null;
         static NameValueCollection pairNames = null;
+        static bool playOffMode = false;
 
         #endregion
 
-
         #region Methods
 
-        static void Main(string[] args) 
+        static void Main(string[] args)
         {
-            // Read all configuration parameters
-            configParameters = ReadConfigParameters();
+            #region Initial Setup
 
-            bool debug = Convert.ToBoolean(configParameters["DebugMode"]);
-
+            long elapsedTime;
+            Stopwatch stopwatch = null;
             NameValueCollection nameNumberMapping = null;
             SpreadSheetAPI spreadsheetAPI = null;
             SitesAPI sitesAPI = null;
 
-            // Initialize SpreadsheetAPI and gather information
+            // Read all configuration parameters
+            configParameters = ReadConfigParameters();
+
+            bool debug = Convert.ToBoolean(configParameters["DebugMode"]);
+            playOffMode = Convert.ToBoolean(configParameters["Playoffs"]);
+
+            #region Initialize SpreadsheetAPI and gather information
+
             if (Boolean.Parse(configParameters["RunUpdateGoogleSpreadsheet"]))
             {
                 Console.WriteLine("Retrieving event parameter data from spreadsheet");
@@ -69,16 +71,26 @@ namespace BridgeMateRunningScores
                     out nameNumberMapping);
             }
 
+            #endregion
+
+            // If we are in playoffs, always read number of rounds and teams from config
+            if (playOffMode)
+            {
+                numberOfBoardsPerRound = Convert.ToInt32(configParameters["NumberOfBoardsPerSegment"]);
+                totalNumberOfTeams = Convert.ToInt32(configParameters["TotalNumberOfTeams"]);
+            }
+
+            // Initialize Google SitesAPI
             Console.WriteLine("Initializing connection to Google Site");
             Console.WriteLine();
-            // Initialize Google SitesAPI
             if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
             {
                 sitesAPI = new SitesAPI(configParameters["GoogleSiteName"], configParameters["Username"], configParameters["Password"], debug);
             }
 
-            long elapsedTime;
-            Stopwatch stopwatch = null;
+            #endregion
+
+            #region Main Loop
             // Run continuously
             while (true) {
                 try
@@ -118,18 +130,25 @@ namespace BridgeMateRunningScores
                             spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
                         }
                     }
-
-                    Console.WriteLine("Done processing...waiting for next cycle");
-                    Console.WriteLine();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception Encountered : " + e.ToString());
                 }
-				elapsedTime = stopwatch.ElapsedMilliseconds;
-				if (debug) Console.WriteLine("Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
+
+                if (Convert.ToBoolean(configParameters["RunOnce"]))
+                {
+                    break;
+                }
+
+                Console.WriteLine("Done processing...");
+                Console.WriteLine();
+                elapsedTime = stopwatch.ElapsedMilliseconds;
+				if (debug) Console.WriteLine("...Sleeping for " + (long.Parse(configParameters["UpdateFrequency"]) - elapsedTime) + " milliseconds.");
 				if (elapsedTime < long.Parse(configParameters["UpdateFrequency"])) Thread.Sleep((int)(long.Parse(configParameters["UpdateFrequency"]) - elapsedTime));
             }
+
+            #endregion
 
         }
 
@@ -245,9 +264,10 @@ namespace BridgeMateRunningScores
                     MergeCurrentButlerScoresIntoCumulativeResults(butlerResults, crossEventButlerResults);
                 }
                 MergeCurrentButlerScoresIntoCumulativeResults(currentEventCumulativeResults, crossEventButlerResults);
+
+                GenerateButlerScoresHTML(crossEventButlerResults, roundInProgress, false, true);
             }
 
-            GenerateButlerScoresHTML(crossEventButlerResults, roundInProgress, false, true);
         }
 
         public static void GenerateRunningScoresHTML(DataTable runningScores, int roundInProgres,
@@ -255,13 +275,19 @@ namespace BridgeMateRunningScores
         {
             bool success;
             int minPlayedBoards = numberOfBoardsPerRound, playedBoards = 0;
-            string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RunningScoresTemplate.html"), out success);
-            string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RowTemplate.html"), out success);
-            string boardTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "BoardTemplate.html"), out success);
             string rowText, rowsText = String.Empty, linkText = String.Empty;
             string result, homeTeam, awayTeam;
 
-            scoresTemplate = scoresTemplate.Replace("[#RoundNumber#]", roundInProgres.ToString());
+            string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RunningScoresTemplate.html"), out success);
+            string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RowTemplate.html"), out success);
+            string boardTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "BoardTemplate.html"), out success);
+            string stage = configParameters["Stage"];
+
+            string roundText = playOffMode ? String.Format("Segment {0}", roundInProgres.ToString()) : 
+                String.Format("Round {0}", roundInProgres.ToString());
+
+            scoresTemplate = scoresTemplate.Replace("[#Stage#]", stage);
+            scoresTemplate = scoresTemplate.Replace("[#SegmentNumber#]", roundText);
             scoresTemplate = scoresTemplate.Replace("[#TimeStamp#]", Utility.GetTimeStamp());
             scoresTemplate = scoresTemplate.Replace("[#EventName#]", eventName);
 
@@ -310,7 +336,7 @@ namespace BridgeMateRunningScores
             for (int i=1;i<=numberOfBoardsPerRound;i++) {
                 // Alternating backgrounds
                 rowText = (i % 2) == 0 ? boardTemplate.Replace("background-color:#def", "background-color:#ddd") : boardTemplate;
-                linkText = configParameters["RunningScoresFileName"]+"/"+configParameters["BoardLinkTemplate"].Replace("[#RoundNumber#]", roundInProgres.ToString());
+                linkText = configParameters["RunningScoresFileName"]+"/"+configParameters["BoardLinkTemplate"].Replace("[#SegmentNumber#]", roundInProgres.ToString());
                 linkText = linkText.Replace("[#BoardNumber#]", i.ToString());
                 rowText = rowText.Replace("[#BoardLink#]", linkText);
                 rowText = rowText.Replace("[#BoardNumber#]", i.ToString());
@@ -488,20 +514,26 @@ namespace BridgeMateRunningScores
             int boards; decimal score; decimal avgScore;
             string result, roundText, roundLinksText = String.Empty, roundLinkTemplate;
 
-            if (!acrossEvents)
-            {
-                roundText = cumulative ? String.Empty : String.Format(" for Round {0}", roundInProgres.ToString());
-            }
-            else
-            {
-                roundText = String.Format(" after Round {0}", roundInProgres.ToString());
-            }
+            //if (!acrossEvents)
+            //{
+            //    roundText = cumulative ? String.Empty : String.Format(" for Round {0}", roundInProgres.ToString());
+            //}
+            //else
+            //{
+            //    roundText = String.Format(" after Round {0}", roundInProgres.ToString());
+            //}
 
-            scoresTemplate = scoresTemplate.Replace("[#RoundNumber#]", roundText);
+            string stage = configParameters["Stage"];
+
+            roundText = playOffMode ? String.Format("Segment {0}", roundInProgres.ToString()) :
+                String.Format("Round {0}", roundInProgres.ToString());
+
+            scoresTemplate = scoresTemplate.Replace("[#Stage#]", stage);
+            scoresTemplate = scoresTemplate.Replace("[#SegmentNumber#]", roundText);
             scoresTemplate = scoresTemplate.Replace("[#TimeStamp#]", Utility.GetTimeStamp());
             scoresTemplate = scoresTemplate.Replace("[#TournamentName#]", configParameters["TournamentName"]);
             scoresTemplate = scoresTemplate.Replace("[#EventName#]", eventName);
-            scoresTemplate = scoresTemplate.Replace("[#Cumulative#]", cumulative ? "Cumulative " : String.Empty);
+            //scoresTemplate = scoresTemplate.Replace("[#Cumulative#]", cumulative ? "Cumulative " : String.Empty);
             scoresTemplate = scoresTemplate.Replace("[#ButlerScoresRoot#]", "../../"+configParameters["ButlerScoresFilename"]);
             int j = 0;
 
@@ -524,10 +556,20 @@ namespace BridgeMateRunningScores
 
             if (cumulative)
             {
-                roundLinkTemplate = String.Format("<td><a href='{0}'</a>Round [#RoundNumber#]</td>", configParameters["ButlerScoresFileName"]+"/"+configParameters["ButlerRoundLinkTemplate"]);
+                if (!playOffMode)
+                {
+                    roundLinkTemplate = String.Format("<td><a href='{0}'</a>Round [#SegmentNumber#]</td>", configParameters["ButlerScoresFileName"] + "/" + configParameters["ButlerRoundLinkTemplate"]);
+                    result = result.Replace("[#RoundWiseHeaderText#]", "Round-wise Butler results");
+                }
+                else
+                {
+                    roundLinkTemplate = String.Format("<td><a href='{0}'</a>Segment [#SegmentNumber#]</td>", configParameters["ButlerScoresFileName"] + "/" + configParameters["ButlerRoundLinkTemplate"]);
+                    result = result.Replace("[#RoundWiseHeaderText#]", "Segment-wise Butler results");
+                }
+
                 for (int i = 1; i <= roundInProgres; i++)
                 {
-                    roundLinksText += roundLinkTemplate.Replace("[#RoundNumber#]", i.ToString());
+                    roundLinksText += roundLinkTemplate.Replace("[#SegmentNumber#]", i.ToString());
                 }
 
                 result = result.Replace("[#RoundLinks#]", roundLinksText);
@@ -558,7 +600,7 @@ namespace BridgeMateRunningScores
             {
                 string butlerOutputFolder = configParameters["OutputFolder"] + "\\butlerscores";
                 if (!Directory.Exists(butlerOutputFolder)) Directory.CreateDirectory(butlerOutputFolder);
-                string outputFileName = String.Format(@"{0}\index.html", butlerOutputFolder);
+                string outputFileName = String.Format(@"{0}\CrossEventButlerScores.html", butlerOutputFolder);
                 Utility.WriteFile(outputFileName, result);
             }
         }
