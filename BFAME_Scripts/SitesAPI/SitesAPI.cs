@@ -57,8 +57,7 @@ namespace Upload_To_Google_Sites
         }
 
         private void uploadPath(String path, String siteRoot)
-        {
-            DateTime lastUpdateTime = DateTime.Now;
+        {        
             if (Directory.Exists(path) || File.Exists(path))
             {
                  if (File.Exists(path))
@@ -74,6 +73,7 @@ namespace Upload_To_Google_Sites
                     String[] directories = Directory.GetDirectories(path);
                     foreach (String dir in directories)
                     {
+                        DateTime lastUpdateTime = Directory.GetLastWriteTime(dir);
                         var dirName = Path.GetFileName(dir);
                         var pageName = makeIdentifier(dirName);
                         String html = "";
@@ -137,7 +137,7 @@ namespace Upload_To_Google_Sites
                 }
                 if (html != "")
                 {
-                    if (!lastRunTimes.ContainsKey(url) || lastModified >= (DateTime)lastRunTimes[url])
+                    if (!lastRunTimes.ContainsKey(url) || lastModified > (DateTime)lastRunTimes[url])
                     {
                         AtomContent newContent = new AtomContent();
                         newContent.Type = "html";
@@ -145,8 +145,8 @@ namespace Upload_To_Google_Sites
                         entry.Content = newContent;
                         entry.Title.Text = IndianBridge.Common.Utility.ToCamelCase(title);
                         service.Update(entry);
-                        lastRunTimes[url] = DateTime.Now;
-                        if (this.debugFlag) printDebugMessage(url + " - Updated.");
+                        lastRunTimes[url] = lastModified;
+                        if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ")");
                     }
                     else
                     {
