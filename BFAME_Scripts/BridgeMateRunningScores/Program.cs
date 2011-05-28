@@ -127,6 +127,7 @@ namespace BridgeMateRunningScores
                             // Update Spreadsheet with round scores
                             Console.WriteLine(String.Format("Uploading spreadsheet with round scores for Round {0}", roundInProgress));
                             Console.WriteLine();
+                            GetWebScores(ref runningScores, nameNumberMapping);
                             spreadsheetAPI.updateScores(roundInProgress, runningScores, debug);
                         }
                     }
@@ -150,6 +151,15 @@ namespace BridgeMateRunningScores
 
             #endregion
 
+        }
+
+        static void GetWebScores(ref DataTable runningScores, NameValueCollection nameNumberMapping)
+        {
+            foreach (DataRow row in runningScores.Rows)
+            {
+                row["HomeTeamNumber"] = nameNumberMapping[row["HomeTeam"].ToString()];
+                row["AwayTeamNumber"] = nameNumberMapping[row["AwayTeam"].ToString()];
+            }
         }
 
         static void GetEventParametersFromConfig(out int totalNumberOfTeams, out string eventName,
@@ -357,23 +367,24 @@ namespace BridgeMateRunningScores
         {
             DataRow[] rows;
             NameValueCollection playedBoards = new NameValueCollection();
-            int numPlayedBoards;
+            int numPlayedBoards, tableNum;
 
-            for (int i = 1; i <= numberOfMatches; i++)
+            for (int i = 0; i < numberOfMatches; i++)
             {
                 numPlayedBoards = 0;
+                tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + i;
                 // Find rows completed at table A-n (where n is the table number)
-                rows = completedBoards.Select(String.Format("Table='A-{0}'", i));
+                rows = completedBoards.Select(String.Format("Table='A-{0}'", tableNum));
 
                 foreach (DataRow row in rows) 
                 {
-                    if (completedBoards.Select(String.Format("Table='B-{0}' AND Board='{1}'", i, row["Board"].ToString())).Length == 1) 
+                    if (completedBoards.Select(String.Format("Table='B-{0}' AND Board='{1}'", tableNum, row["Board"].ToString())).Length > 0) 
                     {
                         numPlayedBoards++;
                     }
                 }
 
-                playedBoards.Add(i.ToString(), numPlayedBoards.ToString());
+                playedBoards.Add(tableNum.ToString(), numPlayedBoards.ToString());
             }
 
             return playedBoards;
@@ -417,6 +428,8 @@ namespace BridgeMateRunningScores
             string row;
             string[] data;
             DataRow dataRow;
+            int boards;
+            decimal score;
 
             // Skip past the header row
             fileStream.ReadLine();
@@ -429,8 +442,11 @@ namespace BridgeMateRunningScores
 
                 dataRow = butlerResults.NewRow();
                 dataRow["Pair"] = data[0];
-                dataRow["Boards"] = Convert.ToInt16(data[1]);
-                dataRow["Score"] = Convert.ToDecimal(data[2]);
+                boards = Convert.ToInt16(data[1]);
+                score = Convert.ToDecimal(data[2]);
+                dataRow["Boards"] = boards;
+                dataRow["Score"] = score;
+                dataRow["AvgScore"] = score/boards;
 
                 butlerResults.Rows.Add(dataRow);
             }
@@ -542,7 +558,14 @@ namespace BridgeMateRunningScores
                 rowText = (j % 2) == 0 ? rowTemplate : rowTemplate.Replace("background-color:#def", "background-color:#ddd");
                 boards = Convert.ToInt16(row["Boards"]);
                 score = Convert.ToDecimal(row["Score"]);
-                avgScore = Convert.ToDecimal(row["AvgScore"]);
+                if (row["AvgScore"] != DBNull.Value)
+                {
+                    avgScore = Convert.ToDecimal(row["AvgScore"]);
+                }
+                else
+                {
+                    avgScore = score/boards;
+                }
 
                 rowText = rowText.Replace("[#Pair#]", row["Pair"].ToString());
                 rowText = rowText.Replace("[#Boards#]", boards.ToString());

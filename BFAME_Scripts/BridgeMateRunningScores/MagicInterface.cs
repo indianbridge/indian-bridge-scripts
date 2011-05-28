@@ -13,11 +13,11 @@ namespace BridgeMateRunningScores
     public class MagicInterface
     {
         #region Constants & Members
-        const string pairHeadingOld = "<FONT face='Verdana, Arial, Helvetica' size=2><b><b>Pair</b></font>";
-        const string pairHeadingNew = "<FONT face='Verdana, Arial, Helvetica' size=2><b><b>Pair<br>NS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EW</b></font>";
+        const string pairHeadingOld = "<FONT face='Verdana, Arial, Helvetica' size=2><b>Pair</b></font>";
+        const string pairHeadingNew = "<FONT face='Verdana, Arial, Helvetica' size=2><b>Pair<br>NS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EW</b></font>";
         const string TABLE_START_TAG = "<TABLE";
         const string TABLE_END_TAG = "</TABLE>";
-        string m_inputFolder, m_runningScoreFileName, m_butlerFileName,m_runningScoreRoot;
+        string m_inputFolder, m_runningScoreFileName, m_butlerFileName, m_runningScoreRoot;
         static DataTable m_completedBoards, m_butlerResults;
         static Dictionary<int, DateTime> m_lastModifiedTimes = new Dictionary<int, DateTime>();
         const string BOARD_RESULT_FONT_TEXT = "<FONT face='Verdana, Arial, Helvetica' size=2>";
@@ -93,7 +93,7 @@ namespace BridgeMateRunningScores
         public DataTable GetRunningScores(int numberOfMatchesPerRound, out int roundInProgress)
         {
             string rowText, result = String.Empty;
-            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, position1;
+            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, position1, tableNum;
             bool success;
             string tableNumber, team1Number, team1Name, team2Number, team2Name, imp1Score, imp2Score, impScore, vpScore;
             string[] vpScores;
@@ -119,7 +119,7 @@ namespace BridgeMateRunningScores
 
             // Find the index of the "Team" column header
             endOfRowPosition = text.IndexOf("Score");
-            int table = 1;
+            int table = 0;
 
             DataTable currentScore = new DataTable();
             currentScore.Columns.Add("TableNumber", typeof(System.String));
@@ -135,7 +135,8 @@ namespace BridgeMateRunningScores
                 DataRow row = currentScore.NewRow();
 
                 // Find the index of the "table" 1
-                position = text.IndexOf(table.ToString(), endOfRowPosition);
+                tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + table;
+                position = text.IndexOf(tableNum.ToString(), endOfRowPosition);
                 // If there's no result for this table move on to the next one
                 if (position == -1)
                 {
@@ -163,7 +164,7 @@ namespace BridgeMateRunningScores
                 imp2Score = rowText.Substring(position, 3).Trim();
                 impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
 
-                position = Utility.findWhiteSpace(rowText, position);
+                position += 3;
 
                 // Skip past whitespace and find the score
                 position += Utility.skipWhiteSpace(rowText, position);
@@ -290,16 +291,19 @@ namespace BridgeMateRunningScores
             m_butlerResults.Columns.Add("Score", typeof(System.Decimal));
             m_butlerResults.Columns.Add("AvgScore", typeof(System.Decimal));
 
-            m_completedBoards = new DataTable();
-            m_completedBoards.Columns.Add("Table", typeof(System.String));
-            m_completedBoards.Columns.Add("Board", typeof(System.Int16));
+            if (m_completedBoards == null)
+            {
+                m_completedBoards = new DataTable();
+                m_completedBoards.Columns.Add("Table", typeof(System.String));
+                m_completedBoards.Columns.Add("Board", typeof(System.Int16));
+            }
 
         }
 
         private string ReplacePairNumbersWithNames(int boardNumber, string boardResultsHtml, 
             NameValueCollection pairNames, int numberOfTables)
         {
-            string rowText, cellText, content, newCellText, result, linksText, tableNumber;
+            string rowText, cellText, content, newCellText, result, linksText, tableNumber = String.Empty;
             string nsPair = String.Empty, ewPair = String.Empty;
             decimal nsScore=0, ewScore=0;
             bool isByeTable;
@@ -356,7 +360,11 @@ namespace BridgeMateRunningScores
                                 if (cellIndex == 1)
                                 {
                                     // Only add the row to completed boards if this is not a bye row
-                                    m_completedBoards.Rows.Add(row);
+                                    // and if we haven't already added this board at this table to the result
+                                    if (m_completedBoards.Select(String.Format("Table='{0}' AND Board={1}", tableNumber, boardNumber)).Length == 0)
+                                    {
+                                        m_completedBoards.Rows.Add(row);
+                                    }
                                     nsPair = pairNames[content];
                                 }
                                 else

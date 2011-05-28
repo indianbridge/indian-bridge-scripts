@@ -147,8 +147,14 @@ namespace IndianBridge.Common
 
         public static void UpdateButlerResults(DataTable butlerResults, string pair, decimal score, int boards = 1)
         {
-            // Update butler results table for the 2 pairs in question
+            // Update butler results table for the given pair
             DataRow[] butlerRows = butlerResults.Select(String.Format("Pair='{0}'", pair));
+
+            // If the pair doesn't already exist, check if the pair is there in reverse order
+            if (butlerRows.Length == 0 )
+            {
+                butlerRows = butlerResults.Select(String.Format("Pair='{0}'", GetPairInverted(pair)));
+            }
             int newBoards = 0;
             DataRow butlerRow;
             decimal newScore = 0;
@@ -172,6 +178,19 @@ namespace IndianBridge.Common
                 butlerRow["AvgScore"] = score / boards;
                 butlerResults.Rows.Add(butlerRow);
             }
+        }
+
+        // Given a pair name in the format "A - B (C)" where A and B are the 2 players and C is the country,
+        // retrieve the inverted pair name in the format "B - A (C)"
+        public static string GetPairInverted(string pair)
+        {
+            int position1, position2;
+            position1 = pair.IndexOf("-");
+            string player1 = pair.Substring(0, position1).Trim();
+            position2 = pair.IndexOf("(");
+            string player2 = pair.Substring(position1 + 1, position2 - position1 - 1).Trim();
+            string country = pair.Substring(position2 + 1).TrimEnd(new char[]{')'});
+            return String.Format("{0} - {1} ({2})", player2, player1, country);
         }
 
         // Function to serialize a NameValueCollection to a file
