@@ -185,8 +185,48 @@ namespace Upload_To_Google_Sites
             }
             updateScores(roundNumber, computedScores,debug);
         }
+        public void updateKnockoutScore(String teamName, int sessionNumber, double score, Boolean debug = false)
+        {
+            updateKnockoutScoreInternal(2, teamName, sessionNumber, score, debug);
+        }
+        public void updateKnockoutScore(int teamNumber, int sessionNumber, double score, Boolean debug = false)
+        {
+            updateKnockoutScoreInternal(1, ""+teamNumber, sessionNumber, score, debug);
+        }
+        private void updateKnockoutScoreInternal(uint column, String team, int sessionNumber, double score, Boolean debug = false)
+        {
+            WorksheetEntry entry = (WorksheetEntry)worksheets["Knockout"];
+            AtomLink cellFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
 
-        public void updateScores(int roundNumber, int[,] scores,Boolean debug=false)
+            CellQuery query = new CellQuery(cellFeedLink.HRef.ToString());
+            query.ReturnEmpty = ReturnEmptyCells.yes;
+            query.MinimumColumn = column;
+            query.MaximumColumn = column;
+            query.MaximumRow = 4;
+            CellFeed feed = service.Query(query);
+            int rowNumber = 0;
+            for (int i = 0; i < feed.Entries.Count; ++i)
+            {
+                CellEntry cellEntry = (CellEntry)feed.Entries[i];
+                if (cellEntry.Cell.InputValue == team) rowNumber = i + 1;
+            }
+            if (rowNumber != 0)
+            {
+                CellQuery query1 = new CellQuery(cellFeedLink.HRef.ToString());
+                query1.ReturnEmpty = ReturnEmptyCells.yes;
+                query1.MinimumColumn = (uint)sessionNumber+3;
+                query1.MaximumColumn = (uint)sessionNumber+3;
+                query1.MinimumRow = (uint)rowNumber;
+                query1.MaximumRow = (uint)rowNumber;
+                CellFeed feed1 = service.Query(query1);
+                CellEntry cellEntry = (CellEntry)feed1.Entries[0];
+                cellEntry.Cell.InputValue = "" + score;
+                cellEntry.Update();
+                if (debug) Console.WriteLine("Updated knockout Score");
+            }
+
+        }
+        public void updateScores(int roundNumber, int[,] scores, Boolean debug = false)
         {
             if (numMatches != scores.GetUpperBound(0) + 1) throw new ArgumentOutOfRangeException("Number of Rows in scores object should be same as number of matches!!!");
             if (6 != scores.GetUpperBound(1) + 1) throw new ArgumentOutOfRangeException("Number of Columns in scores object should be 6!!!");
