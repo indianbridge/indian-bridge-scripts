@@ -90,13 +90,14 @@ namespace BridgeMateRunningScores
             return pairNames;
         }
 
-        public DataTable GetRunningScores(int numberOfMatchesPerRound, out int roundInProgress)
+        public DataTable GetRunningScores(int numberOfMatchesPerRound, bool playOffMode, out int roundInProgress)
         {
             string rowText, result = String.Empty;
-            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, position1, tableNum;
+            int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, tableNum;
             bool success;
             string tableNumber, team1Number, team1Name, team2Number, team2Name, imp1Score, imp2Score, impScore, vpScore;
             string[] vpScores;
+            DataTable currentScore = new DataTable();
 
             // Prior to retrieving running scores for a round, initialize the Completed Boards and Butler Results datatables
             InitializeDataTables();
@@ -117,102 +118,106 @@ namespace BridgeMateRunningScores
 
             roundInProgress = Convert.ToInt32(fileData.Substring(roundStartPosition, roundEndPosition - roundStartPosition).Trim());
 
-            // Find the index of the "Team" column header
-            endOfRowPosition = text.IndexOf("Score");
-            int table = 0;
-
-            DataTable currentScore = new DataTable();
-            currentScore.Columns.Add("TableNumber", typeof(System.String));
-            currentScore.Columns.Add("HomeTeamNumber", typeof(System.String));
-            currentScore.Columns.Add("AwayTeamNumber", typeof(System.String));
-            currentScore.Columns.Add("HomeTeam", typeof(System.String));
-            currentScore.Columns.Add("AwayTeam", typeof(System.String));
-            currentScore.Columns.Add("IMPScore", typeof(System.String));
-            currentScore.Columns.Add("VPScore", typeof(System.String));
-
-            while (table <= numberOfMatchesPerRound)
+            #region Get Running scores in non-playoff mode
+            if (!playOffMode)
             {
-                DataRow row = currentScore.NewRow();
+                // Find the index of the "Team" column header
+                endOfRowPosition = text.IndexOf("Score");
+                int table = 0;
 
-                // Find the index of the "table" 1
-                tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + table;
-                position = text.IndexOf(tableNum.ToString(), endOfRowPosition);
-                // If there's no result for this table move on to the next one
-                if (position == -1)
+                currentScore.Columns.Add("TableNumber", typeof(System.String));
+                currentScore.Columns.Add("HomeTeamNumber", typeof(System.String));
+                currentScore.Columns.Add("AwayTeamNumber", typeof(System.String));
+                currentScore.Columns.Add("HomeTeam", typeof(System.String));
+                currentScore.Columns.Add("AwayTeam", typeof(System.String));
+                currentScore.Columns.Add("IMPScore", typeof(System.String));
+                currentScore.Columns.Add("VPScore", typeof(System.String));
+
+                while (table <= numberOfMatchesPerRound)
                 {
+                    DataRow row = currentScore.NewRow();
+
+                    // Find the index of the "table" 1
+                    tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + table;
+                    position = text.IndexOf(tableNum.ToString(), endOfRowPosition);
+                    // If there's no result for this table move on to the next one
+                    if (position == -1)
+                    {
+                        table++;
+                        continue;
+                    }
+
+                    endOfRowPosition = text.IndexOf("\r\n", position);
+
+                    rowText = text.Substring(position, endOfRowPosition - position);
+
+                    position = 0;
+
+                    tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
+                    team1Number = Utility.GetField(rowText, ref position);
+                    team1Name = Utility.GetField(rowText, ref position);
+                    team2Number = Utility.GetField(rowText, ref position);
+                    team2Name = Utility.GetField(rowText, ref position);
+                    imp1Score = Utility.GetField(rowText, ref position, "-");
+                    // Skip beyond the '-'
+                    position = rowText.IndexOf("-", position) + 1;
+
+                    //position1 = Utility.findWhiteSpace(rowText, position);
+                    //imp2Score = rowText.Substring(position, position1 - position);
+                    imp2Score = rowText.Substring(position, 3).Trim();
+                    impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
+
+                    position += 3;
+
+                    // Skip past whitespace and find the score
+                    position += Utility.skipWhiteSpace(rowText, position);
+
+                    vpScore = rowText.Substring(position).Trim();
+                    vpScores = vpScore.Split(new char[] { ' ' });
+
+                    if (vpScores.Length > 1)
+                    {
+                        vpScore = String.Format("{0}-{1}", vpScores[0].Trim(), vpScores[vpScores.Length - 1].Trim());
+                    }
+
+                    row["TableNumber"] = tableNumber;
+                    row["IMPScore"] = impScore;
+                    row["VPScore"] = vpScore;
+
+                    if (team1Number != "--")
+                    {
+                        row["HomeTeam"] = Utility.ToCamelCase(team1Name);
+                        row["HomeTeamNumber"] = team1Number;
+                    }
+                    else
+                    {
+                        row["HomeTeam"] = String.Empty;
+                        row["HomeTeamNumber"] = String.Empty;
+                    }
+
+                    if (team2Number != "--")
+                    {
+                        row["AwayTeam"] = Utility.ToCamelCase(team2Name);
+                        row["AwayTeamNumber"] = team2Number;
+                    }
+                    else
+                    {
+                        row["AwayTeam"] = string.Empty;
+                        row["AwayTeamNumber"] = String.Empty;
+                    }
+
+                    currentScore.Rows.Add(row);
+
                     table++;
-                    continue;
                 }
-
-                endOfRowPosition = text.IndexOf("\r\n", position);
-
-                rowText = text.Substring(position, endOfRowPosition - position);
-
-                position = 0;
-
-                tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
-                team1Number = Utility.GetField(rowText, ref position);
-                team1Name = Utility.GetField(rowText, ref position);
-                team2Number = Utility.GetField(rowText, ref position);
-                team2Name = Utility.GetField(rowText, ref position);
-                imp1Score = Utility.GetField(rowText, ref position, "-");
-                // Skip beyond the '-'
-                position = rowText.IndexOf("-", position) + 1;
-
-                //position1 = Utility.findWhiteSpace(rowText, position);
-                //imp2Score = rowText.Substring(position, position1 - position);
-                imp2Score = rowText.Substring(position, 3).Trim();
-                impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
-
-                position += 3;
-
-                // Skip past whitespace and find the score
-                position += Utility.skipWhiteSpace(rowText, position);
-
-                vpScore = rowText.Substring(position).Trim();
-                vpScores = vpScore.Split(new char[] { ' ' });
-
-                if (vpScores.Length > 1)
-                {
-                    vpScore = String.Format("{0}-{1}", vpScores[0].Trim(), vpScores[vpScores.Length - 1].Trim());
-                }
-
-                row["TableNumber"] = tableNumber;
-                row["IMPScore"] = impScore;
-                row["VPScore"] = vpScore;
-
-                if (team1Number != "--")
-                {
-                    row["HomeTeam"] = Utility.ToCamelCase(team1Name);
-                    row["HomeTeamNumber"] = team1Number;
-                }
-                else
-                {
-                    row["HomeTeam"] = String.Empty;
-                    row["HomeTeamNumber"] = String.Empty;
-                }
-
-                if (team2Number != "--")
-                {
-                    row["AwayTeam"] = Utility.ToCamelCase(team2Name);
-                    row["AwayTeamNumber"] = team2Number;
-                }
-                else
-                {
-                    row["AwayTeam"] = string.Empty;
-                    row["AwayTeamNumber"] = String.Empty;
-                }
-
-                currentScore.Rows.Add(row);
-
-                table++;
             }
+            #endregion
 
             return currentScore;
         }
 
         public string GetBoardResults(int boardNumber, NameValueCollection pairNames, 
-            int numberOfTables, out bool hasNewResults)
+            int numberOfTables, bool playOffMode, out bool hasNewResults)
         {
             bool success; DateTime boardLastUpdatedTime;
             string fileName = String.Format(@"{0}\{1}-{2}.htm", m_inputFolder, 
@@ -241,7 +246,7 @@ namespace BridgeMateRunningScores
             }
 
             string html = Utility.ReadFile(fileName, out success, true);
-            string backLinkText = GetBackToRunningScoresLinktext();
+            string backLinkText = GetBackToRunningScoresLinktext(playOffMode);
             string navigationLinksText = GetNavigationLinksText(boardNumber, String.Empty);
 
             if (!success)
@@ -433,9 +438,17 @@ namespace BridgeMateRunningScores
             return linksText;
         }
 
-        private string GetBackToRunningScoresLinktext()
+        private string GetBackToRunningScoresLinktext(bool playOffMode)
         {
-            return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+            if (!playOffMode)
+            {
+                return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+            }
+            else
+            {
+                //TODO: use relative path
+                return String.Format("<a href='{0}'>Back to Finals board-wise Results</a>", "https://sites.google.com/site/2011bfame/running-scores/playoffs");
+            }
         }
 
         #endregion
