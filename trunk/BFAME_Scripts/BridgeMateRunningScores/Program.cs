@@ -108,11 +108,19 @@ namespace BridgeMateRunningScores
                         Console.WriteLine("Uploading running scores");
                         Console.WriteLine();
 
-                        sitesAPI.uploadDirectory(configParameters["OutputFolder"]
-                            + "\\runningscores", configParameters["GoogleRunningScoresRoot"]);
+                        if (!playOffMode)
+                        {
+                            sitesAPI.uploadDirectory(configParameters["OutputFolder"]
+                                + "\\runningscores", configParameters["GoogleRunningScoresRoot"]);
+                        }
+                        else
+                        {
+                            sitesAPI.uploadDirectory(configParameters["OutputFolder"]
+                                                       + "\\playoffs", configParameters["GooglePlayoffsRoot"]);
+                        }
                     }
 
-                    if (isEndOfRound)
+                    if (isEndOfRound || playOffMode)
                     {
                         if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
                         {
@@ -190,9 +198,11 @@ namespace BridgeMateRunningScores
             string boardResultText, outputFileName;
             bool hasNewResults;
             DataTable cumulativeButlerScores;
+            String eventFolder, boardsOutputFolder;
+            NameValueCollection playedBoards;
 
             MagicInterface magicInterface = new MagicInterface(configParameters["InputFolder"], configParameters["RunningScoreFileName"], configParameters["ButlerFileName"], configParameters["RunningScoresFileName"]);
-            DataTable runningScores = magicInterface.GetRunningScores(((totalNumberOfTeams+1) / 2), out roundInProgress);
+            DataTable runningScores = magicInterface.GetRunningScores(((totalNumberOfTeams+1) / 2), playOffMode, out roundInProgress);
 
             if (roundInProgress > 0)
             {
@@ -201,14 +211,25 @@ namespace BridgeMateRunningScores
                 {
                     pairNames = magicInterface.GetPairNames(numberOfPairs);
                 }
-                String eventFolder = String.Format(@"{0}\runningscores\{1}", configParameters["OutputFolder"], configParameters["RunningScoresFileName"]);
-                if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
-                string boardsOutputFolder = String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
-                if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+
+                if (!playOffMode)
+                {
+                    eventFolder = String.Format(@"{0}\runningscores\{1}", configParameters["OutputFolder"], configParameters["RunningScoresFileName"]);
+                    if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
+                    boardsOutputFolder = String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
+                    if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+                }
+                else
+                {
+                    eventFolder = String.Format(@"{0}\playoffs", configParameters["OutputFolder"]);
+                    if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
+                    boardsOutputFolder = String.Format(@"{0}\segment{1}", eventFolder, roundInProgress.ToString());
+                    if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+                }
 
                 for (int i = 1; i <= numberOfBoardsPerRound; i++)
                 {
-                    boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables, out hasNewResults);
+                    boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables, playOffMode, out hasNewResults);
 
                     // only update the file if results have been updated
                     if (hasNewResults)
@@ -218,12 +239,15 @@ namespace BridgeMateRunningScores
                     }
                 }
 
-                NameValueCollection playedBoards = GetPlayedBoards(numberOfMatchesPerRound, magicInterface.CompletedBoards);
-                
-                GenerateRunningScoresHTML(runningScores, roundInProgress, playedBoards, nameNumberMapping);
+                // We need running scores (for now) only in round robin
+                if (!playOffMode)
+                {
+                    playedBoards = GetPlayedBoards(numberOfMatchesPerRound, magicInterface.CompletedBoards);
+                    GenerateRunningScoresHTML(runningScores, roundInProgress, playedBoards, nameNumberMapping);
+                }
 
                 // Perform closure actions at end of round
-                if (isEndOfRound)
+                if (isEndOfRound || playOffMode)
                 {
                     // Only re-compute results if we haven't already generated butler results for this round
                     bool success;
