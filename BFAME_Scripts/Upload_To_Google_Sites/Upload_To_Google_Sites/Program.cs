@@ -17,7 +17,7 @@ namespace Upload_To_Google_Sites
     {
         static void Main(string[] args)
         {
-            MediaService service = new MediaService("jotspot", "test");
+            /*MediaService service = new MediaService("jotspot", "test");
             service.setUserCredentials("indianbridge.dummy@gmail.com", "kibitzer");
             String url = "https://sites.google.com/feeds/content/site/srirambridgetest?path=/open";
             AtomEntry entry = service.Get(url);
@@ -32,7 +32,7 @@ namespace Upload_To_Google_Sites
             entry.Content = newContent;
             string title = IndianBridge.Common.Utility.ToCamelCase("open");
             entry.Title.Text = title;
-            service.Update(entry);
+            service.Update(entry);*/
 
 
             /*if (args.Length < 1)
@@ -52,6 +52,15 @@ namespace Upload_To_Google_Sites
             //SpreadsheetTest(sitename, username, password, debug_flag);
             Console.WriteLine("Exitting.");
             Console.ReadLine();*/
+
+            String sitename = "2011winternationals";
+            String username = "indianbridge.dummy@gmail.com";
+            String password = "kibitzer";
+            Boolean debug_flag = true;
+            SitesTest(sitename, username, password, debug_flag);
+            /*String input = "pre_quarters";
+            Console.WriteLine("Originial : "+input+", camel : "+IndianBridge.Common.Utility.ConvertCaseString(input,IndianBridge.Common.Utility.Case.PascalCase));*/
+
         }
 
         static NameValueCollection getTeamNames(String spreadsheetname,Boolean debug_flag=false)
@@ -169,7 +178,7 @@ namespace Upload_To_Google_Sites
             {
                 try
                 {
-                    sa.uploadDirectory(@"C:\Documents and Settings\snarasim\My Documents\Downloads\Output", "/test");
+                    sa.uploadDirectory(@"C:\Users\snarasim\Documents\Bridge\runningscores", "/scores/ruia-gold");
                 }
                 catch (Exception e) { Console.WriteLine("Exception : " + e.ToString()); }
                 Console.WriteLine("Press Ctrl+Z to quit, Enter to run again.");

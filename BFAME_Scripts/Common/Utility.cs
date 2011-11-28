@@ -20,6 +20,44 @@ namespace IndianBridge.Common
         const string TABLE_START_TAG = "<TABLE";
         const string TABLE_END_TAG = "</TABLE>";
 
+        /// <summary>
+        /// Converts the phrase to specified convention.
+        /// </summary>
+        /// <param name="phrase"></param>
+        /// <param name="cases">The cases.</param>
+        /// <returns>string</returns>
+        public static string ConvertCaseString(string phrase, Case cases=Case.PascalCase)
+        {
+            string[] splittedPhrase = phrase.Split(' ', '-', '.','_');
+            var sb = new StringBuilder();
+
+            if (cases == Case.CamelCase)
+            {
+                sb.Append(splittedPhrase[0].ToLower());
+                splittedPhrase[0] = string.Empty;
+            }
+            else if (cases == Case.PascalCase)
+                sb = new StringBuilder();
+            int count = 0;
+            foreach (String s in splittedPhrase)
+            {
+                char[] splittedPhraseChars = s.ToCharArray();
+                if (splittedPhraseChars.Length > 0)
+                {
+                    splittedPhraseChars[0] = ((new String(splittedPhraseChars[0], 1)).ToUpper().ToCharArray())[0];
+                }
+                if (count++ > 0) sb.Append(' ');
+                sb.Append(new String(splittedPhraseChars));
+            }
+            return sb.ToString();
+        }
+
+        public enum Case
+        {
+            PascalCase,
+            CamelCase
+        }
+
         public static string ToCamelCase(string input, string separator = "_")
         {
             string output, firstString, secondString;
