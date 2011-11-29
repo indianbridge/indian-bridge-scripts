@@ -178,7 +178,7 @@ namespace Upload_To_Google_Sites
             {
                 try
                 {
-                    sa.uploadDirectory(@"C:\Users\snarasim\Documents\Bridge\runningscores", "/scores/ruia-gold");
+                    sa.uploadDirectory(@"C:\Users\snarasim\Documents\Bridge\runningscores_backup", "/sriram_test");
                 }
                 catch (Exception e) { Console.WriteLine("Exception : " + e.ToString()); }
                 Console.WriteLine("Press Ctrl+Z to quit, Enter to run again.");

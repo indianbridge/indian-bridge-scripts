@@ -18,6 +18,9 @@ namespace Upload_To_Google_Sites
         private String sitename = null;
         private Boolean debugFlag = false;
         Hashtable lastRunTimes = new Hashtable();
+        private String m_backUpDirectory = null;
+        private bool m_deleteFilesAfterUpload = false;
+        private String m_hashTableFileName = "";
 
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
         {
@@ -38,6 +41,25 @@ namespace Upload_To_Google_Sites
                 if (this.debugFlag) printDebugMessage("All HTTP traffic will be reported in " + factory.CombinedLogFileName);
             }
 
+            // read existing hash table data if any 
+            m_hashTableFileName = Path.Combine(Directory.GetCurrentDirectory(), "LastModifiedTimes.log");
+            if (File.Exists(m_hashTableFileName))
+            {
+                readHashTableFile(m_hashTableFileName);
+            }
+            File.Create(m_hashTableFileName);
+        }
+
+        private void readHashTableFile(String fileName) {
+            String line = "";
+            TextReader tr = new StreamReader(fileName);
+            while (tr.Peek() >= 0)
+            {
+                line = tr.ReadLine();
+                String[] values = line.Split(',');
+                lastRunTimes[values[0]] = values[1];
+            }
+            tr.Close();
         }
 
         private void printDebugMessage(String message) {
@@ -46,14 +68,60 @@ namespace Upload_To_Google_Sites
 
         private String makeIdentifier(String text) { return text.Replace(" ", "-"); }
 
-        public void uploadDirectory(String directory, String siteRoot)
+        public void uploadDirectory(String directory, String siteRoot, String backUpDirectory=null)
         {
             if (!Directory.Exists(directory))
             {
                 throw new System.ArgumentException("Only a directory structure can be uploaded");
             }
+            m_backUpDirectory = backUpDirectory;
             printDebugMessage("Uploading " + directory + " to " + siteRoot);
+            // First back up the directory 
+            if (Directory.Exists(m_backUpDirectory))
+            {
+                m_deleteFilesAfterUpload = true;
+
+                DirectoryInfo diSource = new DirectoryInfo(directory);
+                DirectoryInfo diTarget = new DirectoryInfo(m_backUpDirectory);
+
+                CopyAll(diSource, diTarget);                
+            }
+            else m_deleteFilesAfterUpload = false;
             uploadPath(directory, siteRoot);
+            if (m_deleteFilesAfterUpload)
+            {
+                if (Directory.Exists(directory)) Directory.Delete(directory, true);
+                        else if (File.Exists(directory)) File.Delete(directory);
+            }
+        }
+
+        public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        {
+            if (source.FullName.ToLower() == target.FullName.ToLower())
+            {
+                return;
+            }
+
+            // Check if the target directory exists, if not, create it.
+            if (Directory.Exists(target.FullName) == false)
+            {
+                Directory.CreateDirectory(target.FullName);
+            }
+
+            // Copy each file into it's new directory.
+            foreach (FileInfo fi in source.GetFiles())
+            {
+                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                fi.CopyTo(Path.Combine(target.ToString(), fi.Name), true);
+            }
+
+            // Copy each subdirectory using recursion.
+            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            {
+                DirectoryInfo nextTargetSubDir =
+                    target.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, nextTargetSubDir);
+            }
         }
 
         private void uploadPath(String path, String siteRoot)
@@ -146,6 +214,9 @@ namespace Upload_To_Google_Sites
                         entry.Title.Text = IndianBridge.Common.Utility.ConvertCaseString(title);
                         service.Update(entry);
                         lastRunTimes[url] = lastModified;
+                        TextWriter tw = new StreamWriter(m_hashTableFileName, true);
+                        tw.WriteLine(url + "," + lastModified);
+                        tw.Close();
                         if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ")");
                     }
                     else
