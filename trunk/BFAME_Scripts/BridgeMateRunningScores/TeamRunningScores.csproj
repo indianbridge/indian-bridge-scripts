@@ -8,8 +8,8 @@
     <ProjectGuid>{D375F8F9-2276-4B26-9E3C-A6B382641204}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BridgeMateRunningScores</RootNamespace>
-    <AssemblyName>BridgeMateRunningScores</AssemblyName>
+    <RootNamespace>TeamRunningScores</RootNamespace>
+    <AssemblyName>TeamRunningScores</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
