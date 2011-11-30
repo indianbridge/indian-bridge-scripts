@@ -17,10 +17,9 @@ namespace BridgeMateRunningScores
         const string pairHeadingNew = "<FONT face='Verdana, Arial, Helvetica' size=2><b>Pair<br>NS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EW</b></font>";
         const string TABLE_START_TAG = "<TABLE";
         const string TABLE_END_TAG = "</TABLE>";
-        string m_inputFolder, m_runningScoreFileName, m_butlerFileName, m_runningScoreRoot;
+        string m_inputFolder, m_runningScoreFileName, m_butlerFileName, m_runningScoreRoot, m_boardResultFont;
         static DataTable m_completedBoards, m_butlerResults;
         static Dictionary<int, DateTime> m_lastModifiedTimes = new Dictionary<int, DateTime>();
-        const string BOARD_RESULT_FONT_TEXT = "<FONT face='Verdana, Arial, Helvetica' size=2>";
         #endregion
 
         #region Properties
@@ -45,12 +44,17 @@ namespace BridgeMateRunningScores
 
         #region Public Methods
 
-        public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName, string runningScoreRoot)
+        public MagicInterface(string folderName, string runningScoreFileName, string butlerFileName,
+            string runningScoreRoot, string boardResultFont, bool boardResultFontBold)
         {
             m_inputFolder = folderName;
             m_runningScoreFileName = runningScoreFileName;
             m_butlerFileName = butlerFileName;
             m_runningScoreRoot = runningScoreRoot;
+            if (boardResultFontBold)
+                m_boardResultFont = String.Format("<{0}><b>", boardResultFont);
+            else
+                m_boardResultFont = String.Format("<{0}>", boardResultFont);
         }
 
         public NameValueCollection GetPairNames(int numberOfPairs)
@@ -90,14 +94,16 @@ namespace BridgeMateRunningScores
             return pairNames;
         }
 
-        public DataTable GetRunningScores(int numberOfMatchesPerRound, bool playOffMode, out int roundInProgress)
+        public DataTable GetRunningScores(int numberOfMatchesPerRound, bool hasCarryOver,
+            out int roundInProgress, out int segmentInProgress)
         {
             string rowText, result = String.Empty;
             int position, endOfRowPosition = 0, roundStartPosition, roundEndPosition, tableNum;
             bool success;
-            string tableNumber, team1Number, team1Name, team2Number, team2Name, imp1Score, imp2Score, impScore, vpScore;
+            string tableNumber, team1Number, team1Name, team2Number, team2Name, vpScore;
             string[] vpScores;
             DataTable currentScore = new DataTable();
+            Tuple<string, string> impScores;
 
             // Prior to retrieving running scores for a round, initialize the Completed Boards and Butler Results datatables
             InitializeDataTables();
@@ -105,6 +111,8 @@ namespace BridgeMateRunningScores
             string fileName = String.Format(@"{0}\{1}", m_inputFolder, m_runningScoreFileName);
             string text = Utility.GetDataFromHtmlTable(fileName, 0, true);
             string fileData = Utility.ReadFile(fileName, out success);
+
+            segmentInProgress = -1;
 
             // If we couldn't read the file, we quit
             if (!success)
@@ -118,98 +126,99 @@ namespace BridgeMateRunningScores
 
             roundInProgress = Convert.ToInt32(fileData.Substring(roundStartPosition, roundEndPosition - roundStartPosition).Trim());
 
-            #region Get Running scores in non-playoff mode
-            if (!playOffMode)
+            #region Get Running scores
+            // Find the index of the "Team" column header
+            endOfRowPosition = text.IndexOf("Score");
+            int table = 0;
+
+            currentScore.Columns.Add("TableNumber", typeof(System.String));
+            currentScore.Columns.Add("HomeTeamNumber", typeof(System.String));
+            currentScore.Columns.Add("AwayTeamNumber", typeof(System.String));
+            currentScore.Columns.Add("HomeTeam", typeof(System.String));
+            currentScore.Columns.Add("AwayTeam", typeof(System.String));
+            currentScore.Columns.Add("IMPScore", typeof(System.String));
+            //currentScore.Columns.Add("CarryOver", typeof(System.String));
+            currentScore.Columns.Add("VPScore", typeof(System.String));
+
+            while (table <= numberOfMatchesPerRound)
             {
-                // Find the index of the "Team" column header
-                endOfRowPosition = text.IndexOf("Score");
-                int table = 0;
+                DataRow row = currentScore.NewRow();
 
-                currentScore.Columns.Add("TableNumber", typeof(System.String));
-                currentScore.Columns.Add("HomeTeamNumber", typeof(System.String));
-                currentScore.Columns.Add("AwayTeamNumber", typeof(System.String));
-                currentScore.Columns.Add("HomeTeam", typeof(System.String));
-                currentScore.Columns.Add("AwayTeam", typeof(System.String));
-                currentScore.Columns.Add("IMPScore", typeof(System.String));
-                currentScore.Columns.Add("VPScore", typeof(System.String));
-
-                while (table <= numberOfMatchesPerRound)
+                // Find the index of the "table" 1
+                tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + table;
+                position = text.IndexOf(tableNum.ToString(), endOfRowPosition);
+                // If there's no result for this table move on to the next one
+                if (position == -1)
                 {
-                    DataRow row = currentScore.NewRow();
-
-                    // Find the index of the "table" 1
-                    tableNum = Convert.ToInt32(ConfigurationManager.AppSettings["StartTableNumber"]) + table;
-                    position = text.IndexOf(tableNum.ToString(), endOfRowPosition);
-                    // If there's no result for this table move on to the next one
-                    if (position == -1)
-                    {
-                        table++;
-                        continue;
-                    }
-
-                    endOfRowPosition = text.IndexOf("\r\n", position);
-
-                    rowText = text.Substring(position, endOfRowPosition - position);
-
-                    position = 0;
-
-                    tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
-                    team1Number = Utility.GetField(rowText, ref position);
-                    team1Name = Utility.GetField(rowText, ref position);
-                    team2Number = Utility.GetField(rowText, ref position);
-                    team2Name = Utility.GetField(rowText, ref position);
-                    imp1Score = Utility.GetField(rowText, ref position, "-");
-                    // Skip beyond the '-'
-                    position = rowText.IndexOf("-", position) + 1;
-
-                    //position1 = Utility.findWhiteSpace(rowText, position);
-                    //imp2Score = rowText.Substring(position, position1 - position);
-                    imp2Score = rowText.Substring(position, 3).Trim();
-                    impScore = String.Format("{0}-{1}", imp1Score, imp2Score);
-
-                    position += 3;
-
-                    // Skip past whitespace and find the score
-                    position += Utility.skipWhiteSpace(rowText, position);
-
-                    vpScore = rowText.Substring(position).Trim();
-                    vpScores = vpScore.Split(new char[] { ' ' });
-
-                    if (vpScores.Length > 1)
-                    {
-                        vpScore = String.Format("{0}-{1}", vpScores[0].Trim(), vpScores[vpScores.Length - 1].Trim());
-                    }
-
-                    row["TableNumber"] = tableNumber;
-                    row["IMPScore"] = impScore;
-                    row["VPScore"] = vpScore;
-
-                    if (team1Number != "--")
-                    {
-                        row["HomeTeam"] = Utility.ToCamelCase(team1Name);
-                        row["HomeTeamNumber"] = team1Number;
-                    }
-                    else
-                    {
-                        row["HomeTeam"] = String.Empty;
-                        row["HomeTeamNumber"] = String.Empty;
-                    }
-
-                    if (team2Number != "--")
-                    {
-                        row["AwayTeam"] = Utility.ToCamelCase(team2Name);
-                        row["AwayTeamNumber"] = team2Number;
-                    }
-                    else
-                    {
-                        row["AwayTeam"] = string.Empty;
-                        row["AwayTeamNumber"] = String.Empty;
-                    }
-
-                    currentScore.Rows.Add(row);
-
                     table++;
+                    continue;
                 }
+
+                endOfRowPosition = text.IndexOf("\r\n", position);
+
+                rowText = text.Substring(position, endOfRowPosition - position);
+
+                position = 0;
+
+                tableNumber = rowText.Substring(position, Utility.findWhiteSpace(rowText, position));
+                team1Number = Utility.GetField(rowText, ref position);
+                team1Name = Utility.GetField(rowText, ref position);
+                team2Number = Utility.GetField(rowText, ref position);
+                team2Name = Utility.GetField(rowText, ref position);
+
+                if (table == 0)
+                {
+                    // Find number of segments, but only in the first row (since the result will be the same for all rows)
+                    string scoreText = rowText.Substring(position);
+
+                    // There is 1 "-" character per segment and one for the cumulative
+                    segmentInProgress = Utility.CountOccurrences(scoreText, '-') - 1;
+                    if (hasCarryOver) segmentInProgress--;
+                }
+
+                impScores = GetImpScores(rowText, ref position, hasCarryOver);
+
+                // Skip past whitespace and find the VP score
+                position += Utility.skipWhiteSpace(rowText, position);
+
+                vpScore = rowText.Substring(position).Trim();
+                vpScores = vpScore.Split(new char[] { ' ' });
+
+                if (vpScores.Length > 1)
+                {
+                    vpScore = String.Format("{0}-{1}", vpScores[0].Trim(), vpScores[vpScores.Length - 1].Trim());
+                }
+
+                row["TableNumber"] = tableNumber;
+                row["IMPScore"] = impScores.Item1;
+                //row["CarryOver"] = impScores.Item2;
+                row["VPScore"] = vpScore;
+
+                if (team1Number != "--")
+                {
+                    row["HomeTeam"] = Utility.ToCamelCase(team1Name);
+                    row["HomeTeamNumber"] = team1Number;
+                }
+                else
+                {
+                    row["HomeTeam"] = String.Empty;
+                    row["HomeTeamNumber"] = String.Empty;
+                }
+
+                if (team2Number != "--")
+                {
+                    row["AwayTeam"] = Utility.ToCamelCase(team2Name);
+                    row["AwayTeamNumber"] = team2Number;
+                }
+                else
+                {
+                    row["AwayTeam"] = string.Empty;
+                    row["AwayTeamNumber"] = String.Empty;
+                }
+
+                currentScore.Rows.Add(row);
+
+                table++;
             }
             #endregion
 
@@ -217,7 +226,7 @@ namespace BridgeMateRunningScores
         }
 
         public string GetBoardResults(int boardNumber, NameValueCollection pairNames, 
-            int numberOfTables, bool playOffMode, out bool hasNewResults)
+            int numberOfTables, bool isMultiRound, bool isMultiSegment, out bool hasNewResults)
         {
             bool success; DateTime boardLastUpdatedTime;
             string fileName = String.Format(@"{0}\{1}-{2}.htm", m_inputFolder, 
@@ -246,7 +255,7 @@ namespace BridgeMateRunningScores
             }
 
             string html = Utility.ReadFile(fileName, out success, true);
-            string backLinkText = GetBackToRunningScoresLinktext(playOffMode);
+            string backLinkText = GetBackToRunningScoresLinktext(isMultiRound, isMultiSegment);
             string navigationLinksText = GetNavigationLinksText(boardNumber, String.Empty);
 
             if (!success)
@@ -261,6 +270,7 @@ namespace BridgeMateRunningScores
 
             string boardResultsTable;
             string imagesRootUrl = ConfigurationManager.AppSettings["ImagesRoot"];
+            string suitSymbolsSuffix = ConfigurationManager.AppSettings["SuitSymbolsSuffix"];
 
             startPosition = tableText.LastIndexOf(TABLE_START_TAG, StringComparison.InvariantCultureIgnoreCase);
             endPosition = tableText.IndexOf(TABLE_END_TAG, startPosition, StringComparison.InvariantCultureIgnoreCase);
@@ -268,16 +278,11 @@ namespace BridgeMateRunningScores
             boardResultsTable = tableText.Substring(startPosition, endPosition + 8 - startPosition);
 
             tableText = tableText.Replace(boardResultsTable, ReplacePairNumbersWithNames(boardNumber, boardResultsTable, pairNames, numberOfTables));
-            //tableText = tableText.Replace("<td width=573 valign=top border=0>", "<td width=623 valign=top border=0>");
-            //tableText = tableText.Replace("<table width=573 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>",
-            //    "<table width=623 border=1 cellspacing=0 cellpadding=2 bordercolor=antiquewhite>");
-            //tableText = tableText.Replace("<td width=114 align=center", "<td width=164 align=center");
-            //tableText = tableText.Replace("<table width=871 border=0>", "<table width=921 border=0>");
-            tableText = tableText.Replace("src='clubs.gif'", String.Format("src={0}clubs-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='diamonds.gif'", String.Format("src={0}diamonds-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='hearts.gif'", String.Format("src={0}hearts-large.gif", imagesRootUrl));
-            tableText = tableText.Replace("src='spades.gif'", String.Format("src={0}spades-large.gif", imagesRootUrl));
-            tableText = tableText.Replace(pairHeadingOld, pairHeadingNew);
+            tableText = tableText.Replace(String.Format("src='clubs{0}'", suitSymbolsSuffix), String.Format("src={0}clubs-large.gif", imagesRootUrl));
+            tableText = tableText.Replace(String.Format("src='diamonds{0}'", suitSymbolsSuffix), String.Format("src={0}diamonds-large.gif", imagesRootUrl));
+            tableText = tableText.Replace(String.Format("src='hearts{0}'", suitSymbolsSuffix), String.Format("src={0}hearts-large.gif", imagesRootUrl));
+            tableText = tableText.Replace(String.Format("src='spades{0}'", suitSymbolsSuffix), String.Format("src={0}spades-large.gif", imagesRootUrl));
+            tableText = tableText.Replace(" color=white>", ">");
 
             tableText = String.Format(@"<b>Page Updated {0}</b><br/><br/>{1}<br/><br/>{2}", Utility.GetTimeStamp(), backLinkText, tableText);
 
@@ -342,7 +347,7 @@ namespace BridgeMateRunningScores
                         cellEndPosition = rowText.IndexOf("</td>", cellStartPosition, StringComparison.InvariantCultureIgnoreCase);
                         cellText = rowText.Substring(cellStartPosition, cellEndPosition + 5 - cellStartPosition);
 
-                        contentStartPosition = cellText.IndexOf(BOARD_RESULT_FONT_TEXT, StringComparison.InvariantCultureIgnoreCase) + 46;
+                        contentStartPosition = cellText.IndexOf(m_boardResultFont, StringComparison.InvariantCultureIgnoreCase) + m_boardResultFont.Length;
                         contentEndPosition = cellText.IndexOf("</font>", contentStartPosition, StringComparison.InvariantCultureIgnoreCase);
                         content = cellText.Substring(contentStartPosition, contentEndPosition - contentStartPosition);
 
@@ -359,7 +364,7 @@ namespace BridgeMateRunningScores
                         {
                             if (content != "--")
                             {
-                                newCellText = cellText.Replace(String.Format("{0}{1}</font>", BOARD_RESULT_FONT_TEXT, content), String.Format("{0}{1}</font>", BOARD_RESULT_FONT_TEXT, pairNames[content]));
+                                newCellText = cellText.Replace(String.Format("{0}{1}</font>", m_boardResultFont, content), String.Format("{0}{1}</font>", m_boardResultFont, pairNames[content].Replace('_', ' ').Replace('~', '-')));
                                 boardResultsHtml = boardResultsHtml.Replace(cellText, newCellText);
 
                                 if (cellIndex == 1)
@@ -370,11 +375,11 @@ namespace BridgeMateRunningScores
                                     {
                                         m_completedBoards.Rows.Add(row);
                                     }
-                                    nsPair = pairNames[content];
+                                    nsPair = pairNames[content].Replace('_', ' ').Replace('~', '-');
                                 }
                                 else
                                 {
-                                    ewPair = pairNames[content];
+                                    ewPair = pairNames[content].Replace('_', ' ').Replace('~', '-');
                                 }
                             }
                             else
@@ -438,17 +443,53 @@ namespace BridgeMateRunningScores
             return linksText;
         }
 
-        private string GetBackToRunningScoresLinktext(bool playOffMode)
+        private string GetBackToRunningScoresLinktext(bool isMultiRound, bool isMultiSegment)
         {
-            if (!playOffMode)
+            string link = String.Empty;
+            if (isMultiRound)
             {
-                return String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+                if (isMultiSegment)
+                    link = String.Format("<a href='../../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+                else
+                    link = String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
             }
             else
             {
-                //TODO: use relative path
-                return String.Format("<a href='{0}'>Back to Finals board-wise Results</a>", "https://sites.google.com/site/2011bfame/running-scores/playoffs");
+                if (isMultiSegment)
+                    link = String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+                else
+                    link = String.Format("<a href='../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
             }
+
+            return link;
+        }
+
+        private Tuple<string, string> GetImpScores(string rowText, ref int position, bool hasCarryOver)
+        {
+            string impScore, impScore1, impScore2, carryOverScore = String.Empty, carryOverScore1 = String.Empty, carryOverScore2 = String.Empty;
+
+            if (hasCarryOver)
+            {
+                carryOverScore1 = Utility.GetField(rowText, ref position, "-");
+                // Skip beyond the '-'
+                position = rowText.IndexOf("-", position) + 1;
+                carryOverScore2 = rowText.Substring(position, 3).Trim();
+            }
+
+            // Find the last index of "-" which will give us the cumulative imp score
+            position = rowText.LastIndexOf("-");
+            position = position - 4;
+
+            impScore1 = Utility.GetField(rowText, ref position, "-");
+            // Skip beyond the '-'
+            position = rowText.IndexOf("-", position) + 1;
+            impScore2 = rowText.Substring(position, 3).Trim();
+
+            impScore = String.Format("{0}-{1}", impScore1.ToString(), impScore2.ToString());
+            if (hasCarryOver)
+                carryOverScore = String.Format("{0}-{1}", carryOverScore1.ToString(), carryOverScore2.ToString());
+            position += 3;
+            return new Tuple<string, string>(impScore, carryOverScore);
         }
 
         #endregion

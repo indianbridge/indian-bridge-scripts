@@ -71,6 +71,8 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Templates\DrawTemplate.html" />
+    <Content Include="Templates\ResultsRowTemplate.html" />
+    <Content Include="Templates\ResultsTemplate.html" />
     <Content Include="Templates\RowTemplate.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

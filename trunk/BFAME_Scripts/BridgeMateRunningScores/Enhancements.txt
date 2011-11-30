@@ -1,0 +1,8 @@
+Add cumulative score to running scores display
+Fix pair interchanges in butler results
+Include rank in butler results
+Put team name in horizontal header also in cross-table summary
+Order cross table results by rank
+Remove page titles from generated pages
+Butler results should be imps not cross-imps (so divide by number of comparisons)
+Fix penalties in all pages (versus adjustments)
