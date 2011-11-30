@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeMateRunningScores", "BridgeMateRunningScores.csproj", "{D375F8F9-2276-4B26-9E3C-A6B382641204}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamRunningScores", "TeamRunningScores.csproj", "{D375F8F9-2276-4B26-9E3C-A6B382641204}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitesAPI", "..\SitesAPI\SitesAPI.csproj", "{B28700E0-2767-4C6A-895E-B1ECC5A2ACEB}"
 EndProject
