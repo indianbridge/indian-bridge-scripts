@@ -53,13 +53,12 @@ namespace Upload_To_Google_Sites
             Console.WriteLine("Exitting.");
             Console.ReadLine();*/
 
-            String sitename = "2011winternationals";
+            String sitename = "winternationals2011test";
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
             Boolean debug_flag = true;
+
             SitesTest(sitename, username, password, debug_flag);
-            /*String input = "pre_quarters";
-            Console.WriteLine("Originial : "+input+", camel : "+IndianBridge.Common.Utility.ConvertCaseString(input,IndianBridge.Common.Utility.Case.PascalCase));*/
 
         }
 
@@ -178,7 +177,7 @@ namespace Upload_To_Google_Sites
             {
                 try
                 {
-                    sa.uploadDirectory(@"C:\Users\snarasim\Documents\Bridge\runningscores_backup", "/sriram_test");
+                    sa.uploadDirectory(@"C:\Users\snarasim\Documents\Bridge\runningscores", "/sriram_test");
                 }
                 catch (Exception e) { Console.WriteLine("Exception : " + e.ToString()); }
                 Console.WriteLine("Press Ctrl+Z to quit, Enter to run again.");
