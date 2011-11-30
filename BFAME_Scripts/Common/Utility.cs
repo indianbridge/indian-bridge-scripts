@@ -79,6 +79,20 @@ namespace IndianBridge.Common
             return output;
         }
 
+        public static int CountOccurrences(string input, char searchChar)
+        {
+            int position = 0, count = 0;
+            while (true)
+            {
+                position = input.IndexOf(searchChar);
+                if (position < 0) break;
+                count++;
+                input = input.Substring(position + 1);
+            }
+
+            return count;
+        }
+
         // Given row text and a start position, find the next field in the row
         public static string GetField(string rowText, ref int startPosition, string separator = " ")
         {
@@ -255,6 +269,7 @@ namespace IndianBridge.Common
         }
 
         // Function to Deserialize from a file to a NameValueCollection
+
         public static NameValueCollection Deserialize(String filename, Boolean debug = false)
         {
             // Declare the NameValueCollection reference.
@@ -280,6 +295,71 @@ namespace IndianBridge.Common
                 fs.Close();
             }
             return names;
+        }
+        /// <summary>
+        /// Method split the line with specified delimeter
+        /// </summary>
+        /// <param name="line">line to split</param>
+        /// <param name="delimiter">delimeter character</param>
+        /// <returns></returns>
+        public static string[] SplitCSVDoubleQuotes(string line, string delimiter)
+        {
+            string inputLine = line;
+            if (inputLine.IndexOf("\"") < 0)
+                return inputLine.Split(Convert.ToChar(delimiter));
+
+            List<string> values = new List<string>();
+            int quoteIndex, valueLength;
+
+            bool addEmptyString = false;
+
+            while (inputLine.Length > 0)
+            {
+                quoteIndex = inputLine.IndexOf("\"");
+                if (quoteIndex == 0)
+                {
+                    inputLine = inputLine.Substring(1);
+                    valueLength = inputLine.IndexOf("\"", 0);
+                }
+                else
+                {
+                    valueLength = inputLine.IndexOf(delimiter);
+                }
+
+                if (valueLength < 0)
+                    valueLength = inputLine.Length;
+
+                string valueToAdd = inputLine.Substring(0, valueLength);
+
+                inputLine = inputLine.Substring(valueLength).Trim();
+
+                if ((inputLine.Length > 0) && (inputLine.Substring(0, 1) == "\"")) inputLine = inputLine.Substring(1).Trim();
+
+                if (inputLine.IndexOf(delimiter) == 0)
+                {
+                    inputLine = inputLine.Substring(inputLine.IndexOf(delimiter) + 1).Trim();
+                    if (inputLine.Length <= 1) addEmptyString = true;
+                }
+                else if (inputLine.IndexOf(delimiter) > 0)
+                {
+                    valueToAdd = String.Format("{0}\"{1}", valueToAdd, inputLine.Substring(0, inputLine.IndexOf(delimiter)));
+                    inputLine = inputLine.Substring(inputLine.IndexOf(delimiter) + 1).Trim();
+                }
+                else
+                {
+                    string trimQuotes = inputLine.Trim(Convert.ToChar("\"")).Trim();
+                    if (trimQuotes != String.Empty) valueToAdd = String.Format("{0}\"{1}", valueToAdd, trimQuotes);
+                    inputLine = String.Empty;
+                }
+
+                values.Add(valueToAdd);
+            }
+
+            if (addEmptyString) values.Add(String.Empty);
+
+
+            return values.ToArray();
+
         }
     }
 }

@@ -1,4 +1,4 @@
-<script type="text/javascript" language="JavaScript">
+﻿<script type="text/javascript" language="JavaScript">
 
 	function scrollbegin() {
 		yDocStart = 1
@@ -27,9 +27,9 @@
 	}
 
 	function scrollend() {
-		window.location.reload(true)
-		scroll(0, 0);
-}
+	    window.location.reload(true);
+	    scroll(0, 0);
+	}
 
 </script>
 
@@ -41,7 +41,8 @@
 
 	<body onload="scrollbegin()">
 
-		<h2>[#EventName#] ([#Stage#]) : Draw for Round [#DrawRoundNumber#] [#ScoreHeader#]</h2>
+		<h2>[#EventName#] ([#Stage#]) : Results of Round [#DrawRoundNumber#]</h2>
+		<h3>Generated at [#TimeStamp#]</h3>
 		<table width="100%">
 			<tbody>
 				<tr>
@@ -49,8 +50,10 @@
 						<table width="100%" style="border:1px solid #cef;text-align:left">
 							<thead>
 								<tr>
-									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Table</th>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Table #</th>
 									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Home Team</th>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">IMP Score</th>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">VP Score</th>
 									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Away Team</th>
 								</tr>
 							</thead>

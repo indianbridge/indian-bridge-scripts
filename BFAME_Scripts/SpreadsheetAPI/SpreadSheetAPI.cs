@@ -35,6 +35,7 @@ namespace Upload_To_Google_Sites
         }
         public int getNumberOfTeams() { return (int)numTeams; }
         public int getNumberOfBoards() { return int.Parse(info["Number of Boards"]); }
+        public int getNumberOfRounds() { return int.Parse(info["Number of Rounds"]); }
         public String getEventName() { return info["Event Name"]; }
         private void initialize(Boolean debug)
         {
