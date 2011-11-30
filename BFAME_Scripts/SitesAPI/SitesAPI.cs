@@ -18,8 +18,8 @@ namespace Upload_To_Google_Sites
         private String sitename = null;
         private Boolean debugFlag = false;
         Hashtable lastRunTimes = new Hashtable();
-        private String m_backUpDirectory = null;
-        private bool m_deleteFilesAfterUpload = false;
+        //private String m_backUpDirectory = null;
+        //private bool m_deleteFilesAfterUpload = false;
         private String m_hashTableFileName = "";
 
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
@@ -62,6 +62,13 @@ namespace Upload_To_Google_Sites
             tr.Close();
         }
 
+        private void writeHashTableFile(String fileName)
+        {
+            TextWriter tw = new StreamWriter(fileName);
+            foreach (DictionaryEntry pair in lastRunTimes) tw.WriteLine(pair.Key + "," + pair.Value);
+            tw.Close();
+        }
+
         private void printDebugMessage(String message) {
             if(this.debugFlag) Console.WriteLine(message);
         }
@@ -74,10 +81,10 @@ namespace Upload_To_Google_Sites
             {
                 throw new System.ArgumentException("Only a directory structure can be uploaded");
             }
-            m_backUpDirectory = backUpDirectory;
+            //m_backUpDirectory = backUpDirectory;
             printDebugMessage("Uploading " + directory + " to " + siteRoot);
             // First back up the directory 
-            if (Directory.Exists(m_backUpDirectory))
+            /*if (Directory.Exists(m_backUpDirectory))
             {
                 m_deleteFilesAfterUpload = true;
 
@@ -86,13 +93,20 @@ namespace Upload_To_Google_Sites
 
                 CopyAll(diSource, diTarget);                
             }
-            else m_deleteFilesAfterUpload = false;
-            uploadPath(directory, siteRoot);
-            if (m_deleteFilesAfterUpload)
+            else m_deleteFilesAfterUpload = false;*/
+            try
+            {
+                uploadPath(directory, siteRoot);
+                writeHashTableFile(m_hashTableFileName);
+            } catch(Exception e) {
+                writeHashTableFile(m_hashTableFileName);
+                throw e;
+            }
+            /*if (m_deleteFilesAfterUpload)
             {
                 if (Directory.Exists(directory)) Directory.Delete(directory, true);
                         else if (File.Exists(directory)) File.Delete(directory);
-            }
+            }*/
         }
 
         public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
@@ -201,11 +215,18 @@ namespace Upload_To_Google_Sites
                 AtomEntry entry = service.Get(url);
                 if (entry == null)
                 {
-                    return createWebPage(path, title, html, pageName);
+                    return createWebPage(url,path, title, html, pageName,lastModified);
                 }
                 if (html != "")
                 {
-                    if (!lastRunTimes.ContainsKey(url) || lastModified > (DateTime)lastRunTimes[url])
+                    double diff = 0;
+                    if (lastRunTimes.ContainsKey(url))
+                    {
+                        DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                        TimeSpan dt = lastModified-lastRunTime;
+                        diff = Math.Abs(dt.TotalSeconds);
+                    }
+                    if (!lastRunTimes.ContainsKey(url) || diff > 1)
                     {
                         AtomContent newContent = new AtomContent();
                         newContent.Type = "html";
@@ -213,15 +234,21 @@ namespace Upload_To_Google_Sites
                         entry.Content = newContent;
                         entry.Title.Text = IndianBridge.Common.Utility.ConvertCaseString(title);
                         service.Update(entry);
+                        if (!lastRunTimes.ContainsKey(url)) printDebugMessage(url + " - Updated. No entry was found for last run time.");
+                        else
+                        {
+                            DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                            if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is later than last update time " + lastRunTime.ToString() + ")");
+                        }
                         lastRunTimes[url] = lastModified;
-                        TextWriter tw = new StreamWriter(m_hashTableFileName, true);
+                        /*TextWriter tw = new StreamWriter(m_hashTableFileName, true);
                         tw.WriteLine(url + "," + lastModified);
-                        tw.Close();
-                        if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ")");
+                        tw.Close();*/
                     }
                     else
                     {
-                        if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is before last update time " + ((DateTime)lastRunTimes[url]).ToString() + ")");
+                        DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                        if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
                     }
                 }
                 return entry;
@@ -230,7 +257,7 @@ namespace Upload_To_Google_Sites
             catch (Exception)
             {
                 //if (this.debugFlag) printDebugMessage("Exception : " + e.ToString() + ", Trying to create webpage.");
-                return createWebPage(path, title, html, pageName);
+                return createWebPage(url,path, title, html, pageName,lastModified);
             }
         }
 
@@ -246,7 +273,7 @@ namespace Upload_To_Google_Sites
             return null;
         }
 
-        public AtomEntry createWebPage(String path, String title, String html, String pageName)
+        public AtomEntry createWebPage(String originalUrl,String path, String title, String html, String pageName, DateTime lastModified)
         {
             String parentUrl = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path;
             if (this.debugFlag) printDebugMessage("Creating page " + parentUrl + "/" + pageName);
@@ -265,6 +292,10 @@ namespace Upload_To_Google_Sites
             AtomEntry newEntry = null;
             String url = "https://sites.google.com/feeds/content/site/" + sitename;
             newEntry = service.Insert(new Uri(url), entry);
+            lastRunTimes[originalUrl] = lastModified;
+            /*TextWriter tw = new StreamWriter(m_hashTableFileName, true);
+            tw.WriteLine(originalUrl + "," + lastModified);
+            tw.Close();*/
             if (this.debugFlag) printDebugMessage(parentUrl + "/" + pageName + " - Created.");
             return newEntry;
         }
