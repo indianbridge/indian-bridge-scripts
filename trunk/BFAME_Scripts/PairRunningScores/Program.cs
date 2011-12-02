@@ -64,7 +64,7 @@ namespace PairRunningScores
                     // Calculate Scores and Update Files
                     Console.WriteLine("Creating Running scores and Board files");
                     Console.WriteLine();
-                    DataTable runningScores = CreateRunningScoresFiles(totalNumberOfPairs, debug);
+                    DataTable runningScores = CreateRunningScoresFile(totalNumberOfPairs, debug);
 
                     if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
                     {
@@ -102,15 +102,16 @@ namespace PairRunningScores
             return new NameValueCollection(ConfigurationManager.AppSettings);
         }
 
-        static DataTable CreateRunningScoresFiles(int totalNumberOfPairs, Boolean debug = false)
+        static DataTable CreateRunningScoresFile(int totalNumberOfPairs, Boolean debug = false)
         {
             string outputFileName;
             String eventFolder, boardsOutputFolder, boardResultText;
             NameValueCollection pairNames;
             bool hasNewResults;
+            int boardNumber;
 
             MagicInterface magicInterface = new MagicInterface(configParameters["InputFolder"], configParameters["RunningScoreFileName"],
-                configParameters["RunningScoresFileName"], configParameters["BoardResultFont"], Convert.ToBoolean(configParameters["BoardResultFontBold"]));
+                configParameters["RunningScoresRoot"], configParameters["BoardResultFont"], Convert.ToBoolean(configParameters["BoardResultFontBold"]));
             DataTable runningScores = magicInterface.GetRunningScores(totalNumberOfPairs / 2, out roundInProgress, out pairNames);
 
             if (roundInProgress > 0)
@@ -126,12 +127,15 @@ namespace PairRunningScores
 
                 for (int i = 1; i <= numberOfBoardsPerRound; i++)
                 {
-                    boardResultText = magicInterface.GetBoardResults(i, pairNames, totalNumberOfPairs / 2, out hasNewResults);
+                    boardNumber = i + (roundInProgress - 1) * numberOfBoardsPerRound;
+
+                    boardResultText = magicInterface.GetBoardResults(i, pairNames, totalNumberOfPairs / 2, 
+                        roundInProgress, numberOfBoardsPerRound, out hasNewResults);
 
                     // only update the file if results have been updated
                     if (hasNewResults)
                     {
-                        outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
+                        outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, boardNumber.ToString());
                         Utility.WriteFile(outputFileName, boardResultText);
                     }
                 }
@@ -145,7 +149,7 @@ namespace PairRunningScores
             bool success;
 
             string rowText, rowsText = String.Empty, linkText = String.Empty, result;
-
+            int boardNumber;
             string scoresTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RunningScoresTemplate.html"), out success);
             string rowTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "RowTemplate.html"), out success);
             string boardTemplate = Utility.ReadFile(String.Format(@"{0}\{1}", configParameters["TemplateFolder"], "BoardTemplate.html"), out success);
@@ -180,15 +184,16 @@ namespace PairRunningScores
 
             for (int i = 1; i <= numberOfBoardsPerRound; i++)
             {
+                boardNumber = i + (roundInProgres - 1) * numberOfBoardsPerRound;
                 // Alternating backgrounds
                 rowText = (i % 2) == 0 ? boardTemplate.Replace("background-color:#def", "background-color:#ddd") : boardTemplate;
 
                 linkText = configParameters["BoardLinkTemplate"];
-                linkText = linkText.Replace("[#BoardNumber#]", i.ToString());
-                linkText = linkText.Replace("[#Path#]", configParameters["RunningScoresRoot"]);
+                linkText = linkText.Replace("[#BoardNumber#]", boardNumber.ToString());
                 linkText = linkText.Replace("[#RoundNumber#]", roundInProgress.ToString());
+                linkText = linkText.Replace("[#Path#]", configParameters["RunningScoresRoot"]);
                 rowText = rowText.Replace("[#BoardLink#]", linkText);
-                rowText = rowText.Replace("[#BoardNumber#]", i.ToString());
+                rowText = rowText.Replace("[#BoardNumber#]", boardNumber.ToString());
                 rowsText += rowText;
             }
 
