@@ -57,6 +57,21 @@ namespace BridgeMateRunningScores
             DataRow row;
             nameNumberMapping = new NameValueCollection();
 
+            int rankStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["RankStartPosition"]);
+            int rankStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["RankStringLength"]);
+            int pairNumberStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["PairNumberStartPosition"]);
+            int pairNumberStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["PairNumberStringLength"]);
+            int cumulativeScoreStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["CumulativeScoreStartPosition"]);
+            int cumulativeScoreStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["CumulativeScoreStringLength"]);
+            int percentScoreStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["PercentScoreStartPosition"]);
+            int percentScoreStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["PercentScoreStringLength"]);
+            int roundScoreStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["RoundScoreStartPosition"]);
+            int roundScoreStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["RoundScoreStringLength"]);
+            int pairNameStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["PairNameStartPosition"]);
+            int pairNameStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["PairNameStringLength"]);
+            int penaltyStartPosition = Convert.ToInt16(ConfigurationManager.AppSettings["PenaltyStartPosition"]);
+            int penaltyStringLength = Convert.ToInt16(ConfigurationManager.AppSettings["PenaltyStringLength"]);
+
             // Prior to retrieving running scores for a round, initialize the Results datatable
             InitializeDataTables();
 
@@ -103,17 +118,17 @@ namespace BridgeMateRunningScores
 
                         // This is a line of score
                         // Rank may be missing if there's a tie
-                        if (!int.TryParse(rowText.Substring(1, 4).Trim(), out rank)) rank = prevRank;
-                        pairNumber = Convert.ToInt16(rowText.Substring(7, 4).Trim());
-                        if (!decimal.TryParse(rowText.Substring(13, 5).Trim(), out cumulativeScore)) cumulativeScore = 0;
-                        percentScore = rowText.Substring(18, 5).Trim();
-                        if (!decimal.TryParse(rowText.Substring(26, 4).Trim(), out roundScore)) roundScore = 0;
-                        pairName = rowText.Substring(32, 37).Trim();
+                        if (!int.TryParse(rowText.Substring(rankStartPosition, rankStringLength).Trim(), out rank)) rank = prevRank;
+                        pairNumber = Convert.ToInt16(rowText.Substring(pairNumberStartPosition, pairNumberStringLength).Trim());
+                        if (!decimal.TryParse(rowText.Substring(cumulativeScoreStartPosition, cumulativeScoreStringLength).Trim(), out cumulativeScore)) cumulativeScore = 0;
+                        percentScore = rowText.Substring(percentScoreStartPosition, percentScoreStringLength).Trim();
+                        if (!decimal.TryParse(rowText.Substring(roundScoreStartPosition, roundScoreStringLength).Trim(), out roundScore)) roundScore = 0;
+                        pairName = rowText.Substring(pairNameStartPosition, pairNameStringLength).Trim();
 
                         // Penalty may not be there so we have to try-catch the value
                         try
                         {
-                            penaltyText = rowText.Substring(70, 5).Trim();
+                            penaltyText = rowText.Substring(penaltyStartPosition, penaltyStringLength).Trim();
                             if (!decimal.TryParse(penaltyText, out penalty)) penalty = 0;
                         }
                         catch (Exception)
@@ -144,18 +159,20 @@ namespace BridgeMateRunningScores
         }
 
         public string GetBoardResults(int boardNumber, NameValueCollection pairNames,
-            int numberOfTables, out bool hasNewResults)
+            int numberOfTables, int roundInProgress, int numberOfBoardsPerRound, out bool hasNewResults)
         {
             bool success; DateTime boardLastUpdatedTime;
+            // The file is always numbered from 1 to numberOfBoardsPerRound in each round
             string fileName = String.Format(@"{0}\{1}-{2}.htm", m_inputFolder, m_runningScoreFileName, boardNumber.ToString());
+            int actualboardNumber = boardNumber + (roundInProgress - 1) * numberOfBoardsPerRound;
 
             hasNewResults = true;
 
             // Only create new board results if the corresponding magic file has been updated in the interim
             DateTime lastModifiedTime = File.GetLastWriteTime(fileName);
-            if (m_lastModifiedTimes.ContainsKey(boardNumber))
+            if (m_lastModifiedTimes.ContainsKey(actualboardNumber))
             {
-                boardLastUpdatedTime = m_lastModifiedTimes[boardNumber];
+                boardLastUpdatedTime = m_lastModifiedTimes[actualboardNumber];
                 if (lastModifiedTime.CompareTo(boardLastUpdatedTime) <= 0)
                 {
                     hasNewResults = false;
@@ -163,22 +180,22 @@ namespace BridgeMateRunningScores
                 }
                 else
                 {
-                    m_lastModifiedTimes[boardNumber] = lastModifiedTime;
+                    m_lastModifiedTimes[actualboardNumber] = lastModifiedTime;
                 }
             }
             else
             {
-                m_lastModifiedTimes.Add(boardNumber, lastModifiedTime);
+                m_lastModifiedTimes.Add(actualboardNumber, lastModifiedTime);
             }
 
             string html = Utility.ReadFile(fileName, out success, true);
             string backLinkText = GetBackToRunningScoresLinktext();
-            string navigationLinksText = GetNavigationLinksText(boardNumber, String.Empty);
+            string navigationLinksText = GetNavigationLinksText(boardNumber, roundInProgress, String.Empty);
 
             if (!success)
             {
                 return String.Format(@"{2}<b>Page Updated {0}</b><br/><br/><b>No scores yet</b><br/><br/><br/>{1}",
-                    Utility.GetTimeStamp(), backLinkText, navigationLinksText, boardNumber.ToString());
+                    Utility.GetTimeStamp(), backLinkText, navigationLinksText, actualboardNumber.ToString());
             }
 
             int startPosition = html.IndexOf("<center>") + 8;
@@ -194,7 +211,7 @@ namespace BridgeMateRunningScores
 
             boardResultsTable = tableText.Substring(startPosition, endPosition + 8 - startPosition);
 
-            tableText = tableText.Replace(boardResultsTable, ReplacePairNumbersWithNames(boardNumber, boardResultsTable, pairNames, numberOfTables));
+            tableText = tableText.Replace(boardResultsTable, ReplacePairNumbersWithNames(boardNumber, boardResultsTable, pairNames, numberOfTables, roundInProgress));
             tableText = tableText.Replace(String.Format("src='clubs{0}'", suitSymbolsSuffix), String.Format("src={0}clubs-large.gif", imagesRootUrl));
             tableText = tableText.Replace(String.Format("src='diamonds{0}'", suitSymbolsSuffix), String.Format("src={0}diamonds-large.gif", imagesRootUrl));
             tableText = tableText.Replace(String.Format("src='hearts{0}'", suitSymbolsSuffix), String.Format("src={0}hearts-large.gif", imagesRootUrl));
@@ -223,7 +240,7 @@ namespace BridgeMateRunningScores
         }
 
         private string ReplacePairNumbersWithNames(int boardNumber, string boardResultsHtml,
-            NameValueCollection pairNames, int numberOfTables)
+            NameValueCollection pairNames, int numberOfTables, int roundInProgress)
         {
             string rowText, cellText, content, newCellText, result, linksText, tableNumber = String.Empty;
             int rowStartPosition, rowEndPosition = 0, rowIndex = 0;
@@ -281,29 +298,30 @@ namespace BridgeMateRunningScores
 
             string note = "<table width=300 border=0><tr><td align=right><b>Note: Scores below are in matchpoints</a></b></td></tr></table>";
 
-            linksText = GetNavigationLinksText(boardNumber, note);
+            linksText = GetNavigationLinksText(boardNumber, roundInProgress, note);
 
             result = linksText + boardResultsHtml.Replace("size=4", "size=2").Replace("width=57 align=center", "width=82 align=center");
             return result;
         }
 
-        private string GetNavigationLinksText(int boardNumber, string note)
+        private string GetNavigationLinksText(int boardNumber, int roundInProgress, string note)
         {
             int numberOfBoardsPerRound = Convert.ToInt16(ConfigurationManager.AppSettings["NumberOfBoardsPerRound"]);
             string imagesRootUrl = ConfigurationManager.AppSettings["ImagesRoot"];
             string linksText = String.Empty;
+            int actualboardNumber = boardNumber + (roundInProgress - 1) * numberOfBoardsPerRound;
 
             if (boardNumber == 1)
             {
-                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td>&nbsp;</td><td><a href=board-{0}><img src={1}buttonNext.png></a></td></tr></table></td><td>{2}</td></tr></table>", boardNumber + 1, imagesRootUrl, note);
+                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td>&nbsp;</td><td><a href=board-{0}><img src={1}buttonNext.png></a></td></tr></table></td><td>{2}</td></tr></table>", actualboardNumber + 1, imagesRootUrl, note);
             }
-            else if (boardNumber == numberOfBoardsPerRound)
+            else if (boardNumber % numberOfBoardsPerRound == 0)
             {
-                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={1}buttonPrev.png></a></td><td>&nbsp;</td></tr></table></td><td>{2}</td></tr></table>", boardNumber - 1, imagesRootUrl, note);
+                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={1}buttonPrev.png></a></td><td>&nbsp;</td></tr></table></td><td>{2}</td></tr></table>", actualboardNumber - 1, imagesRootUrl, note);
             }
             else
             {
-                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={2}buttonPrev.png></a></td><td><a href=board-{1}><img src={2}buttonNext.png></a></td></tr></table></td><td>{3}</td></tr></table>", boardNumber - 1, boardNumber + 1, imagesRootUrl, note);
+                linksText = String.Format("<table><tr><td><table border=0><tr align=right border=0><td><a href=board-{0}><img src={2}buttonPrev.png></a></td><td><a href=board-{1}><img src={2}buttonNext.png></a></td></tr></table></td><td>{3}</td></tr></table>", actualboardNumber - 1, actualboardNumber + 1, imagesRootUrl, note);
             }
 
             return linksText;
@@ -312,7 +330,7 @@ namespace BridgeMateRunningScores
         private string GetBackToRunningScoresLinktext()
         {
             string link = String.Empty;
-            link = String.Format("<a href='../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
+            link = String.Format("<a href='../../{0}'>Back to Running Scores</a>", m_runningScoreRoot);
             return link;
         }
 

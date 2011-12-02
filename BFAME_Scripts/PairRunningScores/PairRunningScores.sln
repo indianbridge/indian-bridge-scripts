@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitesAPI", "..\SitesAPI\Sit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{FA0A367F-859A-41E7-8F87-A507D4154E04}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "PairRunningScoresSetup", "..\PairRunningScoresSetup\PairRunningScoresSetup.vdproj", "{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,13 @@ Global
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|x86.ActiveCfg = Release|Any CPU
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Debug|Any CPU.ActiveCfg = Debug
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Debug|x86.ActiveCfg = Debug
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Release|Any CPU.ActiveCfg = Release
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Release|Mixed Platforms.ActiveCfg = Release
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Release|Mixed Platforms.Build.0 = Release
+		{265DBED6-0E7D-48A0-AC0C-0F1F08BE3081}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
