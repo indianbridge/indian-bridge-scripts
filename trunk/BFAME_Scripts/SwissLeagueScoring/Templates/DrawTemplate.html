@@ -1,0 +1,67 @@
+<script type="text/javascript" language="JavaScript">
+
+	function scrollbegin() {
+		yDocStart = 1
+		nPauseBegin = 10000
+		nPauseMiddle = 10000
+		nPauseEnd = 10000
+		setTimeout("scrolldown()", nPauseBegin)
+	}
+	function scrolldown() {
+		yDocMax = document.body.scrollHeight
+		yWindowMax = document.body.clientHeight
+
+		if (yWindowMax >= yDocMax) {
+			scrollend()
+			return
+		}
+
+		yDoc = yDocStart + yWindowMax - 30
+		scroll(1, yDoc)
+
+		if (yDoc < yDocMax) {
+			yDocStart = yDoc
+			setTimeout("scrolldown()", nPauseMiddle)
+		}
+		else scrollend()
+	}
+
+	function scrollend() {
+		window.location.reload(true)
+		scroll(0, 0);
+}
+
+</script>
+
+<html>
+
+	<head>
+		<title>2011 Chennai Winter Nationals</title>
+	</head>
+
+	<body onload="scrollbegin()">
+
+		<h2>[#EventName#] ([#Stage#]) : Draw for Round [#DrawRoundNumber#] [#ScoreHeader#]</h2>
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td valign="top">
+						<table width="100%" style="border:1px solid #cef;text-align:left">
+							<thead>
+								<tr>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Table</th>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Home Team</th>
+									<th align="center" style="font-weight:bold;background-color:#acf;border-bottom:1px solid #cef;padding:4px 5px">Away Team</th>
+								</tr>
+							</thead>
+							<tbody>
+								[#Scores#]
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</body>
+</html>
