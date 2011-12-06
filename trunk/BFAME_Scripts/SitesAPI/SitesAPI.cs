@@ -18,8 +18,8 @@ namespace Upload_To_Google_Sites
         private String sitename = null;
         private Boolean debugFlag = false;
         Hashtable lastRunTimes = new Hashtable();
-        //private String m_backUpDirectory = null;
-        //private bool m_deleteFilesAfterUpload = false;
+        private String m_backUpDirectory = null;
+        private bool m_deleteFilesAfterUpload = false;
         private String m_hashTableFileName = "";
 
         public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
@@ -81,10 +81,10 @@ namespace Upload_To_Google_Sites
             {
                 throw new System.ArgumentException("Only a directory structure can be uploaded");
             }
-            //m_backUpDirectory = backUpDirectory;
+            m_backUpDirectory = backUpDirectory;
             printDebugMessage("Uploading " + directory + " to " + siteRoot);
             // First back up the directory 
-            /*if (Directory.Exists(m_backUpDirectory))
+            if (Directory.Exists(m_backUpDirectory))
             {
                 m_deleteFilesAfterUpload = true;
 
@@ -93,7 +93,7 @@ namespace Upload_To_Google_Sites
 
                 CopyAll(diSource, diTarget);                
             }
-            else m_deleteFilesAfterUpload = false;*/
+            else m_deleteFilesAfterUpload = false;
             try
             {
                 uploadPath(directory, siteRoot);
@@ -102,11 +102,11 @@ namespace Upload_To_Google_Sites
                 writeHashTableFile(m_hashTableFileName);
                 throw e;
             }
-            /*if (m_deleteFilesAfterUpload)
+            if (m_deleteFilesAfterUpload)
             {
                 if (Directory.Exists(directory)) Directory.Delete(directory, true);
-                        else if (File.Exists(directory)) File.Delete(directory);
-            }*/
+                else if (File.Exists(directory)) File.Delete(directory);
+            }
         }
 
         public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
