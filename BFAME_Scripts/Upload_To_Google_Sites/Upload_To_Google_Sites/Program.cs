@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 
 using Google.GData.Client;
 using Google.GData.Spreadsheets;
+using System.Text.RegularExpressions;
 
 namespace Upload_To_Google_Sites
 {
@@ -53,13 +54,73 @@ namespace Upload_To_Google_Sites
             Console.WriteLine("Exitting.");
             Console.ReadLine();*/
 
-            String sitename = "winternationals2011test";
+           /* String sitename = "winternationals2011test";
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
             Boolean debug_flag = true;
 
-            SitesTest(sitename, username, password, debug_flag);
+            SitesTest(sitename, username, password, debug_flag);*/
+            string html = File.ReadAllText(@"C:\Users\snarasim\Documents\Bridge\indian-bridge-scripts\IndianBridge\ResultsCreation\Applications\WinterNationals2011PairsResultsCreator\bin\Webpages\Holkar-Pairs\boards\board1score.html");
+            string url = @"https://sites.google.com/feeds/content/site/winternationals2011test?Path=/results/pairs/Holkar-Pairs/boards/board1score";
+            string newHTML = replaceLinks(html, url);
+            Console.WriteLine(newHTML);
+            /*string input = "This is an example body of HTML with <a href  ='./index.htm'></a>3 links"+ 
+                "<a href= http://www.one.com/mike/test.html title=test>link</a> more text"+
+                "here <a href = \"http://www.TWO.com/2/index.htm\" target=_blank>link</a>"+
+                "now for a <em>relative link</em>. <a href=/csa.html>CSA</a>. Mike Golding";
+            Console.WriteLine(Regex.Replace(input, @"(\./index\.html)|(\./index\.htm)", "MAYA", RegexOptions.IgnoreCase));*/
+            /*Regex re = new Regex(@"<a\s+href[^<]*</a>", RegexOptions.IgnoreCase);
+            Regex re2 = new Regex("http",RegexOptions.IgnoreCase);
+            string output = re.Replace(input, new MatchEvaluator(
+                delegate(Match match)
+                {
+                    Console.WriteLine(match.Value);
+                    string result = match.Value;
+                    if(re2.IsMatch(result)) return result;
+                    else return result.Replace(".html", "").Replace(".htm", "");
+                }));
 
+            Console.WriteLine(output);*/
+            
+        }
+
+        private static string getParentPage(string path)
+        {
+            string parentPage = path.TrimEnd('/').TrimEnd('\\');
+            int index1 = parentPage.LastIndexOf('/');
+            int index2 = parentPage.LastIndexOf('\\');
+            int index = index1 > index2 ? index1 : index2;
+            return parentPage.Substring(0, index);
+        }
+        private static string getPage(string path)
+        {
+            return path.TrimEnd('/').TrimEnd('\\');
+        }
+
+
+        private static string replaceLinks(string html, string pathUrl)
+        {
+            string url = Regex.Replace(pathUrl, @"\?Path=", "", RegexOptions.IgnoreCase);
+            url = Regex.Replace(url, @"feeds/content/", "", RegexOptions.IgnoreCase);
+            Regex re = new Regex(@"<a\s+href[^<]*</a>", RegexOptions.IgnoreCase);
+            Regex re2 = new Regex("http", RegexOptions.IgnoreCase);
+            return re.Replace(html, new MatchEvaluator(
+            delegate(Match match)
+            {
+                string result = match.Value;
+                if (re2.IsMatch(result)) return result;
+                else
+                {
+                    result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(url) + "/", RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"(\./)|(\.\\)", getPage(url) + "/", RegexOptions.IgnoreCase);
+                    //string parentPage = "";
+                    //string page = getPage(url, out parentPage);
+                    result = Regex.Replace(result, @"(index\.html)|(index\.htm)", "", RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"(\.html)|(\.htm)", "", RegexOptions.IgnoreCase);
+                    result = result.TrimEnd('/').TrimEnd('\\');
+                    return result;
+                }
+            }));
         }
 
         static NameValueCollection getTeamNames(String spreadsheetname,Boolean debug_flag=false)
