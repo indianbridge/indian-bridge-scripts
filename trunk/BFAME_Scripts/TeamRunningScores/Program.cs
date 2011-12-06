@@ -124,7 +124,7 @@ namespace BridgeMateRunningScores
 					if (isEndOfSegment)
 					{
 						// Upload Butler Scores at the end of each segment
-						if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
+						if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]) && Boolean.Parse(configParameters["UseButlerScores"]))
 						{
 							Console.WriteLine("Uploading Butler Scores");
 							Console.WriteLine();
@@ -255,7 +255,7 @@ namespace BridgeMateRunningScores
 				GenerateRunningScoresHTML(runningScores, roundInProgress, segmentInProgress, playedBoards, nameNumberMapping);
 
 				// Perform closure actions at end of segment
-				if (isEndOfSegment)
+				if (isEndOfSegment && Boolean.Parse(configParameters["UseButlerScores"]))
 				{
 					// Only re-compute results if we haven't already generated butler results for this round
 					bool success;
