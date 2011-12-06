@@ -199,6 +199,7 @@ namespace BridgeMateRunningScores
 			DataTable cumulativeButlerScores;
 			String eventFolder, boardsOutputFolder;
 			NameValueCollection playedBoards;
+			int boardNumber = 0;
 
 			MagicInterface magicInterface = new MagicInterface(configParameters["InputFolder"], configParameters["RunningScoreFileName"],
 				configParameters["ButlerFileName"], configParameters["RunningScoresFileName"], configParameters["BoardResultFont"], Convert.ToBoolean(configParameters["BoardResultFontBold"]));
@@ -238,6 +239,15 @@ namespace BridgeMateRunningScores
 					{
 						outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
 						Utility.WriteFile(outputFileName, boardResultText);
+						// If this is a multi-segment event, also write all the boards to the Round folder
+						if (isMultiSegment)
+						{
+							boardNumber = (segmentInProgress - 1) * numberOfBoardsPerRound + i;
+							boardsOutputFolder = String.Format(@"{0}\round{1}\boards", eventFolder, roundInProgress.ToString());
+                            if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+							outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, boardNumber.ToString());
+							Utility.WriteFile(outputFileName, boardResultText);
+						}
 					}
 				}
 
