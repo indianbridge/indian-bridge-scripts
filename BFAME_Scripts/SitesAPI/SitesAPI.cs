@@ -57,7 +57,7 @@ namespace Upload_To_Google_Sites
             {
                 line = tr.ReadLine();
                 String[] values = line.Split(',');
-                lastRunTimes[values[0]] = values[1];
+                lastRunTimes[values[0]] = DateTime.Parse(values[1]);
             }
             tr.Close();
         }
@@ -65,7 +65,7 @@ namespace Upload_To_Google_Sites
         private void writeHashTableFile(String fileName)
         {
             TextWriter tw = new StreamWriter(fileName);
-            foreach (DictionaryEntry pair in lastRunTimes) tw.WriteLine(pair.Key + "," + pair.Value);
+            foreach (DictionaryEntry pair in lastRunTimes) tw.WriteLine(pair.Key + "," + pair.Value.ToString());
             tw.Close();
         }
 
@@ -222,7 +222,7 @@ namespace Upload_To_Google_Sites
                     double diff = 0;
                     if (lastRunTimes.ContainsKey(url))
                     {
-                        DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                        DateTime lastRunTime = (DateTime)lastRunTimes[url];
                         TimeSpan dt = lastModified-lastRunTime;
                         diff = Math.Abs(dt.TotalSeconds);
                     }
@@ -237,7 +237,7 @@ namespace Upload_To_Google_Sites
                         if (!lastRunTimes.ContainsKey(url)) printDebugMessage(url + " - Updated. No entry was found for last run time.");
                         else
                         {
-                            DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                            DateTime lastRunTime = (DateTime)lastRunTimes[url];
                             if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is later than last update time " + lastRunTime.ToString() + ")");
                         }
                         lastRunTimes[url] = lastModified;
@@ -247,16 +247,16 @@ namespace Upload_To_Google_Sites
                     }
                     else
                     {
-                        DateTime lastRunTime = DateTime.Parse((String)lastRunTimes[url]);
+                        DateTime lastRunTime = (DateTime)lastRunTimes[url];
                         if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
                     }
                 }
                 return entry;
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //if (this.debugFlag) printDebugMessage("Exception : " + e.ToString() + ", Trying to create webpage.");
+                if (this.debugFlag) printDebugMessage("Exception : " + e.ToString() + ", Trying to create webpage.");
                 return createWebPage(url,path, title, html, pageName,lastModified);
             }
         }
