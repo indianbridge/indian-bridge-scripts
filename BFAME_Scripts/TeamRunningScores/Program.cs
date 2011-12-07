@@ -197,7 +197,7 @@ namespace BridgeMateRunningScores
 			string boardResultText, outputFileName;
 			bool hasNewResults;
 			DataTable cumulativeButlerScores;
-			String eventFolder, boardsOutputFolder;
+			String eventFolder = String.Empty, boardsOutputFolder;
 			NameValueCollection playedBoards;
 			int boardNumber = 0;
 
@@ -209,44 +209,47 @@ namespace BridgeMateRunningScores
 			if (roundInProgress > 0)
 			{
 				// Only retrieve pair names if they've not already been retrieved
-				if (pairNames == null || pairNames.Count == 0)
+				if (Boolean.Parse(configParameters["UseButlerScores"]) && (pairNames == null || pairNames.Count == 0))
 				{
 					pairNames = magicInterface.GetPairNames(numberOfPairs);
 				}
 
-				eventFolder = String.Format(@"{0}\runningscores\{1}", configParameters["OutputFolder"], configParameters["RunningScoresFileName"]);
-				if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
-
-				if (isMultiRound)
+                if (Boolean.Parse(configParameters["GetBoardResults"]))
 				{
-					boardsOutputFolder = isMultiSegment ? String.Format(@"{0}\round{1}\segment{2}", eventFolder, roundInProgress.ToString(), segmentInProgress.ToString())
-						: String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
-				}
-				else
-				{
-					boardsOutputFolder = isMultiSegment ? String.Format(@"{0}\segment{1}", eventFolder, segmentInProgress.ToString())
-						: String.Format(@"{0}\segment1", eventFolder);
-				}
+					eventFolder = String.Format(@"{0}\runningscores\{1}", configParameters["OutputFolder"], configParameters["RunningScoresFileName"]);
+					if (!Directory.Exists(eventFolder)) Directory.CreateDirectory(eventFolder);
 
-				if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
-
-				for (int i = 1; i <= numberOfBoardsPerRound; i++)
-				{
-					boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables, isMultiRound, isMultiSegment, out hasNewResults);
-
-					// only update the file if results have been updated
-					if (hasNewResults)
+					if (isMultiRound)
 					{
-						outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
-						Utility.WriteFile(outputFileName, boardResultText);
-						// If this is a multi-segment event, also write all the boards to the Round folder
-						if (isMultiSegment)
+						boardsOutputFolder = isMultiSegment ? String.Format(@"{0}\round{1}\segment{2}", eventFolder, roundInProgress.ToString(), segmentInProgress.ToString())
+							: String.Format(@"{0}\round{1}", eventFolder, roundInProgress.ToString());
+					}
+					else
+					{
+						boardsOutputFolder = isMultiSegment ? String.Format(@"{0}\segment{1}", eventFolder, segmentInProgress.ToString())
+							: String.Format(@"{0}\segment1", eventFolder);
+					}
+
+					if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+
+					for (int i = 1; i <= numberOfBoardsPerRound; i++)
+					{
+						boardResultText = magicInterface.GetBoardResults(i, pairNames, numberOfTables, isMultiRound, isMultiSegment, out hasNewResults);
+
+						// only update the file if results have been updated
+						if (hasNewResults)
 						{
-							boardNumber = (segmentInProgress - 1) * numberOfBoardsPerRound + i;
-							boardsOutputFolder = String.Format(@"{0}\round{1}\boards", eventFolder, roundInProgress.ToString());
-                            if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
-							outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, boardNumber.ToString());
+							outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, i.ToString());
 							Utility.WriteFile(outputFileName, boardResultText);
+							// If this is a multi-segment event, also write all the boards to the Round folder
+							if (isMultiSegment)
+							{
+								boardNumber = (segmentInProgress - 1) * numberOfBoardsPerRound + i;
+								boardsOutputFolder = String.Format(@"{0}\round{1}\boards", eventFolder, roundInProgress.ToString());
+								if (!Directory.Exists(boardsOutputFolder)) Directory.CreateDirectory(boardsOutputFolder);
+								outputFileName = String.Format(@"{0}\board-{1}.html", boardsOutputFolder, boardNumber.ToString());
+								Utility.WriteFile(outputFileName, boardResultText);
+							}
 						}
 					}
 				}
@@ -402,42 +405,53 @@ namespace BridgeMateRunningScores
 
 			rowsText = String.Empty;
 
-			if (isMultiRound)
+			if (Boolean.Parse(configParameters["GetBoardResults"]))
 			{
-				if (isMultiSegment)
+				if (isMultiRound)
 				{
-					path = String.Format("round{0}/segment{1}", roundInProgres, segmentInProgress);
+					if (isMultiSegment)
+					{
+						path = String.Format("round{0}/segment{1}", roundInProgres, segmentInProgress);
+					}
+					else
+					{
+						path = String.Format("round{0}", roundInProgres);
+					}
 				}
 				else
 				{
-					path = String.Format("round{0}", roundInProgres);
+					if (isMultiSegment)
+					{
+						path = String.Format("segment{1}", segmentInProgress);
+					}
+					else
+					{
+						path = "segment1";
+					}
 				}
+
+				for (int i = 1; i <= numberOfBoardsPerRound; i++)
+				{
+					// Alternating backgrounds
+					rowText = (i % 2) == 0 ? boardTemplate.Replace("background-color:#def", "background-color:#ddd") : boardTemplate;
+
+					linkText = configParameters["BoardLinkTemplate"];
+					linkText = linkText.Replace("[#BoardNumber#]", i.ToString());
+					linkText = linkText.Replace("[#Path#]", String.Format("{0}/{1}", configParameters["RunningScoresFileName"], path));
+					rowText = rowText.Replace("[#BoardLink#]", linkText);
+					rowText = rowText.Replace("[#BoardNumber#]", i.ToString());
+					rowsText += rowText;
+				}
+
+				result = result.Replace("[#Boards#]", rowsText);
 			}
 			else
 			{
-				if (isMultiSegment)
-				{
-					path = String.Format("segment{1}", segmentInProgress);
-				}
-				else
-				{
-					path = "segment1";
-				}
+				result = result.Replace("[#Boards#]", "<tr><td>No board results available</td></tr>");
+                // If we are not parsing board files, we assume it's the end of the segment
+                isEndOfSegment = true;
 			}
 
-			for (int i=1;i<=numberOfBoardsPerRound;i++) {
-				// Alternating backgrounds
-				rowText = (i % 2) == 0 ? boardTemplate.Replace("background-color:#def", "background-color:#ddd") : boardTemplate;
-
-				linkText = configParameters["BoardLinkTemplate"];
-				linkText = linkText.Replace("[#BoardNumber#]", i.ToString());
-				linkText = linkText.Replace("[#Path#]", String.Format("{0}/{1}", configParameters["RunningScoresFileName"], path));
-				rowText = rowText.Replace("[#BoardLink#]", linkText);
-				rowText = rowText.Replace("[#BoardNumber#]", i.ToString());
-				rowsText += rowText;
-			}
-
-			result = result.Replace("[#Boards#]", rowsText);
 			String runningScoresFolder = configParameters["OutputFolder"] + "\\runningscores";
 			if (!Directory.Exists(runningScoresFolder)) Directory.CreateDirectory(runningScoresFolder);
 			String runningScoresRootFolder = String.Format(@"{0}\{1}", runningScoresFolder, configParameters["RunningScoresFileName"]);
