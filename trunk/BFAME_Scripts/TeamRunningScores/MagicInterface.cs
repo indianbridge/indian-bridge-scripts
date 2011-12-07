@@ -13,6 +13,7 @@ namespace BridgeMateRunningScores
     public class MagicInterface
     {
         #region Constants & Members
+        const string DELIMITER = "\n";
         const string pairHeadingOld = "<FONT face='Verdana, Arial, Helvetica' size=2><b>Pair</b></font>";
         const string pairHeadingNew = "<FONT face='Verdana, Arial, Helvetica' size=2><b>Pair<br>NS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EW</b></font>";
         const string TABLE_START_TAG = "<TABLE";
@@ -69,13 +70,13 @@ namespace BridgeMateRunningScores
 
             // Find the index of the "Name" column header
             endOfRowPosition = text.IndexOf("Name");
-            position = text.IndexOf("\r\n\r\n", endOfRowPosition) + 4;
+            position = text.IndexOf(DELIMITER+DELIMITER, endOfRowPosition) + 4;
             int rank = 1;
 
             while (rank <= numberOfPairs)
             {
                 // Find 
-                endOfRowPosition = text.IndexOf("\r\n", position);
+                endOfRowPosition = text.IndexOf(DELIMITER, position);
 
                 rowText = text.Substring(position, endOfRowPosition - position);
                 position = 0;
@@ -121,8 +122,8 @@ namespace BridgeMateRunningScores
                 return null;
             }
 
-            roundStartPosition = fileData.IndexOf("<PRE>\r\nRound:") + 13;
-            roundEndPosition = fileData.IndexOf("\r\n", roundStartPosition);
+            roundStartPosition = fileData.IndexOf("<PRE>"+DELIMITER+"Round:") + 13;
+            roundEndPosition = fileData.IndexOf(DELIMITER, roundStartPosition);
 
             roundInProgress = Convert.ToInt32(fileData.Substring(roundStartPosition, roundEndPosition - roundStartPosition).Trim());
 
@@ -154,7 +155,7 @@ namespace BridgeMateRunningScores
                     continue;
                 }
 
-                endOfRowPosition = text.IndexOf("\r\n", position);
+                endOfRowPosition = text.IndexOf(DELIMITER, position);
 
                 rowText = text.Substring(position, endOfRowPosition - position);
 

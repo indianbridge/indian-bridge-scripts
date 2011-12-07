@@ -109,7 +109,7 @@ namespace BridgeMateRunningScores
 					// Calculate Scores and Update Files
 					Console.WriteLine("Creating Butler, Running scores and Board files");
 					Console.WriteLine();
-					DataTable runningScores = CreateButlerAndRunningScoresFiles(totalNumberOfTeams, nameNumberMapping, debug);
+					 DataTable runningScores = CreateButlerAndRunningScoresFiles(totalNumberOfTeams, nameNumberMapping, debug);
 
 					if (Boolean.Parse(configParameters["RunUpdateGoogleSite"]))
 					{
