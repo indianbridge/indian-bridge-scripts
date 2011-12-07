@@ -22,7 +22,7 @@ namespace Upload_To_Google_Sites
         private bool m_deleteFilesAfterUpload = false;
         private String m_hashTableFileName = "";
 
-        public SitesAPI(String sitename, String username, String password, bool debugFlag=false)
+        public SitesAPI(String sitename, String username, String password, bool debugFlag = false)
         {
             this.debugFlag = debugFlag;
             this.sitename = sitename;
@@ -32,7 +32,7 @@ namespace Upload_To_Google_Sites
             {
                 Google.GData.Client.GDataLoggingRequestFactory factory = new GDataLoggingRequestFactory("jotspot", "SpreadsheetsLoggingTest");
                 factory.MethodOverride = true;
-                factory.CombinedLogFileName = Path.Combine(Directory.GetCurrentDirectory(),"HTTP_Traffic.log");
+                factory.CombinedLogFileName = Path.Combine(Directory.GetCurrentDirectory(), "HTTP_Traffic.log");
                 FileStream stream = new FileStream(factory.CombinedLogFileName, FileMode.Create);
                 TextWriter writer = new StreamWriter(stream);
                 writer.WriteLine("");
@@ -50,7 +50,8 @@ namespace Upload_To_Google_Sites
             File.Create(m_hashTableFileName);
         }
 
-        private void readHashTableFile(String fileName) {
+        private void readHashTableFile(String fileName)
+        {
             String line = "";
             TextReader tr = new StreamReader(fileName);
             while (tr.Peek() >= 0)
@@ -69,13 +70,14 @@ namespace Upload_To_Google_Sites
             tw.Close();
         }
 
-        private void printDebugMessage(String message) {
-            if(this.debugFlag) Console.WriteLine(message);
+        private void printDebugMessage(String message)
+        {
+            if (this.debugFlag) Console.WriteLine(message);
         }
 
         private String makeIdentifier(String text) { return text.Replace(" ", "-"); }
 
-        public void uploadDirectory(String directory, String siteRoot, String backUpDirectory=null)
+        public void uploadDirectory(String directory, String siteRoot, String backUpDirectory = null)
         {
             if (!Directory.Exists(directory))
             {
@@ -91,14 +93,16 @@ namespace Upload_To_Google_Sites
                 DirectoryInfo diSource = new DirectoryInfo(directory);
                 DirectoryInfo diTarget = new DirectoryInfo(m_backUpDirectory);
 
-                CopyAll(diSource, diTarget);                
+                CopyAll(diSource, diTarget);
             }
             else m_deleteFilesAfterUpload = false;
             try
             {
                 uploadPath(directory, siteRoot);
                 writeHashTableFile(m_hashTableFileName);
-            } catch(Exception e) {
+            }
+            catch (Exception e)
+            {
                 writeHashTableFile(m_hashTableFileName);
                 throw e;
             }
@@ -139,19 +143,20 @@ namespace Upload_To_Google_Sites
         }
 
         private void uploadPath(String path, String siteRoot)
-        {        
+        {
             if (Directory.Exists(path) || File.Exists(path))
             {
-                 if (File.Exists(path))
+                if (File.Exists(path))
                 {
                     String extension = Path.GetExtension(path).ToLower();
-                    if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower()!="index")
+                    if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower() != "index")
                     {
-                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)),File.GetLastWriteTime(path));
+                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)), File.GetLastWriteTime(path));
                     }
                     return;
-                } 
-                else if (Directory.Exists(path)) {
+                }
+                else if (Directory.Exists(path))
+                {
                     String[] directories = Directory.GetDirectories(path);
                     foreach (String dir in directories)
                     {
@@ -176,14 +181,14 @@ namespace Upload_To_Google_Sites
                             }
                             else html = getSubPageListing();
                         }
-                        updateWebpage(siteRoot,dirName, html, pageName, lastUpdateTime);
+                        updateWebpage(siteRoot, dirName, html, pageName, lastUpdateTime);
                         uploadPath(dir, siteRoot + "/" + pageName);
                     }
                     String[] files = Directory.GetFiles(path);
-                    foreach (String file in files) uploadPath(file,siteRoot);
+                    foreach (String file in files) uploadPath(file, siteRoot);
                 }
             }
-            
+
         }
 
         private String getSubPageListing()
@@ -208,57 +213,58 @@ namespace Upload_To_Google_Sites
 
         public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified)
         {
-            String url = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path+"/"+pageName;
+            String url = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path + "/" + pageName;
             if (this.debugFlag) printDebugMessage("Updating Page : " + url);
+            AtomEntry entry = null;
             try
             {
-                AtomEntry entry = service.Get(url);
-                if (entry == null)
+                entry = service.Get(url);
+            }
+            catch (Exception)
+            {
+                return createWebPage(url, path, title, html, pageName, lastModified);
+            }
+            if (entry == null)
+            {
+                return createWebPage(url, path, title, html, pageName, lastModified);
+            }
+            if (html != "")
+            {
+                double diff = 0;
+                if (lastRunTimes.ContainsKey(url))
                 {
-                    return createWebPage(url,path, title, html, pageName,lastModified);
+                    DateTime lastRunTime = (DateTime)lastRunTimes[url];
+                    TimeSpan dt = lastModified - lastRunTime;
+                    diff = Math.Abs(dt.TotalSeconds);
                 }
-                if (html != "")
+                if (!lastRunTimes.ContainsKey(url) || diff > 1)
                 {
-                    double diff = 0;
-                    if (lastRunTimes.ContainsKey(url))
-                    {
-                        DateTime lastRunTime = (DateTime)lastRunTimes[url];
-                        TimeSpan dt = lastModified-lastRunTime;
-                        diff = Math.Abs(dt.TotalSeconds);
-                    }
-                    if (!lastRunTimes.ContainsKey(url) || diff > 1)
-                    {
-                        AtomContent newContent = new AtomContent();
-                        newContent.Type = "html";
-                        newContent.Content = html;
-                        entry.Content = newContent;
-                        entry.Title.Text = IndianBridge.Common.Utility.ConvertCaseString(title);
-                        service.Update(entry);
-                        if (!lastRunTimes.ContainsKey(url)) printDebugMessage(url + " - Updated. No entry was found for last run time.");
-                        else
-                        {
-                            DateTime lastRunTime = (DateTime)lastRunTimes[url];
-                            if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is later than last update time " + lastRunTime.ToString() + ")");
-                        }
-                        lastRunTimes[url] = lastModified;
-                        /*TextWriter tw = new StreamWriter(m_hashTableFileName, true);
-                        tw.WriteLine(url + "," + lastModified);
-                        tw.Close();*/
-                    }
+                    AtomContent newContent = new AtomContent();
+                    newContent.Type = "html";
+                    newContent.Content = html;
+                    entry.Content = newContent;
+                    entry.Title.Text = IndianBridge.Common.Utility.ConvertCaseString(title);
+                    service.Update(entry);
+                    if (!lastRunTimes.ContainsKey(url)) printDebugMessage(url + " - Updated. No entry was found for last run time.");
                     else
                     {
                         DateTime lastRunTime = (DateTime)lastRunTimes[url];
-                        if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
+                        if (this.debugFlag) printDebugMessage(url + " - Updated. (Last Modified Time " + lastModified.ToString() + " is later than last update time " + lastRunTime.ToString() + ")");
                     }
+                    lastRunTimes[url] = lastModified;
+                    /*TextWriter tw = new StreamWriter(m_hashTableFileName, true);
+                    tw.WriteLine(url + "," + lastModified);
+                    tw.Close();*/
                 }
-                return entry;
+                else
+                {
+                    DateTime lastRunTime = (DateTime)lastRunTimes[url];
+                    if (this.debugFlag) printDebugMessage(url + " - No Changes to Upload. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
+                }
+            }
+            return entry;
 
-            }
-            catch (Exception e)
-            {
-                if (this.debugFlag) printDebugMessage("Exception : " + e.ToString() + ", Trying to create webpage.");
-                return createWebPage(url,path, title, html, pageName,lastModified);
-            }
+
         }
 
         public String getCategoryLabel(AtomCategoryCollection categories)
@@ -273,7 +279,7 @@ namespace Upload_To_Google_Sites
             return null;
         }
 
-        public AtomEntry createWebPage(String originalUrl,String path, String title, String html, String pageName, DateTime lastModified)
+        public AtomEntry createWebPage(String originalUrl, String path, String title, String html, String pageName, DateTime lastModified)
         {
             String parentUrl = "https://sites.google.com/feeds/content/site/" + sitename + "?path=" + path;
             if (this.debugFlag) printDebugMessage("Creating page " + parentUrl + "/" + pageName);
