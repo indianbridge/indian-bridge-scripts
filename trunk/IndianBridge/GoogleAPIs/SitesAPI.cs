@@ -33,7 +33,7 @@ namespace IndianBridge.GoogleAPIs
             if (logHTTPTraffic) startHTTPTrafficLogging();
 
             // read existing hash table data if any 
-            m_hashTableFileName = Path.Combine(IndianBridge.Common.Utilities.m_rootDirectory, LAST_UPDATED_TIMES_PREFIX + ".log");
+            m_hashTableFileName = Path.Combine(Globals.m_rootDirectory, LAST_UPDATED_TIMES_PREFIX + ".log");
             if (File.Exists(m_hashTableFileName)) readHashTableFile(m_hashTableFileName);
         }
 
@@ -48,7 +48,7 @@ namespace IndianBridge.GoogleAPIs
             Google.GData.Client.GDataLoggingRequestFactory factory = new GDataLoggingRequestFactory("jotspot", "SpreadsheetsLoggingTest");
             factory.MethodOverride = true;
             string logFileName = LOG_FILE_PREFIX + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
-            factory.CombinedLogFileName = Path.Combine(IndianBridge.Common.Utilities.m_rootDirectory, logFileName);
+            factory.CombinedLogFileName = Path.Combine(Globals.m_rootDirectory, logFileName);
             m_service.RequestFactory = factory;
         }
 

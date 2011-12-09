@@ -123,7 +123,7 @@ namespace IndianBridge.ResultsManager
             eventInformation.isIMP = false;
             eventInformation.hasDirectionField = false;
             eventInformation.eventName = "Unknown";
-            eventInformation.eventDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Utilities.INDIAN_ZONE);
+            eventInformation.eventDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Globals.INDIAN_ZONE);
             eventInformation.databaseFileName = "";
             return eventInformation;
         }
@@ -149,7 +149,7 @@ namespace IndianBridge.ResultsManager
             eventInformation.eventName = "" + row["Event_Name"];
             eventInformation.eventDate = DateTime.Parse("" + row["Event_Date"]);
             eventInformation.databaseFileName = databaseFileName;
-            eventInformation.webpagesDirectory = constructWebpagesDirectory(Utilities.m_rootDirectory, eventInformation.eventName, eventInformation.eventDate);
+            eventInformation.webpagesDirectory = constructWebpagesDirectory(Globals.m_rootDirectory, eventInformation.eventName, eventInformation.eventDate);
         }
 
         public static void loadPairsDatabaseInformation(String databaseFileName, out PairsDatabaseParameters databaseParameters)

@@ -5,10 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace IndianBridge.Common
 {
-        public class Utilities
+        public static class Utilities
         {
 
-            public static TimeZoneInfo INDIAN_ZONE = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
             public static String makeIdentifier_(String variableName)
             {
                 Regex re = new Regex(@"\W");
@@ -23,8 +22,6 @@ namespace IndianBridge.Common
                 }
                 catch (Exception) { return 0; }
             }
-
-            public static string m_rootDirectory = "";
 
             /// <summary>
             /// Converts the phrase to specified convention.

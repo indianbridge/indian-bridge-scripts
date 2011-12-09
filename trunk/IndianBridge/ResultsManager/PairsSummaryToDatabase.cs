@@ -24,7 +24,7 @@ namespace IndianBridge.ResultsManager
         {
             m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
             System.IO.File.Delete(m_eventInformation.databaseFileName);
-            String sourceFileName = System.IO.Path.Combine(Utilities.m_rootDirectory,"Databases", "ScoreDatabaseTemplate.mdb");
+            String sourceFileName = System.IO.Path.Combine(Globals.m_rootDirectory, "Databases", "ScoreDatabaseTemplate.mdb");
             System.IO.File.Copy(sourceFileName, m_eventInformation.databaseFileName);
             PairsGeneral.loadPairsDatabaseInformation(m_eventInformation.databaseFileName, out m_databaseParameters);
             printMessage("Updating Event Information...");

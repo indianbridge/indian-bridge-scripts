@@ -243,7 +243,7 @@ namespace IndianBridge.ResultsManager
 
         public String _commonPageHeader(DataRow dRow)
         {
-            DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Utilities.INDIAN_ZONE);
+            DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Globals.INDIAN_ZONE);
             String result = "Page Updated on " + indianTime.ToString() + " IST<br/>";
             result += "Travellers : ";
             for (int i = 1; i <= m_numberOfBoards; ++i)
