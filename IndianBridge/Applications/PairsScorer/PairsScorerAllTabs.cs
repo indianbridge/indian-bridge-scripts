@@ -21,7 +21,7 @@ namespace IndianBridge.Applications
         public PairsScorerAllTabs()
         {
             InitializeComponent();
-            Utilities.m_rootDirectory = Directory.GetCurrentDirectory();
+            Globals.m_rootDirectory = Directory.GetCurrentDirectory();
         }
 
 
@@ -46,8 +46,8 @@ namespace IndianBridge.Applications
         {
             String summaryText = Utilities.compressText_(Summary.Text);
             m_eventInformation = PairsGeneral.getEventInformation_(summaryText);
-            m_eventInformation.databaseFileName = PairsGeneral.constructDatabaseFileName(Utilities.m_rootDirectory, m_eventInformation.eventName, m_eventInformation.eventDate);
-            m_eventInformation.webpagesDirectory = PairsGeneral.constructWebpagesDirectory(Utilities.m_rootDirectory, m_eventInformation.eventName, m_eventInformation.eventDate);
+            m_eventInformation.databaseFileName = PairsGeneral.constructDatabaseFileName(Globals.m_rootDirectory, m_eventInformation.eventName, m_eventInformation.eventDate);
+            m_eventInformation.webpagesDirectory = PairsGeneral.constructWebpagesDirectory(Globals.m_rootDirectory, m_eventInformation.eventName, m_eventInformation.eventDate);
             EventInformationDisplay eventInformationDisplayDialog = new EventInformationDisplay(m_eventInformation);
             eventInformationDisplayDialog.ShowDialog();
             m_eventInformation = eventInformationDisplayDialog.m_eventInformation;

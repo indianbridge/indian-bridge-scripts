@@ -15,7 +15,7 @@ namespace TeamsScorer
         public MainWindow()
         {
             InitializeComponent();
-            Utilities.m_rootDirectory = Directory.GetCurrentDirectory();
+            Globals.m_rootDirectory = Directory.GetCurrentDirectory();
         }
 
 
@@ -25,8 +25,8 @@ namespace TeamsScorer
             TextBoxTraceListener _textBoxListener = new TextBoxTraceListener(Status);
             Trace.Listeners.Add(_textBoxListener);
             ResultsDatabase rd = new ResultsDatabase(new List<string>() { "Info_", "Names_", "Scores_" });
-            String sourceFileName = System.IO.Path.Combine(Utilities.m_rootDirectory, "Databases", "TeamsScoreDatabaseTemplate.mdb");
-            String destinationFileName = System.IO.Path.Combine(Utilities.m_rootDirectory, "Databases", "Test" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".mdb");
+            String sourceFileName = System.IO.Path.Combine(Globals.m_rootDirectory, "Databases", "TeamsScoreDatabaseTemplate.mdb");
+            String destinationFileName = System.IO.Path.Combine(Globals.m_rootDirectory, "Databases", "Test" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".mdb");
             System.IO.File.Copy(sourceFileName, destinationFileName);
             rd.loadAccessDatabase(destinationFileName);
             rd.loadDataFromGoogleSpreadsheet("Winter Nationals 2011 RUIA Gold Pre-Quarters",

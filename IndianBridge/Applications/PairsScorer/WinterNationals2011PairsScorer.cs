@@ -17,7 +17,7 @@ namespace IndianBridge.Applications
             InitializeComponent();
             m_configParameters = new DotNetConfigSource(DotNetConfigSource.GetFullConfigPath());
             getFieldName("GoogleSiteName");
-            Utilities.m_rootDirectory = Directory.GetCurrentDirectory();
+            Globals.m_rootDirectory = Directory.GetCurrentDirectory();
             loadEventPageMapping();
         }
 
@@ -94,8 +94,8 @@ namespace IndianBridge.Applications
                 PairsEventInformation eventInformation = PairsGeneral.getEventInformation_(Utilities.compressText_(Summary.Text));
                 if (!eventInformation.isACBLSummary) throw new Exception("The provide summary cannot be parsed as an ACBL Summary. Only ACBL Summaries can be uploaded using this application.");
                 string eventName = Utilities.makeIdentifier_("" + PairsEventName.SelectedItem);
-                eventInformation.databaseFileName = Path.Combine(Utilities.m_rootDirectory, "Databases", eventName + ".mdb");
-                eventInformation.webpagesDirectory = Path.Combine(Utilities.m_rootDirectory, "Webpages", eventName);
+                eventInformation.databaseFileName = Path.Combine(Globals.m_rootDirectory, "Databases", eventName + ".mdb");
+                eventInformation.webpagesDirectory = Path.Combine(Globals.m_rootDirectory, "Webpages", eventName);
                 PairsDatabaseParameters databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
                 ProgressReport.Clear();
                 if (!Steps.GetItemChecked(0))
