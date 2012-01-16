@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+  <ModulePrefs  
+    title="Get source URL"
+    description="Demonstrate how to get from where the gadget is displayed" 
+    author="Jerome Mouton"
+    author_email="test_feedback@ljmsite.com"
+    author_location="Huntsville, AL"
+    author_affiliation="None"
+    screenshot="http://www.ljmsite.com/google/gadgets/tests/bug.jpg"
+    thumbnail="http://www.ljmsite.com/google/gadgets/tests/bug.jpg"
+    height="10">
+  </ModulePrefs> 
+  <Content type="html">
+<![CDATA[
+
+
+<script type="text/javascript">
+	alert('This gadget is added on ' + _unesc(_args()["source"]));
+</script>
+
+]]> 
+  </Content>
+</Module>
