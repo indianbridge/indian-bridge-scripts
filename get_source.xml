@@ -17,6 +17,7 @@
 
 <script type="text/javascript">
 	alert('PArent is ' + _unesc(_args()["parent"]));
+	alert('referrer is ' + document.referrer);
 </script>
 
 ]]> 
