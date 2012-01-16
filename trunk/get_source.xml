@@ -16,7 +16,7 @@
 
 
 <script type="text/javascript">
-	alert('This gadget is added on ' + _unesc(_args()["parent"]));
+	alert('PArent is ' + _unesc(_args()["parent"]));
 </script>
 
 ]]> 
