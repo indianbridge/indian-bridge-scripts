@@ -131,6 +131,7 @@ namespace SwissLeagueScoring
             int teamScoreStartPosition = int.Parse(configParameters["TeamScoreStartPosition"]);
             int teamScoreStringLength = int.Parse(configParameters["TeamScoreStringLength"]);
             string scoreFileName = configParameters["MagicScoreFileName"];
+            int numLinesToSkip = int.Parse(configParameters["LinesToSkip"]);
             string numberOfTeams = String.Empty;
 
             int teamNumber, teamScore, position = 0;
@@ -168,8 +169,8 @@ namespace SwissLeagueScoring
                             roundCompleted = 0;
                         }
 
-                        // skip past 3 more lined
-                        for (int i = 0; i < 3; i++)
+                        // skip past irrelevant lines
+                        for (int i = 0; i < numLinesToSkip; i++)
                         {
                             streamReader.ReadLine();
                         }
@@ -288,6 +289,7 @@ namespace SwissLeagueScoring
             string homeTeamName = String.Empty, awayTeamName = String.Empty, impScore1, impScore2, vpScore;
             string[] vpScores;
             DataRow row;
+            bool isByeTable = false;
 
             string fileName = String.Format(@"{0}\{1}", inputFolder, scoreFileName);
 
@@ -297,6 +299,7 @@ namespace SwissLeagueScoring
 
             while (!streamReader.EndOfStream)
             {
+                isByeTable = false;
                 // Read in a line of the file data
                 recordData = streamReader.ReadLine();
 
@@ -332,6 +335,7 @@ namespace SwissLeagueScoring
                             // We've to do this anyway to move the cursor to the next field
                             homeTeamName = Utility.GetField(recordData, ref position);
                             homeTeamName = "BYE";
+                            isByeTable = true;
                         }
                         else
                         {
@@ -342,36 +346,60 @@ namespace SwissLeagueScoring
                         {
                             awayTeamNumber = 0;
                             awayTeamName = "BYE";
+                            isByeTable = true;
                         }
                         else
                         {
                             awayTeamName = Utility.GetField(recordData, ref position);
                         }
 
-                        // Find the last index of "-" which will give us the imp score
-                        position = recordData.LastIndexOf("-");
-                        if (position == -1)
+                        if (!isByeTable)
                         {
-                            vpScores = new string[2];
-                            impScore1 = impScore2 = vpScores[0] = vpScores[1] = "0";
+                            // Find the last index of "-" which will give us the imp score
+                            position = recordData.LastIndexOf("-");
+                            if (position == -1)
+                            {
+                                vpScores = new string[2];
+                                impScore1 = impScore2 = vpScores[0] = vpScores[1] = "0";
+                            }
+                            else
+                            {
+                                position = position - 4;
+
+                                impScore1 = Utility.GetField(recordData, ref position, "-");
+                                // Skip beyond the '-'
+                                position = recordData.IndexOf("-", position) + 1;
+                                impScore2 = recordData.Substring(position, 3).Trim();
+
+                                position += 4;
+
+                                // Skip past whitespace and find the VP score
+                                position += Utility.skipWhiteSpace(recordData, position);
+
+                                vpScore = recordData.Substring(position).Trim();
+                                vpScores = vpScore.Split(new char[] { ' ' });
+                                if (vpScores.Length == 3) vpScores[1] = vpScores[2];
+                            }
                         }
                         else
                         {
-                            position = position - 4;
+                            if (homeTeamNumber == 0)
+                            {
+                                impScore1 = impScore2 = "0";
+                                vpScores = new string[2];
+                                vpScores[0] = "0";
+                                // TODO : Use config setting for bye score
+                                vpScores[1] = "18";
+                            }
+                            else
+                            {
+                                impScore1 = impScore2 = "0";
+                                vpScores = new string[2];
+                                vpScores[1] = "0";
+                                // TODO : Use config setting for bye score
+                                vpScores[0] = "18";
+                            }
 
-                            impScore1 = Utility.GetField(recordData, ref position, "-");
-                            // Skip beyond the '-'
-                            position = recordData.IndexOf("-", position) + 1;
-                            impScore2 = recordData.Substring(position, 3).Trim();
-
-                            position += 4;
-
-                            // Skip past whitespace and find the VP score
-                            position += Utility.skipWhiteSpace(recordData, position);
-
-                            vpScore = recordData.Substring(position).Trim();
-                            vpScores = vpScore.Split(new char[] { ' ' });
-                            if (vpScores.Length == 3) vpScores[1] = vpScores[2];
                         }
 
                         row = results.NewRow();
@@ -385,6 +413,7 @@ namespace SwissLeagueScoring
                         row["HomeTeamVPScore"] = homeTeamNumber == 0 ? 0 : Convert.ToInt16(vpScores[0]);
                         row["AwayTeamVPScore"] = awayTeamNumber == 0 ? 0 : Convert.ToInt16(vpScores[1]);
                         results.Rows.Add(row);
+
                     }
                 }
             }
