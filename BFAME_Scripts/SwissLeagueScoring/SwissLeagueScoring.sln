@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwissLeagueScoring", "Swiss
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{FA0A367F-859A-41E7-8F87-A507D4154E04}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SwissLeagueScoringSetup", "..\SwissLeagueScoringSetup\SwissLeagueScoringSetup.vdproj", "{748030E6-F38B-4E63-9F5E-ED8A92E78315}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,13 @@ Global
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FA0A367F-859A-41E7-8F87-A507D4154E04}.Release|x86.ActiveCfg = Release|Any CPU
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Debug|Any CPU.ActiveCfg = Debug
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Debug|x86.ActiveCfg = Debug
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Release|Any CPU.ActiveCfg = Release
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Release|Mixed Platforms.ActiveCfg = Release
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Release|Mixed Platforms.Build.0 = Release
+		{748030E6-F38B-4E63-9F5E-ED8A92E78315}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
