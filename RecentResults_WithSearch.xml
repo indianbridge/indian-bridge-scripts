@@ -9,7 +9,7 @@
 	<UserPref name="cityname" display_name="City for which Recent Results are needed" default_value="" />
 	<Content type="html">
 	<![CDATA[
-		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <div style="font-size:small;" id="search-parameters">
     <div>Search for Events using following parameters (Specify any or all of these parameters. Note that search will return first 10 matches only sorted in descending order of start date.)</div>
 	    <form id="search-form" name="myform" action="" method="get">
@@ -26,8 +26,8 @@
     </div>
     <hr/>
 		<div id="events">Loading Events...</div>   
-    <link rel="stylesheet" type="text/css" media="all" href="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
-    <script type="text/javascript" src="http://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>       
+    <link rel="stylesheet" type="text/css" media="all" href="https://indianbridgefiles.appspot.com/ResultsSubmission/calendar.css" />
+    <script type="text/javascript" src="https://indianbridgefiles.appspot.com/ResultsSubmission/calendar.js"></script>       
 	<script type="text/javascript">
 	    gadgets.util.registerOnLoadHandler(init);
 	    function init() {
@@ -88,7 +88,7 @@
 		            var resultsLink = getResultsURL(event);
                 var startDate = event.getTimes()[0].getStartTime().getDate();
                 var endDate = event.getTimes()[0].getEndTime().getDate();
-		            html += "<tr>" + makeTableCell_([event.getTitle().getText(), getDateString(event), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
+		            html += "<tr>" + makeTableCell_([event.getTitle().getText(), getDateString(event), (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="https://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>')], i) + "</tr>";
 		        }
 		        html += '</tbody></table>';
 		    } else {

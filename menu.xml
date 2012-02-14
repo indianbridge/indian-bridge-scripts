@@ -13,8 +13,8 @@
   <UserPref name="selectedTab" datatype="hidden"/>
   <Content type="html">
     <![CDATA[
-<link type="text/css" rel="stylesheet" href="http://indian-bridge-scripts.googlecode.com/svn/trunk/style.css" />
-		  <script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/functions.js"></script>
+<link type="text/css" rel="stylesheet" href="https://indian-bridge-scripts.googlecode.com/svn/trunk/style.css" />
+		  <script type="text/javascript" src="https://indian-bridge-scripts.googlecode.com/svn/trunk/functions.js"></script>
       <div>testing</div>
 <div id="navigation">
 

@@ -7,8 +7,8 @@
     author_email="test_feedback@ljmsite.com"
     author_location="Huntsville, AL"
     author_affiliation="None"
-    screenshot="http://www.ljmsite.com/google/gadgets/tests/bug.jpg"
-    thumbnail="http://www.ljmsite.com/google/gadgets/tests/bug.jpg"
+    screenshot="https://www.ljmsite.com/google/gadgets/tests/bug.jpg"
+    thumbnail="https://www.ljmsite.com/google/gadgets/tests/bug.jpg"
     height="10">
   </ModulePrefs> 
   <Content type="html">

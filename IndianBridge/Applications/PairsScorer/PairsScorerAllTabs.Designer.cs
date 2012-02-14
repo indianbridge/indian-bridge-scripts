@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PairsScorerAllTabs));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.Summary = new System.Windows.Forms.TextBox();
             this.Summary_Label = new System.Windows.Forms.Label();
             this.SelectSummaryFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -37,6 +37,8 @@
             this.LoadSummaryTab = new System.Windows.Forms.TabPage();
             this.LoadSummaryButton = new System.Windows.Forms.Button();
             this.CreateDatabaseTab = new System.Windows.Forms.TabPage();
+            this.CD_StatusLabel = new System.Windows.Forms.Label();
+            this.CD_Status = new System.Windows.Forms.TextBox();
             this.CreateDatabaseButton = new System.Windows.Forms.Button();
             this.ChangeDatabaseButton = new System.Windows.Forms.Button();
             this.DatabaseFileNameLabel = new System.Windows.Forms.Label();
@@ -47,29 +49,40 @@
             this.LoadDatabaseLabel = new System.Windows.Forms.Label();
             this.LoadDatabaseFileName = new System.Windows.Forms.TextBox();
             this.CreateWebpagesTab = new System.Windows.Forms.TabPage();
+            this.CW_StatusLabel = new System.Windows.Forms.Label();
+            this.CW_Status = new System.Windows.Forms.TextBox();
             this.CW_CreateButton = new System.Windows.Forms.Button();
             this.CW_ChangeButton = new System.Windows.Forms.Button();
             this.CW_RootFolderLabel = new System.Windows.Forms.Label();
             this.CW_RootFolder = new System.Windows.Forms.TextBox();
             this.FindCalendarEventTab = new System.Windows.Forms.TabPage();
+            this.calendarGetEvents_SearchTextbox = new System.Windows.Forms.TextBox();
+            this.queryString_Label = new System.Windows.Forms.Label();
+            this.calendarGetEvents_Status = new System.Windows.Forms.TextBox();
+            this.calendarGetEvents_Button = new System.Windows.Forms.Button();
+            this.toDate_Label = new System.Windows.Forms.Label();
+            this.fromDate_Label = new System.Windows.Forms.Label();
+            this.calendarGetEvents_endDate = new System.Windows.Forms.DateTimePicker();
+            this.calendarGetEvents_startDate = new System.Windows.Forms.DateTimePicker();
             this.UploadWebpagesTab = new System.Windows.Forms.TabPage();
             this.UW_webpagesDirectory = new System.Windows.Forms.TextBox();
             this.UW_Status = new System.Windows.Forms.TextBox();
             this.UW_RootPath = new System.Windows.Forms.TextBox();
             this.UploadToSites = new System.Windows.Forms.Button();
             this.UW_SiteName = new System.Windows.Forms.TextBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.DatabaseChangeDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.LoadDatabaseFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.CD_Status = new System.Windows.Forms.TextBox();
-            this.CD_StatusLabel = new System.Windows.Forms.Label();
-            this.CW_StatusLabel = new System.Windows.Forms.Label();
-            this.CW_Status = new System.Windows.Forms.TextBox();
             this.ControlTabs.SuspendLayout();
             this.LoadSummaryTab.SuspendLayout();
             this.CreateDatabaseTab.SuspendLayout();
             this.LoadDatabaseTab.SuspendLayout();
             this.CreateWebpagesTab.SuspendLayout();
+            this.FindCalendarEventTab.SuspendLayout();
             this.UploadWebpagesTab.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // Summary
@@ -80,7 +93,6 @@
             this.Summary.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.Summary.Size = new System.Drawing.Size(717, 236);
             this.Summary.TabIndex = 1;
-            this.Summary.Text = resources.GetString("Summary.Text");
             // 
             // Summary_Label
             // 
@@ -93,7 +105,6 @@
             // 
             // SelectSummaryFileDialog
             // 
-            this.SelectSummaryFileDialog.FileName = "*.txt";
             this.SelectSummaryFileDialog.Title = "Select Summary File to Load";
             // 
             // SelectSummaryFileButton
@@ -115,6 +126,7 @@
             this.ControlTabs.Controls.Add(this.CreateWebpagesTab);
             this.ControlTabs.Controls.Add(this.FindCalendarEventTab);
             this.ControlTabs.Controls.Add(this.UploadWebpagesTab);
+            this.ControlTabs.Controls.Add(this.tabPage1);
             this.ControlTabs.Location = new System.Drawing.Point(9, 11);
             this.ControlTabs.Name = "ControlTabs";
             this.ControlTabs.SelectedIndex = 0;
@@ -159,6 +171,24 @@
             this.CreateDatabaseTab.TabIndex = 5;
             this.CreateDatabaseTab.Text = "Create Database";
             this.CreateDatabaseTab.UseVisualStyleBackColor = true;
+            // 
+            // CD_StatusLabel
+            // 
+            this.CD_StatusLabel.AutoSize = true;
+            this.CD_StatusLabel.Location = new System.Drawing.Point(5, 116);
+            this.CD_StatusLabel.Name = "CD_StatusLabel";
+            this.CD_StatusLabel.Size = new System.Drawing.Size(37, 13);
+            this.CD_StatusLabel.TabIndex = 0;
+            this.CD_StatusLabel.Text = "Status";
+            // 
+            // CD_Status
+            // 
+            this.CD_Status.Location = new System.Drawing.Point(8, 136);
+            this.CD_Status.Multiline = true;
+            this.CD_Status.Name = "CD_Status";
+            this.CD_Status.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.CD_Status.Size = new System.Drawing.Size(778, 199);
+            this.CD_Status.TabIndex = 19;
             // 
             // CreateDatabaseButton
             // 
@@ -266,6 +296,24 @@
             this.CreateWebpagesTab.Text = "Create Webpages";
             this.CreateWebpagesTab.UseVisualStyleBackColor = true;
             // 
+            // CW_StatusLabel
+            // 
+            this.CW_StatusLabel.AutoSize = true;
+            this.CW_StatusLabel.Location = new System.Drawing.Point(4, 120);
+            this.CW_StatusLabel.Name = "CW_StatusLabel";
+            this.CW_StatusLabel.Size = new System.Drawing.Size(37, 13);
+            this.CW_StatusLabel.TabIndex = 25;
+            this.CW_StatusLabel.Text = "Status";
+            // 
+            // CW_Status
+            // 
+            this.CW_Status.Location = new System.Drawing.Point(7, 140);
+            this.CW_Status.Multiline = true;
+            this.CW_Status.Name = "CW_Status";
+            this.CW_Status.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.CW_Status.Size = new System.Drawing.Size(778, 199);
+            this.CW_Status.TabIndex = 26;
+            // 
             // CW_CreateButton
             // 
             this.CW_CreateButton.Location = new System.Drawing.Point(7, 73);
@@ -306,12 +354,88 @@
             // 
             // FindCalendarEventTab
             // 
+            this.FindCalendarEventTab.Controls.Add(this.calendarGetEvents_SearchTextbox);
+            this.FindCalendarEventTab.Controls.Add(this.queryString_Label);
+            this.FindCalendarEventTab.Controls.Add(this.calendarGetEvents_Status);
+            this.FindCalendarEventTab.Controls.Add(this.calendarGetEvents_Button);
+            this.FindCalendarEventTab.Controls.Add(this.toDate_Label);
+            this.FindCalendarEventTab.Controls.Add(this.fromDate_Label);
+            this.FindCalendarEventTab.Controls.Add(this.calendarGetEvents_endDate);
+            this.FindCalendarEventTab.Controls.Add(this.calendarGetEvents_startDate);
             this.FindCalendarEventTab.Location = new System.Drawing.Point(4, 22);
             this.FindCalendarEventTab.Name = "FindCalendarEventTab";
             this.FindCalendarEventTab.Size = new System.Drawing.Size(869, 341);
             this.FindCalendarEventTab.TabIndex = 3;
             this.FindCalendarEventTab.Text = "Find Calendar Event";
             this.FindCalendarEventTab.UseVisualStyleBackColor = true;
+            // 
+            // calendarGetEvents_SearchTextbox
+            // 
+            this.calendarGetEvents_SearchTextbox.Location = new System.Drawing.Point(84, 59);
+            this.calendarGetEvents_SearchTextbox.Name = "calendarGetEvents_SearchTextbox";
+            this.calendarGetEvents_SearchTextbox.Size = new System.Drawing.Size(200, 20);
+            this.calendarGetEvents_SearchTextbox.TabIndex = 23;
+            // 
+            // queryString_Label
+            // 
+            this.queryString_Label.AutoSize = true;
+            this.queryString_Label.Location = new System.Drawing.Point(8, 59);
+            this.queryString_Label.Name = "queryString_Label";
+            this.queryString_Label.Size = new System.Drawing.Size(65, 13);
+            this.queryString_Label.TabIndex = 22;
+            this.queryString_Label.Text = "Search Text";
+            // 
+            // calendarGetEvents_Status
+            // 
+            this.calendarGetEvents_Status.Location = new System.Drawing.Point(11, 115);
+            this.calendarGetEvents_Status.Multiline = true;
+            this.calendarGetEvents_Status.Name = "calendarGetEvents_Status";
+            this.calendarGetEvents_Status.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.calendarGetEvents_Status.Size = new System.Drawing.Size(273, 223);
+            this.calendarGetEvents_Status.TabIndex = 20;
+            // 
+            // calendarGetEvents_Button
+            // 
+            this.calendarGetEvents_Button.Location = new System.Drawing.Point(11, 86);
+            this.calendarGetEvents_Button.Name = "calendarGetEvents_Button";
+            this.calendarGetEvents_Button.Size = new System.Drawing.Size(273, 23);
+            this.calendarGetEvents_Button.TabIndex = 4;
+            this.calendarGetEvents_Button.Text = "Get Events";
+            this.calendarGetEvents_Button.UseVisualStyleBackColor = true;
+            this.calendarGetEvents_Button.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // toDate_Label
+            // 
+            this.toDate_Label.AutoSize = true;
+            this.toDate_Label.Location = new System.Drawing.Point(8, 29);
+            this.toDate_Label.Name = "toDate_Label";
+            this.toDate_Label.Size = new System.Drawing.Size(46, 13);
+            this.toDate_Label.TabIndex = 3;
+            this.toDate_Label.Text = "To Date";
+            // 
+            // fromDate_Label
+            // 
+            this.fromDate_Label.AutoSize = true;
+            this.fromDate_Label.Location = new System.Drawing.Point(8, 3);
+            this.fromDate_Label.Name = "fromDate_Label";
+            this.fromDate_Label.Size = new System.Drawing.Size(53, 13);
+            this.fromDate_Label.TabIndex = 2;
+            this.fromDate_Label.Text = "FromDate";
+            // 
+            // calendarGetEvents_endDate
+            // 
+            this.calendarGetEvents_endDate.Location = new System.Drawing.Point(84, 29);
+            this.calendarGetEvents_endDate.Name = "calendarGetEvents_endDate";
+            this.calendarGetEvents_endDate.Size = new System.Drawing.Size(200, 20);
+            this.calendarGetEvents_endDate.TabIndex = 1;
+            // 
+            // calendarGetEvents_startDate
+            // 
+            this.calendarGetEvents_startDate.Location = new System.Drawing.Point(84, 3);
+            this.calendarGetEvents_startDate.Name = "calendarGetEvents_startDate";
+            this.calendarGetEvents_startDate.Size = new System.Drawing.Size(200, 20);
+            this.calendarGetEvents_startDate.TabIndex = 0;
+            this.calendarGetEvents_startDate.Value = new System.DateTime(2012, 2, 3, 11, 12, 0, 0);
             // 
             // UploadWebpagesTab
             // 
@@ -369,53 +493,46 @@
             this.UW_SiteName.TabIndex = 0;
             this.UW_SiteName.Text = "srirambridgetest";
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.dataGridView1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(869, 341);
+            this.tabPage1.TabIndex = 6;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToOrderColumns = true;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(36, 22);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(827, 195);
+            this.dataGridView1.TabIndex = 12;
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
+            // 
             // LoadDatabaseFileDialog
             // 
             this.LoadDatabaseFileDialog.Title = "Select a database to load";
             // 
-            // CD_Status
-            // 
-            this.CD_Status.Location = new System.Drawing.Point(8, 136);
-            this.CD_Status.Multiline = true;
-            this.CD_Status.Name = "CD_Status";
-            this.CD_Status.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.CD_Status.Size = new System.Drawing.Size(778, 199);
-            this.CD_Status.TabIndex = 19;
-            // 
-            // CD_StatusLabel
-            // 
-            this.CD_StatusLabel.AutoSize = true;
-            this.CD_StatusLabel.Location = new System.Drawing.Point(5, 116);
-            this.CD_StatusLabel.Name = "CD_StatusLabel";
-            this.CD_StatusLabel.Size = new System.Drawing.Size(37, 13);
-            this.CD_StatusLabel.TabIndex = 0;
-            this.CD_StatusLabel.Text = "Status";
-            // 
-            // CW_StatusLabel
-            // 
-            this.CW_StatusLabel.AutoSize = true;
-            this.CW_StatusLabel.Location = new System.Drawing.Point(4, 120);
-            this.CW_StatusLabel.Name = "CW_StatusLabel";
-            this.CW_StatusLabel.Size = new System.Drawing.Size(37, 13);
-            this.CW_StatusLabel.TabIndex = 25;
-            this.CW_StatusLabel.Text = "Status";
-            // 
-            // CW_Status
-            // 
-            this.CW_Status.Location = new System.Drawing.Point(7, 140);
-            this.CW_Status.Multiline = true;
-            this.CW_Status.Name = "CW_Status";
-            this.CW_Status.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.CW_Status.Size = new System.Drawing.Size(778, 199);
-            this.CW_Status.TabIndex = 26;
-            // 
-            // PairsResultsSubmission
+            // PairsScorerAllTabs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(895, 384);
             this.Controls.Add(this.ControlTabs);
-            this.Name = "PairsResultsSubmission";
+            this.Name = "PairsScorerAllTabs";
             this.Text = "Pairs Results Submission";
             this.ControlTabs.ResumeLayout(false);
             this.LoadSummaryTab.ResumeLayout(false);
@@ -426,8 +543,12 @@
             this.LoadDatabaseTab.PerformLayout();
             this.CreateWebpagesTab.ResumeLayout(false);
             this.CreateWebpagesTab.PerformLayout();
+            this.FindCalendarEventTab.ResumeLayout(false);
+            this.FindCalendarEventTab.PerformLayout();
             this.UploadWebpagesTab.ResumeLayout(false);
             this.UploadWebpagesTab.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -469,6 +590,16 @@
         private System.Windows.Forms.Label CD_StatusLabel;
         private System.Windows.Forms.Label CW_StatusLabel;
         private System.Windows.Forms.TextBox CW_Status;
+        private System.Windows.Forms.DateTimePicker calendarGetEvents_startDate;
+        private System.Windows.Forms.Label fromDate_Label;
+        private System.Windows.Forms.DateTimePicker calendarGetEvents_endDate;
+        private System.Windows.Forms.Label toDate_Label;
+        private System.Windows.Forms.TextBox calendarGetEvents_Status;
+        private System.Windows.Forms.Button calendarGetEvents_Button;
+        private System.Windows.Forms.TextBox calendarGetEvents_SearchTextbox;
+        private System.Windows.Forms.Label queryString_Label;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 

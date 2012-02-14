@@ -73,67 +73,82 @@ namespace IndianBridge.ResultsManager
         {
             String rootFolder = m_eventInformation.webpagesDirectory;
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
-            printMessage("Creating Section Names...");
-            m_sectionNames.Clear();
-            if (m_eventInformation.hasDirectionField) m_sectionNames.Add(SINGLE_SECTION_NAME);
-            else { m_sectionNames.Add(NORTH_SOUTH_SECTION_NAME); m_sectionNames.Add(EAST_WEST_SECTION_NAME); }
-            m_numberOfBoards = Convert.ToInt16(m_databaseParameters.m_ds.Tables["Board_Wise_Scores"].Select("Board_Number=MAX(Board_Number)")[0]["Board_Number"]);
-            Parameters parameters = createDefaultParameters();
-            parameters.columns.Add("Rank", "{Event_Rank}");
-            parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
-            parameters.columns.Add("Names", "[_makePairNamesLink]");
-            parameters.columns.Add(m_eventInformation.isIMP ? "IMPs" : "MPs", "{Total_Score}");
-            if (!m_eventInformation.isIMP) parameters.columns.Add("Percentage", "{Percentage}");
-            parameters.sectionName = null;
-            parameters.sortCriteria = "Event_Rank ASC";
-            m_prefix = "./";
-            parameters.fileName = Path.Combine(rootFolder, "index.html");
-            parameters.filterCriteria = "";
-            parameters.headerTemplate = headerify_("Combined Ranking sorted by Rank<br/>[_commonPageHeader]");
-            parameters.tableName = "Pair_Information";
-            printMessage("Creating Combined Ranking Leaderboard...");
-            createPage_(parameters);
-            foreach (String sectionName in m_sectionNames)
+            if (m_eventInformation.isACBLSummary)
             {
-                String newFolder = Path.Combine(rootFolder, Utilities.makeIdentifier_(sectionName));
-                if (!Directory.Exists(newFolder)) Directory.CreateDirectory(newFolder);
-                parameters.columns["Rank"] = "{Session_Rank}";
-                parameters.sortCriteria = "Session_Rank ASC";
-                m_prefix = "../";
-                parameters.fileName = Path.Combine(newFolder, "leaderboard.html");
-                parameters.sectionName = sectionName;
-                parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
-                parameters.headerTemplate = headerify_("Ranking for " + parameters.sectionName + " sorted by Rank<br/>[_commonPageHeader]");
-                printMessage("Creating Leaderboard for " + sectionName);
+                printMessage("Creating Section Names...");
+                m_sectionNames.Clear();
+                if (m_eventInformation.hasDirectionField) m_sectionNames.Add(SINGLE_SECTION_NAME);
+                else { m_sectionNames.Add(NORTH_SOUTH_SECTION_NAME); m_sectionNames.Add(EAST_WEST_SECTION_NAME); }
+                m_numberOfBoards = Convert.ToInt16(m_databaseParameters.m_ds.Tables["Board_Wise_Scores"].Select("Board_Number=MAX(Board_Number)")[0]["Board_Number"]);
+                Parameters parameters = createDefaultParameters();
+                parameters.columns.Add("Rank", "{Event_Rank}");
+                parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
+                parameters.columns.Add("Names", "[_makePairNamesLink]");
+                parameters.columns.Add(m_eventInformation.isIMP ? "IMPs" : "MPs", "{Total_Score}");
+                if (!m_eventInformation.isIMP) parameters.columns.Add("Percentage", "{Percentage}");
+                parameters.sectionName = null;
+                parameters.sortCriteria = "Event_Rank ASC";
+                m_prefix = "./";
+                parameters.fileName = Path.Combine(rootFolder, "index.html");
+                parameters.filterCriteria = "";
+                parameters.headerTemplate = headerify_("Combined Ranking sorted by Rank<br/>[_commonPageHeader]");
+                parameters.tableName = "Pair_Information";
+                printMessage("Creating Combined Ranking Leaderboard...");
                 createPage_(parameters);
+                foreach (String sectionName in m_sectionNames)
+                {
+                    String newFolder = Path.Combine(rootFolder, Utilities.makeIdentifier_(sectionName));
+                    if (!Directory.Exists(newFolder)) Directory.CreateDirectory(newFolder);
+                    parameters.columns["Rank"] = "{Session_Rank}";
+                    parameters.sortCriteria = "Session_Rank ASC";
+                    m_prefix = "../";
+                    parameters.fileName = Path.Combine(newFolder, "leaderboard.html");
+                    parameters.sectionName = sectionName;
+                    parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
+                    parameters.headerTemplate = headerify_("Ranking for " + parameters.sectionName + " sorted by Rank<br/>[_commonPageHeader]");
+                    printMessage("Creating Leaderboard for " + sectionName);
+                    createPage_(parameters);
+                }
+                parameters.columns.Clear();
+                parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
+                parameters.columns.Add("Names", "[_makePairNamesLink]");
+                parameters.columns.Add("Rank", "{Session_Rank}");
+                parameters.columns.Add(m_eventInformation.isIMP ? "IMPs" : "MPs", "{Total_Score}");
+                if (!m_eventInformation.isIMP) parameters.columns.Add("Percentage", "{Percentage}");
+                foreach (String sectionName in m_sectionNames)
+                {
+                    String newFolder = Path.Combine(rootFolder, Utilities.makeIdentifier_(sectionName));
+                    if (!Directory.Exists(newFolder)) Directory.CreateDirectory(newFolder);
+                    parameters.sortCriteria = "Pair_Number ASC";
+                    m_prefix = "../";
+                    parameters.fileName = Path.Combine(newFolder, "pair_wise_scores.html");
+                    parameters.sectionName = sectionName;
+                    parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
+                    parameters.headerTemplate = headerify_("Pair Wise Scores " + parameters.sectionName + "<br/>[_commonPageHeader]");
+                    printMessage("Creating pair wise scores for " + sectionName);
+                    createPage_(parameters);
+                }
+                createBoardPages_(rootFolder);
+                createPairPages_(rootFolder);
             }
-            parameters.columns.Clear();
-            parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
-            parameters.columns.Add("Names", "[_makePairNamesLink]");
-            parameters.columns.Add("Rank", "{Session_Rank}");
-            parameters.columns.Add(m_eventInformation.isIMP ? "IMPs" : "MPs", "{Total_Score}");
-            if (!m_eventInformation.isIMP) parameters.columns.Add("Percentage", "{Percentage}");
-            foreach (String sectionName in m_sectionNames)
+            else
             {
-                String newFolder = Path.Combine(rootFolder, Utilities.makeIdentifier_(sectionName));
-                if (!Directory.Exists(newFolder)) Directory.CreateDirectory(newFolder);
-                parameters.sortCriteria = "Pair_Number ASC";
-                m_prefix = "../";
-                parameters.fileName = Path.Combine(newFolder, "pair_wise_scores.html");
-                parameters.sectionName = sectionName;
-                parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
-                parameters.headerTemplate = headerify_("Pair Wise Scores " + parameters.sectionName + "<br/>[_commonPageHeader]");
-                printMessage("Creating pair wise scores for " + sectionName);
-                createPage_(parameters);
+                createNonACBLSummaryPage_(Path.Combine(rootFolder, "index.html"),m_eventInformation.rawText);
             }
-            createBoardPages_(rootFolder);
-            createPairPages_(rootFolder);
             printMessage("Finished");
         }
         private String headerify_(String text)
         {
             return text;
             //return "<h4>" + text + "</h4>";
+        }
+        private void createNonACBLSummaryPage_(String fileName, String summary)
+        {
+            StreamWriter sw = new StreamWriter(fileName);
+            sw.WriteLine("<html><head></head><body>");
+            sw.WriteLine(summary);
+            sw.WriteLine("</body></html>");
+            sw.Close();
         }
         private void createPage_(Parameters parameters)
         {
@@ -156,7 +171,7 @@ namespace IndianBridge.ResultsManager
                 foreach (DictionaryEntry pair in parameters.columns)
                 {
                     string value = "" + pair.Value;
-                    if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + i);
+                    if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + (i+1));
                     else tableRow.Add(applyTemplate_(value, row));
                 }
                 sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");

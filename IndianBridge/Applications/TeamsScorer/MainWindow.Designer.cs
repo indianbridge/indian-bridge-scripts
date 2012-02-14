@@ -1,4 +1,4 @@
-﻿namespace TeamsScorer
+﻿namespace IndianBridge.Applications
 {
     partial class MainWindow
     {

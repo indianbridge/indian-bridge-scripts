@@ -72,7 +72,7 @@ var getRecurrence = function (event) {
 }
 var getResultsLink = function (event) {
     var resultsLink = getResultsURL(event);
-    var resultsText = (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="http://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>');
+    var resultsText = (resultsLink ? '<a target="_blank" href="' + resultsLink + '">Results</a>' : '<img title="Not Published" src="https://indianbridgefiles.appspot.com/images/publish_x.png" alt="Not Published"/>');
     return resultsText;
 }
 function getEvents(queryParameters, otherParameters) {
