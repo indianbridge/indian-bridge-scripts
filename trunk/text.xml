@@ -13,8 +13,8 @@
   <UserPref name="selectedTab" datatype="hidden"/>
   <Content type="html">
     <![CDATA[
-		<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-		<script type="text/javascript" src="http://indian-bridge-scripts.googlecode.com/svn/trunk/Utilities.js"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="https://indian-bridge-scripts.googlecode.com/svn/trunk/Utilities.js"></script>
 		<script type="text/javascript">
 			google.load("gdata", "1");
       var googleLoadedFlag = false; 

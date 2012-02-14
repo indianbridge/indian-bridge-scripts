@@ -5,7 +5,8 @@ using System.Windows.Forms;
 using IndianBridge.Common;
 using IndianBridge.ResultsManager;
 using IndianBridge.GoogleAPIs;
-
+using System.Collections.Generic;
+using System.Data;
 
 namespace IndianBridge.Applications
 {
@@ -21,6 +22,7 @@ namespace IndianBridge.Applications
         public PairsScorerAllTabs()
         {
             InitializeComponent();
+
             Globals.m_rootDirectory = Directory.GetCurrentDirectory();
         }
 
@@ -68,10 +70,10 @@ namespace IndianBridge.Applications
             m_eventInformation.databaseFileName = CD_DatabaseFileName.Text;
             if (System.IO.File.Exists(m_eventInformation.databaseFileName))
             {
-                DialogResult result = MessageBox.Show(m_eventInformation.databaseFileName + " exists!!!\nShould the contents be overwritten?\nIf you would like to load an existing database then Click Cancel and Select the Load Database Tab.","Overwrite?", MessageBoxButtons.OKCancel);
+                DialogResult result = MessageBox.Show(m_eventInformation.databaseFileName + " exists!!!\nShould the contents be overwritten?\nIf you would like to load an existing database then Click Cancel and Select the Load Database Tab.", "Overwrite?", MessageBoxButtons.OKCancel);
                 if (result == DialogResult.OK)
                 {
-                    loadSummaryIntoDatabase();                
+                    loadSummaryIntoDatabase();
                 }
             }
             else
@@ -123,12 +125,13 @@ namespace IndianBridge.Applications
         private void LoadDatabaseButton_Click(object sender, EventArgs e)
         {
             m_eventInformation.databaseFileName = LoadDatabaseFileName.Text;
-            if(!File.Exists(m_eventInformation.databaseFileName)) {
-                MessageBox.Show(m_eventInformation.databaseFileName+" does not exist!!!!");
+            if (!File.Exists(m_eventInformation.databaseFileName))
+            {
+                MessageBox.Show(m_eventInformation.databaseFileName + " does not exist!!!!");
                 return;
             }
-            PairsGeneral.loadPairsDatabaseInformation(m_eventInformation.databaseFileName,out m_databaseParameters);
-            PairsGeneral.loadPairsEventInformation(m_databaseParameters,m_eventInformation.databaseFileName,out m_eventInformation);
+            PairsGeneral.loadPairsDatabaseInformation(m_eventInformation.databaseFileName, out m_databaseParameters);
+            PairsGeneral.loadPairsEventInformation(m_databaseParameters, m_eventInformation.databaseFileName, out m_eventInformation);
             CW_RootFolder.Text = m_eventInformation.webpagesDirectory;
             ControlTabs.SelectTab("CreateWebpagesTab");
         }
@@ -139,7 +142,7 @@ namespace IndianBridge.Applications
             {
                 CW_RootFolder.Text = PairsGeneral.constructWebpagesDirectory(DatabaseChangeDialog.SelectedPath, m_eventInformation.eventName, m_eventInformation.eventDate);
             }
- 
+
         }
 
         private void CW_CreateButton_Click(object sender, EventArgs e)
@@ -168,7 +171,7 @@ namespace IndianBridge.Applications
 
         private void createWebpages()
         {
-            PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation,m_databaseParameters);
+            PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
             TextBoxTraceListener _textBoxListener = new TextBoxTraceListener(CW_Status);
             Trace.Listeners.Add(_textBoxListener);
             try
@@ -195,7 +198,7 @@ namespace IndianBridge.Applications
             {
                 SitesAPI sa = new SitesAPI(sitename: sitename, username: username, password: password, replaceLinks: true, logHTTPTraffic: false);
                 sa.uploadDirectory(UW_webpagesDirectory.Text, UW_RootPath.Text);
-                string rootPage = "https://sites.google.com/site/"+UW_SiteName+UW_RootPath;
+                string rootPage = "https://sites.google.com/site/" + UW_SiteName + UW_RootPath;
                 MessageBox.Show("Webpages created. See <a href='" + rootPage + "'>" + rootPage + "</a>");
             }
             catch (Exception ex)
@@ -205,6 +208,36 @@ namespace IndianBridge.Applications
             Trace.Listeners.Remove(_textBoxListener);
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            TextBoxTraceListener _textBoxListener = new TextBoxTraceListener(calendarGetEvents_Status);
+            Trace.Listeners.Add(_textBoxListener);
+            try
+            {
+                CalendarAPI cApi = new CalendarAPI("indianbridge.dummy@gmail.com", "kibitzer");
+                SortableBindingList<IndianCalendarEvent> test = cApi.getEvents(calendarGetEvents_startDate.Value, calendarGetEvents_endDate.Value, calendarGetEvents_SearchTextbox.Text);
+                this.dataGridView1.DataSource = test;
+                SpreadSheetAPI ssa = new SpreadSheetAPI("Pair Results City And Event Names", "indianbridge.dummy@gmail.com", "kibitzer");
+                DataTable table = ssa.getValuesFromSheet("Sheet1");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            Trace.Listeners.Remove(_textBoxListener);
+        }
+
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show("Selected = " + dataGridView1.CurrentRow.Index);
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            MessageBox.Show("Selected = " + dataGridView1.CurrentRow.Index);
+
+        }
 
     }
 }
+

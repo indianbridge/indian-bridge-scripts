@@ -164,7 +164,7 @@
             this.label3.TabIndex = 23;
             this.label3.Text = "Progress Steps";
             // 
-            // WinterNationals2011PairsResultsCreator
+            // WinterNationals2011PairsScorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -181,7 +181,7 @@
             this.Controls.Add(this.Summary);
             this.Controls.Add(this.SelectSummaryFileButton);
             this.Controls.Add(this.Summary_Label);
-            this.Name = "WinterNationals2011PairsResultsCreator";
+            this.Name = "WinterNationals2011PairsScorer";
             this.Text = "Winter Nationals 2011 Pairs Results Creator";
             this.ResumeLayout(false);
             this.PerformLayout();

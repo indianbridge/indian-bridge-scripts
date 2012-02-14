@@ -34,10 +34,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Google.GData.Client, Version=1.8.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ExternalAssemblies\Google.GData.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Nini">
       <HintPath>..\..\ExternalAssemblies\Nini.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,6 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACBLSummaryPairsScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ACBLSummaryPairsScorer.Designer.cs">
+      <DependentUpon>ACBLSummaryPairsScorer.cs</DependentUpon>
+    </Compile>
     <Compile Include="PairsScorerAllTabs.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,6 +86,12 @@
     <Compile Include="WinterNationals2011PairsScorer.Designer.cs">
       <DependentUpon>WinterNationals2011PairsScorer.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ACBLSummaryPairsScorer.resx">
+      <DependentUpon>ACBLSummaryPairsScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PairsScorerAllTabs.resx">
+      <DependentUpon>PairsScorerAllTabs.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -84,6 +101,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="WinterNationals2011PairsScorer.resx">
+      <DependentUpon>WinterNationals2011PairsScorer.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>

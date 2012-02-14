@@ -33,11 +33,51 @@ namespace IndianBridge.GoogleAPIs
             getAllWorksheets();
         }
 
+        public DataTable getValuesFromSheet(string sheetName)
+        {
+            DataTable table = new DataTable();
+            WorksheetEntry entry = (WorksheetEntry)m_worksheets[sheetName];
+            if (entry == null)
+            {
+                string message = sheetName + " not found in " + m_spreadsheetName;
+                Trace.WriteLine(message);
+                throw new ArgumentNullException(message);
+            }
+            AtomLink listFeedLink = entry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+
+            ListQuery query = new ListQuery(listFeedLink.HRef.ToString());
+            ListFeed feed = m_service.Query(query);
+            Trace.WriteLine("Found " + feed.Entries.Count + " rows of data in " + sheetName);
+            if (feed.Entries.Count > 0)
+            {
+                ListEntry worksheetRow = (ListEntry)feed.Entries[0];
+                ListEntry.CustomElementCollection elements = worksheetRow.Elements;
+                for (int i = 0; i < elements.Count; ++i)
+                {
+                    string value = "" + elements[i].Value;
+                    table.Columns.Add(value,System.Type.GetType("System.String"));
+                }
+                for (int j = 1; j < feed.Entries.Count; ++j)
+                {
+                    worksheetRow = (ListEntry)feed.Entries[j];
+                    elements = worksheetRow.Elements;
+                    DataRow workRow = table.NewRow();
+                    for (int i = 0; i < elements.Count; ++i)
+                    {
+                        string value = "" + elements[i].Value;
+                        workRow[i] = value;
+                    }
+                    table.Rows.Add(workRow);
+                }
+            }
+            return table;
+        }
+
         public void getValues(string sheetName, DataSet dataSet)
         {
             var tableName = sheetName;
             if (dataSet.Tables[tableName] == null) tableName = sheetName + "_";
-            if (dataSet.Tables[tableName] == null) throw new ArgumentException("Neither " + sheetName + " not " + sheetName + "_ tables could be found in the passed dataset!!!");
+            if (dataSet.Tables[tableName] == null) throw new ArgumentException("Neither " + sheetName + " nor " + sheetName + "_ tables could be found in the passed dataset!!!");
             DataColumnCollection columnNames = dataSet.Tables[tableName].Columns;
             WorksheetEntry entry = (WorksheetEntry)m_worksheets[sheetName];
             if (entry == null)

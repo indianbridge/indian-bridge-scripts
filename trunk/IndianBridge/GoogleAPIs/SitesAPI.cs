@@ -21,6 +21,27 @@ namespace IndianBridge.GoogleAPIs
         private string m_hashTableFileName = "";
         private bool m_replaceLinks = false;
 
+        public static Boolean checkCredentials(String url, String username, String password)
+        {    
+            SitesService service = new SitesService(APP_NAME);
+            service.setUserCredentials(username, password);
+            try
+            {
+                AtomEntry entry = service.Get(url);
+                if (entry.Title.Text.EndsWith(" "))
+                    entry.Title.Text = entry.Title.Text.Substring(0, entry.Title.Text.Length - 1);
+                else entry.Title.Text += " ";
+                service.Update(entry);
+                //entry.Update();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+                return false;
+            }
+            return true;
+        }
+
         public SitesAPI(String sitename, String username, String password, bool replaceLinks = false, bool logHTTPTraffic = false)
         {
             // Initialize member variables

@@ -15,7 +15,7 @@ namespace IndianBridge.Applications
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new WinterNationals2011PairsScorer());
+            Application.Run(new ACBLSummaryPairsScorer());
         }
     }
 }
