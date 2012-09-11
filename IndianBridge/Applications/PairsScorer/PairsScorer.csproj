@@ -11,7 +11,8 @@
     <RootNamespace>PairsScorer</RootNamespace>
     <AssemblyName>PairsScorer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -34,6 +35,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetOpenAuth">
+      <HintPath>..\..\ExternalAssemblies\DotNetOpenAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis">
+      <HintPath>..\..\ExternalAssemblies\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Authentication.OAuth2">
+      <HintPath>..\..\ExternalAssemblies\Google.Apis.Authentication.OAuth2.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Calendar.v3">
+      <HintPath>..\..\ExternalAssemblies\Google.Apis.Calendar.v3.dll</HintPath>
+    </Reference>
     <Reference Include="Google.GData.Client, Version=1.8.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ExternalAssemblies\Google.GData.Client.dll</HintPath>
@@ -59,6 +72,18 @@
     </Compile>
     <Compile Include="ACBLSummaryPairsScorer.Designer.cs">
       <DependentUpon>ACBLSummaryPairsScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GoogleAuthenticationAPI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GoogleAuthenticationAPI.Designer.cs">
+      <DependentUpon>GoogleAuthenticationAPI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GoogleLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GoogleLogin.Designer.cs">
+      <DependentUpon>GoogleLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="PairsScorerAllTabs.cs">
       <SubType>Form</SubType>
@@ -89,6 +114,12 @@
     <EmbeddedResource Include="ACBLSummaryPairsScorer.resx">
       <DependentUpon>ACBLSummaryPairsScorer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GoogleAuthenticationAPI.resx">
+      <DependentUpon>GoogleAuthenticationAPI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GoogleLogin.resx">
+      <DependentUpon>GoogleLogin.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PairsScorerAllTabs.resx">
       <DependentUpon>PairsScorerAllTabs.cs</DependentUpon>
     </EmbeddedResource>
@@ -100,6 +131,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="WinterNationals2011PairsScorer.resx">
       <DependentUpon>WinterNationals2011PairsScorer.cs</DependentUpon>

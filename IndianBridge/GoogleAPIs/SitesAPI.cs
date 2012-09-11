@@ -20,6 +20,9 @@ namespace IndianBridge.GoogleAPIs
         Hashtable m_lastRunTimes = new Hashtable();
         private string m_hashTableFileName = "";
         private bool m_replaceLinks = false;
+        private bool m_convertCase = false;
+
+        public void convertCase(bool convert) { m_convertCase = convert; }
 
         public static Boolean checkCredentials(String url, String username, String password)
         {    
@@ -225,7 +228,7 @@ namespace IndianBridge.GoogleAPIs
                         newContent.Type = "html";
                         newContent.Content = m_replaceLinks ? replaceLinks(html,url) : html;
                         entry.Content = newContent;
-                        entry.Title.Text = IndianBridge.Common.Utilities.ConvertCaseString(title);
+                        entry.Title.Text = m_convertCase?IndianBridge.Common.Utilities.ConvertCaseString(title):title;
                         m_service.Update(entry);
                         if (!m_lastRunTimes.ContainsKey(url)) printMessage("UPDATED. No entry was found for last run time.");
                         else
@@ -275,7 +278,7 @@ namespace IndianBridge.GoogleAPIs
             AtomLink link = new AtomLink("application/atom+xml", "http://schemas.google.com/sites/2008#parent");
             link.HRef = parent.EditUri;
             entry.Links.Add(link);
-            entry.Title.Text = IndianBridge.Common.Utilities.ConvertCaseString(title);
+            entry.Title.Text = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
             entry.Content.Type = "html";
             entry.Content.Content = m_replaceLinks ? replaceLinks(html,originalUrl) : html;
             entry.ExtensionElements.Add(makePageNameExtension(pageName));

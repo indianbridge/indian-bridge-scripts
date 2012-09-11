@@ -23,6 +23,7 @@ namespace IndianBridge.ResultsManager
         public void loadSummaryIntoDatabase()
         {
             m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(m_eventInformation.databaseFileName));
             System.IO.File.Delete(m_eventInformation.databaseFileName);
             String sourceFileName = System.IO.Path.Combine(Globals.m_rootDirectory, "Databases", "PairsScoreDatabaseTemplate.mdb");
             System.IO.File.Copy(sourceFileName, m_eventInformation.databaseFileName);
@@ -42,6 +43,10 @@ namespace IndianBridge.ResultsManager
             m_databaseParameters.m_daEventInformation.Update(m_databaseParameters.m_ds, "Event_Information");
             printMessage("Processing Summaries...");
             String[] lines = m_eventInformation.rawText.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            if (lines.Length < 2)
+            {
+                lines = m_eventInformation.rawText.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            }
             int lineNumber = getNextSummaryLine_(lines, 0);
             while (lineNumber < lines.Length && lineNumber != -1)
             {
@@ -105,13 +110,13 @@ namespace IndianBridge.ResultsManager
                 if (lineNumber != -1)
                 {
                     lineNumber++;
-                    text = lines[lineNumber];
+                    text = lines[lineNumber].Trim();
                 }
                 while (lineNumber != -1 && lineNumber < lines.Length && !re.IsMatch(text))
                 {
                     processOneScoreLine_(text, sectionName, pairNumber, update);
                     lineNumber++;
-                    if (lineNumber < lines.Length) text = lines[lineNumber];
+                    if (lineNumber < lines.Length) text = lines[lineNumber].Trim();
                     else text = "Session";
                 }
                 processSessionLine_(lines, lineNumber, sectionName, pairNumber);
@@ -123,14 +128,14 @@ namespace IndianBridge.ResultsManager
         {
             sectionName = "";
             pairNumber = -1;
-            String text = lines[lineNumber++];
+            String text = lines[lineNumber++].Trim();
             String[] tokens = text.Split(new string[] { "Summary for Pair " }, StringSplitOptions.None);
             if (tokens.Length > 1)
             {
                 String[] newTokens = tokens[1].Split(' ');
                 sectionName = (Utilities.containsPattern_(text, PairsGeneral.NORTH_SOUTH_SECTION_NAME) ? PairsGeneral.NORTH_SOUTH_SECTION_NAME : (Utilities.containsPattern_(text, PairsGeneral.EAST_WEST_SECTION_NAME) ? PairsGeneral.EAST_WEST_SECTION_NAME : PairsGeneral.SINGLE_SECTION_NAME));
                 pairNumber = newTokens.Length > 1 ? Convert.ToInt16(newTokens[1]) : -1;
-                String pairNames = lines[lineNumber++];
+                String pairNames = lines[lineNumber++].Trim();
                 if (pairNumber != -1)
                 {
                     printMessage((update ? "Updating" : "Adding") + " pair information - " + sectionName + ", " + pairNumber + ", " + pairNames);
@@ -180,7 +185,7 @@ namespace IndianBridge.ResultsManager
 
         private  void processSessionLine_(String[] lines, int lineNumber, String sectionName, int pairNumber)
         {
-            String text = lines[lineNumber++];
+            String text = lines[lineNumber++].Trim();
             String[] tokens = text.Split(' ');
 
             double totalScore = 0;
@@ -210,7 +215,7 @@ namespace IndianBridge.ResultsManager
             {
                 sessionRank = 0;
             }
-            text = lines[lineNumber];
+            text = lines[lineNumber].Trim();
             tokens = text.Split(' ');
             int eventRank = 0;
             if (tokens[0].Equals("Event", StringComparison.OrdinalIgnoreCase))
