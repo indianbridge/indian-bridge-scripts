@@ -77,7 +77,11 @@ namespace IndianBridge.ResultsManager
         private static void getEventNameAndDate_(string text)
         {
             String[] lines = text.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            if (lines.Length < 2) return;
+            if (lines.Length < 2)
+            {
+                lines = text.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                if (lines.Length < 2) return;
+            }
             String eventNameAndDateLine = lines[2];
             String[] tokens = eventNameAndDateLine.Split(',');
             if (tokens.Length < 2) { m_eventInformation.eventName = eventNameAndDateLine; return; }

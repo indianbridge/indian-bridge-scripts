@@ -70,6 +70,7 @@ namespace IndianBridge.GoogleAPIs
                     table.Rows.Add(workRow);
                 }
             }
+            table.PrimaryKey = new DataColumn[] { table.Columns[0] };
             return table;
         }
 

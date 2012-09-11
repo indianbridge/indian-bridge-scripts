@@ -83,6 +83,7 @@ namespace IndianBridge.ResultsManager
                 Parameters parameters = createDefaultParameters();
                 parameters.columns.Add("Rank", "{Event_Rank}");
                 parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
+                parameters.columns.Add("Direction","{Section_Name}");
                 parameters.columns.Add("Names", "[_makePairNamesLink]");
                 parameters.columns.Add(m_eventInformation.isIMP ? "IMPs" : "MPs", "{Total_Score}");
                 if (!m_eventInformation.isIMP) parameters.columns.Add("Percentage", "{Percentage}");
@@ -155,26 +156,33 @@ namespace IndianBridge.ResultsManager
             StreamWriter sw = new StreamWriter(parameters.fileName);
             sw.WriteLine("<html><head></head><body>");
             DataRow[] foundRows = m_databaseParameters.m_ds.Tables[parameters.tableName].Select(parameters.filterCriteria, parameters.sortCriteria);
-            DataRow dRow = foundRows[0];
-            sw.WriteLine(applyTemplate_(parameters.headerTemplate, dRow));
-            sw.WriteLine(makeTablePreamble_() + "<thead><tr>");
-            ArrayList tableHeader = new ArrayList();
-            foreach (DictionaryEntry pair in parameters.columns)
+            if (foundRows.Length < 1)
             {
-                tableHeader.Add(applyTemplate_("" + pair.Key, dRow));
+                sw.WriteLine("<h3>Bye Table</h3>");
             }
-            sw.WriteLine(makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-            for (int i = 0; i < foundRows.Length; ++i)
+            else
             {
-                DataRow row = foundRows[i];
-                ArrayList tableRow = new ArrayList();
+                DataRow dRow = foundRows[0];
+                sw.WriteLine(applyTemplate_(parameters.headerTemplate, dRow));
+                sw.WriteLine(makeTablePreamble_() + "<thead><tr>");
+                ArrayList tableHeader = new ArrayList();
                 foreach (DictionaryEntry pair in parameters.columns)
                 {
-                    string value = "" + pair.Value;
-                    if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + (i+1));
-                    else tableRow.Add(applyTemplate_(value, row));
+                    tableHeader.Add(applyTemplate_("" + pair.Key, dRow));
                 }
-                sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                sw.WriteLine(makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+                for (int i = 0; i < foundRows.Length; ++i)
+                {
+                    DataRow row = foundRows[i];
+                    ArrayList tableRow = new ArrayList();
+                    foreach (DictionaryEntry pair in parameters.columns)
+                    {
+                        string value = "" + pair.Value;
+                        if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + (i + 1));
+                        else tableRow.Add(applyTemplate_(value, row));
+                    }
+                    sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                }
             }
             sw.WriteLine("</tbody></table></body></html>");
             sw.Close();
@@ -259,7 +267,7 @@ namespace IndianBridge.ResultsManager
         public String _commonPageHeader(DataRow dRow)
         {
             DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Globals.INDIAN_ZONE);
-            String result = "Page Updated on " + indianTime.ToString() + " IST<br/>";
+            String result = "Page Updated on " + indianTime.ToString("MMMM dd, yyyy hh:mm:ss tt") + " IST<br/>";
             result += "Travellers : ";
             for (int i = 1; i <= m_numberOfBoards; ++i)
             {
