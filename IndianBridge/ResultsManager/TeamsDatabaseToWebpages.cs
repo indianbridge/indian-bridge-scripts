@@ -13,7 +13,7 @@ namespace IndianBridge.ResultsManager
 {
     public class TeamsDatabaseToWebpages
     {
-       /* public struct Parameters
+        /*public struct Parameters
         {
             public String sortCriteria;
             public String sectionName;
@@ -35,14 +35,15 @@ namespace IndianBridge.ResultsManager
             parameters.columns = new OrderedDictionary();
             return parameters;
         }
-        public TeamsEventInformation m_eventInformation;
+        private string m_databaseFileName;
+        private string m_webpagesRootDirectory;
         public TeamsDatabaseParameters m_databaseParameters;
         private String m_prefix = "";
 
-        public TeamsDatabaseToWebpages(TeamsEventInformation eventInformation,TeamsDatabaseParameters databaseParameters)
+        public TeamsDatabaseToWebpages(string databaseFileName, string webpagesRootDirectory)
         {
-            m_eventInformation = eventInformation;
-            m_databaseParameters = databaseParameters;
+            m_databaseFileName = databaseFileName;
+            m_webpagesRootDirectory = webpagesRootDirectory;
         }
 
         private void printMessage(String message) { Trace.WriteLine(message); }
@@ -171,6 +172,7 @@ namespace IndianBridge.ResultsManager
             sw.WriteLine("</tbody></table></body></html>");
             sw.Close();
         }
+        
         private void createPairPages_(String rootFolder)
         {
             foreach (String sectionName in m_sectionNames)

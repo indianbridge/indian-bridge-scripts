@@ -7,11 +7,27 @@ using System.IO;
 using System.Data;
 using System.Collections;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace IndianBridge.Common
 {
         public static class Utilities
         {
+
+            public static TimeZoneInfo INDIAN_ZONE = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+            public static void createDatabase(string databaseFileName) {
+                if (!File.Exists(databaseFileName))
+                {
+                    string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + databaseFileName + ";Jet OLEDB:Engine Type=5";
+                    ADOX.CatalogClass cat = new ADOX.CatalogClass();
+                    cat.Create(strAccessConn);
+                    cat = null;
+                }
+                else
+                {
+                    MessageBox.Show(databaseFileName+" already exists. Cannot create!!!","File Already Exists!!!",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                }
+            }
 
             public static String makeIdentifier_(String variableName)
             {
