@@ -46,7 +46,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultsDatabase.cs" />
     <Compile Include="TeamsDatabaseToWebpages.cs" />
-    <Compile Include="TeamsScorer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
