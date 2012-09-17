@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IndianBridgeScorer</RootNamespace>
+    <AssemblyName>IndianBridgeScorer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\IndianBridgeScorer\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\IndianBridgeScorer\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddNewEvent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewEvent.Designer.cs">
+      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EventManagement.Designer.cs">
+      <DependentUpon>EventManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GetGoogleWebsiteRoot.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GetGoogleWebsiteRoot.Designer.cs">
+      <DependentUpon>GetGoogleWebsiteRoot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InitializeTeamEvent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InitializeTeamEvent.Designer.cs">
+      <DependentUpon>InitializeTeamEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadingEvents.Designer.cs">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PairsScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PairsScorer.Designer.cs">
+      <DependentUpon>PairsScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PDScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PDScorer.Designer.cs">
+      <DependentUpon>PDScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CreateAndPublishTeamResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateAndPublishTeamResults.Designer.cs">
+      <DependentUpon>CreateAndPublishTeamResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CreateAndPublishPairsResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateAndPublishPairsResults.Designer.cs">
+      <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelectCalendarEvent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectCalendarEvent.Designer.cs">
+      <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ShowDataGrid.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ShowDataGrid.Designer.cs">
+      <DependentUpon>ShowDataGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TeamScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TeamScorer.Designer.cs">
+      <DependentUpon>TeamScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TeamsDatabaseToWebpages.cs" />
+    <Compile Include="TourneyInformationDatabase.cs" />
+    <Compile Include="TourneyManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TourneyManagement.Designer.cs">
+      <DependentUpon>TourneyManagement.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AddNewEvent.resx">
+      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EventManagement.resx">
+      <DependentUpon>EventManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GetGoogleWebsiteRoot.resx">
+      <DependentUpon>GetGoogleWebsiteRoot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InitializeTeamEvent.resx">
+      <DependentUpon>InitializeTeamEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadingEvents.resx">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PairsScorer.resx">
+      <DependentUpon>PairsScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CreateAndPublishTeamResults.resx">
+      <DependentUpon>CreateAndPublishTeamResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateAndPublishPairsResults.resx">
+      <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectCalendarEvent.resx">
+      <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ShowDataGrid.resx">
+      <DependentUpon>ShowDataGrid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TeamScorer.resx">
+      <DependentUpon>TeamScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TourneyManagement.resx">
+      <DependentUpon>TourneyManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{1C337ECB-18C4-4F1E-8557-C29696777EC6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GoogleAPIs\GoogleAPIs.csproj">
+      <Project>{042A360C-0A60-43EE-87E6-0FBD16EC7BDF}</Project>
+      <Name>GoogleAPIs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ResultsManager\ResultsManager.csproj">
+      <Project>{B464537E-F74F-40DF-AD24-83ECBA82E312}</Project>
+      <Name>ResultsManager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
