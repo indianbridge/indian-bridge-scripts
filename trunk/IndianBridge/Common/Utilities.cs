@@ -17,6 +17,8 @@ namespace IndianBridge.Common
 
         public static TimeZoneInfo INDIAN_ZONE = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
         public static double fontSize = 0.8;
+        public static double paddingSize = 5;
+        public static bool useBorder = false;
 
         public static bool HasNull(DataTable table)
         {
@@ -40,30 +42,50 @@ namespace IndianBridge.Common
             return true;
         }
 
-        public static String makeTablePreamble_()
+        public static string makeHtmlPrintStyle_()
         {
-            return "<table style=\'font-size:"+fontSize+"em;border: 1px solid #cef;text-align: left;\'>";
+            string result = "";
+            result += "<style>";
+            result += "@media print";
+            result += "{";
+            result += "table { page-break-after:auto }";
+            result += "tr    { page-break-inside:avoid; page-break-after:auto }";
+            result += "td    { page-break-inside:avoid; page-break-after:auto }";
+            result += "thead { display:table-header-group }";
+            result += "tfoot { display:table-footer-group }";
+            result += "}";
+            result += "</style>";
+            return result;
+        }
+
+        public static string makeTablePreamble_()
+        {
+            string borderText = (useBorder ? "border: 1px solid #000;" : "border: 1px solid #cef;");
+            return "<table style=\'font-size:" + fontSize + "em;" + borderText + "text-align: left;\'>";
         }
         public static String makeTableHeader_(ArrayList text, bool usePadding = false)
         {
             var retVal = "";
-            foreach (String i in text) retVal += makeTableHeader_(i,usePadding);
+            foreach (String i in text) retVal += makeTableHeader_(i, usePadding);
             return retVal;
         }
         public static String makeTableHeader_(String text, bool usePadding = false)
         {
-            return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;" + (usePadding ? "padding: 4px 5px;" : "") + "\'>" + text + "</th>";
+            string borderText = (useBorder ? "border: 1px solid #000;" : "border: 1px solid #cef;");
+            return "<th style=\'font-weight: bold;background-color: #acf;" + borderText + "" + (usePadding ? "padding: " + paddingSize + "px " + paddingSize + "px;" : "") + "\'>" + text + "</th>";
         }
         public static String makeTableCell_(ArrayList text, int row, bool usePadding = false)
         {
             var retVal = "";
-            foreach (String i in text) retVal += makeTableCell_(i, row,usePadding);
+            foreach (String i in text) retVal += makeTableCell_(i, row, usePadding);
             return retVal;
         }
         public static String makeTableCell_(String text, int row, bool usePadding = false)
         {
-            if (row % 2 == 0) return "<td style=\'" + (usePadding ? "padding: 4px 5px;" : "") + "background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>";
-            else return "<td " + (usePadding ? "style=\'padding: 4px 5px;\'" : "") + ">" + text + "</td>";
+            string borderText = (useBorder ? "border: 1px solid #000;" : "border: 1px solid #cef;");
+            string paddingText = (usePadding ? "padding: " + paddingSize + "px " + paddingSize + "px;" : "");
+            if (row % 2 == 0) return "<td style=\'" + paddingText + "background-color: #def;" + borderText + "\'>" + text + "</td>";
+            else return "<td style=\'" + paddingText + "" + borderText + "\'>" + text + "</td>";
         }
         public static void createDatabase(string databaseFileName)
         {

@@ -105,6 +105,7 @@ namespace IndianBridgeScorer
             m_localWebpagesRootDirectory = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(m_databaseFileName)), "Webpages", Utilities.makeIdentifier_(m_eventName));
             initializeDataSet();
             loadDatabase(m_databaseFileName);
+            tiebreakerMethodCombobox.SelectedIndex = 0;
             m_tabPages = new List<TabPage>();
             eventSetupDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             showNames();
@@ -974,15 +975,21 @@ namespace IndianBridgeScorer
         {
             for (int i = 1; i <= numberOfTeams; ++i)
             {
-                calculateTieBreakerQuotient(i, roundNumber);
+                DataRow dComputedRow = m_ds.Tables[computedScoresTableName].Rows.Find(i);
+                Debug.Assert(dComputedRow != null, "Row for team number " + i + " was not found in computed scores table");
+                if (tiebreakerMethodCombobox.Text == "Team Number")
+                {
+                    dComputedRow["Tiebreaker_After_Round_" + roundNumber] = -i;
+                }
+                else
+                {
+                    calculateTieBreakerQuotient(dComputedRow, i, roundNumber);
+                }
             }
         }
 
-        private void calculateTieBreakerQuotient(int teamNumber, int roundNumber)
+        private void calculateTieBreakerQuotient(DataRow dComputedRow, int teamNumber, int roundNumber)
         {
-            DataTable computedScoresTable = m_ds.Tables[computedScoresTableName];
-            DataRow dComputedRow = computedScoresTable.Rows.Find(teamNumber);
-            Debug.Assert(dComputedRow != null, "Row for team number " + teamNumber + " was not found in computed scores table");
             DataTable table = m_ds.Tables[scoresTableName];
             int count = 0;
             double tieBreakerScore = 0; 
@@ -995,7 +1002,7 @@ namespace IndianBridgeScorer
                     if (opponent > 0 && opponent <= numberOfTeams)
                     {
                         double vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
-                        DataRow[] foundRows = computedScoresTable.Select("Team_Number = " + opponent);
+                        DataRow[] foundRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + opponent);
                         Debug.Assert(foundRows.Length == 1);
                         double score = getValue(foundRows[0], "Score_After_Round_" + roundNumber);
                         tieBreakerScore += (score * vps);
@@ -1013,7 +1020,7 @@ namespace IndianBridgeScorer
                     if (opponent > 0 && opponent <= numberOfTeams)
                     {
                         double vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
-                        DataRow[] foundRows = computedScoresTable.Select("Team_Number = " + opponent);
+                        DataRow[] foundRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + opponent);
                         Debug.Assert(foundRows.Length == 1);
                         double score = getValue(foundRows[0], "Score_After_Round_" + roundNumber);
                         tieBreakerScore += (score * vps);
@@ -1528,7 +1535,8 @@ namespace IndianBridgeScorer
             int number = (int)dRow[columnName];
             DataRow[] dRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + number);
             Debug.Assert(dRows.Length == 1);
-            double score = getValue(dRows[0], "Score_After_Round_" + roundNumber);
+            int roundsCompleted = getParameterValue("Rounds_Scored");
+            double score = (roundsCompleted <= 1)?0:getValue(dRows[0], "Score_After_Round_" + roundsCompleted);
             dRows = m_ds.Tables[namesTableName].Select("Team_Number = " + number);
             string teamName = (string)dRows[0]["Team_Name"];
             return "" + number + " " + teamName + " (" + score + ")";
@@ -1548,10 +1556,17 @@ namespace IndianBridgeScorer
                 MessageBox.Show("No saved draw found for round " + drawRoundNumber + Environment.NewLine + "Make sure you have saved the current draw before printing it.", "Draw not found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            Utilities.fontSize = 1.5;
+            double oldFontSize = Utilities.fontSize;
+            Utilities.fontSize = double.Parse(drawFontSizeTextbox.Text);
+            double oldPaddingSize = Utilities.paddingSize;
+            Utilities.paddingSize = double.Parse(drawPaddingSizeTextbox.Text);
+            bool oldUseBorder = Utilities.useBorder;
+            Utilities.useBorder = true;
             string fileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(m_localWebpagesRootDirectory)), "draw.html");
             StreamWriter sw = new StreamWriter(fileName);
-            sw.WriteLine("<html><head><title>Draw for Round " + drawRoundNumber + "</title></head><body>");
+            sw.WriteLine("<html><head><title>Draw for Round " + drawRoundNumber + "</title>");
+            sw.WriteLine(Utilities.makeHtmlPrintStyle_());
+            sw.WriteLine("</head><body>");
             sw.WriteLine("<h1>Draw for Round " + drawRoundNumber + "</h1>");
             sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
@@ -1574,7 +1589,9 @@ namespace IndianBridgeScorer
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
-            Utilities.fontSize = 0.8;
+            Utilities.fontSize = oldFontSize;
+            Utilities.paddingSize = oldPaddingSize;
+            Utilities.useBorder = oldUseBorder;
             printDrawBrowser.Url = new Uri(fileName);
         }
 
@@ -1802,6 +1819,12 @@ namespace IndianBridgeScorer
         private void eventSetupDataGridView_KeyDown(object sender, KeyEventArgs e)
         {
             handleCopyPaste(sender, e);
+        }
+
+        private void recalculateAllRoundScores_Click(object sender, EventArgs e)
+        {
+            doScoring("1");
+            showBalloonNotification("Success", "Re-calculated All Round Scores and Leaderboard");
         }
 
     }
