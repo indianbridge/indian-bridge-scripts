@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubmitPairsResults", "Appli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndianBridgeScorer", "Applications\IndianBridgeScorer\IndianBridgeScorer.csproj", "{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "Applications\TestApplication\TestApplication.csproj", "{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CD_ROM|Any CPU = CD_ROM|Any CPU
@@ -236,6 +238,31 @@ Global
 		{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}.SingleImage|Mixed Platforms.Build.0 = Release|x86
 		{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}.SingleImage|x86.ActiveCfg = Release|x86
 		{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}.SingleImage|x86.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.CD_ROM|Any CPU.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.CD_ROM|Mixed Platforms.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.CD_ROM|Mixed Platforms.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.CD_ROM|x86.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.CD_ROM|x86.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Debug|x86.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Debug|x86.Build.0 = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.DVD-5|Any CPU.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.DVD-5|Mixed Platforms.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.DVD-5|Mixed Platforms.Build.0 = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.DVD-5|x86.ActiveCfg = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.DVD-5|x86.Build.0 = Debug|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Release|Any CPU.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Release|x86.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.Release|x86.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|Any CPU.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|Mixed Platforms.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|Mixed Platforms.Build.0 = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|x86.ActiveCfg = Release|x86
+		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -41,10 +41,10 @@ namespace IndianBridge.Applications
         {
             if (LoadDatabaseFileDialog.ShowDialog() == DialogResult.OK)
             {
-                IndianBridge.ResultsManager.TeamsScorer scorer = new IndianBridge.ResultsManager.TeamsScorer();
+                /*IndianBridge.ResultsManager.TeamsScorer scorer = new IndianBridge.ResultsManager.TeamsScorer();
                 scorer.loadTeamsDatabaseInformation(LoadDatabaseFileDialog.FileName);
                 scorer.doRanking_(6);
-                scorer.createLeaderboard();
+                scorer.createLeaderboard();*/
                 MessageBox.Show("Finished");
 
             }

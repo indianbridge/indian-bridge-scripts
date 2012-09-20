@@ -48,11 +48,14 @@
             this.scoresTab = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
+            this.tiebreakerMethodCombobox = new System.Windows.Forms.ComboBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.scoresEntryFormatCombobox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.showingScoresForRoundCombobox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.scoresDataGridView = new System.Windows.Forms.DataGridView();
+            this.recalculateAllRoundScores = new System.Windows.Forms.Button();
             this.reloadScoresButton = new System.Windows.Forms.Button();
             this.writeScoresButton = new System.Windows.Forms.Button();
             this.drawTab = new System.Windows.Forms.TabPage();
@@ -64,6 +67,10 @@
             this.randomDrawButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.drawDataGridView = new System.Windows.Forms.DataGridView();
+            this.drawPaddingSizeTextbox = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.drawFontSizeTextbox = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.printDrawBrowser = new System.Windows.Forms.WebBrowser();
             this.printDrawButton = new System.Windows.Forms.Button();
             this.reloadDrawButton = new System.Windows.Forms.Button();
@@ -381,10 +388,11 @@
             // 
             // splitContainer3.Panel2
             // 
+            this.splitContainer3.Panel2.Controls.Add(this.recalculateAllRoundScores);
             this.splitContainer3.Panel2.Controls.Add(this.reloadScoresButton);
             this.splitContainer3.Panel2.Controls.Add(this.writeScoresButton);
             this.splitContainer3.Size = new System.Drawing.Size(1059, 602);
-            this.splitContainer3.SplitterDistance = 518;
+            this.splitContainer3.SplitterDistance = 492;
             this.splitContainer3.TabIndex = 2;
             // 
             // splitContainer6
@@ -396,6 +404,8 @@
             // 
             // splitContainer6.Panel1
             // 
+            this.splitContainer6.Panel1.Controls.Add(this.tiebreakerMethodCombobox);
+            this.splitContainer6.Panel1.Controls.Add(this.label6);
             this.splitContainer6.Panel1.Controls.Add(this.scoresEntryFormatCombobox);
             this.splitContainer6.Panel1.Controls.Add(this.label2);
             this.splitContainer6.Panel1.Controls.Add(this.showingScoresForRoundCombobox);
@@ -404,9 +414,33 @@
             // splitContainer6.Panel2
             // 
             this.splitContainer6.Panel2.Controls.Add(this.scoresDataGridView);
-            this.splitContainer6.Size = new System.Drawing.Size(1059, 518);
-            this.splitContainer6.SplitterDistance = 81;
+            this.splitContainer6.Size = new System.Drawing.Size(1059, 492);
+            this.splitContainer6.SplitterDistance = 76;
             this.splitContainer6.TabIndex = 0;
+            // 
+            // tiebreakerMethodCombobox
+            // 
+            this.tiebreakerMethodCombobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tiebreakerMethodCombobox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tiebreakerMethodCombobox.FormattingEnabled = true;
+            this.tiebreakerMethodCombobox.Items.AddRange(new object[] {
+            "Quotient",
+            "Team Number"});
+            this.tiebreakerMethodCombobox.Location = new System.Drawing.Point(773, 45);
+            this.tiebreakerMethodCombobox.Name = "tiebreakerMethodCombobox";
+            this.tiebreakerMethodCombobox.Size = new System.Drawing.Size(137, 24);
+            this.tiebreakerMethodCombobox.TabIndex = 5;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(537, 45);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(230, 26);
+            this.label6.TabIndex = 4;
+            this.label6.Text = "Tiebreaker Method : ";
             // 
             // scoresEntryFormatCombobox
             // 
@@ -416,7 +450,7 @@
             this.scoresEntryFormatCombobox.Items.AddRange(new object[] {
             "IMPs",
             "VPs"});
-            this.scoresEntryFormatCombobox.Location = new System.Drawing.Point(658, 47);
+            this.scoresEntryFormatCombobox.Location = new System.Drawing.Point(406, 45);
             this.scoresEntryFormatCombobox.Name = "scoresEntryFormatCombobox";
             this.scoresEntryFormatCombobox.Size = new System.Drawing.Size(65, 24);
             this.scoresEntryFormatCombobox.TabIndex = 3;
@@ -427,7 +461,7 @@
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(400, 45);
+            this.label2.Location = new System.Drawing.Point(148, 45);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(252, 26);
             this.label2.TabIndex = 2;
@@ -463,17 +497,30 @@
             this.scoresDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scoresDataGridView.Location = new System.Drawing.Point(0, 0);
             this.scoresDataGridView.Name = "scoresDataGridView";
-            this.scoresDataGridView.Size = new System.Drawing.Size(1059, 433);
+            this.scoresDataGridView.Size = new System.Drawing.Size(1059, 412);
             this.scoresDataGridView.TabIndex = 0;
             this.scoresDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.scoresDataGridView_CellValueChanged);
             this.scoresDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.scoresDataGridView_KeyDown);
+            // 
+            // recalculateAllRoundScores
+            // 
+            this.recalculateAllRoundScores.AutoSize = true;
+            this.recalculateAllRoundScores.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.recalculateAllRoundScores.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.recalculateAllRoundScores.Location = new System.Drawing.Point(225, 60);
+            this.recalculateAllRoundScores.Name = "recalculateAllRoundScores";
+            this.recalculateAllRoundScores.Size = new System.Drawing.Size(608, 36);
+            this.recalculateAllRoundScores.TabIndex = 12;
+            this.recalculateAllRoundScores.Text = "Recalculate All Round Scores";
+            this.recalculateAllRoundScores.UseVisualStyleBackColor = false;
+            this.recalculateAllRoundScores.Click += new System.EventHandler(this.recalculateAllRoundScores_Click);
             // 
             // reloadScoresButton
             // 
             this.reloadScoresButton.BackColor = System.Drawing.Color.Red;
             this.reloadScoresButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.reloadScoresButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.reloadScoresButton.Location = new System.Drawing.Point(540, 19);
+            this.reloadScoresButton.Location = new System.Drawing.Point(540, 11);
             this.reloadScoresButton.Name = "reloadScoresButton";
             this.reloadScoresButton.Size = new System.Drawing.Size(293, 43);
             this.reloadScoresButton.TabIndex = 10;
@@ -486,7 +533,7 @@
             this.writeScoresButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.writeScoresButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.writeScoresButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.writeScoresButton.Location = new System.Drawing.Point(225, 19);
+            this.writeScoresButton.Location = new System.Drawing.Point(225, 11);
             this.writeScoresButton.Name = "writeScoresButton";
             this.writeScoresButton.Size = new System.Drawing.Size(287, 43);
             this.writeScoresButton.TabIndex = 9;
@@ -517,6 +564,10 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.drawPaddingSizeTextbox);
+            this.splitContainer2.Panel2.Controls.Add(this.label9);
+            this.splitContainer2.Panel2.Controls.Add(this.drawFontSizeTextbox);
+            this.splitContainer2.Panel2.Controls.Add(this.label7);
             this.splitContainer2.Panel2.Controls.Add(this.printDrawBrowser);
             this.splitContainer2.Panel2.Controls.Add(this.printDrawButton);
             this.splitContainer2.Panel2.Controls.Add(this.reloadDrawButton);
@@ -615,6 +666,40 @@
             this.drawDataGridView.Size = new System.Drawing.Size(1059, 387);
             this.drawDataGridView.TabIndex = 0;
             this.drawDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.drawDataGridView_KeyDown);
+            // 
+            // drawPaddingSizeTextbox
+            // 
+            this.drawPaddingSizeTextbox.Location = new System.Drawing.Point(923, 87);
+            this.drawPaddingSizeTextbox.Name = "drawPaddingSizeTextbox";
+            this.drawPaddingSizeTextbox.Size = new System.Drawing.Size(44, 20);
+            this.drawPaddingSizeTextbox.TabIndex = 16;
+            this.drawPaddingSizeTextbox.Text = "5";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(839, 90);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(78, 13);
+            this.label9.TabIndex = 15;
+            this.label9.Text = "Padding Size : ";
+            // 
+            // drawFontSizeTextbox
+            // 
+            this.drawFontSizeTextbox.Location = new System.Drawing.Point(923, 64);
+            this.drawFontSizeTextbox.Name = "drawFontSizeTextbox";
+            this.drawFontSizeTextbox.Size = new System.Drawing.Size(44, 20);
+            this.drawFontSizeTextbox.TabIndex = 14;
+            this.drawFontSizeTextbox.Text = "1.5";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(860, 67);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(57, 13);
+            this.label7.TabIndex = 13;
+            this.label7.Text = "Font Size :";
             // 
             // printDrawBrowser
             // 
@@ -1027,6 +1112,7 @@
             this.scoresTab.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
+            this.splitContainer3.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
@@ -1150,5 +1236,12 @@
         private System.Windows.Forms.Button showKnockoutButton;
         private System.Windows.Forms.TextBox fontSizeTextBox;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox tiebreakerMethodCombobox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button recalculateAllRoundScores;
+        private System.Windows.Forms.TextBox drawPaddingSizeTextbox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox drawFontSizeTextbox;
+        private System.Windows.Forms.Label label7;
     }
 }
