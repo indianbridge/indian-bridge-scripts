@@ -1542,6 +1542,12 @@ namespace IndianBridgeScorer
                 return;
             }
             int drawRoundNumber = int.Parse(showingDrawCombobox.Text);
+
+            if (drawRoundNumber > getParameterValue("Draws_Completed"))
+            {
+                MessageBox.Show("No saved draw found for round " + drawRoundNumber + Environment.NewLine + "Make sure you have saved the current draw before printing it.", "Draw not found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             Utilities.fontSize = 1.5;
             string fileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(m_localWebpagesRootDirectory)), "draw.html");
             StreamWriter sw = new StreamWriter(fileName);

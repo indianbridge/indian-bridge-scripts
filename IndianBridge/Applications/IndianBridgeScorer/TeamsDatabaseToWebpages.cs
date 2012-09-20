@@ -40,6 +40,7 @@ namespace IndianBridgeScorer
         private string m_webpagesRootDirectory = "";
         private String m_prefix = "";
         private int m_roundsCompleted = 0;
+        private int m_drawsCompleted = 0;
         private int m_numberOfTeams = 0;
         private int m_numberOfRounds = 0;
 
@@ -53,6 +54,7 @@ namespace IndianBridgeScorer
                 m_numberOfTeams = (int)dRow["Number_Of_Teams"];
                 m_numberOfRounds = (int)dRow["Number_Of_Rounds"];
                 m_roundsCompleted = (int)dRow["Rounds_Completed"];
+                m_drawsCompleted = (int)dRow["Draws_Completed"];
             }
 
         }
@@ -367,11 +369,23 @@ namespace IndianBridgeScorer
             sw.WriteLine("<html><head></head><body>");
             DataRow[] foundRows = m_ds.Tables[TeamScorer.scoresTableName].Select("Round_Number = " + roundNumber, "Table_Number ASC");
             DataRow dRow = (foundRows.Length>0)?foundRows[0]:null;
-            string headerTemplate = headerify_("<h2>Scores for Round : " + roundNumber + " : </h2>" + "<br/>[_commonPageHeader]");
+            string headerTemplate = headerify_("<h2>Scores for Round " + roundNumber + "</h2>" + "<br/>[_commonPageHeader]");
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
             if (roundNumber > m_roundsCompleted)
             {
-                sw.WriteLine("<h2>Round not scored yet!</h2>");
+                if (roundNumber <= m_drawsCompleted)
+                {
+                    sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
+                    ArrayList tableHeader = new ArrayList();
+                    tableHeader.Clear();
+                    tableHeader.Add("Round " + roundNumber + " Draw");
+                    sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+                    sw.WriteLine("<tr><td>");
+                    sw.WriteLine(createRoundTable(roundNumber, foundRows,false));
+                    sw.WriteLine("</td></tr></tbody></table>");
+                    sw.WriteLine("</tbody></table>");
+                }
+                else sw.WriteLine("<h2>No Draw or Score published yet!</h2>");
             }
             else
             {
@@ -403,7 +417,7 @@ namespace IndianBridgeScorer
             sw.Close();
         }
 
-        private string createRoundTable(int roundNumber, DataRow[] foundRows)
+        private string createRoundTable(int roundNumber, DataRow[] foundRows, bool showVPs= true)
         {
             string result = "";
             result += (Utilities.makeTablePreamble_() + "<thead><tr>");
@@ -411,8 +425,11 @@ namespace IndianBridgeScorer
             tableHeader.Clear();
             tableHeader.Add("Table");
             tableHeader.Add("Team 1");
-            tableHeader.Add("Team 1 VPs");
-            tableHeader.Add("Team 2 VPs");
+            if (showVPs)
+            {
+                tableHeader.Add("Team 1 VPs");
+                tableHeader.Add("Team 2 VPs");
+            }
             tableHeader.Add("Team 2");
             result += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             int i = 0;
@@ -421,10 +438,13 @@ namespace IndianBridgeScorer
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add("" + (int)dRow["Table_Number"]);
                 tableRow.Add(getTeamLink(dRow["Team_1_Number"], true, true));
-                double team1vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
-                double team2vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
-                tableRow.Add("" + team1vps);
-                tableRow.Add("" + team2vps);
+                if (showVPs)
+                {
+                    double team1vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
+                    double team2vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
+                    tableRow.Add("" + team1vps);
+                    tableRow.Add("" + team2vps);
+                }
                 tableRow.Add(getTeamLink(dRow["Team_2_Number"], true, true));
                 result += ("<tr>" + Utilities.makeTableCell_(tableRow, i++) + "</tr>");
             }
