@@ -312,12 +312,15 @@ namespace IndianBridge.GoogleAPIs
             return re.Replace(html, new MatchEvaluator(
             delegate(Match match)
             {
-                Console.WriteLine(match.Value);
                 string result = match.Value;
                 if (re2.IsMatch(result)) return result;
                 else
                 {
-                    result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(getParentPage(url)) + "/", RegexOptions.IgnoreCase);
+                    if (result.EndsWith("index.html", StringComparison.OrdinalIgnoreCase) || result.EndsWith("index.htm", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(url) + "/", RegexOptions.IgnoreCase);
+                    }
+                    else result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(getParentPage(url)) + "/", RegexOptions.IgnoreCase);
                     result = Regex.Replace(result, @"(\./)|(\.\\)", getPage(url) + "/", RegexOptions.IgnoreCase);
                     result = Regex.Replace(result, @"(index\.html)|(index\.htm)", "", RegexOptions.IgnoreCase);
                     result = Regex.Replace(result, @"(\.html)|(\.htm)", "", RegexOptions.IgnoreCase);
