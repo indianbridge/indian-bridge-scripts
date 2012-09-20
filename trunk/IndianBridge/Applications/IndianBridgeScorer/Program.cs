@@ -15,8 +15,7 @@ namespace IndianBridgeScorer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new TourneyManagement());
-            Application.Run(new TeamScorer());
+            Application.Run(new TourneyManagement());
         }
     }
 }

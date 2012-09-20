@@ -17,30 +17,17 @@ namespace IndianBridgeScorer
     {
         private PairsEventInformation m_eventInformation;
         private PairsDatabaseParameters m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
-        private string m_googleSiteName = "indiancitybridgeresults";
-        String m_googleSiteRootPageName = "";
+        private string m_resultsWebsite = "";
 
-        public CreateAndPublishPairsResults(PairsEventInformation eventInformation, String googleSiteName, String googleSiteRootPageName)
+        public CreateAndPublishPairsResults(PairsEventInformation eventInformation, string resultsWebsite)
         {
             m_eventInformation = eventInformation;
-            m_googleSiteName = googleSiteName;
-            m_googleSiteRootPageName = googleSiteRootPageName;
+            m_resultsWebsite = resultsWebsite;
             InitializeComponent();
+            this.Text = "Create and Publish Results for " + m_eventInformation.eventName;
         }
 
-        public CreateAndPublishPairsResults(PairsEventInformation eventInformation, string websiteRoot)
-        {
-            m_eventInformation = eventInformation;
-            string[] tokens = websiteRoot.Split('/');
 
-            m_googleSiteName = tokens[4];
-            m_googleSiteRootPageName = "";
-            for (int i = 5; i < tokens.Length; ++i)
-            {
-                m_googleSiteRootPageName += "/" + tokens[i];
-            }
-            InitializeComponent();
-        }
 
         private bool loadSummaryIntoDatabase()
         {
@@ -94,14 +81,16 @@ namespace IndianBridgeScorer
             currentOperationTitle.Text = "Uploading Results to Google Sites";
             status.Text = "";
             status.Refresh();
+            string siteName, pagePath;
+            Utilities.getGoogleSiteComponents(m_resultsWebsite, out siteName, out pagePath);
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
             TextBoxTraceListener _textBoxListener = new TextBoxTraceListener(status);
             Trace.Listeners.Add(_textBoxListener);
             try
             {
-                SitesAPI sa = new SitesAPI(sitename: m_googleSiteName, username: username, password: password, replaceLinks: true, logHTTPTraffic: false);
-                sa.uploadDirectory(m_eventInformation.webpagesDirectory, m_googleSiteRootPageName);
+                SitesAPI sa = new SitesAPI(sitename: siteName, username: username, password: password, replaceLinks: true, logHTTPTraffic: false);
+                sa.uploadDirectory(m_eventInformation.webpagesDirectory, pagePath);
             }
             catch (Exception e)
             {
@@ -120,15 +109,11 @@ namespace IndianBridgeScorer
             {
                 if (createWebpages())
                 {
-                    if (uploadPages())
-                    {
-                        currentOperationTitle.Text = "Updating Google Calendar";
-                        status.Text = "";
-                        status.Refresh();
-
-                        if (SelectCalendarEvent.calendarAPI.updateResults(SelectCalendarEvent.selectedEntryNumber, "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName))
+                    if (string.IsNullOrWhiteSpace(m_resultsWebsite)) MessageBox.Show("Local webpages created in " +m_eventInformation.webpagesDirectory, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else {
+                        if (uploadPages())
                         {
-                            MessageBox.Show("Results created and successfully uploaded to " + "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName);
+                            MessageBox.Show("Results created and successfully uploaded to " + m_resultsWebsite,"Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
                         }
                     }
                 }

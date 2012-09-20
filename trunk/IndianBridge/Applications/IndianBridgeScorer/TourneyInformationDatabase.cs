@@ -70,6 +70,13 @@ namespace IndianBridgeScorer
             return (string)dRow["Tourney_Name"];
         }
 
+        public string getTourneyResultsWebsite()
+        {
+            if (m_ds.Tables[tourneyInfoTableName].Rows.Count < 1) return "None";
+            DataRow dRow = m_ds.Tables[tourneyInfoTableName].Rows[0];
+            return (string)dRow["Tourney_Results_Website"];
+        }
+
         public void setTourneyInfo(string tourneyName, DateTime tourneyDate, string tourneyResultsWebsite)
         {
             DataTable table = m_ds.Tables[tourneyInfoTableName];

@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using IndianBridge.ResultsManager;
 using IndianBridge.Common;
 using System.IO;
+using IndianBridge.ResultsManager;
 
 namespace IndianBridgeScorer
 {
@@ -19,16 +19,17 @@ namespace IndianBridgeScorer
         TourneyInformationDatabase m_tid;
         string m_databaseFileName;
         string m_eventName;
-        public PairsScorer(TourneyInformationDatabase tid, string eventName, string databaseFileName)
+        public PairsScorer(TourneyInformationDatabase tid, string eventName,string databaseFileName)
         {
             m_tid = tid;
             m_eventName = eventName;
             m_databaseFileName = databaseFileName;
             InitializeComponent();
+            this.Text = "Pairs Scorer for " + m_eventName;
             DataTable table = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyInfoTableName];
             DataRow dRow = table.Rows[0];
-            string websiteRoot = (string)dRow["Tourney_Results_Website"];
-            websiteAddress_textBox.Text = websiteRoot + "/" + Utilities.makeIdentifier_(eventName);
+            string websiteRoot = m_tid.getTourneyResultsWebsite();
+            websiteAddress_textBox.Text = string.IsNullOrWhiteSpace(websiteRoot)?"":websiteRoot + "/" + Utilities.makeIdentifier_(m_eventName);
         }
 
         private void updateButtonStatus()

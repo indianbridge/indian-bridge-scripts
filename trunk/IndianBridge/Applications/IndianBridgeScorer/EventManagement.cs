@@ -20,7 +20,8 @@ namespace IndianBridgeScorer
             InitializeComponent();
             m_scorers = new Dictionary<string, Form>();
             this.Text = "Tourney Name : " + tid.getTourneyName();
-            tourneyNameLabel.Text = "Tourney Name : " + tid.getTourneyName();
+            tourneyNameTextBox.Text = tid.getTourneyName();
+            resultsWebsiteTextBox.Text = tid.getTourneyResultsWebsite();
             updateEvents();
         }
 
@@ -88,13 +89,13 @@ namespace IndianBridgeScorer
             string eventType = (string)dRow["Event_Type"];
             string databaseFileName = (string)dRow["Event_File"];
             DataTable infoTable = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyInfoTableName];
-            DataRow foundRow = table.Rows[0];
-            string websiteRoot = (string)foundRow["Tourney_Results_Website"];
+            DataRow foundRow = infoTable.Rows[0];
+            string websiteRoot = resultsWebsiteTextBox.Text;
             string websiteAddress = websiteRoot + "/" + Utilities.makeIdentifier_(eventName);
             switch (eventType)
             {
                 case "Team":
-                    TeamScorer ts = new TeamScorer(databaseFileName,websiteAddress);
+                    TeamScorer ts = new TeamScorer(m_tid, eventName, databaseFileName);
                     m_scorers[eventName] = ts;
                     break;
                 case "Pairs":
@@ -102,7 +103,7 @@ namespace IndianBridgeScorer
                     m_scorers[eventName] = ps;
                     break;
                 case "PD":
-                    PDScorer pds = new PDScorer();
+                    PDScorer pds = new PDScorer(m_tid, eventName,databaseFileName);
                     m_scorers[eventName] = pds;
                     break;
             }
@@ -114,17 +115,43 @@ namespace IndianBridgeScorer
             DialogResult result = MessageBox.Show("Are you sure?\nAll information for this event will be deleted", "Confirm Delete", MessageBoxButtons.YesNo);
             if (result == DialogResult.No) return;
             m_tid.deleteEvent(eventName);
-            m_scorers[eventName].Close();
+            if (m_scorers.ContainsKey(eventName) && m_scorers[eventName] != null && !m_scorers[eventName].IsDisposed) m_scorers[eventName].Close();
             m_scorers[eventName] = null;
             m_scorers.Remove(eventName);
             updateEvents();
         }
 
-        private void addNewEventButton_Click(object sender, EventArgs e)
+        private void addEvent(string eventType)
         {
-            AddNewEvent ane = new AddNewEvent(m_tid);
-            ane.ShowDialog();
+            string eventName = Microsoft.VisualBasic.Interaction.InputBox("What is the name of the event?", "Event Name");
+            if (string.IsNullOrWhiteSpace(eventName))
+            {
+                MessageBox.Show("Event Name cannot be empty!", "Empty Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (m_tid.eventExists(eventName))
+            {
+                MessageBox.Show("Another event with same name ("+eventName+") already exists!"+Environment.NewLine+"Either delete the other event first or provide a different event name!", "Duplicate Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            m_tid.addNewEvent(eventName,eventType);
             updateEvents();
         }
+
+        private void addNewTeamEventButton_Click(object sender, EventArgs e)
+        {
+            addEvent("Team");
+        }
+
+        private void addNewPairEventButton_Click(object sender, EventArgs e)
+        {
+            addEvent("Pairs");
+        }
+
+        private void addNewPDEventButton_Click(object sender, EventArgs e)
+        {
+            addEvent("PD");
+        }
+
     }
 }

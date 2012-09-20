@@ -11,7 +11,7 @@ namespace IndianBridgeScorer
 {
     public partial class PDScorer : Form
     {
-        public PDScorer()
+        public PDScorer(TourneyInformationDatabase tid, string eventName, string databaseFileName)
         {
             InitializeComponent();
         }

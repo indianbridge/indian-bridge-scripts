@@ -31,7 +31,8 @@
             this.createTourneyButton = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.loadExistingTourneyButton = new System.Windows.Forms.Button();
-            this.selectTourneyRootFolder = new System.Windows.Forms.FolderBrowserDialog();
+            this.tourneyListCombobox = new System.Windows.Forms.ComboBox();
+            this.deleteTourneyButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // createTourneyButton
@@ -60,20 +61,43 @@
             // 
             this.loadExistingTourneyButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.loadExistingTourneyButton.ForeColor = System.Drawing.Color.Blue;
-            this.loadExistingTourneyButton.Location = new System.Drawing.Point(10, 111);
+            this.loadExistingTourneyButton.Location = new System.Drawing.Point(10, 146);
             this.loadExistingTourneyButton.Name = "loadExistingTourneyButton";
             this.loadExistingTourneyButton.Size = new System.Drawing.Size(437, 56);
             this.loadExistingTourneyButton.TabIndex = 8;
-            this.loadExistingTourneyButton.Text = "Load Existing Tourney";
+            this.loadExistingTourneyButton.Text = "Load Selected Tourney";
             this.loadExistingTourneyButton.UseVisualStyleBackColor = true;
             this.loadExistingTourneyButton.Click += new System.EventHandler(this.loadExistingTourneyButton_Click);
+            // 
+            // tourneyListCombobox
+            // 
+            this.tourneyListCombobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tourneyListCombobox.FormattingEnabled = true;
+            this.tourneyListCombobox.Location = new System.Drawing.Point(12, 111);
+            this.tourneyListCombobox.Name = "tourneyListCombobox";
+            this.tourneyListCombobox.Size = new System.Drawing.Size(434, 21);
+            this.tourneyListCombobox.TabIndex = 9;
+            // 
+            // deleteTourneyButton
+            // 
+            this.deleteTourneyButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.deleteTourneyButton.ForeColor = System.Drawing.Color.Blue;
+            this.deleteTourneyButton.Location = new System.Drawing.Point(10, 208);
+            this.deleteTourneyButton.Name = "deleteTourneyButton";
+            this.deleteTourneyButton.Size = new System.Drawing.Size(437, 56);
+            this.deleteTourneyButton.TabIndex = 10;
+            this.deleteTourneyButton.Text = "Delete Selected Tourney";
+            this.deleteTourneyButton.UseVisualStyleBackColor = true;
+            this.deleteTourneyButton.Click += new System.EventHandler(this.deleteTourneyButton_Click);
             // 
             // TourneyManagement
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(457, 178);
+            this.ClientSize = new System.Drawing.Size(457, 284);
+            this.Controls.Add(this.deleteTourneyButton);
+            this.Controls.Add(this.tourneyListCombobox);
             this.Controls.Add(this.loadExistingTourneyButton);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.createTourneyButton);
@@ -92,6 +116,7 @@
         private System.Windows.Forms.Button createTourneyButton;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button loadExistingTourneyButton;
-        private System.Windows.Forms.FolderBrowserDialog selectTourneyRootFolder;
+        private System.Windows.Forms.ComboBox tourneyListCombobox;
+        private System.Windows.Forms.Button deleteTourneyButton;
     }
 }
