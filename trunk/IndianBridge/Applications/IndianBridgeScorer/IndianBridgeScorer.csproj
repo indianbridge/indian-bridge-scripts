@@ -47,6 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PDScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PDScorer.Designer.cs">
+      <DependentUpon>PDScorer.cs</DependentUpon>
+    </Compile>
     <Compile Include="CreateAndPublishKnockoutResults.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,12 +76,6 @@
     </Compile>
     <Compile Include="PairsScorer.Designer.cs">
       <DependentUpon>PairsScorer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PDScorer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PDScorer.Designer.cs">
-      <DependentUpon>PDScorer.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -123,6 +123,9 @@
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="PDScorer.resx">
+      <DependentUpon>PDScorer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CreateAndPublishKnockoutResults.resx">
       <DependentUpon>CreateAndPublishKnockoutResults.cs</DependentUpon>
     </EmbeddedResource>
@@ -134,9 +137,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PairsScorer.resx">
       <DependentUpon>PairsScorer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PDScorer.resx">
-      <DependentUpon>PDScorer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
