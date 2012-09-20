@@ -12,6 +12,7 @@ namespace IndianBridgeScorer
     public class TourneyInformationDatabase
     {
         private string m_databaseFileName;
+        private string m_rootFolder;
         public DataSet m_ds;
         public System.Data.OleDb.OleDbDataAdapter m_daTourneyInfo;
         public OleDbCommandBuilder m_cbTourneyInfo;
@@ -36,7 +37,8 @@ namespace IndianBridgeScorer
         {
             DataTable table = m_ds.Tables[tourneyEventsTableName];
             DataRow dRow = table.Rows.Find(eventName);
-            File.Delete((string)dRow["Event_File"]);
+            string eventFileName = Path.Combine(Globals.m_rootDirectory, "Tourneys", (string)dRow["Event_File"]);
+            File.Delete(eventFileName);
             dRow.Delete();
             m_daTourneyEvents.Update(m_ds, tourneyEventsTableName);
         }
@@ -47,20 +49,21 @@ namespace IndianBridgeScorer
             DataRow dRow = table.NewRow();
             dRow["Event_Name"] = eventName;
             dRow["Event_Type"] = eventType;
-            dRow["Event_File"] = Path.Combine(Path.GetDirectoryName(m_databaseFileName), Utilities.makeIdentifier_(eventName) + ".mdb");
+            dRow["Event_File"] = Path.Combine(m_rootFolder, "Databases", Utilities.makeIdentifier_(eventName)+".mdb"); 
             table.Rows.Add(dRow);
             m_daTourneyEvents.Update(m_ds, tourneyEventsTableName);
         }
 
-        public TourneyInformationDatabase(string databaseFileName)
+        public TourneyInformationDatabase(string rootFolder)
         {
             initializeDataset();
-            setDatabase(databaseFileName);
+            setRootFolder(rootFolder);
         }
 
-        public void setDatabase(string databaseFileName)
+        public void setRootFolder(string rootFolder)
         {
-            m_databaseFileName = databaseFileName;
+            m_rootFolder = rootFolder;
+            m_databaseFileName = Path.Combine(Globals.m_rootDirectory,"Tourneys",m_rootFolder, "Databases", "TourneyInformation.mdb");
             loadDatabase();
         }
         public string getTourneyName()

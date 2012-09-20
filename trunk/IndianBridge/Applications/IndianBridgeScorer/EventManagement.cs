@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using IndianBridge.Common;
+using System.IO;
 
 namespace IndianBridgeScorer
 {
@@ -87,7 +88,7 @@ namespace IndianBridgeScorer
             DataTable table = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyEventsTableName];
             DataRow dRow = table.Rows.Find(eventName);
             string eventType = (string)dRow["Event_Type"];
-            string databaseFileName = (string)dRow["Event_File"];
+            string databaseFileName = Path.Combine(Globals.m_rootDirectory,"Tourneys",(string)dRow["Event_File"]);
             DataTable infoTable = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyInfoTableName];
             DataRow foundRow = infoTable.Rows[0];
             string websiteRoot = resultsWebsiteTextBox.Text;

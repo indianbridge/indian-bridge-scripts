@@ -48,11 +48,16 @@ namespace IndianBridgeScorer
                 return;
             }
 
-            TourneyInformationDatabase tid = new TourneyInformationDatabase(destinationFileName);
+            TourneyInformationDatabase tid = new TourneyInformationDatabase(selectedTourney);
             eventManagement = new EventManagement(tid);
             this.Hide();
             eventManagement.ShowDialog();
             this.Close();
+        }
+
+        private string createTourneyFolderName(string tourneyName, DateTime eventDate)
+        {
+            return Utilities.makeIdentifier_(tourneyName) + "_" + eventDate.ToString("yyyy_MM_dd");
         }
 
         private void createTourneyButton_Click(object sender, EventArgs e)
@@ -61,7 +66,8 @@ namespace IndianBridgeScorer
             sti.ShowDialog();
             if (sti.cancelPressed) return;
             DateTime eventDate = DateTime.Now;
-            string rootDirectory = Path.Combine(Globals.m_rootDirectory, "Tourneys", Utilities.makeIdentifier_(sti.tourneyName) + "_" + eventDate.ToString("yyyy_MM_dd"));
+            string tourneyFolderName = createTourneyFolderName(sti.tourneyName,eventDate);
+            string rootDirectory = Path.Combine(Globals.m_rootDirectory, "Tourneys", tourneyFolderName);
             if (Directory.Exists(rootDirectory))
             {
                 DialogResult result = MessageBox.Show("A folder already exists at " + rootDirectory + Environment.NewLine + "Do you want to erase all contents and create a new tourney?", "Tourney Exists!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -74,7 +80,7 @@ namespace IndianBridgeScorer
             string sourceFileName = Path.Combine(Directory.GetCurrentDirectory(), "Databases", "TourneyInformationDatabaseTemplate.mdb");
             string destinationFileName = Path.Combine(rootDirectory, "Databases", "TourneyInformation.mdb");
             System.IO.File.Copy(sourceFileName, destinationFileName);
-            TourneyInformationDatabase tid = new TourneyInformationDatabase(destinationFileName);
+            TourneyInformationDatabase tid = new TourneyInformationDatabase(tourneyFolderName);
             tid.setTourneyInfo(sti.tourneyName, eventDate, sti.resultsWebsiteRoot);
             eventManagement = new EventManagement(tid);
             this.Hide();
