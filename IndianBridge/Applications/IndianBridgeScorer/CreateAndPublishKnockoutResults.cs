@@ -12,26 +12,26 @@ using IndianBridge.GoogleAPIs;
 
 namespace IndianBridgeScorer
 {
-    public partial class CreateAndPublishTeamResults : Form
+    public partial class CreateAndPublishKnockoutResults : Form
     {
         private DataSet m_ds = null;
         private string m_localWebpagesRootDirectory = "";
         private string m_resultsWebsite = "";
         private string m_eventName = "";
 
-        public CreateAndPublishTeamResults(DataSet ds, string webpagesRootDirectory, String resultsWebsite, string eventName)
+        public CreateAndPublishKnockoutResults(DataSet ds, string webpagesRootDirectory, String resultsWebsite, string eventName)
         {
             m_ds = ds;
             m_localWebpagesRootDirectory = webpagesRootDirectory;
             m_resultsWebsite = resultsWebsite;
             m_eventName = eventName;
             InitializeComponent();
-            this.Text = "Create and Publish Results for " + m_eventName;
+            this.Text = "Create and Publish Knockout Results for " + m_eventName;
         }
 
         private bool createWebpages()
         {
-            currentOperationTitle.Text = "Creating Local webpages from results database";
+            currentOperationTitle.Text = "Creating Local Knockout webpages from results database";
             status.Text = "";
             status.Refresh();
             TeamsDatabaseToWebpages tdw = new TeamsDatabaseToWebpages(m_ds, m_localWebpagesRootDirectory);
@@ -39,7 +39,7 @@ namespace IndianBridgeScorer
             Trace.Listeners.Add(_textBoxListener);
             try
             {
-                tdw.createWebpages_();
+                tdw.createKnockoutPage();
                 Trace.Listeners.Remove(_textBoxListener);
             }
             catch (Exception e)

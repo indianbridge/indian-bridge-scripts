@@ -72,6 +72,8 @@ namespace IndianBridgeScorer
         private void createLeaderboard()
         {
             printMessage("Creating Leaderboard...");
+            String rootFolder = Path.Combine(m_webpagesRootDirectory, "leaderboard");
+            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
             string title = (m_roundsCompleted == m_numberOfRounds) ? "<h2>Final Leaderboard</h2>" : "<h2>Leaderboard after Round " + m_roundsCompleted+"</h2>";
             string headerTemplate = headerify_(title + "<br/>[_commonPageHeader]");
             if (m_roundsCompleted < 1)
@@ -90,24 +92,30 @@ namespace IndianBridgeScorer
             parameters.columns.Add("Name", "[_makeTeamNameLink]");
             parameters.columns.Add("VPs", "{Score_After_Round_" + m_roundsCompleted + "}");
             parameters.sortCriteria = "Rank_After_Round_" + m_roundsCompleted + " ASC";
-            m_prefix = "./";
-            parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
+            m_prefix = "../";
+            parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerTemplate;
             parameters.tableName = TeamScorer.computedScoresTableName;          
+            createPage_(parameters);
+            m_prefix = "./";
+            parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
             createPage_(parameters);
         }
 
         private void createNamesPage()
         {
             printMessage("Creating Team Names...");
+            String rootFolder = Path.Combine(m_webpagesRootDirectory, "names");
+            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
+
             Parameters parameters = createDefaultParameters();
             parameters.columns.Add("No.", "[_makeTeamNumberLink]");
             parameters.columns.Add("Name", "[_makeTeamNameLink]");
             parameters.columns.Add("Members", "{Member_Names}");
             parameters.sortCriteria = "Team_Number ASC";
-            m_prefix = "./";
-            parameters.fileName = Path.Combine(m_webpagesRootDirectory, "names.html");
+            m_prefix = "../";
+            parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerify_("<h2>Team Compositions</h2>" + "<br/>[_commonPageHeader]");
             parameters.tableName = TeamScorer.namesTableName;
@@ -132,6 +140,112 @@ namespace IndianBridgeScorer
             return (string)dRows[0]["Member_Names"];
         }
 
+        private void writeKnockoutPage(string fileName)
+        {
+            DataRow[] dRows = m_ds.Tables[TeamScorer.knockoutSessionsTableName].Select("", "Round_Number ASC");
+            if (dRows.Length < 1) return;
+            StreamWriter sw = new StreamWriter(fileName);
+            sw.WriteLine("<html><head></head><body>");
+            string title = "<h2>Knockout Scores</h2>";
+            string headerTemplate = headerify_(title + "<br/>[_commonPageHeader]");
+            sw.WriteLine(applyTemplate_(headerTemplate, null));
+            bool scoresAvailable = false;
+            foreach (DataRow dRow in dRows)
+            {
+                string html = getKnockoutRoundTable(dRow);
+                if (!string.IsNullOrWhiteSpace(html))
+                {
+                    scoresAvailable = true;
+                    sw.Write(html);
+                }
+            }
+            if (!scoresAvailable)
+            {
+                sw.WriteLine("<h1>No Scores Available Yet!</h1>");
+            }
+            sw.WriteLine("</body></html>");
+            sw.Close();
+        }
+
+        public void createKnockoutPage()
+        {
+            printMessage("Creating Knockout Pages");
+            String rootFolder = Path.Combine(m_webpagesRootDirectory, "knockout");
+            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
+            m_prefix = "../";
+            string fileName = Path.Combine(rootFolder, "index.html");
+            writeKnockoutPage(fileName);
+            m_prefix = "./";
+            fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
+            writeKnockoutPage(fileName);
+        }
+
+        private string getKnockoutRoundTable(DataRow dRow)
+        {
+            string html = "";
+            string roundName = (string)dRow["Round"];
+            DataTable table = m_ds.Tables[roundName];
+            Debug.Assert(table != null);
+            if (Utilities.AllNull(table, "Total_IMPs")) return "";
+            int numberOfMatches = (int)Math.Pow(2,(int)dRow["Round_Number"]);
+            int numberOfSessions = (int)dRow["Number_Of_Sessions"];
+            html+=(Utilities.makeTablePreamble_() + "<thead><tr>");
+            ArrayList tableHeader = new ArrayList();
+            ArrayList tableRow = new ArrayList();
+            tableHeader.Add(roundName);
+            html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            for (int i = 1; i <= numberOfMatches/2; ++i)
+            {
+                tableRow.Clear();
+                DataRow[] foundRows = table.Select("Match_Number = " + i);
+                Debug.Assert(foundRows.Length == 2);
+                tableRow.Add(createMatchTable(foundRows,numberOfSessions));
+                html += ("<tr>" + Utilities.makeTableCell_(tableRow, 1) + "</tr>");
+            }
+            html+=("</tbody></table>");
+            return html;
+        }
+
+        private string createMatchTable(DataRow[] dRows, int numberOfSessions)
+        {
+            string html = "";
+            html+=(Utilities.makeTablePreamble_() + "<thead><tr>");
+            ArrayList tableHeader = new ArrayList();
+            ArrayList tableRow = new ArrayList();
+            tableHeader.Add("Team");
+            tableHeader.Add("Carryover");
+            for (int i = 1; i <= numberOfSessions; ++i)
+            {
+                tableHeader.Add("Session " + i);
+            }
+            tableHeader.Add("Total");
+            html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            for (int j = 0; j < 2; ++j)
+            {
+                int otherRow = 1 - j;
+                tableRow.Clear();
+                int teamNumber = (int)dRows[j]["Team_Number"];
+                double total = (double)dRows[j]["Total_IMPs"];
+                double otherTotal = (double)dRows[otherRow]["Total_IMPs"];
+                if (total > otherTotal) tableRow.Add("<b>" + getTeamLink(teamNumber, true, true) + "</b>");
+                else tableRow.Add(getTeamLink(teamNumber, true, true));
+                tableRow.Add(""+getValue(dRows[j], "Carryover"));
+                for (int k = 1; k <= numberOfSessions; ++k)
+                {
+                    string columnName = "Session_" + k + "_Score";
+                    double sessionScore = getValue(dRows[j],columnName);
+                    double otherSessionScore = getValue(dRows[otherRow], columnName);
+                    if (sessionScore > otherSessionScore) tableRow.Add("<b>" + sessionScore + "</b>");
+                    else tableRow.Add("" + sessionScore);
+                }
+                if (total > otherTotal) tableRow.Add("<b>" + total + "</b>");
+                else tableRow.Add(""+total);
+                html += ("<tr>" + Utilities.makeTableCell_(tableRow, (total>otherTotal)?0:1) + "</tr>");
+            }
+            html+=("</tbody></table>");
+            return html;
+        }
+
         private void createTeamPage(int teamNumber)
         {
             printMessage("Creating Team Page for Team Number : " + teamNumber);
@@ -144,7 +258,7 @@ namespace IndianBridgeScorer
             string headerTemplate = headerify_("<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>" + "<br/>[_commonPageHeader]");
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
 
-            sw.WriteLine(makeTablePreamble_() + "<thead><tr>");
+            sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
             tableHeader.Add("Round");
             tableHeader.Add("Opponent");
@@ -152,7 +266,7 @@ namespace IndianBridgeScorer
             tableHeader.Add("Adjustment");
             tableHeader.Add("Cumulative Score After Round");
             tableHeader.Add("Rank After Round");
-            sw.WriteLine(makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             for (int i = 1; i <= m_roundsCompleted; ++i)
             {
                 ArrayList tableRow = new ArrayList();
@@ -203,7 +317,7 @@ namespace IndianBridgeScorer
                     if (dRow.Table.Columns.Contains(columnName)) tableRow.Add("" + getValue(dRow, columnName));
                     else tableRow.Add("-");
                 }
-                sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             for (int i = m_roundsCompleted + 1; i <= m_numberOfRounds; ++i)
             {
@@ -214,7 +328,7 @@ namespace IndianBridgeScorer
                 tableRow.Add("-");
                 tableRow.Add("-");
                 tableRow.Add("-");
-                sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
@@ -260,12 +374,12 @@ namespace IndianBridgeScorer
             }
             else
             {
-                sw.WriteLine(makeTablePreamble_() + "<thead><tr>");
+                sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
                 ArrayList tableHeader = new ArrayList();
                 tableHeader.Clear();
                 tableHeader.Add("Round "+roundNumber+" Score");
                 tableHeader.Add("Cumulative Score and Ranking after Round " + roundNumber);
-                sw.WriteLine(makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+                sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
                 sw.WriteLine("<tr><td>");
                 sw.WriteLine(createRoundTable(roundNumber,foundRows));
                 sw.WriteLine("</td><td>");
@@ -274,7 +388,7 @@ namespace IndianBridgeScorer
                 parameters.columns.Add("No.", "[_makeTeamNumberLink]");
                 parameters.columns.Add("Name", "[_makeTeamNameLink]");
                 parameters.columns.Add("VPs", "{Score_After_Round_" + roundNumber + "}");
-                parameters.sortCriteria = "Rank_After_Round_" + m_roundsCompleted + " ASC";
+                parameters.sortCriteria = "Rank_After_Round_" + roundNumber + " ASC";
                 parameters.filterCriteria = "";
                 parameters.headerTemplate = headerTemplate;
                 parameters.tableName = TeamScorer.computedScoresTableName;          
@@ -290,7 +404,7 @@ namespace IndianBridgeScorer
         private string createRoundTable(int roundNumber, DataRow[] foundRows)
         {
             string result = "";
-            result += (makeTablePreamble_() + "<thead><tr>");
+            result += (Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
             tableHeader.Clear();
             tableHeader.Add("Table");
@@ -298,7 +412,7 @@ namespace IndianBridgeScorer
             tableHeader.Add("Team 1 VPs");
             tableHeader.Add("Team 2 VPs");
             tableHeader.Add("Team 2");
-            result += (makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            result += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             int i = 0;
             foreach (DataRow dRow in foundRows)
             {
@@ -310,7 +424,7 @@ namespace IndianBridgeScorer
                 tableRow.Add("" + team1vps);
                 tableRow.Add("" + team2vps);
                 tableRow.Add(getTeamLink(dRow["Team_2_Number"], true, true));
-                result += ("<tr>" + makeTableCell_(tableRow, i++) + "</tr>");
+                result += ("<tr>" + Utilities.makeTableCell_(tableRow, i++) + "</tr>");
             }
             result += "</tbody></table>";
             return result;
@@ -321,6 +435,7 @@ namespace IndianBridgeScorer
         {
             String rootFolder = m_webpagesRootDirectory;
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
+            createKnockoutPage();
             createLeaderboard();
             createNamesPage();
             createTeamPages();
@@ -333,13 +448,13 @@ namespace IndianBridgeScorer
             DataRow[] foundRows = m_ds.Tables[parameters.tableName].Select(parameters.filterCriteria, parameters.sortCriteria);
             DataRow dRow = (foundRows.Length < 1) ? null : foundRows[0];
 
-            result += (makeTablePreamble_() + "<thead><tr>");
+            result += (Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
             foreach (DictionaryEntry pair in parameters.columns)
             {
                 tableHeader.Add(applyTemplate_("" + pair.Key, dRow));
             }
-            result += (makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            result += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             for (int i = 0; i < foundRows.Length; ++i)
             {
                 DataRow row = foundRows[i];
@@ -350,7 +465,7 @@ namespace IndianBridgeScorer
                     if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + i);
                     else tableRow.Add(applyTemplate_(value, row));
                 }
-                result += ("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                result += ("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             result += ("</tbody></table>");
             return result;
@@ -364,13 +479,13 @@ namespace IndianBridgeScorer
             DataRow dRow = (foundRows.Length < 1) ? null : foundRows[0];
             sw.WriteLine(applyTemplate_(parameters.headerTemplate, dRow));
 
-            sw.WriteLine(makeTablePreamble_() + "<thead><tr>");
+            sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
             foreach (DictionaryEntry pair in parameters.columns)
             {
                 tableHeader.Add(applyTemplate_("" + pair.Key, dRow));
             }
-            sw.WriteLine(makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             for (int i = 0; i < foundRows.Length; ++i)
             {
                 DataRow row = foundRows[i];
@@ -381,37 +496,11 @@ namespace IndianBridgeScorer
                     if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + i);
                     else tableRow.Add(applyTemplate_(value, row));
                 }
-                sw.WriteLine("<tr>" + makeTableCell_(tableRow, i) + "</tr>");
+                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
-        }
-
-        private String makeTablePreamble_()
-        {
-            return "<table style=\'font-size:0.8em;border: 1px solid #cef;text-align: left;\'>";
-        }
-        private String makeTableHeader_(ArrayList text)
-        {
-            var retVal = "";
-            foreach (String i in text) retVal += makeTableHeader_(i);
-            return retVal;
-        }
-        private String makeTableHeader_(String text, bool usePadding = false)
-        {
-            return "<th style=\'font-weight: bold;background-color: #acf;border-bottom: 1px solid #cef;" + (usePadding ? "padding: 4px 5px;" : "") + "\'>" + text + "</th>";
-        }
-        private String makeTableCell_(ArrayList text, int row)
-        {
-            var retVal = "";
-            foreach (String i in text) retVal += makeTableCell_(i, row);
-            return retVal;
-        }
-        private String makeTableCell_(String text, int row, bool usePadding = false)
-        {
-            if (row % 2 == 0) return "<td style=\'" + (usePadding ? "padding: 4px 5px;" : "") + "background-color: #def; border-bottom: 1px solid #cef;\'>" + text + "</td>";
-            else return "<td " + (usePadding ? "style=\'padding: 4px 5px;\'" : "") + ">" + text + "</td>";
         }
 
         private string applyTemplate_(String template, DataRow dRow)
@@ -446,8 +535,9 @@ namespace IndianBridgeScorer
         {
             DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Utilities.INDIAN_ZONE);
             String result = "Page Updated on " + indianTime.ToString() + " IST<br/>";
-            result += "<a href='" + m_prefix + "index.html'>Leaderboard</a>";
-            result += " | <a href='" + m_prefix + "names.html'>Team Member Names</a><br/>";
+            result += "<a href='" + m_prefix + "knockout/index.html'>Knockout</a>";
+            result += " | <a href='" + m_prefix + "leaderboard/index.html'>Round Robin Leaderboard</a>";
+            result += " | <a href='" + m_prefix + "names/index.html'>Team Compositions</a><br/>";
             result += "Team Scores : ";
             for (int i = 1; i <= m_numberOfTeams; ++i)
             {

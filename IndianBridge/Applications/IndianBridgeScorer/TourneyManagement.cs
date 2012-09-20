@@ -13,58 +13,85 @@ namespace IndianBridgeScorer
 {
     public partial class TourneyManagement : Form
     {
-        SelectCalendarEvent selectCalendarEventForm;
+        //SelectCalendarEvent selectCalendarEventForm;
         EventManagement eventManagement;
         public TourneyManagement()
         {
             Globals.m_rootDirectory = Directory.GetCurrentDirectory();
             InitializeComponent();
-            selectCalendarEventForm = new SelectCalendarEvent(DateTime.Today.AddDays(1),DateTime.Today.AddDays(-7));
+            loadExistingTourneys();
+            //selectCalendarEventForm = new SelectCalendarEvent(DateTime.Today.AddDays(1),DateTime.Today.AddDays(-7));
+        }
+
+        private void loadExistingTourneys()
+        {
+            string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "Tourneys");
+            string[] tourneys = Directory.GetDirectories(rootFolder);
+            tourneyListCombobox.Items.Clear();
+            foreach (string tourney in tourneys) tourneyListCombobox.Items.Add(Path.GetFileName(tourney));
+            if (tourneys.Length > 0) tourneyListCombobox.SelectedIndex = 0;
         }
 
         private void loadExistingTourneyButton_Click(object sender, EventArgs e)
         {
-            selectTourneyRootFolder.SelectedPath = Path.Combine(Directory.GetCurrentDirectory(), "Tourneys");
-            DialogResult result = selectTourneyRootFolder.ShowDialog();
-            if (result == DialogResult.OK)
+            string selectedTourney = tourneyListCombobox.Text;
+            string selectedFolder = Path.Combine(Directory.GetCurrentDirectory(), "Tourneys", selectedTourney);
+            if (!Directory.Exists(selectedFolder))
             {
-                string destinationFileName = Path.Combine(selectTourneyRootFolder.SelectedPath, "TourneyInformation.mdb");           
-                TourneyInformationDatabase tid = new TourneyInformationDatabase(destinationFileName);
-                eventManagement = new EventManagement(tid);
-                this.Hide();
-                eventManagement.ShowDialog();
-                this.Close();
-            }
-        }
-
-        private void createTourneyButton_Click(object sender, EventArgs e)
-        {
-            selectCalendarEventForm.ShowDialog(this);
-            if (selectCalendarEventForm.calendarEventInfo == null)
-            {
+                MessageBox.Show(selectedFolder + " tourney folder does not exist!", "Missing Folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            string eventName = selectCalendarEventForm.calendarEventInfo.Item1;
-            DateTime eventDate = selectCalendarEventForm.calendarEventInfo.Item2;
-            string rootDirectory = Path.Combine(Globals.m_rootDirectory, "Tourneys", Utilities.makeIdentifier_(eventName) + "_" + eventDate.ToString("yyyy_MM_dd"));
-            if (Directory.Exists(rootDirectory)) {
-                DialogResult result = MessageBox.Show("A folder already exists at " + rootDirectory + "\nDo you want to erase all contents and create a new tourney?", "Tourney Exists!!!", MessageBoxButtons.YesNo);
-                if (result == DialogResult.No) return;
-                Directory.Delete(rootDirectory, true);
+            string destinationFileName = Path.Combine(selectedFolder,"Databases", "TourneyInformation.mdb");
+            if (!File.Exists(destinationFileName))
+            {
+                MessageBox.Show(selectedFolder + " folder does not contains tourney databases!", "Missing database files!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            Directory.CreateDirectory(rootDirectory);
-            string sourceFileName = Path.Combine(Directory.GetCurrentDirectory(), "TourneyInformationDatabaseTemplate.mdb");
-            string destinationFileName = Path.Combine(rootDirectory, "Databases","TourneyInformation.mdb");
-            System.IO.File.Copy(sourceFileName, destinationFileName);
             TourneyInformationDatabase tid = new TourneyInformationDatabase(destinationFileName);
-            GetGoogleWebsiteRoot ggwr = new GetGoogleWebsiteRoot(eventName);
-            ggwr.ShowDialog();
-            tid.setTourneyInfo(eventName,eventDate,ggwr.websiteRoot);
             eventManagement = new EventManagement(tid);
             this.Hide();
             eventManagement.ShowDialog();
             this.Close();
+        }
+
+        private void createTourneyButton_Click(object sender, EventArgs e)
+        {
+            SetTourneyInfo sti = new SetTourneyInfo();
+            sti.ShowDialog();
+            if (sti.cancelPressed) return;
+            DateTime eventDate = DateTime.Now;
+            string rootDirectory = Path.Combine(Globals.m_rootDirectory, "Tourneys", Utilities.makeIdentifier_(sti.tourneyName) + "_" + eventDate.ToString("yyyy_MM_dd"));
+            if (Directory.Exists(rootDirectory))
+            {
+                DialogResult result = MessageBox.Show("A folder already exists at " + rootDirectory + Environment.NewLine + "Do you want to erase all contents and create a new tourney?", "Tourney Exists!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.No) return;
+                Directory.Delete(rootDirectory, true);
+            }
+            Directory.CreateDirectory(rootDirectory);
+            Directory.CreateDirectory(Path.Combine(rootDirectory, "Databases"));
+            Directory.CreateDirectory(Path.Combine(rootDirectory, "Webpages"));
+            string sourceFileName = Path.Combine(Directory.GetCurrentDirectory(), "Databases", "TourneyInformationDatabaseTemplate.mdb");
+            string destinationFileName = Path.Combine(rootDirectory, "Databases", "TourneyInformation.mdb");
+            System.IO.File.Copy(sourceFileName, destinationFileName);
+            TourneyInformationDatabase tid = new TourneyInformationDatabase(destinationFileName);
+            tid.setTourneyInfo(sti.tourneyName, eventDate, sti.resultsWebsiteRoot);
+            eventManagement = new EventManagement(tid);
+            this.Hide();
+            eventManagement.ShowDialog();
+            this.Close();
+        }
+
+        private void deleteTourneyButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Are you sure?" + Environment.NewLine + "All contents of the tourney will be delete!", "Confirm tourney delete!", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                string selectedTourney = tourneyListCombobox.Text;
+                string selectedFolder = Path.Combine(Directory.GetCurrentDirectory(), "Tourneys", selectedTourney);
+                Directory.Delete(selectedFolder, true);
+                loadExistingTourneys();
+            }
         }
     }
 }

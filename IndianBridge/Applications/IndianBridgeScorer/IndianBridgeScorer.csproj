@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,29 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddNewEvent.cs">
+    <Compile Include="CreateAndPublishKnockoutResults.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddNewEvent.Designer.cs">
-      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    <Compile Include="CreateAndPublishKnockoutResults.Designer.cs">
+      <DependentUpon>CreateAndPublishKnockoutResults.cs</DependentUpon>
     </Compile>
     <Compile Include="EventManagement.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EventManagement.Designer.cs">
       <DependentUpon>EventManagement.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GetGoogleWebsiteRoot.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GetGoogleWebsiteRoot.Designer.cs">
-      <DependentUpon>GetGoogleWebsiteRoot.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InitializeTeamEvent.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InitializeTeamEvent.Designer.cs">
-      <DependentUpon>InitializeTeamEvent.cs</DependentUpon>
     </Compile>
     <Compile Include="LoadingEvents.cs">
       <SubType>Form</SubType>
@@ -108,6 +97,12 @@
     <Compile Include="SelectCalendarEvent.Designer.cs">
       <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
     </Compile>
+    <Compile Include="SetTourneyInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetTourneyInfo.Designer.cs">
+      <DependentUpon>SetTourneyInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="ShowDataGrid.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -128,23 +123,20 @@
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AddNewEvent.resx">
-      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    <EmbeddedResource Include="CreateAndPublishKnockoutResults.resx">
+      <DependentUpon>CreateAndPublishKnockoutResults.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EventManagement.resx">
       <DependentUpon>EventManagement.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GetGoogleWebsiteRoot.resx">
-      <DependentUpon>GetGoogleWebsiteRoot.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InitializeTeamEvent.resx">
-      <DependentUpon>InitializeTeamEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadingEvents.resx">
       <DependentUpon>LoadingEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PairsScorer.resx">
       <DependentUpon>PairsScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PDScorer.resx">
+      <DependentUpon>PDScorer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -163,6 +155,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SelectCalendarEvent.resx">
       <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetTourneyInfo.resx">
+      <DependentUpon>SetTourneyInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ShowDataGrid.resx">
       <DependentUpon>ShowDataGrid.cs</DependentUpon>
