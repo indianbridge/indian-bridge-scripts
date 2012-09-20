@@ -45,7 +45,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextBoxTraceListener.cs" />
     <Compile Include="Utilities.cs" />
-    <Compile Include="WebpageCreationUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADOX">
