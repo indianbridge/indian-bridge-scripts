@@ -933,6 +933,7 @@ namespace IndianBridgeScorer
             for (int i = roundsScored; i <= roundsCompleted; ++i)
             {
                 doScoring(i);
+                doTieBreaker(i);
                 doRanking(i);
             }
             m_daComputedScores.Update(m_ds, computedScoresTableName);
@@ -969,10 +970,65 @@ namespace IndianBridgeScorer
             }
         }
 
+        private void doTieBreaker(int roundNumber)
+        {
+            for (int i = 1; i <= numberOfTeams; ++i)
+            {
+                calculateTieBreakerQuotient(i, roundNumber);
+            }
+        }
+
+        private void calculateTieBreakerQuotient(int teamNumber, int roundNumber)
+        {
+            DataTable computedScoresTable = m_ds.Tables[computedScoresTableName];
+            DataRow dComputedRow = computedScoresTable.Rows.Find(teamNumber);
+            Debug.Assert(dComputedRow != null, "Row for team number " + teamNumber + " was not found in computed scores table");
+            DataTable table = m_ds.Tables[scoresTableName];
+            int count = 0;
+            double tieBreakerScore = 0; 
+            DataRow[] dRows = table.Select("Round_Number <= " + roundNumber + " AND Team_1_Number = " + teamNumber);
+            if (dRows.Length > 0)
+            {
+                foreach (DataRow dRow in dRows)
+                {
+                    int opponent = (int)dRow["Team_2_Number"];
+                    if (opponent > 0 && opponent <= numberOfTeams)
+                    {
+                        double vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
+                        DataRow[] foundRows = computedScoresTable.Select("Team_Number = " + opponent);
+                        Debug.Assert(foundRows.Length == 1);
+                        double score = getValue(foundRows[0], "Score_After_Round_" + roundNumber);
+                        tieBreakerScore += (score * vps);
+                        count++;
+                    }
+                }
+            }
+            dRows = table.Select("Round_Number <= " + roundNumber + " AND Team_2_Number = " + teamNumber);
+
+            if (dRows.Length > 0)
+            {
+                foreach (DataRow dRow in dRows)
+                {
+                    int opponent = (int)dRow["Team_1_Number"];
+                    if (opponent > 0 && opponent <= numberOfTeams)
+                    {
+                        double vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
+                        DataRow[] foundRows = computedScoresTable.Select("Team_Number = " + opponent);
+                        Debug.Assert(foundRows.Length == 1);
+                        double score = getValue(foundRows[0], "Score_After_Round_" + roundNumber);
+                        tieBreakerScore += (score * vps);
+                        count++;
+                    }
+                }
+            }
+            
+            dComputedRow["Tiebreaker_After_Round_" + roundNumber] = tieBreakerScore/count;
+        }
+
         private void doRanking(int roundNumber)
         {
             DataTable table = m_ds.Tables[computedScoresTableName];
-            DataRow[] foundRows = table.Select("", "Score_After_Round_" + roundNumber + " DESC, Tiebreaker_After_Round_" + roundNumber + " ASC");
+            DataRow[] foundRows = table.Select("", "Score_After_Round_" + roundNumber + " DESC, Tiebreaker_After_Round_" + roundNumber + " DESC");
             int rank = 1;
             double previousValue = 0;
             double previousTiebreaker = 0;

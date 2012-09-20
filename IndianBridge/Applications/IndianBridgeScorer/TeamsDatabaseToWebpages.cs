@@ -91,6 +91,7 @@ namespace IndianBridgeScorer
             parameters.columns.Add("No.", "[_makeTeamNumberLink]");
             parameters.columns.Add("Name", "[_makeTeamNameLink]");
             parameters.columns.Add("VPs", "{Score_After_Round_" + m_roundsCompleted + "}");
+            parameters.columns.Add("Tiebreaker Quotient", "{Tiebreaker_After_Round_" + m_roundsCompleted + "}");
             parameters.sortCriteria = "Rank_After_Round_" + m_roundsCompleted + " ASC";
             m_prefix = "../";
             parameters.fileName = Path.Combine(rootFolder, "index.html");
@@ -388,6 +389,7 @@ namespace IndianBridgeScorer
                 parameters.columns.Add("No.", "[_makeTeamNumberLink]");
                 parameters.columns.Add("Name", "[_makeTeamNameLink]");
                 parameters.columns.Add("VPs", "{Score_After_Round_" + roundNumber + "}");
+                parameters.columns.Add("Tiebreaker Quotient", "{Tiebreaker_After_Round_" + roundNumber + "}");
                 parameters.sortCriteria = "Rank_After_Round_" + roundNumber + " ASC";
                 parameters.filterCriteria = "";
                 parameters.headerTemplate = headerTemplate;
