@@ -86,15 +86,7 @@ namespace IndianBridgeScorer
             DataView dView = new DataView(m_ds.Tables[namesTableName]);
             dView.RowFilter = "";
             dView.Sort = "Team_Number ASC";
-            string[] readOnlyColumns = new string[] { "Team_Number" };
-            enterNamesDataGridView.AutoResizeColumns();
-            enterNamesDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             enterNamesDataGridView.DataSource = dView;
-            foreach (string str in readOnlyColumns)
-            {
-                enterNamesDataGridView.Columns[str].ReadOnly = true;
-            }
-
         }
 
         private void initialize()
@@ -107,7 +99,6 @@ namespace IndianBridgeScorer
             loadDatabase(m_databaseFileName);
             tiebreakerMethodCombobox.SelectedIndex = 0;
             m_tabPages = new List<TabPage>();
-            eventSetupDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             showNames();
             foreach (TabPage tp in mainControlTab.TabPages)
             {
@@ -884,27 +875,12 @@ namespace IndianBridgeScorer
             DataView dView = new DataView(m_ds.Tables[knockoutSessionsTableName]);
             dView.RowFilter = "";
             dView.Sort = "Round_Number DESC";
-            string[] readOnlyColumns = new string[] { "Round" };
-            string[] hideColumns = new string[] { "Round_Number" };
-            numberOfSessionsDataGridView.AutoResizeColumns();
-            numberOfSessionsDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
             numberOfSessionsDataGridView.DataSource = dView;
-            /*foreach (string str in readOnlyColumns)
-            {
-                numberOfSessionsDataGridView.Columns[str].ReadOnly = true;
-            }
-            foreach (string str in hideColumns)
-            {
-                numberOfSessionsDataGridView.Columns[str].Visible = false;
-            }*/
-
         }
 
         private void showScores()
         {
             scoresDataGridView.Columns.Clear();
-            bool useIMPs = (scoresEntryFormatCombobox.Text == "IMPs");
             DataRow dRow = getInfoDataRow();
             if (dRow == null) return;
             if (string.IsNullOrWhiteSpace(showingScoresForRoundCombobox.Text)) return;
@@ -912,30 +888,7 @@ namespace IndianBridgeScorer
             DataView dView = new DataView(m_ds.Tables[scoresTableName]);
             dView.RowFilter = "Round_Number = " + selectedRound;
             dView.Sort = "Table_Number ASC";
-            string[] readOnlyColumns;
-            string[] hideColumns;
-            if (useIMPs)
-            {
-                readOnlyColumns = new string[] { "Table_Number", "Team_1_VPs", "Team_2_VPs" };
-                hideColumns = new string[] { "Round_Number" };
-            }
-            else
-            {
-                readOnlyColumns = new string[] { "Table_Number" };
-                hideColumns = new string[] { "Round_Number", "Team_1_IMPS", "Team_2_IMPs" };
-            }
-            scoresDataGridView.AutoResizeColumns();
-            scoresDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
             scoresDataGridView.DataSource = dView;
-            foreach (string str in readOnlyColumns)
-            {
-                scoresDataGridView.Columns[str].ReadOnly = true;
-            }
-            foreach (string str in hideColumns)
-            {
-                scoresDataGridView.Columns[str].Visible = false;
-            }
         }
 
         private void doScoring(string roundChanged)
@@ -1110,19 +1063,7 @@ namespace IndianBridgeScorer
             DataView dView = new DataView(m_ds.Tables[scoresTableName]);
             dView.RowFilter = "Round_Number = " + selectedRound;
             dView.Sort = "Table_Number ASC";
-            string[] readOnlyColumns = new string[] { "Table_Number" };
-            string[] hideColumns = new string[] { "Round_Number", "Team_1_IMPS", "Team_2_IMPs", "Team_1_VPs", "Team_2_VPs", "Team_1_VP_Adjustment", "Team_2_VP_Adjustment" };
-            drawDataGridView.AutoResizeColumns();
-            drawDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             drawDataGridView.DataSource = dView;
-            foreach (string str in readOnlyColumns)
-            {
-                drawDataGridView.Columns[str].ReadOnly = true;
-            }
-            foreach (string str in hideColumns)
-            {
-                drawDataGridView.Columns[str].Visible = false;
-            }
         }
 
         private bool allAssigned(bool[] assigned)
@@ -1564,14 +1505,32 @@ namespace IndianBridgeScorer
             return (dRows.Length > 0) ? (string)dRows[0]["Team_Name"] : "Unknown";
         }
 
-        private string getDrawTeam(DataRow dRow, string columnName, int roundNumber)
+        private string getScore(int teamNumber) {
+            if (teamNumber < 1 || teamNumber > numberOfTeams) return "BYE";
+            int scoreRound = int.Parse(drawBasedOnCombobox.Text);
+            DataRow[] dRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + teamNumber);
+            Debug.Assert(dRows.Length == 1);
+            double score = (scoreRound < 1) ? 0 : getValue(dRows[0], "Score_After_Round_" + scoreRound);
+            return ""+score;
+        }
+
+        private string getDrawTeam(DataRow dRow, string columnName)
+        {
+            int teamNumber = (int)dRow[columnName];
+            if (teamNumber < 1 || teamNumber > numberOfTeams) return "BYE";
+            DataRow[] dRows = m_ds.Tables[namesTableName].Select("Team_Number = " + teamNumber);
+            string teamName = (string)dRows[0]["Team_Name"];
+            return "" + teamNumber + " " + teamName;
+        }
+
+        private string getDrawTeamAndScore(DataRow dRow, string columnName)
         {
             int number = (int)dRow[columnName];
             if (number < 1 || number > numberOfTeams) return "BYE";
             DataRow[] dRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + number);
             Debug.Assert(dRows.Length == 1);
-            int roundsCompleted = getParameterValue("Rounds_Scored");
-            double score = (roundsCompleted < 1)?0:getValue(dRows[0], "Score_After_Round_" + roundsCompleted);
+            int scoreRound = int.Parse(drawBasedOnCombobox.Text);
+            double score = (scoreRound < 1) ? 0 : getValue(dRows[0], "Score_After_Round_" + scoreRound);
             dRows = m_ds.Tables[namesTableName].Select("Team_Number = " + number);
             string teamName = (string)dRows[0]["Team_Name"];
             return "" + number + " " + teamName + " (" + score + ")";
@@ -1579,6 +1538,8 @@ namespace IndianBridgeScorer
 
         private void printDrawButton_Click(object sender, EventArgs e)
         {
+
+            bool vpsInSeparateColumn = vpsInSeparateColumnCheckbox.Checked;
             if (string.IsNullOrWhiteSpace(showingDrawCombobox.Text))
             {
                 MessageBox.Show("No Draw Available to Print!", "No Draw", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1607,7 +1568,9 @@ namespace IndianBridgeScorer
             ArrayList tableHeader = new ArrayList();
             tableHeader.Add("Table");
             tableHeader.Add("Team 1");
+            if (vpsInSeparateColumn) tableHeader.Add("VPs");
             tableHeader.Add("Vs.");
+            if (vpsInSeparateColumn) tableHeader.Add("VPs");
             tableHeader.Add("Team2");
             sw.WriteLine(Utilities.makeTableHeader_(tableHeader, true) + "</tr></thead><tbody>");
             DataRow[] foundRows = m_ds.Tables[scoresTableName].Select("Round_Number = " + drawRoundNumber, "Table_Number ASC");
@@ -1616,9 +1579,19 @@ namespace IndianBridgeScorer
             {
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add("" + dRow["Table_Number"]);
-                tableRow.Add(getDrawTeam(dRow, "Team_1_Number", drawRoundNumber));
+                if (vpsInSeparateColumn)
+                {
+                    tableRow.Add(getDrawTeam(dRow, "Team_1_Number"));
+                    tableRow.Add(getScore((int)dRow["Team_1_Number"]));
+                }
+                else tableRow.Add(getDrawTeamAndScore(dRow, "Team_1_Number"));
                 tableRow.Add("Vs.");
-                tableRow.Add(getDrawTeam(dRow, "Team_2_Number", drawRoundNumber));
+                if (vpsInSeparateColumn)
+                {
+                    tableRow.Add(getScore((int)dRow["Team_2_Number"]));
+                    tableRow.Add(getDrawTeam(dRow, "Team_2_Number"));
+                }
+                else tableRow.Add(getDrawTeamAndScore(dRow, "Team_2_Number"));
                 sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i++, true) + "</tr>");
             }
             sw.WriteLine("</tbody></table>");
@@ -1694,8 +1667,6 @@ namespace IndianBridgeScorer
             DataView dView = new DataView(m_ds.Tables[knockoutCombobox.Text]);
             dView.RowFilter = "";
             dView.Sort = "Match_Number ASC";
-            knockoutDataGridView.AutoResizeColumns();
-            knockoutDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             knockoutDataGridView.DataSource = dView;
         }
 
@@ -1767,36 +1738,6 @@ namespace IndianBridgeScorer
             cptr.Dispose();
             showUrl(Path.Combine(m_localWebpagesRootDirectory, "index.html"));
             resetFontSize();
-        }
-
-        private void numberOfSessionsDataGridView_DataSourceChanged(object sender, EventArgs e)
-        {
-            if (numberOfSessionsDataGridView.Columns.Count > 0)
-            {
-                string[] readOnlyColumns = new string[] { "Round" };
-                string[] hideColumns = new string[] { "Round_Number" };
-                foreach (string str in readOnlyColumns)
-                {
-                    numberOfSessionsDataGridView.Columns[str].ReadOnly = true;
-                }
-                foreach (string str in hideColumns)
-                {
-                    numberOfSessionsDataGridView.Columns[str].Visible = false;
-                }
-            }
-
-        }
-
-        private void knockoutDataGridView_DataSourceChanged(object sender, EventArgs e)
-        {
-            if (knockoutDataGridView.Columns.Count > 0)
-            {
-                string[] readOnlyColumns = new string[] { "Match_Number" };
-                foreach (string str in readOnlyColumns)
-                {
-                    knockoutDataGridView.Columns[str].ReadOnly = true;
-                }
-            }
         }
 
         private void handleCopyPaste(object sender, KeyEventArgs e) {
@@ -1877,15 +1818,60 @@ namespace IndianBridgeScorer
             }
         }
 
-        private void editVPScaleDataGridView_DataSourceChanged(object sender, EventArgs e)
+        private void setReadOnlyAndVisibleColumns(DataGridView dgv, string[] readOnlyColumns, string[] hideColumns)
         {
-             string[] hideColumns = new string[] { "VP_Scale", "Number_Of_Boards_Lower", "Number_Of_Boards_Upper" };
-
+            foreach (string str in readOnlyColumns)
+            {
+                dgv.Columns[str].ReadOnly = true;
+            }
             foreach (string str in hideColumns)
             {
-                editVPScaleDataGridView.Columns[str].Visible = false;
+                dgv.Columns[str].Visible = false;
             }
+        }
 
+        private void editVPScaleDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            string[] readOnlyColumns = new string[] { };
+            string[] hideColumns = new string[] { "VP_Scale", "Number_Of_Boards_Lower", "Number_Of_Boards_Upper" };
+            setReadOnlyAndVisibleColumns(editVPScaleDataGridView, readOnlyColumns, hideColumns);
+        }
+
+        private void enterNamesDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            string[] readOnlyColumns = new string[] { "Team_Number" };
+            string[] hideColumns = new string[] { };
+            setReadOnlyAndVisibleColumns(enterNamesDataGridView, readOnlyColumns, hideColumns);
+        }
+
+        private void drawDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            string[] readOnlyColumns = new string[] { "Table_Number" };
+            string[] hideColumns = new string[] { "Round_Number", "Team_1_IMPS", "Team_2_IMPs", "Team_1_VPs", "Team_2_VPs", "Team_1_VP_Adjustment", "Team_2_VP_Adjustment" };
+            setReadOnlyAndVisibleColumns(drawDataGridView, readOnlyColumns, hideColumns);
+        }
+
+        private void scoresDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            bool useIMPs = (scoresEntryFormatCombobox.Text == "IMPs");
+            string[] readOnlyColumns = (useIMPs ? new string[] { "Table_Number", "Team_1_VPs", "Team_2_VPs" } : new string[] { "Table_Number" });
+            string[] hideColumns = (useIMPs ? new string[] { "Round_Number" } : new string[] { "Round_Number", "Team_1_IMPS", "Team_2_IMPs" });
+            setReadOnlyAndVisibleColumns(scoresDataGridView, readOnlyColumns, hideColumns);
+
+        }
+
+        private void numberOfSessionsDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            string[] readOnlyColumns = new string[] { "Round" };
+            string[] hideColumns = new string[] { "Round_Number" };
+            setReadOnlyAndVisibleColumns(numberOfSessionsDataGridView, readOnlyColumns, hideColumns);
+        }
+
+        private void knockoutDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            string[] readOnlyColumns = new string[] { "Match_Number" };
+            string[] hideColumns = new string[] { };
+            setReadOnlyAndVisibleColumns(knockoutDataGridView, readOnlyColumns, hideColumns);
 
         }
 
