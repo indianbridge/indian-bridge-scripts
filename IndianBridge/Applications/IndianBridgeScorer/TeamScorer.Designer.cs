@@ -100,6 +100,11 @@
             this.reloadKnockoutButton = new System.Windows.Forms.Button();
             this.writeKnockoutButton = new System.Windows.Forms.Button();
             this.notifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
+            this.editVPScaleTab = new System.Windows.Forms.TabPage();
+            this.splitContainer13 = new System.Windows.Forms.SplitContainer();
+            this.reloadVPScaleButton = new System.Windows.Forms.Button();
+            this.writeVPScaleButton = new System.Windows.Forms.Button();
+            this.editVPScaleDataGridView = new System.Windows.Forms.DataGridView();
             this.publishResultsTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
@@ -161,6 +166,12 @@
             this.splitContainer12.Panel2.SuspendLayout();
             this.splitContainer12.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.knockoutDataGridView)).BeginInit();
+            this.editVPScaleTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer13)).BeginInit();
+            this.splitContainer13.Panel1.SuspendLayout();
+            this.splitContainer13.Panel2.SuspendLayout();
+            this.splitContainer13.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.editVPScaleDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // createLocalWebpagesButton
@@ -894,6 +905,7 @@
             this.mainControlTab.Controls.Add(this.scoresTab);
             this.mainControlTab.Controls.Add(this.knockoutTab);
             this.mainControlTab.Controls.Add(this.publishResultsTab);
+            this.mainControlTab.Controls.Add(this.editVPScaleTab);
             this.mainControlTab.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainControlTab.Location = new System.Drawing.Point(0, 0);
             this.mainControlTab.Name = "mainControlTab";
@@ -1090,6 +1102,74 @@
             this.notifyMessage.Text = "notifyIcon1";
             this.notifyMessage.Visible = true;
             // 
+            // editVPScaleTab
+            // 
+            this.editVPScaleTab.Controls.Add(this.splitContainer13);
+            this.editVPScaleTab.Location = new System.Drawing.Point(4, 22);
+            this.editVPScaleTab.Name = "editVPScaleTab";
+            this.editVPScaleTab.Size = new System.Drawing.Size(1059, 602);
+            this.editVPScaleTab.TabIndex = 6;
+            this.editVPScaleTab.Text = "Edit VP Scale";
+            this.editVPScaleTab.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer13
+            // 
+            this.splitContainer13.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer13.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer13.Name = "splitContainer13";
+            this.splitContainer13.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer13.Panel1
+            // 
+            this.splitContainer13.Panel1.Controls.Add(this.editVPScaleDataGridView);
+            // 
+            // splitContainer13.Panel2
+            // 
+            this.splitContainer13.Panel2.Controls.Add(this.reloadVPScaleButton);
+            this.splitContainer13.Panel2.Controls.Add(this.writeVPScaleButton);
+            this.splitContainer13.Size = new System.Drawing.Size(1059, 602);
+            this.splitContainer13.SplitterDistance = 515;
+            this.splitContainer13.TabIndex = 0;
+            // 
+            // reloadVPScaleButton
+            // 
+            this.reloadVPScaleButton.BackColor = System.Drawing.Color.Red;
+            this.reloadVPScaleButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.reloadVPScaleButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.reloadVPScaleButton.Location = new System.Drawing.Point(540, 20);
+            this.reloadVPScaleButton.Name = "reloadVPScaleButton";
+            this.reloadVPScaleButton.Size = new System.Drawing.Size(293, 43);
+            this.reloadVPScaleButton.TabIndex = 12;
+            this.reloadVPScaleButton.Text = "Reload VPScale From Database";
+            this.reloadVPScaleButton.UseVisualStyleBackColor = false;
+            this.reloadVPScaleButton.Click += new System.EventHandler(this.reloadVPScaleButton_Click);
+            // 
+            // writeVPScaleButton
+            // 
+            this.writeVPScaleButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.writeVPScaleButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.writeVPScaleButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.writeVPScaleButton.Location = new System.Drawing.Point(225, 20);
+            this.writeVPScaleButton.Name = "writeVPScaleButton";
+            this.writeVPScaleButton.Size = new System.Drawing.Size(287, 43);
+            this.writeVPScaleButton.TabIndex = 11;
+            this.writeVPScaleButton.Text = "Write VPScale to Database";
+            this.writeVPScaleButton.UseVisualStyleBackColor = false;
+            this.writeVPScaleButton.Click += new System.EventHandler(this.writeVPScaleButton_Click);
+            // 
+            // editVPScaleDataGridView
+            // 
+            this.editVPScaleDataGridView.AllowUserToAddRows = false;
+            this.editVPScaleDataGridView.AllowUserToDeleteRows = false;
+            this.editVPScaleDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            this.editVPScaleDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.editVPScaleDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.editVPScaleDataGridView.Location = new System.Drawing.Point(0, 0);
+            this.editVPScaleDataGridView.Name = "editVPScaleDataGridView";
+            this.editVPScaleDataGridView.Size = new System.Drawing.Size(1059, 515);
+            this.editVPScaleDataGridView.TabIndex = 0;
+            this.editVPScaleDataGridView.DataSourceChanged += new System.EventHandler(this.editVPScaleDataGridView_DataSourceChanged);
+            // 
             // TeamScorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1166,6 +1246,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer12)).EndInit();
             this.splitContainer12.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.knockoutDataGridView)).EndInit();
+            this.editVPScaleTab.ResumeLayout(false);
+            this.splitContainer13.Panel1.ResumeLayout(false);
+            this.splitContainer13.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer13)).EndInit();
+            this.splitContainer13.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.editVPScaleDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1243,5 +1329,10 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox drawFontSizeTextbox;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TabPage editVPScaleTab;
+        private System.Windows.Forms.SplitContainer splitContainer13;
+        private System.Windows.Forms.DataGridView editVPScaleDataGridView;
+        private System.Windows.Forms.Button reloadVPScaleButton;
+        private System.Windows.Forms.Button writeVPScaleButton;
     }
 }
