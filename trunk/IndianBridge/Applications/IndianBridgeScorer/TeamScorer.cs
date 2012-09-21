@@ -954,14 +954,14 @@ namespace IndianBridgeScorer
                 double team2VPs = getValue(dRow, "Team_2_VPs");
                 double team1Adjustment = getValue(dRow, "Team_1_VP_Adjustment");
                 double team2Adjustment = getValue(dRow, "Team_2_VP_Adjustment");
-                if (team1Number <= numberOfTeams)
+                if (team1Number > 0 && team1Number <= numberOfTeams)
                 {
                     DataRow dComputedRow = computedScoresTable.Rows.Find(team1Number);
                     Debug.Assert(dComputedRow != null, "Row for team number " + team1Number + " was not found in computed scores table");
                     double previousScore = (roundNumber == 1) ? 0 : getValue(dComputedRow, "Score_After_Round_" + (roundNumber - 1));
                     dComputedRow["Score_After_Round_" + roundNumber] = previousScore + team1VPs + team1Adjustment;
                 }
-                if (team2Number <= numberOfTeams)
+                if (team2Number > 0 && team2Number <= numberOfTeams)
                 {
                     DataRow dComputedRow = computedScoresTable.Rows.Find(team2Number);
                     Debug.Assert(dComputedRow != null, "Row for team number " + team2Number + " was not found in computed scores table");
@@ -1028,8 +1028,7 @@ namespace IndianBridgeScorer
                     }
                 }
             }
-            
-            dComputedRow["Tiebreaker_After_Round_" + roundNumber] = tieBreakerScore/count;
+                dComputedRow["Tiebreaker_After_Round_" + roundNumber] = (count > 0)?tieBreakerScore/count:0;
         }
 
         private void doRanking(int roundNumber)
@@ -1141,8 +1140,30 @@ namespace IndianBridgeScorer
                 Console.WriteLine("index2 = " + index2);
                 if (index2 == -1) return -1;
                 int team2 = teamNumber[index2];
-                DataRow[] dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = " + (team1) + " AND Team_2_Number = " + (team2));
-                if (dRows.Length == 0) return index2;
+                if (team1 < 1 || team1 > numberOfTeams)
+                {
+                    DataRow[] dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = 0 AND Team_2_Number = " + (team2));
+                    if (dRows.Length == 0)
+                    {
+                        dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = "+ (numberOfTeams+1)+" AND Team_2_Number = " + (team2));
+                        if (dRows.Length == 0) return index2;
+                    }
+
+                }
+                else if (team2 < 1 || team2 > numberOfTeams)
+                {
+                    DataRow[] dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = "+(team1)+" AND Team_2_Number = 0");
+                    if (dRows.Length == 0)
+                    {
+                        dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = " + (team1) + " AND Team_2_Number = " + (numberOfTeams+1));
+                        if (dRows.Length == 0) return index2;
+                    }
+                }
+                else
+                {
+                    DataRow[] dRows = m_ds.Tables[scoresTableName].Select("Round_Number < " + drawRoundNumber + " AND Team_1_Number = " + (team1) + " AND Team_2_Number = " + (team2));
+                    if (dRows.Length == 0) return index2;
+                }
             }
             return -1;
         }
@@ -1329,6 +1350,7 @@ namespace IndianBridgeScorer
             for (int i = 0; i < totalTeams; ++i) assigned[i] = false;
             int numberOfMatches = (numberOfTeams / 2) + (numberOfTeams % 2);
             int[] teamNumber = new int[totalTeams];
+            if (totalTeams > numberOfTeams) teamNumber[totalTeams - 1] = 0;
             if (roundNumber > 0)
             {
                 DataTable table = m_ds.Tables[computedScoresTableName];
@@ -1533,6 +1555,7 @@ namespace IndianBridgeScorer
         private string getDrawTeam(DataRow dRow, string columnName, int roundNumber)
         {
             int number = (int)dRow[columnName];
+            if (number < 1 || number > numberOfTeams) return "BYE";
             DataRow[] dRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + number);
             Debug.Assert(dRows.Length == 1);
             int roundsCompleted = getParameterValue("Rounds_Scored");

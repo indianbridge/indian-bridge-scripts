@@ -437,15 +437,31 @@ namespace IndianBridgeScorer
             {
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add("" + (int)dRow["Table_Number"]);
-                tableRow.Add(getTeamLink(dRow["Team_1_Number"], true, true));
+                string team1string = getTeamLink(dRow["Team_1_Number"], true, true);
+                tableRow.Add(team1string);
+                string team2string = getTeamLink(dRow["Team_2_Number"], true, true);
                 if (showVPs)
                 {
-                    double team1vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
-                    double team2vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
-                    tableRow.Add("" + team1vps);
-                    tableRow.Add("" + team2vps);
+                    if (team1string == "BYE")
+                    {
+                        tableRow.Add("BYE");
+                    }
+                    else
+                    {
+                        double team1vps = getValue(dRow, "Team_1_VPs") + getValue(dRow, "Team_1_VP_Adjustment");
+                        tableRow.Add("" + team1vps);
+                    }
+                    if (team2string == "BYE")
+                    {
+                        tableRow.Add("BYE");
+                    }
+                    else
+                    {
+                        double team2vps = getValue(dRow, "Team_2_VPs") + getValue(dRow, "Team_2_VP_Adjustment");
+                        tableRow.Add("" + team2vps);
+                    }
                 }
-                tableRow.Add(getTeamLink(dRow["Team_2_Number"], true, true));
+                tableRow.Add(team2string);
                 result += ("<tr>" + Utilities.makeTableCell_(tableRow, i++) + "</tr>");
             }
             result += "</tbody></table>";
@@ -579,7 +595,7 @@ namespace IndianBridgeScorer
             string result = "";
             if (teamNumberObject == DBNull.Value) return "-";
             int teamNumber = (int)teamNumberObject;
-            if (teamNumber < 0 || teamNumber > m_numberOfTeams) return "BYE";
+            if (teamNumber <= 0 || teamNumber > m_numberOfTeams) return "BYE";
             DataRow[] dRows = m_ds.Tables[TeamScorer.namesTableName].Select("Team_Number = " + teamNumber);
             Debug.Assert(dRows.Length == 1);
             DataRow dRow = dRows[0];
