@@ -167,7 +167,6 @@
             this.createLocalWebpagesButton.TabIndex = 8;
             this.createLocalWebpagesButton.Text = "Create and Publish All Results to Website";
             this.createLocalWebpagesButton.UseVisualStyleBackColor = false;
-            this.createLocalWebpagesButton.Click += new System.EventHandler(this.createLocalWebpagesButton_Click);
             // 
             // publishResultsTab
             // 
@@ -307,8 +306,6 @@
             this.showRoundScoresButton.Size = new System.Drawing.Size(229, 36);
             this.showRoundScoresButton.TabIndex = 16;
             this.showRoundScoresButton.Text = "Show Scores for Round :  ";
-            this.showRoundScoresButton.UseVisualStyleBackColor = false;
-            this.showRoundScoresButton.Click += new System.EventHandler(this.showRoundScoresButton_Click);
             // 
             // showTeamScoresButton
             // 
@@ -321,7 +318,6 @@
             this.showTeamScoresButton.TabIndex = 15;
             this.showTeamScoresButton.Text = "Show Scores for Team :  ";
             this.showTeamScoresButton.UseVisualStyleBackColor = false;
-            this.showTeamScoresButton.Click += new System.EventHandler(this.showTeamScoresButton_Click);
             // 
             // showTeamScoresCombobox
             // 
@@ -354,7 +350,6 @@
             this.showLeaderboardButton.TabIndex = 12;
             this.showLeaderboardButton.Text = "Show Leaderboard";
             this.showLeaderboardButton.UseVisualStyleBackColor = false;
-            this.showLeaderboardButton.Click += new System.EventHandler(this.showLeaderboardButton_Click);
             // 
             // scoresTab
             // 
@@ -418,7 +413,6 @@
             this.scoresEntryFormatCombobox.Name = "scoresEntryFormatCombobox";
             this.scoresEntryFormatCombobox.Size = new System.Drawing.Size(65, 24);
             this.scoresEntryFormatCombobox.TabIndex = 3;
-            this.scoresEntryFormatCombobox.SelectedIndexChanged += new System.EventHandler(this.scoresEntryFormatCombobox_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -440,7 +434,6 @@
             this.showingScoresForRoundCombobox.Name = "showingScoresForRoundCombobox";
             this.showingScoresForRoundCombobox.Size = new System.Drawing.Size(65, 24);
             this.showingScoresForRoundCombobox.TabIndex = 1;
-            this.showingScoresForRoundCombobox.SelectedIndexChanged += new System.EventHandler(this.showingScoresForRoundCombobox_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -463,8 +456,6 @@
             this.scoresDataGridView.Name = "scoresDataGridView";
             this.scoresDataGridView.Size = new System.Drawing.Size(1059, 433);
             this.scoresDataGridView.TabIndex = 0;
-            this.scoresDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.scoresDataGridView_CellValueChanged);
-            this.scoresDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.scoresDataGridView_KeyDown);
             // 
             // reloadScoresButton
             // 
@@ -477,7 +468,6 @@
             this.reloadScoresButton.TabIndex = 10;
             this.reloadScoresButton.Text = "Reload Scores From Database";
             this.reloadScoresButton.UseVisualStyleBackColor = false;
-            this.reloadScoresButton.Click += new System.EventHandler(this.reloadScoresButton_Click);
             // 
             // writeScoresButton
             // 
@@ -490,7 +480,6 @@
             this.writeScoresButton.TabIndex = 9;
             this.writeScoresButton.Text = "Write Scores to Database";
             this.writeScoresButton.UseVisualStyleBackColor = false;
-            this.writeScoresButton.Click += new System.EventHandler(this.writeScoresButton_Click);
             // 
             // drawTab
             // 
@@ -564,7 +553,6 @@
             this.showingDrawCombobox.Name = "showingDrawCombobox";
             this.showingDrawCombobox.Size = new System.Drawing.Size(65, 24);
             this.showingDrawCombobox.TabIndex = 1;
-            this.showingDrawCombobox.SelectedIndexChanged += new System.EventHandler(this.showingDrawCombobox_SelectedIndexChanged);
             // 
             // roundDrawButton
             // 
@@ -576,7 +564,6 @@
             this.roundDrawButton.TabIndex = 7;
             this.roundDrawButton.Text = "Draw based on Scores after Round : ";
             this.roundDrawButton.UseVisualStyleBackColor = false;
-            this.roundDrawButton.Click += new System.EventHandler(this.roundDrawButton_Click);
             // 
             // randomDrawButton
             // 
@@ -589,7 +576,6 @@
             this.randomDrawButton.TabIndex = 8;
             this.randomDrawButton.Text = "Random Draw";
             this.randomDrawButton.UseVisualStyleBackColor = false;
-            this.randomDrawButton.Click += new System.EventHandler(this.randomDrawButton_Click);
             // 
             // label8
             // 
@@ -612,7 +598,6 @@
             this.drawDataGridView.Name = "drawDataGridView";
             this.drawDataGridView.Size = new System.Drawing.Size(1059, 387);
             this.drawDataGridView.TabIndex = 0;
-            this.drawDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.drawDataGridView_KeyDown);
             // 
             // printDrawBrowser
             // 
@@ -622,7 +607,6 @@
             this.printDrawBrowser.Size = new System.Drawing.Size(189, 250);
             this.printDrawBrowser.TabIndex = 12;
             this.printDrawBrowser.Visible = false;
-            this.printDrawBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.printDrawBrowser_DocumentCompleted);
             // 
             // printDrawButton
             // 
@@ -635,7 +619,6 @@
             this.printDrawButton.TabIndex = 11;
             this.printDrawButton.Text = "Print Draw";
             this.printDrawButton.UseVisualStyleBackColor = false;
-            this.printDrawButton.Click += new System.EventHandler(this.printDrawButton_Click);
             // 
             // reloadDrawButton
             // 
@@ -648,7 +631,6 @@
             this.reloadDrawButton.TabIndex = 10;
             this.reloadDrawButton.Text = "Reload Draw From Database";
             this.reloadDrawButton.UseVisualStyleBackColor = false;
-            this.reloadDrawButton.Click += new System.EventHandler(this.reloadDrawButton_Click);
             // 
             // writeDrawButton
             // 
@@ -661,7 +643,6 @@
             this.writeDrawButton.TabIndex = 9;
             this.writeDrawButton.Text = "Write Draw to Database";
             this.writeDrawButton.UseVisualStyleBackColor = false;
-            this.writeDrawButton.Click += new System.EventHandler(this.writeDrawButton_Click);
             // 
             // enterNamesTab
             // 
@@ -703,7 +684,6 @@
             this.enterNamesDataGridView.Name = "enterNamesDataGridView";
             this.enterNamesDataGridView.Size = new System.Drawing.Size(1053, 515);
             this.enterNamesDataGridView.TabIndex = 1;
-            this.enterNamesDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.enterNamesDataGridView_KeyDown);
             // 
             // reloadNamesButton
             // 
@@ -716,7 +696,6 @@
             this.reloadNamesButton.TabIndex = 8;
             this.reloadNamesButton.Text = "Reload Names from Database";
             this.reloadNamesButton.UseVisualStyleBackColor = false;
-            this.reloadNamesButton.Click += new System.EventHandler(this.reloadNamesButton_Click);
             // 
             // updateNamesButton
             // 
@@ -729,7 +708,6 @@
             this.updateNamesButton.TabIndex = 7;
             this.updateNamesButton.Text = "Write Names to Database";
             this.updateNamesButton.UseVisualStyleBackColor = false;
-            this.updateNamesButton.Click += new System.EventHandler(this.updateNamesButton_Click);
             // 
             // eventSetupTab
             // 
@@ -771,7 +749,6 @@
             this.eventSetupDataGridView.Name = "eventSetupDataGridView";
             this.eventSetupDataGridView.Size = new System.Drawing.Size(1053, 516);
             this.eventSetupDataGridView.TabIndex = 0;
-            this.eventSetupDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.eventSetupDataGridView_KeyDown);
             // 
             // reloadEventSetupButton
             // 
@@ -784,7 +761,6 @@
             this.reloadEventSetupButton.TabIndex = 6;
             this.reloadEventSetupButton.Text = "Reload Event Setup from Database";
             this.reloadEventSetupButton.UseVisualStyleBackColor = false;
-            this.reloadEventSetupButton.Click += new System.EventHandler(this.reloadEventSetupButton_Click);
             // 
             // updateEventSetupButton
             // 
@@ -797,7 +773,6 @@
             this.updateEventSetupButton.TabIndex = 5;
             this.updateEventSetupButton.Text = "Write Event Setup to Database";
             this.updateEventSetupButton.UseVisualStyleBackColor = false;
-            this.updateEventSetupButton.Click += new System.EventHandler(this.updateEventSetupButton_Click);
             // 
             // mainControlTab
             // 

@@ -67,6 +67,7 @@
             this.randomDrawButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.drawDataGridView = new System.Windows.Forms.DataGridView();
+            this.vpsInSeparateColumnCheckbox = new System.Windows.Forms.CheckBox();
             this.drawPaddingSizeTextbox = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.drawFontSizeTextbox = new System.Windows.Forms.TextBox();
@@ -99,12 +100,12 @@
             this.knockoutDataGridView = new System.Windows.Forms.DataGridView();
             this.reloadKnockoutButton = new System.Windows.Forms.Button();
             this.writeKnockoutButton = new System.Windows.Forms.Button();
-            this.notifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
             this.editVPScaleTab = new System.Windows.Forms.TabPage();
             this.splitContainer13 = new System.Windows.Forms.SplitContainer();
+            this.editVPScaleDataGridView = new System.Windows.Forms.DataGridView();
             this.reloadVPScaleButton = new System.Windows.Forms.Button();
             this.writeVPScaleButton = new System.Windows.Forms.Button();
-            this.editVPScaleDataGridView = new System.Windows.Forms.DataGridView();
+            this.notifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
             this.publishResultsTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
             this.splitContainer7.Panel1.SuspendLayout();
@@ -504,6 +505,7 @@
             // 
             this.scoresDataGridView.AllowUserToAddRows = false;
             this.scoresDataGridView.AllowUserToDeleteRows = false;
+            this.scoresDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.scoresDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.scoresDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scoresDataGridView.Location = new System.Drawing.Point(0, 0);
@@ -511,6 +513,7 @@
             this.scoresDataGridView.Size = new System.Drawing.Size(1059, 412);
             this.scoresDataGridView.TabIndex = 0;
             this.scoresDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.scoresDataGridView_CellValueChanged);
+            this.scoresDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.scoresDataGridView_DataBindingComplete);
             this.scoresDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.scoresDataGridView_KeyDown);
             // 
             // recalculateAllRoundScores
@@ -575,6 +578,7 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.vpsInSeparateColumnCheckbox);
             this.splitContainer2.Panel2.Controls.Add(this.drawPaddingSizeTextbox);
             this.splitContainer2.Panel2.Controls.Add(this.label9);
             this.splitContainer2.Panel2.Controls.Add(this.drawFontSizeTextbox);
@@ -670,13 +674,25 @@
             // 
             this.drawDataGridView.AllowUserToAddRows = false;
             this.drawDataGridView.AllowUserToDeleteRows = false;
+            this.drawDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.drawDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.drawDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.drawDataGridView.Location = new System.Drawing.Point(0, 0);
             this.drawDataGridView.Name = "drawDataGridView";
             this.drawDataGridView.Size = new System.Drawing.Size(1059, 387);
             this.drawDataGridView.TabIndex = 0;
+            this.drawDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.drawDataGridView_DataBindingComplete);
             this.drawDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.drawDataGridView_KeyDown);
+            // 
+            // vpsInSeparateColumnCheckbox
+            // 
+            this.vpsInSeparateColumnCheckbox.AutoSize = true;
+            this.vpsInSeparateColumnCheckbox.Location = new System.Drawing.Point(79, 67);
+            this.vpsInSeparateColumnCheckbox.Name = "vpsInSeparateColumnCheckbox";
+            this.vpsInSeparateColumnCheckbox.Size = new System.Drawing.Size(140, 17);
+            this.vpsInSeparateColumnCheckbox.TabIndex = 17;
+            this.vpsInSeparateColumnCheckbox.Text = "VPs in Separate Column";
+            this.vpsInSeparateColumnCheckbox.UseVisualStyleBackColor = true;
             // 
             // drawPaddingSizeTextbox
             // 
@@ -795,12 +811,14 @@
             // 
             this.enterNamesDataGridView.AllowUserToAddRows = false;
             this.enterNamesDataGridView.AllowUserToDeleteRows = false;
+            this.enterNamesDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.enterNamesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.enterNamesDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.enterNamesDataGridView.Location = new System.Drawing.Point(0, 0);
             this.enterNamesDataGridView.Name = "enterNamesDataGridView";
             this.enterNamesDataGridView.Size = new System.Drawing.Size(1053, 515);
             this.enterNamesDataGridView.TabIndex = 1;
+            this.enterNamesDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.enterNamesDataGridView_DataBindingComplete);
             this.enterNamesDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.enterNamesDataGridView_KeyDown);
             // 
             // reloadNamesButton
@@ -863,6 +881,7 @@
             // 
             this.eventSetupDataGridView.AllowUserToAddRows = false;
             this.eventSetupDataGridView.AllowUserToDeleteRows = false;
+            this.eventSetupDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.eventSetupDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.eventSetupDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.eventSetupDataGridView.Location = new System.Drawing.Point(0, 0);
@@ -963,13 +982,14 @@
             // 
             this.numberOfSessionsDataGridView.AllowUserToAddRows = false;
             this.numberOfSessionsDataGridView.AllowUserToDeleteRows = false;
+            this.numberOfSessionsDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.numberOfSessionsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.numberOfSessionsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.numberOfSessionsDataGridView.Location = new System.Drawing.Point(0, 0);
             this.numberOfSessionsDataGridView.Name = "numberOfSessionsDataGridView";
             this.numberOfSessionsDataGridView.Size = new System.Drawing.Size(274, 451);
             this.numberOfSessionsDataGridView.TabIndex = 0;
-            this.numberOfSessionsDataGridView.DataSourceChanged += new System.EventHandler(this.numberOfSessionsDataGridView_DataSourceChanged);
+            this.numberOfSessionsDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.numberOfSessionsDataGridView_DataBindingComplete);
             // 
             // reloadSessions
             // 
@@ -1061,14 +1081,15 @@
             // 
             this.knockoutDataGridView.AllowUserToAddRows = false;
             this.knockoutDataGridView.AllowUserToDeleteRows = false;
+            this.knockoutDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.knockoutDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.knockoutDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.knockoutDataGridView.Location = new System.Drawing.Point(0, 0);
             this.knockoutDataGridView.Name = "knockoutDataGridView";
             this.knockoutDataGridView.Size = new System.Drawing.Size(781, 454);
             this.knockoutDataGridView.TabIndex = 0;
-            this.knockoutDataGridView.DataSourceChanged += new System.EventHandler(this.knockoutDataGridView_DataSourceChanged);
             this.knockoutDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.knockoutDataGridView_CellValueChanged);
+            this.knockoutDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.knockoutDataGridView_DataBindingComplete);
             this.knockoutDataGridView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.knockoutDataGridView_KeyDown);
             // 
             // reloadKnockoutButton
@@ -1096,11 +1117,6 @@
             this.writeKnockoutButton.Text = "Write Knockout Score to Database";
             this.writeKnockoutButton.UseVisualStyleBackColor = false;
             this.writeKnockoutButton.Click += new System.EventHandler(this.writeKnockoutButton_Click);
-            // 
-            // notifyMessage
-            // 
-            this.notifyMessage.Text = "notifyIcon1";
-            this.notifyMessage.Visible = true;
             // 
             // editVPScaleTab
             // 
@@ -1131,6 +1147,19 @@
             this.splitContainer13.SplitterDistance = 515;
             this.splitContainer13.TabIndex = 0;
             // 
+            // editVPScaleDataGridView
+            // 
+            this.editVPScaleDataGridView.AllowUserToAddRows = false;
+            this.editVPScaleDataGridView.AllowUserToDeleteRows = false;
+            this.editVPScaleDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            this.editVPScaleDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.editVPScaleDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.editVPScaleDataGridView.Location = new System.Drawing.Point(0, 0);
+            this.editVPScaleDataGridView.Name = "editVPScaleDataGridView";
+            this.editVPScaleDataGridView.Size = new System.Drawing.Size(1059, 515);
+            this.editVPScaleDataGridView.TabIndex = 0;
+            this.editVPScaleDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.editVPScaleDataGridView_DataBindingComplete);
+            // 
             // reloadVPScaleButton
             // 
             this.reloadVPScaleButton.BackColor = System.Drawing.Color.Red;
@@ -1157,18 +1186,10 @@
             this.writeVPScaleButton.UseVisualStyleBackColor = false;
             this.writeVPScaleButton.Click += new System.EventHandler(this.writeVPScaleButton_Click);
             // 
-            // editVPScaleDataGridView
+            // notifyMessage
             // 
-            this.editVPScaleDataGridView.AllowUserToAddRows = false;
-            this.editVPScaleDataGridView.AllowUserToDeleteRows = false;
-            this.editVPScaleDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            this.editVPScaleDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.editVPScaleDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.editVPScaleDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.editVPScaleDataGridView.Name = "editVPScaleDataGridView";
-            this.editVPScaleDataGridView.Size = new System.Drawing.Size(1059, 515);
-            this.editVPScaleDataGridView.TabIndex = 0;
-            this.editVPScaleDataGridView.DataSourceChanged += new System.EventHandler(this.editVPScaleDataGridView_DataSourceChanged);
+            this.notifyMessage.Text = "notifyIcon1";
+            this.notifyMessage.Visible = true;
             // 
             // TeamScorer
             // 
@@ -1334,5 +1355,6 @@
         private System.Windows.Forms.DataGridView editVPScaleDataGridView;
         private System.Windows.Forms.Button reloadVPScaleButton;
         private System.Windows.Forms.Button writeVPScaleButton;
+        private System.Windows.Forms.CheckBox vpsInSeparateColumnCheckbox;
     }
 }

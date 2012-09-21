@@ -9,6 +9,7 @@ using System.Collections;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace IndianBridge.Common
 {
@@ -19,6 +20,73 @@ namespace IndianBridge.Common
         public static double fontSize = 0.8;
         public static double paddingSize = 5;
         public static bool useBorder = false;
+
+        public static Dictionary<TabControl, List<TabPage>> m_tabPages;
+
+        public static void showErrorMessage(string message)
+        {
+            MessageBox.Show(message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public static void showWarningessage(string message)
+        {
+            MessageBox.Show(message, "Warning!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        public static void saveTabs(TabControl tabControl)
+        {
+            m_tabPages[tabControl] = new List<TabPage>();
+            foreach (TabPage tp in tabControl.TabPages) m_tabPages[tabControl].Add(tp);
+        }
+
+        public static void hideTabs(TabControl tabControl, List<string> tabNames = null)
+        {
+            foreach (TabPage tp in m_tabPages[tabControl])
+            {
+                if (tabNames == null || tabNames.Contains(tp.Name)) tabControl.TabPages.Remove(tp);
+            }
+        }
+
+        public static void showTabs(TabControl tabControl, List<string> tabNames = null)
+        {
+            foreach (TabPage tp in m_tabPages[tabControl])
+            {
+                if (!tabControl.TabPages.Contains(tp)) tabControl.TabPages.Add(tp);
+            }
+        }
+
+        public static void handleCopyPaste(object sender, KeyEventArgs e)
+        {
+            DataGridView dgv = sender as DataGridView;
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                DataObject d = dgv.GetClipboardContent();
+                Clipboard.SetDataObject(d);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.V)
+            {
+                string s = Clipboard.GetText();
+                string[] lines = s.Split('\n');
+                int row = dgv.CurrentCell.RowIndex;
+                int col = dgv.CurrentCell.ColumnIndex;
+                foreach (string line in lines)
+                {
+                    if (row < dgv.RowCount && line.Length > 0)
+                    {
+                        string[] cells = line.Split('\t');
+                        for (int i = 0; i < cells.GetLength(0); ++i)
+                        {
+                            if (col + i < dgv.ColumnCount) dgv[col + i, row].Value = Convert.ChangeType(cells[i], dgv[col + i, row].ValueType);
+                            else break;
+                        }
+                        row++;
+                    }
+                    else break;
+                }
+            }
+        }
+
 
         public static bool HasNull(DataTable table)
         {

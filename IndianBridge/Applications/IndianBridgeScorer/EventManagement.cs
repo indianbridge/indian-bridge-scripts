@@ -104,7 +104,8 @@ namespace IndianBridgeScorer
                     m_scorers[eventName] = ps;
                     break;
                 case "PD":
-                    PDScorer pds = new PDScorer(m_tid, eventName,databaseFileName);
+                    string localWebpagesRoot = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(databaseFileName)), "Webpages", Utilities.makeIdentifier_(eventName));
+                    PDScorer pds = new PDScorer(eventName,databaseFileName,localWebpagesRoot,m_tid.getTourneyResultsWebsite());
                     m_scorers[eventName] = pds;
                     break;
             }
