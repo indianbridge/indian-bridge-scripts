@@ -126,11 +126,22 @@ namespace IndianBridgeScorer
             {
                 if (m_tabsHidden) showTabs();
                 getEventParameters();
-                loadVPScale(m_ds);
+                loadVPScale();
+                populateVPScaleDataGrid();
                 populateComboboxes();
                 updateComboboxes();
                 scoresEntryFormatCombobox.SelectedIndex = scoresEntryFormatCombobox.FindStringExact("IMPs");
             }
+        }
+
+        private void populateVPScaleDataGrid()
+        {
+            DataView dView = new DataView(m_ds.Tables[VPScaleTableName]);
+            dView.RowFilter = "";
+            dView.Sort = "Number_Of_IMPs_Lower ASC";
+
+            editVPScaleDataGridView.DataSource = dView;
+            
         }
 
         private bool parseParameterAsInt(DataTable table, string parameterName, out int value)
@@ -279,7 +290,8 @@ namespace IndianBridgeScorer
                 if (boards != numberOfBoards)
                 {
                     numberOfBoards = boards;
-                    loadVPScale(m_ds);
+                    loadVPScale();
+                    populateVPScaleDataGrid();
                 }
                 if (numberOfQualifiers != qualifiers)
                 {
@@ -488,21 +500,21 @@ namespace IndianBridgeScorer
             createKnockoutSessionsTable(false);
         }
 
-        public static void loadVPScale(DataSet ds)
+        public void loadVPScale()
         {
             string VPScaleDatabaseFileName = Path.Combine(Directory.GetCurrentDirectory(), "Databases", VPScaleTableName + ".mdb");
             string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + VPScaleDatabaseFileName + ";";
             OleDbConnection myAccessConn = new OleDbConnection(strAccessConn);
             myAccessConn.Open();
             string sql = "SELECT * From " + VPScaleTableName + " WHERE VP_Scale=30 AND Number_Of_Boards_Lower<=" + numberOfBoards + " AND Number_Of_Boards_Upper>=" + numberOfBoards;
-            OleDbDataAdapter da = new OleDbDataAdapter(sql, myAccessConn);
-            OleDbCommandBuilder cb = new OleDbCommandBuilder(da);
-            if (ds.Tables[VPScaleTableName] != null)
+            m_daVPScale = new OleDbDataAdapter(sql, myAccessConn);
+            m_cbVPScale = new OleDbCommandBuilder(m_daVPScale);
+            if (m_ds.Tables[VPScaleTableName] != null)
             {
-                ds.Tables[VPScaleTableName].Clear();
+                m_ds.Tables[VPScaleTableName].Clear();
             }
-            da.Fill(ds, VPScaleTableName);
-            DataTable table = ds.Tables[VPScaleTableName];
+            m_daVPScale.Fill(m_ds, VPScaleTableName);
+            DataTable table = m_ds.Tables[VPScaleTableName];
             table.PrimaryKey = new DataColumn[] { table.Columns["VP_Scale"], table.Columns["Number_Of_Boards_Lower"], table.Columns["Number_Of_Boards_Upper"], table.Columns["Number_Of_IMPs_Lower"], table.Columns["Number_Of_IMPs_Upper"] };
             myAccessConn.Close();
             myAccessConn = null;
@@ -1559,7 +1571,7 @@ namespace IndianBridgeScorer
             DataRow[] dRows = m_ds.Tables[computedScoresTableName].Select("Team_Number = " + number);
             Debug.Assert(dRows.Length == 1);
             int roundsCompleted = getParameterValue("Rounds_Scored");
-            double score = (roundsCompleted <= 1)?0:getValue(dRows[0], "Score_After_Round_" + roundsCompleted);
+            double score = (roundsCompleted < 1)?0:getValue(dRows[0], "Score_After_Round_" + roundsCompleted);
             dRows = m_ds.Tables[namesTableName].Select("Team_Number = " + number);
             string teamName = (string)dRows[0]["Team_Name"];
             return "" + number + " " + teamName + " (" + score + ")";
@@ -1848,6 +1860,33 @@ namespace IndianBridgeScorer
         {
             doScoring("1");
             showBalloonNotification("Success", "Re-calculated All Round Scores and Leaderboard");
+        }
+
+        private void writeVPScaleButton_Click(object sender, EventArgs e)
+        {
+            m_daVPScale.Update(m_ds, VPScaleTableName);
+            showBalloonNotification("Success", "Updated VP Scale");
+        }
+
+        private void reloadVPScaleButton_Click(object sender, EventArgs e)
+        {
+            if (confirmReload("VPScale"))
+            {
+                loadVPScale();
+                populateVPScaleDataGrid();
+            }
+        }
+
+        private void editVPScaleDataGridView_DataSourceChanged(object sender, EventArgs e)
+        {
+             string[] hideColumns = new string[] { "VP_Scale", "Number_Of_Boards_Lower", "Number_Of_Boards_Upper" };
+
+            foreach (string str in hideColumns)
+            {
+                editVPScaleDataGridView.Columns[str].Visible = false;
+            }
+
+
         }
 
     }
