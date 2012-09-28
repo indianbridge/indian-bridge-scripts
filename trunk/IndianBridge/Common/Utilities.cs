@@ -10,18 +10,84 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Linq;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace IndianBridge.Common
 {
     public static class Utilities
     {
+        public struct HTMLTableParameters
+        {
+            public string sortCriteria;
+            public string sectionName;
+            public string fileName;
+            public string filterCriteria;
+            public string headerTemplate;
+            public string tableName;
+            public OrderedDictionary columns;
 
+            public HTMLTableParameters(string table="Teams")
+            {
+                sortCriteria = "Event_Rank ASC";
+                sectionName = "";
+                fileName = "test.html";
+                filterCriteria = "Pair_Number = '1'";
+                headerTemplate = "Summary for";
+                tableName = table;
+                columns = new OrderedDictionary();
+            }
+        }
         public static TimeZoneInfo INDIAN_ZONE = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
         public static double fontSize = 0.8;
         public static double paddingSize = 5;
         public static bool useBorder = false;
 
-        public static Dictionary<TabControl, List<TabPage>> m_tabPages;
+        public static Dictionary<TabControl, List<TabPage>> m_tabPages = new Dictionary<TabControl,List<TabPage>>();
+
+        public static void appendToMessage(ref string message, string extra)
+        {
+            message += (string.IsNullOrWhiteSpace(message)?"":Environment.NewLine)+extra;
+            return;
+        }
+
+        public static void showBalloonNotification(string title, string text)
+        {
+            NotifyIcon notifyMessage = new NotifyIcon();
+            notifyMessage.BalloonTipText = text;
+            notifyMessage.BalloonTipTitle = title;
+            notifyMessage.Icon = SystemIcons.Information;
+            notifyMessage.Visible = true;
+            notifyMessage.ShowBalloonTip(3);
+        }
+
+        public static void setReadOnlyAndVisibleColumns(DataGridView dgv, string[] readOnlyColumns, string[] hideColumns)
+        {
+            foreach (DataGridViewColumn column in dgv.Columns)
+            {
+                column.ReadOnly = false;
+                column.Visible = true;
+            }
+            if (readOnlyColumns != null)
+            {
+                foreach (string str in readOnlyColumns)
+                {
+                    dgv.Columns[str].ReadOnly = true;
+                }
+            }
+            if (hideColumns != null)
+            {
+                foreach (string str in hideColumns)
+                {
+                    dgv.Columns[str].Visible = false;
+                }
+            }
+        }
+
+        public static bool confirmReload(string tableName)
+        {
+            DialogResult result = MessageBox.Show("Are you sure? Any changes you have made to the " + tableName + " table above will be lost!", "Confirm reload!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            return result == DialogResult.Yes;
+        }
 
         public static void showErrorMessage(string message)
         {
@@ -51,7 +117,7 @@ namespace IndianBridge.Common
         {
             foreach (TabPage tp in m_tabPages[tabControl])
             {
-                if (!tabControl.TabPages.Contains(tp)) tabControl.TabPages.Add(tp);
+                if (!tabControl.TabPages.Contains(tp) && (tabNames == null || tabNames.Contains(tp.Name))) tabControl.TabPages.Add(tp);
             }
         }
 
