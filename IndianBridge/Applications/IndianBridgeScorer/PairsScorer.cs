@@ -16,20 +16,31 @@ namespace IndianBridgeScorer
     {
         private Boolean resultsLoaded = false, publishEnabled = false;
         private PairsEventInformation m_eventInformation = PairsGeneral.createDefaultEventInformation();
-        TourneyInformationDatabase m_tid;
-        string m_databaseFileName;
-        string m_eventName;
-        public PairsScorer(TourneyInformationDatabase tid, string eventName,string databaseFileName)
+        //TourneyInformationDatabase m_tid;
+        private string m_databaseFileName;
+        private string m_eventName;
+        private string m_localWebpagesRoot;
+        private string m_resultsWebsite;
+        public PairsScorer(string eventName)
         {
-            m_tid = tid;
+            //m_tid = tid;
             m_eventName = eventName;
-            m_databaseFileName = databaseFileName;
             InitializeComponent();
+        }
+
+        private void initialize()
+        {
             this.Text = "Pairs Scorer for " + m_eventName;
-            DataTable table = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyInfoTableName];
-            DataRow dRow = table.Rows[0];
-            string websiteRoot = m_tid.getTourneyResultsWebsite();
-            websiteAddress_textBox.Text = string.IsNullOrWhiteSpace(websiteRoot)?"":websiteRoot + "/" + Utilities.makeIdentifier_(m_eventName);
+            /*m_databaseFileName = LocalUtilities.getEventDatabase(m_eventName);
+            m_localWebpagesRoot = LocalUtilities.getEventWebpagesFolder(m_eventName);
+            m_resultsWebsite = LocalUtilities.getEventResultsWebsite(m_eventName);*/
+            websiteAddress_textBox.Text = m_resultsWebsite;
+        }
+
+        private void setResultsWebsite(string resultsWebsite)
+        {
+            m_resultsWebsite = string.IsNullOrWhiteSpace(resultsWebsite) ? "" : resultsWebsite + "/" + Utilities.makeIdentifier_(m_eventName);
+            websiteAddress_textBox.Text = m_resultsWebsite;
         }
 
         private void updateButtonStatus()
@@ -57,7 +68,7 @@ namespace IndianBridgeScorer
                     String summaryText = Utilities.compressText_(text);
                     m_eventInformation = PairsGeneral.getEventInformation_(summaryText);
                     m_eventInformation.databaseFileName = m_databaseFileName;
-                    m_eventInformation.webpagesDirectory = Path.Combine(Path.GetDirectoryName(m_databaseFileName), "Webpages",Utilities.makeIdentifier_(m_eventName));
+                    m_eventInformation.webpagesDirectory = m_localWebpagesRoot;
                 }
                 catch (Exception exception)
                 {

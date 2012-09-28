@@ -47,6 +47,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="PropertyGridClasses.cs" />
+    <Compile Include="PublishSwissTeamResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PublishSwissTeamResults.Designer.cs">
+      <DependentUpon>PublishSwissTeamResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CreateSwissTeamResults.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateSwissTeamResults.Designer.cs">
+      <DependentUpon>CreateSwissTeamResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SwissTeamsDatabaseToWebpages.cs" />
     <Compile Include="PDScorer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,12 +79,6 @@
     </Compile>
     <Compile Include="EventManagement.Designer.cs">
       <DependentUpon>EventManagement.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LoadingEvents.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="LoadingEvents.Designer.cs">
-      <DependentUpon>LoadingEvents.cs</DependentUpon>
     </Compile>
     <Compile Include="PairsScorer.cs">
       <SubType>Form</SubType>
@@ -91,23 +100,11 @@
     <Compile Include="CreateAndPublishPairsResults.Designer.cs">
       <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
     </Compile>
-    <Compile Include="SelectCalendarEvent.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SelectCalendarEvent.Designer.cs">
-      <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
-    </Compile>
     <Compile Include="SetTourneyInfo.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SetTourneyInfo.Designer.cs">
       <DependentUpon>SetTourneyInfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ShowDataGrid.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ShowDataGrid.Designer.cs">
-      <DependentUpon>ShowDataGrid.cs</DependentUpon>
     </Compile>
     <Compile Include="TeamScorer.cs">
       <SubType>Form</SubType>
@@ -116,13 +113,24 @@
       <DependentUpon>TeamScorer.cs</DependentUpon>
     </Compile>
     <Compile Include="TeamsDatabaseToWebpages.cs" />
-    <Compile Include="TourneyInformationDatabase.cs" />
+    <Compile Include="TeamsScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TeamsScorer.Designer.cs">
+      <DependentUpon>TeamsScorer.cs</DependentUpon>
+    </Compile>
     <Compile Include="TourneyManagement.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="PublishSwissTeamResults.resx">
+      <DependentUpon>PublishSwissTeamResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateSwissTeamResults.resx">
+      <DependentUpon>CreateSwissTeamResults.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PDScorer.resx">
       <DependentUpon>PDScorer.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,9 +139,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EventManagement.resx">
       <DependentUpon>EventManagement.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="LoadingEvents.resx">
-      <DependentUpon>LoadingEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PairsScorer.resx">
       <DependentUpon>PairsScorer.cs</DependentUpon>
@@ -153,17 +158,14 @@
     <EmbeddedResource Include="CreateAndPublishPairsResults.resx">
       <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectCalendarEvent.resx">
-      <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="SetTourneyInfo.resx">
       <DependentUpon>SetTourneyInfo.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ShowDataGrid.resx">
-      <DependentUpon>ShowDataGrid.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TeamScorer.resx">
       <DependentUpon>TeamScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TeamsScorer.resx">
+      <DependentUpon>TeamsScorer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TourneyManagement.resx">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
