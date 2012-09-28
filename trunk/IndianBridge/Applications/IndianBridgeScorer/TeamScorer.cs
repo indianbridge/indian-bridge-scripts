@@ -44,8 +44,8 @@ namespace IndianBridgeScorer
         public static int numberOfTeams = 0;
         public static int numberOfBoards = 0;
         private int numberOfQualifiers = 0;
-        private string m_localWebpagesRootDirectory = "";
-        private TourneyInformationDatabase m_tid;
+        private string m_localWebpagesRoot = "";
+        //private TourneyInformationDatabase m_tid;
         private string m_eventName = "";
         private string m_resultsWebsite = "";
         private List<TabPage> m_tabPages = null;
@@ -56,47 +56,44 @@ namespace IndianBridgeScorer
         Dictionary<string, int> m_numberOfMatches = new Dictionary<string, int>();
         private double m_oldFontSize;
 
-        public TeamScorer(TourneyInformationDatabase tid, string eventName, string databaseFileName)
+        public TeamScorer(string eventName)
         {
             InitializeComponent();
             m_eventName = eventName;
-            m_tid = tid;
-            m_databaseFileName = databaseFileName;
             initialize();
-        }
-
-        private void hideTabs()
-        {
-            foreach (TabPage tp in m_tabPages) mainControlTab.TabPages.Remove(tp);
-            m_tabsHidden = true;
-
-        }
-
-        private void showTabs()
-        {
-            foreach (TabPage tp in m_tabPages) mainControlTab.TabPages.Add(tp);
-            m_tabsHidden = false;
-            populateComboboxes();
-            updateComboboxes();
-            scoresEntryFormatCombobox.SelectedIndex = scoresEntryFormatCombobox.FindStringExact("IMPs");
-        }
-
-        private void showNames()
-        {
-            DataView dView = new DataView(m_ds.Tables[namesTableName]);
-            dView.RowFilter = "";
-            dView.Sort = "Team_Number ASC";
-            enterNamesDataGridView.DataSource = dView;
         }
 
         private void initialize()
         {
-            this.Text = "Team Scorer for " + m_eventName;
-            m_resultsWebsite = m_tid.getTourneyResultsWebsite();
+            /*this.Text = LocalUtilities.getTourneyName() + " : " + m_eventName;
+            m_databaseFileName = LocalUtilities.getEventDatabase(m_eventName);
+            m_localWebpagesRoot = LocalUtilities.getEventWebpagesFolder(m_eventName);
+            m_resultsWebsite = LocalUtilities.getEventResultsWebsite(m_eventName);*/
             websiteResultsTextbox.Text = m_resultsWebsite;
-            m_localWebpagesRootDirectory = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(m_databaseFileName)), "Webpages", Utilities.makeIdentifier_(m_eventName));
-            initializeDataSet();
+
+            // Save all tabs
+            Utilities.saveTabs(mainControlTab);
+            // Enable copy paste in all datagridview's
+            foreach (DataGridView control in this.Controls.OfType<DataGridView>())
+            {
+                control.KeyDown += new KeyEventHandler(Utilities.handleCopyPaste);
+            }
+
+            // Load database creating it if necessary
             loadDatabase(m_databaseFileName);
+            if (isEventSetup())
+            {
+                Utilities.showTabs(mainControlTab);
+                mainControlTab.SelectedTab = mainControlTab.TabPages["enterNamesTab"];
+            }
+            else
+            {
+                Utilities.hideTabs(mainControlTab);
+                List<string> tabNames = new List<string>();
+                tabNames.Add("eventSetupTab");
+                Utilities.showTabs(mainControlTab, tabNames);
+                mainControlTab.SelectedTab = mainControlTab.TabPages["eventSetupTab"];
+            }
             tiebreakerMethodCombobox.SelectedIndex = 0;
             m_tabPages = new List<TabPage>();
             showNames();
@@ -123,6 +120,41 @@ namespace IndianBridgeScorer
                 updateComboboxes();
                 scoresEntryFormatCombobox.SelectedIndex = scoresEntryFormatCombobox.FindStringExact("IMPs");
             }
+        }
+
+        /*private bool isEventSetup()
+        {
+            DataTable table = getTable(infoTableName);
+            Debug.Assert(table.Rows.Count == 3);
+            foreach (DataRow dRow in table.Rows)
+            {
+                if (getIntValue(dRow, "Parameter_Value") < 2) return false;
+            }
+            return true;
+        }*/
+
+        private void hideTabs()
+        {
+            foreach (TabPage tp in m_tabPages) mainControlTab.TabPages.Remove(tp);
+            m_tabsHidden = true;
+
+        }
+
+        private void showTabs()
+        {
+            foreach (TabPage tp in m_tabPages) mainControlTab.TabPages.Add(tp);
+            m_tabsHidden = false;
+            populateComboboxes();
+            updateComboboxes();
+            scoresEntryFormatCombobox.SelectedIndex = scoresEntryFormatCombobox.FindStringExact("IMPs");
+        }
+
+        private void showNames()
+        {
+            DataView dView = new DataView(m_ds.Tables[namesTableName]);
+            dView.RowFilter = "";
+            dView.Sort = "Team_Number ASC";
+            enterNamesDataGridView.DataSource = dView;
         }
 
         private void populateVPScaleDataGrid()
@@ -244,10 +276,6 @@ namespace IndianBridgeScorer
             m_daScores.Update(m_ds, scoresTableName);
         }
 
-        private void updateKnockoutTab()
-        {
-        }
-
         private bool validateEventParameters()
         {
             int teams, rounds, boards, qualifiers;
@@ -287,7 +315,6 @@ namespace IndianBridgeScorer
                 if (numberOfQualifiers != qualifiers)
                 {
                     numberOfQualifiers = qualifiers;
-                    updateKnockoutTab();
                     createKnockoutSessionsTable(true);
                 }
                 if (teams != numberOfTeams || rounds != numberOfRounds)
@@ -461,34 +488,88 @@ namespace IndianBridgeScorer
         {
             if (!File.Exists(m_databaseFileName))
             {
-                Utilities.createDatabase(m_databaseFileName);
-                createTables();
+                createTeamsDatabase();
+                //Utilities.createDatabase(m_databaseFileName);
+                //createTables();
             }
-            loadTablesFromDatabase();
+            eventSetupDataGridView.DataSource = loadTable(infoTableName);
+            enterNamesDataGridView.DataSource = loadTable(namesTableName);
+        }
+
+        private void createTeamsDatabase()
+        {
+            AccessDatabaseUtilities.createDatabase(m_databaseFileName);
+            createInfoTable();
+            createTeamsTable();
+            createScoresTable();
+        }
+
+        private void createInfoTable()
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Parameter_Name", "TEXT", 255));
+            fields.Add(new DatabaseField("Parameter_Value", "INTEGER"));
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Parameter_Name");
+            AccessDatabaseUtilities.createTable(m_databaseFileName, infoTableName, fields, primaryKeys);
+            DataTable table = loadTable(infoTableName);
+            string[] parameters = new string[] { "Number_Of_Teams", "Number_Of_Rounds", "Number_Of_Boards" };
+            foreach (string parameter in parameters)
+            {
+                DataRow dRow = table.NewRow();
+                dRow["Parameter_Name"] = parameter;
+                dRow["Parameter_Value"] = 0;
+                table.Rows.Add(dRow);
+            }
+            saveTable(infoTableName);
+        }
+
+        private void createTeamsTable()
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Team_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
+            fields.Add(new DatabaseField("Member_Names", "TEXT", 255));
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Team_Number");
+            AccessDatabaseUtilities.createTable(m_databaseFileName, namesTableName, fields, primaryKeys);
+            loadTable(namesTableName);
+        }
+
+        private void createScoresTable()
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Round_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Table_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_1_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_2_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_1_IMPs", "NUMBER"));
+            fields.Add(new DatabaseField("Team_2_IMPs", "NUMBER"));
+            fields.Add(new DatabaseField("Team_1_VPs", "NUMBER"));
+            fields.Add(new DatabaseField("Team_2_VPs", "NUMBER"));
+            fields.Add(new DatabaseField("Team_2_VP_Adjustment", "NUMBER"));
+            fields.Add(new DatabaseField("Team_2_VP_Adjustment", "NUMBER"));
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Round_Number");
+            primaryKeys.Add("Table_Number");
+            AccessDatabaseUtilities.createTable(m_databaseFileName, scoresTableName, fields, primaryKeys);
+            loadTable(scoresTableName);
         }
 
         private void createTables()
         {
-            string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + m_databaseFileName + ";";
+            /*string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + m_databaseFileName + ";";
             OleDbConnection myAccessConn = new OleDbConnection(strAccessConn);
             myAccessConn.Open();
             string query = "CREATE TABLE " + infoTableName + "([Event_Name] TEXT(255) PRIMARY KEY, [Number_Of_Rounds] INTEGER, [Number_Of_Teams] INTEGER,"
             + "[Number_Of_Boards] INTEGER,[Number_Of_Qualifiers] INTEGER,[Rounds_Completed] INTEGER,[Draws_Completed] INTEGER, [Rounds_Scored] INTEGER)";
             OleDbCommand myCommand = new OleDbCommand(query, myAccessConn);
             myCommand.ExecuteNonQuery();
-            query = "CREATE TABLE " + namesTableName + "([Team_Number] INTEGER PRIMARY KEY, [Team_Name] TEXT(255), [Member_Names] TEXT(255))";
-            myCommand = new OleDbCommand(query, myAccessConn);
-            myCommand.ExecuteNonQuery();
-            query = "CREATE TABLE " + scoresTableName + "([Round_Number] INTEGER, [Table_Number] INTEGER, [Team_1_Number] INTEGER ,"
-            + " [Team_2_Number] INTEGER, [Team_1_IMPs] NUMBER, [Team_2_IMPs] NUMBER, [Team_1_VPs] NUMBER, [Team_2_VPs] NUMBER, "
-            + "[Team_1_VP_Adjustment] NUMBER, [Team_2_VP_Adjustment] NUMBER,"
-            + "CONSTRAINT primarykey PRIMARY KEY(Round_Number,Table_Number))";
-            myCommand = new OleDbCommand(query, myAccessConn);
-            myCommand.ExecuteNonQuery();
+
             myAccessConn.Close();
             myAccessConn = null;
             createComputedScoresTable(0, false);
-            createKnockoutSessionsTable(false);
+            createKnockoutSessionsTable(false);*/
         }
 
         public void loadVPScale()
@@ -1365,11 +1446,10 @@ namespace IndianBridgeScorer
             {
                 MessageBox.Show("No website for publishing the results was provided. So only local webpages will be created.", "No Website Provided!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            string m_googleSiteRoot = m_resultsWebsite + "/" + Utilities.makeIdentifier_(m_eventName);
-            CreateAndPublishTeamResults cptr = new CreateAndPublishTeamResults(m_ds, m_localWebpagesRootDirectory, string.IsNullOrWhiteSpace(m_resultsWebsite) ? "" : m_googleSiteRoot, m_eventName);
+            CreateAndPublishTeamResults cptr = new CreateAndPublishTeamResults(m_ds, m_localWebpagesRoot, m_resultsWebsite, m_eventName);
             cptr.ShowDialog();
             cptr.Dispose();
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "index.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "index.html"));
             resetFontSize();
         }
 
@@ -1538,7 +1618,6 @@ namespace IndianBridgeScorer
 
         private void printDrawButton_Click(object sender, EventArgs e)
         {
-
             bool vpsInSeparateColumn = vpsInSeparateColumnCheckbox.Checked;
             if (string.IsNullOrWhiteSpace(showingDrawCombobox.Text))
             {
@@ -1558,7 +1637,7 @@ namespace IndianBridgeScorer
             Utilities.paddingSize = double.Parse(drawPaddingSizeTextbox.Text);
             bool oldUseBorder = Utilities.useBorder;
             Utilities.useBorder = true;
-            string fileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(m_localWebpagesRootDirectory)), "draw.html");
+            string fileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName( m_localWebpagesRoot)), "draw.html");
             StreamWriter sw = new StreamWriter(fileName);
             sw.WriteLine("<html><head><title>Draw for Round " + drawRoundNumber + "</title>");
             sw.WriteLine(Utilities.makeHtmlPrintStyle_());
@@ -1619,7 +1698,7 @@ namespace IndianBridgeScorer
 
         private void showLeaderboardButton_Click(object sender, EventArgs e)
         {
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "leaderboard/index.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "leaderboard/index.html"));
         }
 
         private void showTeamScoresButton_Click(object sender, EventArgs e)
@@ -1630,7 +1709,7 @@ namespace IndianBridgeScorer
                 return;
             }
             int teamNumber = int.Parse(showTeamScoresCombobox.Text);
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "teams", "team" + teamNumber + "score.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "teams", "team" + teamNumber + "score.html"));
         }
 
         private void showRoundScoresButton_Click(object sender, EventArgs e)
@@ -1641,7 +1720,7 @@ namespace IndianBridgeScorer
                 return;
             }
             int roundNumber = int.Parse(showRoundScoresCombobox.Text);
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "rounds", "round" + roundNumber + "score.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "rounds", "round" + roundNumber + "score.html"));
 
         }
 
@@ -1721,7 +1800,7 @@ namespace IndianBridgeScorer
 
         private void showKnockoutButton_Click(object sender, EventArgs e)
         {
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "knockout/index.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "knockout/index.html"));
         }
 
         private void createAndPublishKnockoutButton_Click_1(object sender, EventArgs e)
@@ -1732,11 +1811,10 @@ namespace IndianBridgeScorer
             {
                 MessageBox.Show("No website for publishing the results was provided. So only local webpages will be created.", "No Website Provided!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            string m_googleSiteRoot = m_resultsWebsite + "/" + Utilities.makeIdentifier_(m_eventName);
-            CreateAndPublishKnockoutResults cptr = new CreateAndPublishKnockoutResults(m_ds, m_localWebpagesRootDirectory, string.IsNullOrWhiteSpace(m_resultsWebsite) ? "" : m_googleSiteRoot, m_eventName);
+            CreateAndPublishKnockoutResults cptr = new CreateAndPublishKnockoutResults(m_ds, m_localWebpagesRoot, m_resultsWebsite, m_eventName);
             cptr.ShowDialog();
             cptr.Dispose();
-            showUrl(Path.Combine(m_localWebpagesRootDirectory, "index.html"));
+            showUrl(Path.Combine( m_localWebpagesRoot, "index.html"));
             resetFontSize();
         }
 
@@ -1873,6 +1951,36 @@ namespace IndianBridgeScorer
             string[] hideColumns = new string[] { };
             setReadOnlyAndVisibleColumns(knockoutDataGridView, readOnlyColumns, hideColumns);
 
+        }
+
+        private DataTable loadTable(string tableName)
+        {
+            return AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, tableName);
+        }
+
+        private DataTable getTable(string tableName)
+        {
+            return AccessDatabaseUtilities.getDataTable(m_databaseFileName, tableName);
+        }
+
+        private void saveTable(string tableName)
+        {
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, tableName);
+        }
+
+        private string getStringValue(DataRow dRow, string columnName)
+        {
+            return AccessDatabaseUtilities.getStringValue(dRow, columnName);
+        }
+
+        private int getIntValue(DataRow dRow, string columnName)
+        {
+            return AccessDatabaseUtilities.getIntValue(dRow, columnName);
+        }
+
+        private double getDoubleValue(DataRow dRow, string columnName)
+        {
+            return AccessDatabaseUtilities.getDoubleValue(dRow, columnName);
         }
 
     }

@@ -95,7 +95,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(457, 284);
+            this.ClientSize = new System.Drawing.Size(457, 272);
             this.Controls.Add(this.deleteTourneyButton);
             this.Controls.Add(this.tourneyListCombobox);
             this.Controls.Add(this.loadExistingTourneyButton);

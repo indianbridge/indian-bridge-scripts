@@ -15,6 +15,7 @@ namespace IndianBridgeScorer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new PDScorer("Test",@"C:\Temp\myDatabase.mdb","",""));
             Application.Run(new TourneyManagement());
         }
     }

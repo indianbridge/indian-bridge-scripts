@@ -28,126 +28,158 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tourneyNameLabel = new System.Windows.Forms.Label();
-            this.addNewTeamEventButton = new System.Windows.Forms.Button();
-            this.eventsList = new System.Windows.Forms.TableLayoutPanel();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.eventsDataGridView = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.resultsWebsiteTextBox = new System.Windows.Forms.TextBox();
-            this.tourneyNameTextBox = new System.Windows.Forms.TextBox();
-            this.addNewPairEventButton = new System.Windows.Forms.Button();
+            this.tourneyInfoPropertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.saveTourneyInfoButton = new System.Windows.Forms.Button();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.addNewPDEventButton = new System.Windows.Forms.Button();
+            this.addNewTeamEventButton = new System.Windows.Forms.Button();
+            this.addNewPairEventButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.eventsDataGridView)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tourneyNameLabel
+            // eventsDataGridView
             // 
-            this.tourneyNameLabel.AutoSize = true;
-            this.tourneyNameLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.tourneyNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tourneyNameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.tourneyNameLabel.Location = new System.Drawing.Point(30, 9);
-            this.tourneyNameLabel.Name = "tourneyNameLabel";
-            this.tourneyNameLabel.Size = new System.Drawing.Size(188, 26);
-            this.tourneyNameLabel.TabIndex = 2;
-            this.tourneyNameLabel.Text = "Tourney Name : ";
-            // 
-            // addNewTeamEventButton
-            // 
-            this.addNewTeamEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addNewTeamEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addNewTeamEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewTeamEventButton.Location = new System.Drawing.Point(12, 303);
-            this.addNewTeamEventButton.Name = "addNewTeamEventButton";
-            this.addNewTeamEventButton.Size = new System.Drawing.Size(257, 43);
-            this.addNewTeamEventButton.TabIndex = 4;
-            this.addNewTeamEventButton.Text = "Add New Team Event";
-            this.addNewTeamEventButton.UseVisualStyleBackColor = false;
-            this.addNewTeamEventButton.Click += new System.EventHandler(this.addNewTeamEventButton_Click);
-            // 
-            // eventsList
-            // 
-            this.eventsList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.eventsList.AutoScroll = true;
-            this.eventsList.AutoSize = true;
-            this.eventsList.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
-            this.eventsList.ColumnCount = 4;
-            this.eventsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.eventsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.eventsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.eventsList.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.eventsList.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.eventsList.Location = new System.Drawing.Point(6, 30);
-            this.eventsList.Name = "eventsList";
-            this.eventsList.RowCount = 1;
-            this.eventsList.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.eventsList.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.eventsList.Size = new System.Drawing.Size(771, 171);
-            this.eventsList.TabIndex = 5;
+            this.eventsDataGridView.AllowUserToAddRows = false;
+            this.eventsDataGridView.AllowUserToDeleteRows = false;
+            this.eventsDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.eventsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.eventsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.eventsDataGridView.DefaultCellStyle = dataGridViewCellStyle4;
+            this.eventsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.eventsDataGridView.Location = new System.Drawing.Point(3, 16);
+            this.eventsDataGridView.Name = "eventsDataGridView";
+            this.eventsDataGridView.ReadOnly = true;
+            this.eventsDataGridView.Size = new System.Drawing.Size(823, 318);
+            this.eventsDataGridView.TabIndex = 6;
+            this.eventsDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.eventsDataGridView_CellContentClick);
+            this.eventsDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.eventsDataGridView_DataBindingComplete);
             // 
             // groupBox1
             // 
-            this.groupBox1.BackColor = System.Drawing.Color.White;
-            this.groupBox1.Controls.Add(this.eventsList);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 82);
+            this.groupBox1.Controls.Add(this.tourneyInfoPropertyGrid);
+            this.groupBox1.Controls.Add(this.tableLayoutPanel1);
+            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(783, 215);
-            this.groupBox1.TabIndex = 6;
+            this.groupBox1.Size = new System.Drawing.Size(829, 141);
+            this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Events in Tourney";
+            this.groupBox1.Text = "Tourney Info";
             // 
-            // label1
+            // tourneyInfoPropertyGrid
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.label1.Location = new System.Drawing.Point(12, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(206, 26);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Results Website : ";
+            this.tourneyInfoPropertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tourneyInfoPropertyGrid.HelpVisible = false;
+            this.tourneyInfoPropertyGrid.Location = new System.Drawing.Point(3, 16);
+            this.tourneyInfoPropertyGrid.Name = "tourneyInfoPropertyGrid";
+            this.tourneyInfoPropertyGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+            this.tourneyInfoPropertyGrid.Size = new System.Drawing.Size(823, 72);
+            this.tourneyInfoPropertyGrid.TabIndex = 2;
             // 
-            // resultsWebsiteTextBox
+            // tableLayoutPanel1
             // 
-            this.resultsWebsiteTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.resultsWebsiteTextBox.Location = new System.Drawing.Point(224, 44);
-            this.resultsWebsiteTextBox.Name = "resultsWebsiteTextBox";
-            this.resultsWebsiteTextBox.ReadOnly = true;
-            this.resultsWebsiteTextBox.Size = new System.Drawing.Size(571, 26);
-            this.resultsWebsiteTextBox.TabIndex = 8;
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Controls.Add(this.saveTourneyInfoButton, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.cancelButton, 1, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 88);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(823, 50);
+            this.tableLayoutPanel1.TabIndex = 1;
             // 
-            // tourneyNameTextBox
+            // saveTourneyInfoButton
             // 
-            this.tourneyNameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tourneyNameTextBox.Location = new System.Drawing.Point(224, 10);
-            this.tourneyNameTextBox.Name = "tourneyNameTextBox";
-            this.tourneyNameTextBox.ReadOnly = true;
-            this.tourneyNameTextBox.Size = new System.Drawing.Size(571, 26);
-            this.tourneyNameTextBox.TabIndex = 9;
+            this.saveTourneyInfoButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.saveTourneyInfoButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.saveTourneyInfoButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveTourneyInfoButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.saveTourneyInfoButton.Location = new System.Drawing.Point(3, 3);
+            this.saveTourneyInfoButton.Name = "saveTourneyInfoButton";
+            this.saveTourneyInfoButton.Size = new System.Drawing.Size(405, 44);
+            this.saveTourneyInfoButton.TabIndex = 6;
+            this.saveTourneyInfoButton.Text = "Save Tourney Info to Database";
+            this.saveTourneyInfoButton.UseVisualStyleBackColor = false;
+            this.saveTourneyInfoButton.Click += new System.EventHandler(this.saveTourneyInfoButton_Click);
             // 
-            // addNewPairEventButton
+            // cancelButton
             // 
-            this.addNewPairEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addNewPairEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addNewPairEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewPairEventButton.Location = new System.Drawing.Point(275, 303);
-            this.addNewPairEventButton.Name = "addNewPairEventButton";
-            this.addNewPairEventButton.Size = new System.Drawing.Size(257, 43);
-            this.addNewPairEventButton.TabIndex = 10;
-            this.addNewPairEventButton.Text = "Add New Pair Event";
-            this.addNewPairEventButton.UseVisualStyleBackColor = false;
-            this.addNewPairEventButton.Click += new System.EventHandler(this.addNewPairEventButton_Click);
+            this.cancelButton.BackColor = System.Drawing.Color.Red;
+            this.cancelButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cancelButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.cancelButton.Location = new System.Drawing.Point(414, 3);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(406, 44);
+            this.cancelButton.TabIndex = 5;
+            this.cancelButton.Text = "Reload Tourney Info from Database";
+            this.cancelButton.UseVisualStyleBackColor = false;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.eventsDataGridView);
+            this.groupBox2.Controls.Add(this.tableLayoutPanel2);
+            this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox2.Location = new System.Drawing.Point(0, 141);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(829, 387);
+            this.groupBox2.TabIndex = 3;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Tourney Events";
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 3;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel2.Controls.Add(this.addNewPDEventButton, 2, 0);
+            this.tableLayoutPanel2.Controls.Add(this.addNewTeamEventButton, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.addNewPairEventButton, 1, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 334);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 1;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(823, 50);
+            this.tableLayoutPanel2.TabIndex = 1;
             // 
             // addNewPDEventButton
             // 
             this.addNewPDEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.addNewPDEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addNewPDEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewPDEventButton.Location = new System.Drawing.Point(538, 303);
+            this.addNewPDEventButton.Location = new System.Drawing.Point(551, 3);
             this.addNewPDEventButton.Name = "addNewPDEventButton";
             this.addNewPDEventButton.Size = new System.Drawing.Size(257, 43);
             this.addNewPDEventButton.TabIndex = 11;
@@ -155,40 +187,65 @@
             this.addNewPDEventButton.UseVisualStyleBackColor = false;
             this.addNewPDEventButton.Click += new System.EventHandler(this.addNewPDEventButton_Click);
             // 
+            // addNewTeamEventButton
+            // 
+            this.addNewTeamEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.addNewTeamEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewTeamEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.addNewTeamEventButton.Location = new System.Drawing.Point(3, 3);
+            this.addNewTeamEventButton.Name = "addNewTeamEventButton";
+            this.addNewTeamEventButton.Size = new System.Drawing.Size(257, 43);
+            this.addNewTeamEventButton.TabIndex = 4;
+            this.addNewTeamEventButton.Text = "Add New Team Event";
+            this.addNewTeamEventButton.UseVisualStyleBackColor = false;
+            this.addNewTeamEventButton.Click += new System.EventHandler(this.addNewTeamEventButton_Click);
+            // 
+            // addNewPairEventButton
+            // 
+            this.addNewPairEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.addNewPairEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewPairEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.addNewPairEventButton.Location = new System.Drawing.Point(277, 3);
+            this.addNewPairEventButton.Name = "addNewPairEventButton";
+            this.addNewPairEventButton.Size = new System.Drawing.Size(257, 43);
+            this.addNewPairEventButton.TabIndex = 10;
+            this.addNewPairEventButton.Text = "Add New Pair Event";
+            this.addNewPairEventButton.UseVisualStyleBackColor = false;
+            this.addNewPairEventButton.Click += new System.EventHandler(this.addNewPairEventButton_Click);
+            // 
             // EventManagement
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(808, 360);
-            this.Controls.Add(this.addNewPDEventButton);
-            this.Controls.Add(this.addNewPairEventButton);
-            this.Controls.Add(this.tourneyNameTextBox);
-            this.Controls.Add(this.resultsWebsiteTextBox);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(829, 528);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.addNewTeamEventButton);
-            this.Controls.Add(this.tourneyNameLabel);
             this.Name = "EventManagement";
             this.Text = "Tourney Name : ";
+            ((System.ComponentModel.ISupportInitialize)(this.eventsDataGridView)).EndInit();
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label tourneyNameLabel;
-        private System.Windows.Forms.Button addNewTeamEventButton;
-        private System.Windows.Forms.TableLayoutPanel eventsList;
+        private System.Windows.Forms.DataGridView eventsDataGridView;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox resultsWebsiteTextBox;
-        private System.Windows.Forms.TextBox tourneyNameTextBox;
-        private System.Windows.Forms.Button addNewPairEventButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button saveTourneyInfoButton;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Button addNewPDEventButton;
+        private System.Windows.Forms.Button addNewTeamEventButton;
+        private System.Windows.Forms.Button addNewPairEventButton;
+        private System.Windows.Forms.PropertyGrid tourneyInfoPropertyGrid;
+
 
     }
 }

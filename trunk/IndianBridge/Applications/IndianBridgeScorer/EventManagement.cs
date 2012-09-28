@@ -8,71 +8,62 @@ using System.Text;
 using System.Windows.Forms;
 using IndianBridge.Common;
 using System.IO;
+using System.Diagnostics;
 
 namespace IndianBridgeScorer
 {
     public partial class EventManagement : Form
     {
-        TourneyInformationDatabase m_tid;
-        Dictionary<string, Form> m_scorers;
-        public EventManagement(TourneyInformationDatabase tid)
+        private string m_tourneyInfoFileName = "";
+        private string m_tourneyEventsFileName = "";
+        private string m_tourneyName;
+        TourneyInfo m_tourneyInfo = null;
+
+        private Dictionary<string, Form> m_scorers = new Dictionary<string, Form>();
+       
+        public EventManagement()
         {
-            m_tid = tid;
             InitializeComponent();
-            m_scorers = new Dictionary<string, Form>();
-            this.Text = "Tourney Name : " + tid.getTourneyName();
-            tourneyNameTextBox.Text = tid.getTourneyName();
-            resultsWebsiteTextBox.Text = tid.getTourneyResultsWebsite();
-            updateEvents();
+            initialize();
         }
 
-        public void updateEvents() {
-            eventsList.Controls.Clear();
-            DataTable table = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyEventsTableName];
-            Label label = new Label();
-            label.Text = "Event Name";
-            label.ForeColor = Color.Blue;
-            eventsList.Controls.Add(label, 0, 0);
-            label = new Label();
-            label.Text = "Event Type";
-            label.ForeColor = Color.Blue;
-            eventsList.Controls.Add(label, 1, 0);
-
-            for (int i = 0; i < table.Rows.Count; ++i)
-            {
-                int rowNumber = i + 1;
-                DataRow dRow = table.Rows[i];
-                label = new Label();
-                string eventName = (string)dRow["Event_Name"];
-                label.Text = eventName;
-                eventsList.Controls.Add(label, 0, rowNumber);
-                label = new Label();
-                label.Text = (string)dRow["Event_type"];
-                eventsList.Controls.Add(label, 1, rowNumber);
-                Button button = new Button();
-                button.Text = "Show Event";
-                button.BackColor = Color.FromArgb(128, 128, 255);
-                eventsList.Controls.Add(button, 2, rowNumber);
-                button.Tag = eventName;
-                button.Click += delegate(object sender, EventArgs e)
-                {
-                    showEvent(sender as Button);
-                };
-                button = new Button();
-                button.Text = "Delete Event";
-                button.BackColor = Color.Red;
-                button.Tag = eventName;
-                button.Click += delegate(object sender, EventArgs e)
-                {
-                    deleteEvent(sender as Button);
-                };
-                eventsList.Controls.Add(button, 3, rowNumber);
-            }
-        }
-
-        public void showEvent(Button button)
+        private void initialize()
         {
-            string eventName = (string)button.Tag;
+            m_tourneyInfoFileName = Constants.getCurrentTourneyInformationFileName();
+            m_tourneyEventsFileName = Constants.getCurrentTourneyEventsFileName();
+            m_tourneyName = NiniUtilities.getStringValue(m_tourneyInfoFileName, Constants.TourneyNameFieldName);
+            this.Text = "Tourney Name : " + m_tourneyName;
+            m_tourneyInfo = new TourneyInfo(Constants.getCurrentTourneyInformationFileName(),false);
+            this.tourneyInfoPropertyGrid.SelectedObject = m_tourneyInfo;
+            AccessDatabaseUtilities.loadDatabaseToTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            loadEvents();
+        }
+
+        private void loadEvents()
+        {
+            eventsDataGridView.DataSource = null;
+            eventsDataGridView.Columns.Clear();
+            eventsDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            var buttonCol = new DataGridViewButtonColumn();
+            buttonCol.Name = "Show Event";
+            buttonCol.HeaderText = "Show Event";
+            buttonCol.Text = "Show Event";
+            buttonCol.UseColumnTextForButtonValue = true;
+            eventsDataGridView.Columns.Add(buttonCol);
+            buttonCol.FlatStyle = FlatStyle.Popup;
+            buttonCol.DefaultCellStyle.ForeColor = Color.Green;
+            buttonCol = new DataGridViewButtonColumn();
+            buttonCol.Name = "Delete Event";
+            buttonCol.HeaderText = "Delete Event";
+            buttonCol.Text = "Delete Event";
+            buttonCol.UseColumnTextForButtonValue = true;
+            buttonCol.FlatStyle = FlatStyle.Popup;
+            buttonCol.DefaultCellStyle.ForeColor = Color.Red;
+            eventsDataGridView.Columns.Add(buttonCol);
+        }
+
+        public void showEvent(string eventName)
+        {
             if (!m_scorers.ContainsKey(eventName) || m_scorers[eventName] == null || m_scorers[eventName].IsDisposed)
             {
                 createEvent(eventName);
@@ -85,42 +76,37 @@ namespace IndianBridgeScorer
 
         public void createEvent(string eventName)
         {
-            DataTable table = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyEventsTableName];
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
             DataRow dRow = table.Rows.Find(eventName);
             string eventType = (string)dRow["Event_Type"];
-            string databaseFileName = Path.Combine(Globals.m_rootDirectory,"Tourneys",(string)dRow["Event_File"]);
-            DataTable infoTable = m_tid.m_ds.Tables[TourneyInformationDatabase.tourneyInfoTableName];
-            DataRow foundRow = infoTable.Rows[0];
-            string websiteRoot = resultsWebsiteTextBox.Text;
-            string websiteAddress = websiteRoot + "/" + Utilities.makeIdentifier_(eventName);
             switch (eventType)
             {
                 case "Team":
-                    TeamScorer ts = new TeamScorer(m_tid, eventName, databaseFileName);
+                    TeamsScorer ts = new TeamsScorer(eventName);
                     m_scorers[eventName] = ts;
                     break;
                 case "Pairs":
-                    PairsScorer ps = new PairsScorer(m_tid, eventName, databaseFileName);
+                    PairsScorer ps = new PairsScorer(eventName);
                     m_scorers[eventName] = ps;
                     break;
                 case "PD":
-                    string localWebpagesRoot = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(databaseFileName)), "Webpages", Utilities.makeIdentifier_(eventName));
-                    PDScorer pds = new PDScorer(eventName,databaseFileName,localWebpagesRoot,m_tid.getTourneyResultsWebsite());
+                    PDScorer pds = new PDScorer(eventName);
                     m_scorers[eventName] = pds;
                     break;
             }
         }
 
-        public void deleteEvent(Button button)
+        public void deleteEvent(string eventName)
         {
-            string eventName = (string)button.Tag;
-            DialogResult result = MessageBox.Show("Are you sure?\nAll information for this event will be deleted", "Confirm Delete", MessageBoxButtons.YesNo);
+            DialogResult result = MessageBox.Show("Are you sure?" + Environment.NewLine + "All information for this event will be deleted", "Confirm Delete", MessageBoxButtons.YesNo);
             if (result == DialogResult.No) return;
-            m_tid.deleteEvent(eventName);
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            DataRow dRow = table.Rows.Find(eventName);
+            dRow.Delete();
+            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
             if (m_scorers.ContainsKey(eventName) && m_scorers[eventName] != null && !m_scorers[eventName].IsDisposed) m_scorers[eventName].Close();
             m_scorers[eventName] = null;
             m_scorers.Remove(eventName);
-            updateEvents();
         }
 
         private void addEvent(string eventType)
@@ -131,13 +117,39 @@ namespace IndianBridgeScorer
                 MessageBox.Show("Event Name cannot be empty!", "Empty Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (m_tid.eventExists(eventName))
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            DataRow dRow = table.Rows.Find(eventName);
+            if (dRow != null)
             {
-                MessageBox.Show("Another event with same name ("+eventName+") already exists!"+Environment.NewLine+"Either delete the other event first or provide a different event name!", "Duplicate Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Another event with same name (" + eventName + ") already exists!" + Environment.NewLine + "Either delete the other event first or provide a different event name!", "Duplicate Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            m_tid.addNewEvent(eventName,eventType);
-            updateEvents();
+            dRow = table.NewRow();
+            dRow["Event_Name"] = eventName;
+            dRow["Event_Type"] = eventType;
+            table.Rows.Add(dRow);
+            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+        }
+
+        private void eventsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == eventsDataGridView.Columns["Show Event"].Index)
+            {
+                string eventName = (string)eventsDataGridView.Rows[e.RowIndex].Cells["Event_Name"].Value;
+                showEvent(eventName);
+            }
+            if (e.RowIndex >= 0 && e.ColumnIndex == eventsDataGridView.Columns["Delete Event"].Index)
+            {
+                string eventName = (string)eventsDataGridView.Rows[e.RowIndex].Cells["Event_Name"].Value;
+                deleteEvent(eventName);
+            }
+        }
+
+        private void eventsDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            eventsDataGridView.Columns["Event_Name"].ReadOnly = true;
+            eventsDataGridView.Columns["Event_Type"].ReadOnly = true;
+            if (eventsDataGridView.Columns.Contains("Event_File")) eventsDataGridView.Columns["Event_File"].Visible = false;
         }
 
         private void addNewTeamEventButton_Click(object sender, EventArgs e)
@@ -153,6 +165,29 @@ namespace IndianBridgeScorer
         private void addNewPDEventButton_Click(object sender, EventArgs e)
         {
             addEvent("PD");
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            if (Utilities.confirmReload("Tourney Info"))
+            {
+                m_tourneyInfo.load();
+                tourneyInfoPropertyGrid.Refresh();
+                Utilities.showBalloonNotification("Reload Success", "Reloaded Tourney Info from Database");
+            }
+        }
+
+        private void saveTourneyInfoButton_Click(object sender, EventArgs e)
+        {
+            string newTourneyName = m_tourneyInfo.TourneyName;
+            if (newTourneyName != m_tourneyName)
+            {
+                Utilities.showErrorMessage("Tourney Name can only be set when you create the tourney and cannot be editted now!" + Environment.NewLine + "Tourney Name will not be changed but any changes to the Results Website will be changed.");
+                m_tourneyInfo.TourneyName = m_tourneyName;
+                tourneyInfoPropertyGrid.Refresh();
+            }
+            m_tourneyInfo.save();
+            Utilities.showBalloonNotification("Save Success", "Saved Tourney Info to Database");
         }
 
     }

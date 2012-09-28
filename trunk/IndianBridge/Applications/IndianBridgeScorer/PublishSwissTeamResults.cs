@@ -12,46 +12,21 @@ using IndianBridge.GoogleAPIs;
 
 namespace IndianBridgeScorer
 {
-    public partial class CreateAndPublishKnockoutResults : Form
+    public partial class PublishSwissTeamResults : Form
     {
-        private DataSet m_ds = null;
         private string m_localWebpagesRootDirectory = "";
         private string m_resultsWebsite = "";
         private string m_eventName = "";
+        public string m_message = "";
 
-        public CreateAndPublishKnockoutResults(DataSet ds, string webpagesRootDirectory, String resultsWebsite, string eventName)
+        public PublishSwissTeamResults(string eventName, string webpagesRootDirectory, String resultsWebsite)
         {
-            m_ds = ds;
             m_localWebpagesRootDirectory = webpagesRootDirectory;
             m_resultsWebsite = resultsWebsite;
             m_eventName = eventName;
             InitializeComponent();
-            this.Text = "Create and Publish Knockout Results for " + m_eventName;
+            this.Text = "Publish Results for " + m_eventName;
         }
-
-        private bool createWebpages()
-        {
-            currentOperationTitle.Text = "Creating Local Knockout webpages from results database";
-            status.Text = "";
-            status.Refresh();
-            TeamsDatabaseToWebpages tdw = new TeamsDatabaseToWebpages(m_ds, m_localWebpagesRootDirectory);
-            TextBoxTraceListener _textBoxListener = new TextBoxTraceListener(status);
-            Trace.Listeners.Add(_textBoxListener);
-            try
-            {
-                //tdw.createKnockoutPage();
-                Trace.Listeners.Remove(_textBoxListener);
-            }
-            catch (Exception e)
-            {
-                Trace.WriteLine(e.Message);
-                Trace.Listeners.Remove(_textBoxListener);
-                MessageBox.Show("Unable to load create local webpages from results database"+Environment.NewLine + e.Message);
-                return false;
-            }
-            return true;
-        }
-
         private bool uploadPages()
         {
             currentOperationTitle.Text = "Uploading Results to Google Sites";
@@ -72,7 +47,7 @@ namespace IndianBridgeScorer
             {
                 Trace.WriteLine(e.Message);
                 Trace.Listeners.Remove(_textBoxListener);
-                MessageBox.Show("Unable to upload results to webpage."+Environment.NewLine + e.Message);
+                m_message = "Unable to upload results to webpage." + Environment.NewLine + e.Message;
                 return false;
             }
             Trace.Listeners.Remove(_textBoxListener);
@@ -81,13 +56,7 @@ namespace IndianBridgeScorer
 
         private void PublishResults_Shown(object sender, EventArgs e)
         {
-            if (createWebpages())
-            {
-                if (string.IsNullOrWhiteSpace(m_resultsWebsite)) MessageBox.Show("Local webpages created in " + m_localWebpagesRootDirectory, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                else {
-                    if (uploadPages()) MessageBox.Show("Results created and successfully uploaded to " + m_resultsWebsite,"Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
-                }
-            }
+            if (uploadPages()) m_message = "Results created and successfully uploaded to " + m_resultsWebsite;
             this.Close();
         }
     }

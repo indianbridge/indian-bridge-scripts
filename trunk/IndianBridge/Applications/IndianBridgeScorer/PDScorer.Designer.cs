@@ -55,22 +55,9 @@
             this.scoresDataGridView = new System.Windows.Forms.DataGridView();
             this.reloadScoresButton = new System.Windows.Forms.Button();
             this.writeScoresButton = new System.Windows.Forms.Button();
-            this.drawTab = new System.Windows.Forms.TabPage();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer5 = new System.Windows.Forms.SplitContainer();
-            this.drawBasedOnCombobox = new System.Windows.Forms.ComboBox();
-            this.showingDrawCombobox = new System.Windows.Forms.ComboBox();
-            this.roundDrawButton = new System.Windows.Forms.Button();
-            this.randomDrawButton = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.drawDataGridView = new System.Windows.Forms.DataGridView();
-            this.printDrawBrowser = new System.Windows.Forms.WebBrowser();
-            this.printDrawButton = new System.Windows.Forms.Button();
-            this.reloadDrawButton = new System.Windows.Forms.Button();
-            this.writeDrawButton = new System.Windows.Forms.Button();
             this.enterNamesTab = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.enterNamesDataGridView = new System.Windows.Forms.DataGridView();
+            this.teamsDataGridView = new System.Windows.Forms.DataGridView();
             this.reloadNamesButton = new System.Windows.Forms.Button();
             this.updateNamesButton = new System.Windows.Forms.Button();
             this.eventSetupTab = new System.Windows.Forms.TabPage();
@@ -79,19 +66,6 @@
             this.reloadEventSetupButton = new System.Windows.Forms.Button();
             this.updateEventSetupButton = new System.Windows.Forms.Button();
             this.mainControlTab = new System.Windows.Forms.TabControl();
-            this.knockoutTab = new System.Windows.Forms.TabPage();
-            this.splitContainer9 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer10 = new System.Windows.Forms.SplitContainer();
-            this.numberOfSessionsDataGridView = new System.Windows.Forms.DataGridView();
-            this.reloadSessions = new System.Windows.Forms.Button();
-            this.writeSessionsButton = new System.Windows.Forms.Button();
-            this.splitContainer11 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer12 = new System.Windows.Forms.SplitContainer();
-            this.knockoutCombobox = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.knockoutDataGridView = new System.Windows.Forms.DataGridView();
-            this.reloadKnockoutButton = new System.Windows.Forms.Button();
-            this.writeKnockoutButton = new System.Windows.Forms.Button();
             this.notifyMessage = new System.Windows.Forms.NotifyIcon(this.components);
             this.publishResultsTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
@@ -112,22 +86,12 @@
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.scoresDataGridView)).BeginInit();
-            this.drawTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
-            this.splitContainer5.Panel1.SuspendLayout();
-            this.splitContainer5.Panel2.SuspendLayout();
-            this.splitContainer5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.drawDataGridView)).BeginInit();
             this.enterNamesTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.enterNamesDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.teamsDataGridView)).BeginInit();
             this.eventSetupTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
@@ -135,25 +99,6 @@
             this.splitContainer4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.eventSetupDataGridView)).BeginInit();
             this.mainControlTab.SuspendLayout();
-            this.knockoutTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer9)).BeginInit();
-            this.splitContainer9.Panel1.SuspendLayout();
-            this.splitContainer9.Panel2.SuspendLayout();
-            this.splitContainer9.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).BeginInit();
-            this.splitContainer10.Panel1.SuspendLayout();
-            this.splitContainer10.Panel2.SuspendLayout();
-            this.splitContainer10.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfSessionsDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer11)).BeginInit();
-            this.splitContainer11.Panel1.SuspendLayout();
-            this.splitContainer11.Panel2.SuspendLayout();
-            this.splitContainer11.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer12)).BeginInit();
-            this.splitContainer12.Panel1.SuspendLayout();
-            this.splitContainer12.Panel2.SuspendLayout();
-            this.splitContainer12.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.knockoutDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // createLocalWebpagesButton
@@ -306,6 +251,7 @@
             this.showRoundScoresButton.Size = new System.Drawing.Size(229, 36);
             this.showRoundScoresButton.TabIndex = 16;
             this.showRoundScoresButton.Text = "Show Scores for Round :  ";
+            this.showRoundScoresButton.UseVisualStyleBackColor = false;
             // 
             // showTeamScoresButton
             // 
@@ -448,14 +394,14 @@
             // 
             // scoresDataGridView
             // 
-            this.scoresDataGridView.AllowUserToAddRows = false;
-            this.scoresDataGridView.AllowUserToDeleteRows = false;
             this.scoresDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.scoresDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scoresDataGridView.Location = new System.Drawing.Point(0, 0);
             this.scoresDataGridView.Name = "scoresDataGridView";
             this.scoresDataGridView.Size = new System.Drawing.Size(1059, 433);
             this.scoresDataGridView.TabIndex = 0;
+            this.scoresDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.scoresDataGridView_CellValueChanged);
+            this.scoresDataGridView.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.scoresDataGridView_RowLeave);
             // 
             // reloadScoresButton
             // 
@@ -468,6 +414,7 @@
             this.reloadScoresButton.TabIndex = 10;
             this.reloadScoresButton.Text = "Reload Scores From Database";
             this.reloadScoresButton.UseVisualStyleBackColor = false;
+            this.reloadScoresButton.Click += new System.EventHandler(this.reloadScoresButton_Click);
             // 
             // writeScoresButton
             // 
@@ -480,169 +427,7 @@
             this.writeScoresButton.TabIndex = 9;
             this.writeScoresButton.Text = "Write Scores to Database";
             this.writeScoresButton.UseVisualStyleBackColor = false;
-            // 
-            // drawTab
-            // 
-            this.drawTab.Controls.Add(this.splitContainer2);
-            this.drawTab.Location = new System.Drawing.Point(4, 22);
-            this.drawTab.Name = "drawTab";
-            this.drawTab.Size = new System.Drawing.Size(1059, 602);
-            this.drawTab.TabIndex = 2;
-            this.drawTab.Text = "Generate/Edit Draw";
-            this.drawTab.UseVisualStyleBackColor = true;
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.splitContainer5);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.printDrawBrowser);
-            this.splitContainer2.Panel2.Controls.Add(this.printDrawButton);
-            this.splitContainer2.Panel2.Controls.Add(this.reloadDrawButton);
-            this.splitContainer2.Panel2.Controls.Add(this.writeDrawButton);
-            this.splitContainer2.Size = new System.Drawing.Size(1059, 602);
-            this.splitContainer2.SplitterDistance = 482;
-            this.splitContainer2.TabIndex = 1;
-            // 
-            // splitContainer5
-            // 
-            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer5.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer5.Name = "splitContainer5";
-            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer5.Panel1
-            // 
-            this.splitContainer5.Panel1.Controls.Add(this.drawBasedOnCombobox);
-            this.splitContainer5.Panel1.Controls.Add(this.showingDrawCombobox);
-            this.splitContainer5.Panel1.Controls.Add(this.roundDrawButton);
-            this.splitContainer5.Panel1.Controls.Add(this.randomDrawButton);
-            this.splitContainer5.Panel1.Controls.Add(this.label8);
-            // 
-            // splitContainer5.Panel2
-            // 
-            this.splitContainer5.Panel2.Controls.Add(this.drawDataGridView);
-            this.splitContainer5.Size = new System.Drawing.Size(1059, 482);
-            this.splitContainer5.SplitterDistance = 91;
-            this.splitContainer5.TabIndex = 0;
-            // 
-            // drawBasedOnCombobox
-            // 
-            this.drawBasedOnCombobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.drawBasedOnCombobox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.drawBasedOnCombobox.FormattingEnabled = true;
-            this.drawBasedOnCombobox.Location = new System.Drawing.Point(820, 43);
-            this.drawBasedOnCombobox.Name = "drawBasedOnCombobox";
-            this.drawBasedOnCombobox.Size = new System.Drawing.Size(49, 24);
-            this.drawBasedOnCombobox.TabIndex = 9;
-            // 
-            // showingDrawCombobox
-            // 
-            this.showingDrawCombobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.showingDrawCombobox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.showingDrawCombobox.FormattingEnabled = true;
-            this.showingDrawCombobox.Location = new System.Drawing.Point(648, 11);
-            this.showingDrawCombobox.Name = "showingDrawCombobox";
-            this.showingDrawCombobox.Size = new System.Drawing.Size(65, 24);
-            this.showingDrawCombobox.TabIndex = 1;
-            // 
-            // roundDrawButton
-            // 
-            this.roundDrawButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.roundDrawButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.roundDrawButton.Location = new System.Drawing.Point(482, 43);
-            this.roundDrawButton.Name = "roundDrawButton";
-            this.roundDrawButton.Size = new System.Drawing.Size(332, 36);
-            this.roundDrawButton.TabIndex = 7;
-            this.roundDrawButton.Text = "Draw based on Scores after Round : ";
-            this.roundDrawButton.UseVisualStyleBackColor = false;
-            // 
-            // randomDrawButton
-            // 
-            this.randomDrawButton.AutoSize = true;
-            this.randomDrawButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.randomDrawButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.randomDrawButton.Location = new System.Drawing.Point(189, 43);
-            this.randomDrawButton.Name = "randomDrawButton";
-            this.randomDrawButton.Size = new System.Drawing.Size(287, 36);
-            this.randomDrawButton.TabIndex = 8;
-            this.randomDrawButton.Text = "Random Draw";
-            this.randomDrawButton.UseVisualStyleBackColor = false;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(345, 11);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(297, 26);
-            this.label8.TabIndex = 0;
-            this.label8.Text = "Showing Draw for Round : ";
-            // 
-            // drawDataGridView
-            // 
-            this.drawDataGridView.AllowUserToAddRows = false;
-            this.drawDataGridView.AllowUserToDeleteRows = false;
-            this.drawDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.drawDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.drawDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.drawDataGridView.Name = "drawDataGridView";
-            this.drawDataGridView.Size = new System.Drawing.Size(1059, 387);
-            this.drawDataGridView.TabIndex = 0;
-            // 
-            // printDrawBrowser
-            // 
-            this.printDrawBrowser.Location = new System.Drawing.Point(9, 4);
-            this.printDrawBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-            this.printDrawBrowser.Name = "printDrawBrowser";
-            this.printDrawBrowser.Size = new System.Drawing.Size(189, 250);
-            this.printDrawBrowser.TabIndex = 12;
-            this.printDrawBrowser.Visible = false;
-            // 
-            // printDrawButton
-            // 
-            this.printDrawButton.AutoSize = true;
-            this.printDrawButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.printDrawButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.printDrawButton.Location = new System.Drawing.Point(225, 67);
-            this.printDrawButton.Name = "printDrawButton";
-            this.printDrawButton.Size = new System.Drawing.Size(608, 36);
-            this.printDrawButton.TabIndex = 11;
-            this.printDrawButton.Text = "Print Draw";
-            this.printDrawButton.UseVisualStyleBackColor = false;
-            // 
-            // reloadDrawButton
-            // 
-            this.reloadDrawButton.BackColor = System.Drawing.Color.Red;
-            this.reloadDrawButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reloadDrawButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.reloadDrawButton.Location = new System.Drawing.Point(540, 13);
-            this.reloadDrawButton.Name = "reloadDrawButton";
-            this.reloadDrawButton.Size = new System.Drawing.Size(293, 43);
-            this.reloadDrawButton.TabIndex = 10;
-            this.reloadDrawButton.Text = "Reload Draw From Database";
-            this.reloadDrawButton.UseVisualStyleBackColor = false;
-            // 
-            // writeDrawButton
-            // 
-            this.writeDrawButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.writeDrawButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.writeDrawButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.writeDrawButton.Location = new System.Drawing.Point(225, 13);
-            this.writeDrawButton.Name = "writeDrawButton";
-            this.writeDrawButton.Size = new System.Drawing.Size(287, 43);
-            this.writeDrawButton.TabIndex = 9;
-            this.writeDrawButton.Text = "Write Draw to Database";
-            this.writeDrawButton.UseVisualStyleBackColor = false;
+            this.writeScoresButton.Click += new System.EventHandler(this.writeScoresButton_Click);
             // 
             // enterNamesTab
             // 
@@ -664,7 +449,7 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.enterNamesDataGridView);
+            this.splitContainer1.Panel1.Controls.Add(this.teamsDataGridView);
             // 
             // splitContainer1.Panel2
             // 
@@ -674,16 +459,17 @@
             this.splitContainer1.SplitterDistance = 515;
             this.splitContainer1.TabIndex = 0;
             // 
-            // enterNamesDataGridView
+            // teamsDataGridView
             // 
-            this.enterNamesDataGridView.AllowUserToAddRows = false;
-            this.enterNamesDataGridView.AllowUserToDeleteRows = false;
-            this.enterNamesDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.enterNamesDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.enterNamesDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.enterNamesDataGridView.Name = "enterNamesDataGridView";
-            this.enterNamesDataGridView.Size = new System.Drawing.Size(1053, 515);
-            this.enterNamesDataGridView.TabIndex = 1;
+            this.teamsDataGridView.AllowUserToAddRows = false;
+            this.teamsDataGridView.AllowUserToDeleteRows = false;
+            this.teamsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.teamsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.teamsDataGridView.Location = new System.Drawing.Point(0, 0);
+            this.teamsDataGridView.Name = "teamsDataGridView";
+            this.teamsDataGridView.Size = new System.Drawing.Size(1053, 515);
+            this.teamsDataGridView.TabIndex = 1;
+            this.teamsDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.teamsDataGridView_DataBindingComplete);
             // 
             // reloadNamesButton
             // 
@@ -696,6 +482,7 @@
             this.reloadNamesButton.TabIndex = 8;
             this.reloadNamesButton.Text = "Reload Names from Database";
             this.reloadNamesButton.UseVisualStyleBackColor = false;
+            this.reloadNamesButton.Click += new System.EventHandler(this.reloadNamesButton_Click);
             // 
             // updateNamesButton
             // 
@@ -708,6 +495,7 @@
             this.updateNamesButton.TabIndex = 7;
             this.updateNamesButton.Text = "Write Names to Database";
             this.updateNamesButton.UseVisualStyleBackColor = false;
+            this.updateNamesButton.Click += new System.EventHandler(this.updateNamesButton_Click);
             // 
             // eventSetupTab
             // 
@@ -749,6 +537,7 @@
             this.eventSetupDataGridView.Name = "eventSetupDataGridView";
             this.eventSetupDataGridView.Size = new System.Drawing.Size(1053, 516);
             this.eventSetupDataGridView.TabIndex = 0;
+            this.eventSetupDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.eventSetupDataGridView_DataBindingComplete);
             // 
             // reloadEventSetupButton
             // 
@@ -761,6 +550,7 @@
             this.reloadEventSetupButton.TabIndex = 6;
             this.reloadEventSetupButton.Text = "Reload Event Setup from Database";
             this.reloadEventSetupButton.UseVisualStyleBackColor = false;
+            this.reloadEventSetupButton.Click += new System.EventHandler(this.reloadEventSetupButton_Click);
             // 
             // updateEventSetupButton
             // 
@@ -773,14 +563,13 @@
             this.updateEventSetupButton.TabIndex = 5;
             this.updateEventSetupButton.Text = "Write Event Setup to Database";
             this.updateEventSetupButton.UseVisualStyleBackColor = false;
+            this.updateEventSetupButton.Click += new System.EventHandler(this.updateEventSetupButton_Click);
             // 
             // mainControlTab
             // 
             this.mainControlTab.Controls.Add(this.eventSetupTab);
             this.mainControlTab.Controls.Add(this.enterNamesTab);
-            this.mainControlTab.Controls.Add(this.drawTab);
             this.mainControlTab.Controls.Add(this.scoresTab);
-            this.mainControlTab.Controls.Add(this.knockoutTab);
             this.mainControlTab.Controls.Add(this.publishResultsTab);
             this.mainControlTab.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainControlTab.Location = new System.Drawing.Point(0, 0);
@@ -789,193 +578,18 @@
             this.mainControlTab.Size = new System.Drawing.Size(1067, 628);
             this.mainControlTab.TabIndex = 22;
             // 
-            // knockoutTab
-            // 
-            this.knockoutTab.Controls.Add(this.splitContainer9);
-            this.knockoutTab.Location = new System.Drawing.Point(4, 22);
-            this.knockoutTab.Name = "knockoutTab";
-            this.knockoutTab.Size = new System.Drawing.Size(1059, 602);
-            this.knockoutTab.TabIndex = 5;
-            this.knockoutTab.Text = "Knockout";
-            this.knockoutTab.UseVisualStyleBackColor = true;
-            // 
-            // splitContainer9
-            // 
-            this.splitContainer9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer9.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer9.Name = "splitContainer9";
-            // 
-            // splitContainer9.Panel1
-            // 
-            this.splitContainer9.Panel1.Controls.Add(this.splitContainer10);
-            // 
-            // splitContainer9.Panel2
-            // 
-            this.splitContainer9.Panel2.Controls.Add(this.splitContainer11);
-            this.splitContainer9.Size = new System.Drawing.Size(1059, 602);
-            this.splitContainer9.SplitterDistance = 274;
-            this.splitContainer9.TabIndex = 0;
-            // 
-            // splitContainer10
-            // 
-            this.splitContainer10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer10.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer10.Name = "splitContainer10";
-            this.splitContainer10.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer10.Panel1
-            // 
-            this.splitContainer10.Panel1.Controls.Add(this.numberOfSessionsDataGridView);
-            // 
-            // splitContainer10.Panel2
-            // 
-            this.splitContainer10.Panel2.Controls.Add(this.reloadSessions);
-            this.splitContainer10.Panel2.Controls.Add(this.writeSessionsButton);
-            this.splitContainer10.Size = new System.Drawing.Size(274, 602);
-            this.splitContainer10.SplitterDistance = 451;
-            this.splitContainer10.TabIndex = 0;
-            // 
-            // numberOfSessionsDataGridView
-            // 
-            this.numberOfSessionsDataGridView.AllowUserToAddRows = false;
-            this.numberOfSessionsDataGridView.AllowUserToDeleteRows = false;
-            this.numberOfSessionsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.numberOfSessionsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.numberOfSessionsDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.numberOfSessionsDataGridView.Name = "numberOfSessionsDataGridView";
-            this.numberOfSessionsDataGridView.Size = new System.Drawing.Size(274, 451);
-            this.numberOfSessionsDataGridView.TabIndex = 0;
-            // 
-            // reloadSessions
-            // 
-            this.reloadSessions.BackColor = System.Drawing.Color.Red;
-            this.reloadSessions.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reloadSessions.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.reloadSessions.Location = new System.Drawing.Point(10, 61);
-            this.reloadSessions.Name = "reloadSessions";
-            this.reloadSessions.Size = new System.Drawing.Size(255, 74);
-            this.reloadSessions.TabIndex = 8;
-            this.reloadSessions.Text = "Reload Sessions from Database";
-            this.reloadSessions.UseVisualStyleBackColor = false;
-            // 
-            // writeSessionsButton
-            // 
-            this.writeSessionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.writeSessionsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.writeSessionsButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.writeSessionsButton.Location = new System.Drawing.Point(8, 12);
-            this.writeSessionsButton.Name = "writeSessionsButton";
-            this.writeSessionsButton.Size = new System.Drawing.Size(258, 43);
-            this.writeSessionsButton.TabIndex = 7;
-            this.writeSessionsButton.Text = "Write Session To Database";
-            this.writeSessionsButton.UseVisualStyleBackColor = false;
-            // 
-            // splitContainer11
-            // 
-            this.splitContainer11.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer11.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer11.Name = "splitContainer11";
-            this.splitContainer11.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer11.Panel1
-            // 
-            this.splitContainer11.Panel1.Controls.Add(this.splitContainer12);
-            // 
-            // splitContainer11.Panel2
-            // 
-            this.splitContainer11.Panel2.Controls.Add(this.reloadKnockoutButton);
-            this.splitContainer11.Panel2.Controls.Add(this.writeKnockoutButton);
-            this.splitContainer11.Size = new System.Drawing.Size(781, 602);
-            this.splitContainer11.SplitterDistance = 532;
-            this.splitContainer11.TabIndex = 0;
-            // 
-            // splitContainer12
-            // 
-            this.splitContainer12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer12.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer12.Name = "splitContainer12";
-            this.splitContainer12.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer12.Panel1
-            // 
-            this.splitContainer12.Panel1.Controls.Add(this.knockoutCombobox);
-            this.splitContainer12.Panel1.Controls.Add(this.label4);
-            // 
-            // splitContainer12.Panel2
-            // 
-            this.splitContainer12.Panel2.Controls.Add(this.knockoutDataGridView);
-            this.splitContainer12.Size = new System.Drawing.Size(781, 532);
-            this.splitContainer12.SplitterDistance = 74;
-            this.splitContainer12.TabIndex = 0;
-            // 
-            // knockoutCombobox
-            // 
-            this.knockoutCombobox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.knockoutCombobox.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.knockoutCombobox.FormattingEnabled = true;
-            this.knockoutCombobox.Location = new System.Drawing.Point(417, 24);
-            this.knockoutCombobox.Name = "knockoutCombobox";
-            this.knockoutCombobox.Size = new System.Drawing.Size(244, 24);
-            this.knockoutCombobox.TabIndex = 3;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(120, 24);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(282, 26);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "Enter Scores for Round : ";
-            // 
-            // knockoutDataGridView
-            // 
-            this.knockoutDataGridView.AllowUserToAddRows = false;
-            this.knockoutDataGridView.AllowUserToDeleteRows = false;
-            this.knockoutDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.knockoutDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.knockoutDataGridView.Location = new System.Drawing.Point(0, 0);
-            this.knockoutDataGridView.Name = "knockoutDataGridView";
-            this.knockoutDataGridView.Size = new System.Drawing.Size(781, 454);
-            this.knockoutDataGridView.TabIndex = 0;
-            // 
-            // reloadKnockoutButton
-            // 
-            this.reloadKnockoutButton.BackColor = System.Drawing.Color.Red;
-            this.reloadKnockoutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.reloadKnockoutButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.reloadKnockoutButton.Location = new System.Drawing.Point(368, 12);
-            this.reloadKnockoutButton.Name = "reloadKnockoutButton";
-            this.reloadKnockoutButton.Size = new System.Drawing.Size(346, 43);
-            this.reloadKnockoutButton.TabIndex = 12;
-            this.reloadKnockoutButton.Text = "Reload Knockout Scores From Database";
-            this.reloadKnockoutButton.UseVisualStyleBackColor = false;
-            // 
-            // writeKnockoutButton
-            // 
-            this.writeKnockoutButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.writeKnockoutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.writeKnockoutButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.writeKnockoutButton.Location = new System.Drawing.Point(67, 12);
-            this.writeKnockoutButton.Name = "writeKnockoutButton";
-            this.writeKnockoutButton.Size = new System.Drawing.Size(295, 43);
-            this.writeKnockoutButton.TabIndex = 11;
-            this.writeKnockoutButton.Text = "Write Knockout Score to Database";
-            this.writeKnockoutButton.UseVisualStyleBackColor = false;
-            // 
             // notifyMessage
             // 
             this.notifyMessage.Text = "notifyIcon1";
             this.notifyMessage.Visible = true;
             // 
-            // TeamScorer
+            // PDScorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1067, 628);
             this.Controls.Add(this.mainControlTab);
-            this.Name = "TeamScorer";
+            this.Name = "PDScorer";
             this.Text = "TeamsScorer";
             this.publishResultsTab.ResumeLayout(false);
             this.splitContainer7.Panel1.ResumeLayout(false);
@@ -999,24 +613,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.scoresDataGridView)).EndInit();
-            this.drawTab.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            this.splitContainer2.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
-            this.splitContainer5.Panel1.ResumeLayout(false);
-            this.splitContainer5.Panel1.PerformLayout();
-            this.splitContainer5.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
-            this.splitContainer5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.drawDataGridView)).EndInit();
             this.enterNamesTab.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.enterNamesDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.teamsDataGridView)).EndInit();
             this.eventSetupTab.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
@@ -1024,26 +626,6 @@
             this.splitContainer4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.eventSetupDataGridView)).EndInit();
             this.mainControlTab.ResumeLayout(false);
-            this.knockoutTab.ResumeLayout(false);
-            this.splitContainer9.Panel1.ResumeLayout(false);
-            this.splitContainer9.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer9)).EndInit();
-            this.splitContainer9.ResumeLayout(false);
-            this.splitContainer10.Panel1.ResumeLayout(false);
-            this.splitContainer10.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).EndInit();
-            this.splitContainer10.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numberOfSessionsDataGridView)).EndInit();
-            this.splitContainer11.Panel1.ResumeLayout(false);
-            this.splitContainer11.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer11)).EndInit();
-            this.splitContainer11.ResumeLayout(false);
-            this.splitContainer12.Panel1.ResumeLayout(false);
-            this.splitContainer12.Panel1.PerformLayout();
-            this.splitContainer12.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer12)).EndInit();
-            this.splitContainer12.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.knockoutDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1053,20 +635,9 @@
         private System.Windows.Forms.Button createLocalWebpagesButton;
         private System.Windows.Forms.TabPage publishResultsTab;
         private System.Windows.Forms.TabPage scoresTab;
-        private System.Windows.Forms.TabPage drawTab;
-        private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.SplitContainer splitContainer5;
-        private System.Windows.Forms.ComboBox drawBasedOnCombobox;
-        private System.Windows.Forms.ComboBox showingDrawCombobox;
-        private System.Windows.Forms.Button roundDrawButton;
-        private System.Windows.Forms.Button randomDrawButton;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.DataGridView drawDataGridView;
-        private System.Windows.Forms.Button reloadDrawButton;
-        private System.Windows.Forms.Button writeDrawButton;
         private System.Windows.Forms.TabPage enterNamesTab;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridView enterNamesDataGridView;
+        private System.Windows.Forms.DataGridView teamsDataGridView;
         private System.Windows.Forms.Button reloadNamesButton;
         private System.Windows.Forms.Button updateNamesButton;
         private System.Windows.Forms.TabPage eventSetupTab;
@@ -1084,10 +655,8 @@
         private System.Windows.Forms.Button writeScoresButton;
         private System.Windows.Forms.ComboBox scoresEntryFormatCombobox;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button printDrawButton;
         private System.Windows.Forms.TextBox websiteResultsTextbox;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.WebBrowser printDrawBrowser;
         private System.Windows.Forms.SplitContainer splitContainer7;
         private System.Windows.Forms.SplitContainer splitContainer8;
         private System.Windows.Forms.WebBrowser displayWebBrowser;
@@ -1096,19 +665,6 @@
         private System.Windows.Forms.Button showTeamScoresButton;
         private System.Windows.Forms.ComboBox showTeamScoresCombobox;
         private System.Windows.Forms.ComboBox showRoundScoresCombobox;
-        private System.Windows.Forms.TabPage knockoutTab;
-        private System.Windows.Forms.SplitContainer splitContainer9;
-        private System.Windows.Forms.SplitContainer splitContainer10;
-        private System.Windows.Forms.DataGridView numberOfSessionsDataGridView;
-        private System.Windows.Forms.Button reloadSessions;
-        private System.Windows.Forms.Button writeSessionsButton;
-        private System.Windows.Forms.SplitContainer splitContainer11;
-        private System.Windows.Forms.SplitContainer splitContainer12;
-        private System.Windows.Forms.ComboBox knockoutCombobox;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button reloadKnockoutButton;
-        private System.Windows.Forms.Button writeKnockoutButton;
-        private System.Windows.Forms.DataGridView knockoutDataGridView;
         private System.Windows.Forms.NotifyIcon notifyMessage;
         private System.Windows.Forms.Button createAndPublishKnockoutButton;
         private System.Windows.Forms.Button showKnockoutButton;
