@@ -86,20 +86,8 @@
     <Compile Include="LoadingEvents.Designer.cs">
       <DependentUpon>LoadingEvents.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PublishResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PublishResults.Designer.cs">
-      <DependentUpon>PublishResults.cs</DependentUpon>
-    </Compile>
     <Compile Include="SelectCalendarEvent.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -118,9 +106,6 @@
     <EmbeddedResource Include="LoadingEvents.resx">
       <DependentUpon>LoadingEvents.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -130,9 +115,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="PublishResults.resx">
-      <DependentUpon>PublishResults.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="SelectCalendarEvent.resx">
       <DependentUpon>SelectCalendarEvent.cs</DependentUpon>
     </EmbeddedResource>

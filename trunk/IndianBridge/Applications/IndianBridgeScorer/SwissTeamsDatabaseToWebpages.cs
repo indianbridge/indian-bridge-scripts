@@ -25,6 +25,7 @@ namespace IndianBridgeScorer
         private int numberOfPagesCreatedSoFar = 0;
         private BackgroundWorker m_worker;
         private bool m_runningInBackground = false;
+        private string m_prefixString = "Creating Local Webpages : ";
 
         public SwissTeamsDatabaseToWebpages(string eventName, string databaseFileName, string webpagesRoot)
         {
@@ -74,7 +75,7 @@ namespace IndianBridgeScorer
             if (m_runningInBackground)
             {
                 double percentage = ((double)numberOfPagesCreatedSoFar / (double)totalNumberOfPagesToBeCreated) * 100;
-                m_worker.ReportProgress(Convert.ToInt32(percentage), "Created " + title+ " Page");
+                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString+ "Created " + title+ " Page");
             }
         }
 
@@ -121,7 +122,7 @@ namespace IndianBridgeScorer
             m_prefix = "./";
             parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
             createPage_(parameters);
-            reportProgress("Leaderboard");
+            reportProgress("Created Leaderboard Page");
         }
 
         private void createNamesPage()
@@ -141,7 +142,7 @@ namespace IndianBridgeScorer
             parameters.headerTemplate = "<h2>Team Compositions</h2>" + "<br/>[_commonPageHeader]";
             parameters.tableName = Constants.EventNamesTableName;
             createPage_(parameters);
-            reportProgress("Names");
+            reportProgress("Created Names Page");
         }
 
         private void createTeamPages() {
@@ -291,7 +292,7 @@ namespace IndianBridgeScorer
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
-            reportProgress("Team "+teamNumber);
+            reportProgress("Created Team "+teamNumber+" Score Page");
         }
 
         private void createRoundPages()
@@ -360,7 +361,7 @@ namespace IndianBridgeScorer
             }
             sw.WriteLine("</body></html>");
             sw.Close();
-            reportProgress("Round "+roundNumber);
+            reportProgress("Created Round "+roundNumber+" Score Page");
         }
 
         private string createRoundTable(int roundNumber, DataRow[] foundRows, bool showVPs= true)

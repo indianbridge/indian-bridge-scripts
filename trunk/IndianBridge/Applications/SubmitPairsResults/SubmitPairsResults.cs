@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using IndianBridge.ResultsManager;
 using System.IO;
 using IndianBridge.Common;
+using IndianBridge.GoogleAPIs;
 
 namespace SubmitPairsResults
 {
@@ -16,9 +17,10 @@ namespace SubmitPairsResults
     {
         private Boolean resultsLoaded = false, eventSelected = false, publishEnabled = false;
         private PairsEventInformation m_eventInformation = PairsGeneral.createDefaultEventInformation();
+        private PairsDatabaseParameters m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
         SelectCalendarEvent selectCalendarEventForm;
-        private string googleSiteName = "indiancitybridgeresults";
-        String googleSiteRootPageName = "";
+        private string m_googleSiteName = "indiancitybridgeresults";
+        string m_googleSiteRootPageName = "";
         public SubmitPairsResults()
         {
             InitializeComponent();
@@ -111,7 +113,7 @@ namespace SubmitPairsResults
                 string pageName = Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy_MM_dd"));
                 m_eventInformation.databaseFileName = Path.Combine(Globals.m_rootDirectory, "Databases", cityName, pageName) + ".mdb";
                 m_eventInformation.webpagesDirectory = Path.Combine(Globals.m_rootDirectory, "Webpages", cityName, pageName);
-                googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy-MM-dd"));
+                m_googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy-MM-dd"));
             }
             else
             {
@@ -119,7 +121,7 @@ namespace SubmitPairsResults
                     Path.Combine(Path.Combine(Globals.m_rootDirectory, "Databases", cityName, eventName), eventDate.ToString("yyyy_MM_dd")) + ".mdb";
                 m_eventInformation.webpagesDirectory =
                     Path.Combine(Path.Combine(Globals.m_rootDirectory, "Webpages", cityName, eventName), eventDate.ToString("yyyy_MM_dd"));
-                googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_(eventName) + "/" + eventDate.ToString("yyyy-MM-dd");
+                m_googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_(eventName) + "/" + eventDate.ToString("yyyy-MM-dd");
             }
 
         }
@@ -132,7 +134,7 @@ namespace SubmitPairsResults
                 eventSelected = true;
                 this.selectedCalendarEvent_textBox.Text = "Event Title : " + selectCalendarEventForm.calendarEventInfo.Item1 + ", Event Date : " + selectCalendarEventForm.calendarEventInfo.Item2.ToString("MMMM dd, yyyy") + ", Event Location : " + selectCalendarEventForm.calendarEventInfo.Item3;
                 deriveWebsiteAddress();
-                this.websiteAddress_textBox.Text = "https://sites.google.com/site/"+googleSiteName+googleSiteRootPageName;
+                this.websiteAddress_textBox.Text = "https://sites.google.com/site/"+m_googleSiteName+m_googleSiteRootPageName;
                 updateButtonStatus();
             }
             else
@@ -144,9 +146,68 @@ namespace SubmitPairsResults
 
         private void publishResults_Click(object sender, EventArgs e)
         {
-            PublishResults publishResults = new PublishResults(m_eventInformation,googleSiteName,googleSiteRootPageName);
-            publishResults.ShowDialog(this);
-            publishResults.Dispose();
+            loadSummaryIntoDatabase();
+        }
+
+        private void publishResultsCompleted()
+        {
+            string calendarMessage = "";
+            if (SelectCalendarEvent.calendarAPI.updateResults(SelectCalendarEvent.selectedEntryNumber, "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName))
+            {
+                calendarMessage = "Indian Bridge Calendar updated with Results";
+            }
+            else calendarMessage = "Not able to update Indian Bridge Calendar";
+            MessageBox.Show("Results created and successfully uploaded to " + "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName+Environment.NewLine+calendarMessage, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void publishResultsInternal()
+        {
+            string resultsWebsite = websiteAddress_textBox.Text;
+            if (string.IsNullOrWhiteSpace(resultsWebsite))
+            {
+                MessageBox.Show("Please provide a results website to publish to.");
+                return;
+            }
+            string siteName, pagePath;
+            Utilities.getGoogleSiteComponents(resultsWebsite, out siteName, out pagePath);
+            String username = "indianbridge.dummy@gmail.com";
+            String password = "kibitzer";
+            SitesAPI sa = new SitesAPI(siteName, username, password, true, false);
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Publish Results", sa.uploadDirectoryInBackground, publishResultsCompleted, operationStatus,
+operationProgressBar, operationCancelButton, null);
+            Tuple<string, string> values = new Tuple<string, string>(m_eventInformation.webpagesDirectory, pagePath);
+            cbw.run(values);
+        }
+
+
+
+        private void loadSummaryCompleted()
+        {
+            m_databaseParameters = std.getDatabaseParameters();
+            createWebpages();
+        }
+
+        PairsSummaryToDatabase std;
+        private void loadSummaryIntoDatabase()
+        {
+            std = new PairsSummaryToDatabase(m_eventInformation);
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Load Summary", std.loadSummaryIntoDatabaseInBackground, loadSummaryCompleted, operationStatus,
+                operationProgressBar, operationCancelButton, null);
+            cbw.run();
+
+        }
+
+        private void createWebpagesCompleted()
+        {
+            publishResultsInternal();
+        }
+
+        private void createWebpages()
+        {
+            PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", dtw.createWebpagesInBackground, createWebpagesCompleted, operationStatus,
+    operationProgressBar, operationCancelButton, null);
+            cbw.run();
         }
     }
 }

@@ -64,6 +64,7 @@ namespace IndianBridgeScorer
             }
             populateComboboxes();
             updateComboboxes();
+            showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
         }
 
         private void updateTeamEventParameters()
@@ -1010,39 +1011,12 @@ namespace IndianBridgeScorer
             doScoring(roundCompletedString);
             Utilities.showBalloonNotification("Saved Scores", "Saved Round " + roundCompleted + " scores and re-calculated leaderboard");
             createLocalWebpages();
+            showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
         }
 
-        private void publishResultsProgress(object sender, ProgressChangedEventArgs e)
+        private void publishResultsCompleted()
         {
-            publishResultsStatus.ForeColor = Color.Orange;
-            publishResultsStatus.Text = e.UserState as string;
-            publishResultsProgressBar.Value = e.ProgressPercentage;
-            publishResultsStatusTextbox.Text = "Publishing - Completed " + e.ProgressPercentage + "%";
-        }
-
-        private void publishResultsCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if ((e.Cancelled == true))
-            {
-                publishResultsStatus.ForeColor = Color.Red;
-                publishResultsStatus.Text = "Cancelled!";
-                publishResultsStatusTextbox.Text = "Cancelled by User";
-                publishResultsProgressBar.Value = 0;
-            }
-
-            else if (!(e.Error == null))
-            {
-                publishResultsStatus.ForeColor = Color.Red;
-                publishResultsStatus.Text = "Error: ";
-                publishResultsStatusTextbox.Text = ("Error encountered when publishing results (as noted below). Please try publishing again to upload all results." +Environment.NewLine+ e.Error.Message);
-            }
-            else
-            {
-                publishResultsStatus.ForeColor = Color.Green;
-                publishResultsStatus.Text = "Done!";
-                publishResultsStatusTextbox.Text = ("Results published succesfully at " + m_resultsPublishParameters.ResultsWebsite);
-                publishResultsProgressBar.Value = 100;
-            }
+            publishResultsStatusTextbox.Text = ("Results published succesfully at " + m_resultsPublishParameters.ResultsWebsite);
         }
 
 
@@ -1057,92 +1031,31 @@ namespace IndianBridgeScorer
             Utilities.getGoogleSiteComponents(m_resultsPublishParameters.ResultsWebsite, out siteName, out pagePath);
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
-            SitesAPI sa = new SitesAPI(siteName,username, password, true, false);
-            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork +=
-                            new DoWorkEventHandler(sa.uploadDirectoryInBackground);
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(publishResultsCompleted);
-            backgroundWorker1.ProgressChanged +=
-                new ProgressChangedEventHandler(publishResultsProgress);
-            if (backgroundWorker1.IsBusy != true)
-            {
-                publishResultsStatus.ForeColor = Color.Orange;
-                publishResultsStatus.Text = "Starting...";
-                Tuple<string, string> values = new Tuple<string, string>(Constants.getEventWebpagesFolder(m_eventName), pagePath);
-                backgroundWorker1.RunWorkerAsync(values);
-            }
-            else
-            {
-                Utilities.showWarningessage("A Publish Results operation is already running! To start a new one cancel the previous one using the button in the status bar or wait for it to complete.");
-            }
+            SitesAPI sa = new SitesAPI(siteName, username, password, true, false);
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Publish Results", sa.uploadDirectoryInBackground, publishResultsCompleted, publishResultsStatus,
+                publishResultsProgressBar,cancelPublishResultsButton,publishResultsStatusTextbox);
+            oldFontSize = Utilities.fontSize;
+            Utilities.fontSize = m_resultsPublishParameters.FontSize;
+            Tuple<string, string> values = new Tuple<string, string>(Constants.getEventWebpagesFolder(m_eventName), pagePath);
+            cbw.run(values);
         }
 
-        private void createWebpagesProgress(object sender, ProgressChangedEventArgs e)
+
+        private void createWebpagesCompleted()
         {
-            createWebpagesStatus.ForeColor = Color.Orange;
-            createWebpagesStatus.Text = e.UserState as string;
-            createWebpagesProgressBar.Value = e.ProgressPercentage;
-            createWebpagesStatusTextbox.Text = "Local Webpages Creation - Completed " + e.ProgressPercentage + "%";
-        }
-
-        private void createWebpagesCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if ((e.Cancelled == true))
-            {
-                createWebpagesStatus.ForeColor = Color.Red;
-                createWebpagesStatus.Text = "Canceled!";
-                createWebpagesProgressBar.Value = 0;
-                createWebpagesStatusTextbox.Text = "Canceled by User! All local webpages were not created.";
-            }
-
-            else if (!(e.Error == null))
-            {
-                createWebpagesStatus.ForeColor = Color.Red;
-                createWebpagesStatus.Text = "Error!";
-                createWebpagesProgressBar.Value = 0;
-                createWebpagesStatusTextbox.Text = ("Error encountered when creating local webpages (as noted below). Please try creating again to create all pages." +Environment.NewLine+ e.Error.Message);
-            }
-
-            else
-            {
-                createWebpagesStatus.ForeColor = Color.Green;
-                createWebpagesStatus.Text = "Done!";
-                createWebpagesProgressBar.Value = 100;
-                createWebpagesStatusTextbox.Text = ("Local webpages created successfully at " + Constants.getEventWebpagesFolder(m_eventName));
-                showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
-            }
             Utilities.fontSize = oldFontSize;
+            showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
         }
 
         private void createLocalWebpages()
         {
+            SwissTeamsDatabaseToWebpages tdw = new SwissTeamsDatabaseToWebpages(m_eventName, m_databaseFileName, Constants.getEventWebpagesFolder(m_eventName));
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages",tdw.createWebpagesInBackground,createWebpagesCompleted,createWebpagesStatus,
+                createWebpagesProgressBar,cancelCreateWebpagesButton,createWebpagesStatusTextbox);
             oldFontSize = Utilities.fontSize;
             Utilities.fontSize = m_resultsPublishParameters.FontSize;
-            SwissTeamsDatabaseToWebpages tdw = new SwissTeamsDatabaseToWebpages(m_eventName, m_databaseFileName, Constants.getEventWebpagesFolder(m_eventName));
-            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork +=
-                            new DoWorkEventHandler(tdw.createWebpagesInBackground);
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(createWebpagesCompleted);
-            backgroundWorker1.ProgressChanged +=
-                new ProgressChangedEventHandler(createWebpagesProgress);
-            if (backgroundWorker1.IsBusy != true)
-            {
-                createWebpagesStatus.ForeColor = Color.Orange;
-                createWebpagesStatus.Text = "Starting...";
-                createWebpagesProgressBar.Value = 0;
-                backgroundWorker1.RunWorkerAsync();
-            }
-            else
-            {
-                Utilities.showWarningessage("A Create Webpages operation is already running! To start a new one cancel the previous one using the button in the status bar or wait for it to complete.");
-            }
-        }
+            cbw.run();
+         }
 
         private void showUrl(string filename)
         {
@@ -1306,19 +1219,6 @@ namespace IndianBridgeScorer
             showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "rounds", "round" + roundNumber + "score.html"));
         }
 
-        /*private void scoresEntryFormatCombobox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            NiniUtilities.setStringValue(m_doScoringParametersNiniFileName, "Scoring_Type",scoresEntryFormatCombobox.Text);
-            NiniUtilities.saveNiniConfig(m_doScoringParametersNiniFileName);
-            showScores();
-        }
-
-        private void tiebreakerMethodCombobox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            NiniUtilities.setStringValue(m_doScoringParametersNiniFileName, "Tiebreaker_Method", tiebreakerMethodCombobox.Text);
-            NiniUtilities.saveNiniConfig(m_doScoringParametersNiniFileName);
-        }*/
-
         private void showingScoresForRoundCombobox_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             showScores();
@@ -1356,13 +1256,12 @@ namespace IndianBridgeScorer
             Utilities.showBalloonNotification("Recalculation Done", "Re-calculated All Round Scores and Leaderboard");
             createLocalWebpages();
             Utilities.showBalloonNotification("Regeneration Done", "Regenerated All Webpages");
+            showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
         }
 
         private void publishResultsButton_Click(object sender, EventArgs e)
         {
             publishResults();
         }
-
-
     }
 }

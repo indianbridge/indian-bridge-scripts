@@ -49,7 +49,7 @@ namespace IndianBridge.ResultsManager
         private int numberOfPagesCreatedSoFar = 0;
         private BackgroundWorker m_worker;
         private bool m_runningInBackground = false;
-        private string m_prefixString = "Creating Local Webpages : ";
+        private string m_prefixString = "";
 
         public PairsDatabaseToWebpages(PairsEventInformation eventInformation, PairsDatabaseParameters databaseParameters)
         {
