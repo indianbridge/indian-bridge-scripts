@@ -54,7 +54,7 @@ namespace IndianBridge.ResultsManager
             System.IO.File.Copy(sourceFileName, m_eventInformation.databaseFileName);
             PairsGeneral.loadPairsDatabaseInformation(m_eventInformation.databaseFileName, out m_databaseParameters);
             printMessage("Updating Event Information...");
-            reportProgress(0,"Load Summary : Reading Event Information");
+            reportProgress(0,"Reading Event Information");
             DataTable eventInfoTable = m_databaseParameters.m_ds.Tables["Event_Information"];
             eventInfoTable.Clear();
             DataRow dRow = eventInfoTable.NewRow();
@@ -67,7 +67,7 @@ namespace IndianBridge.ResultsManager
             eventInfoTable.Rows.Add(dRow);
             printMessage("Uploading Event Information Table to Database...");
             m_databaseParameters.m_daEventInformation.Update(m_databaseParameters.m_ds, "Event_Information");
-            reportProgress(10, "Load Summary : Processing Summaries");
+            reportProgress(10, "Processing Summaries");
             printMessage("Processing Summaries...");
             String[] lines = m_eventInformation.rawText.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length < 2)
@@ -87,7 +87,7 @@ namespace IndianBridge.ResultsManager
                 lineNumber = getNextSummaryLine_(lines, lineNumber);
             }
 
-            reportProgress(50, "Load Summary : Calculating Scores");
+            reportProgress(50, "Calculating Scores");
             printMessage("Calculating Ranks...");
             // Combined Ranking
             doRanking_();
@@ -98,7 +98,7 @@ namespace IndianBridge.ResultsManager
                 doRanking_(PairsGeneral.NORTH_SOUTH_SECTION_NAME, "Session_Rank");
                 doRanking_(PairsGeneral.EAST_WEST_SECTION_NAME, "Session_Rank");
             }
-            reportProgress(75, "Load Summary : Saving to database");
+            reportProgress(75, "Saving to database");
             printMessage("Uploading Pair Information Table to Database...");
             m_databaseParameters.m_daPairInformation.Update(m_databaseParameters.m_ds, "Pair_Information");
             printMessage("Uploading Pair Wise Scores Table to Database...");

@@ -23,10 +23,11 @@ namespace IndianBridge.GoogleAPIs
         private bool m_replaceLinks = false;
         private bool m_convertCase = false;
         private BackgroundWorker m_worker;
+        private DoWorkEventArgs m_e;
         private bool m_runningInBackground = false;
         private int totalPagesToUpload = 0;
         private int numberOfPagesAlreadyUploaded = 0;
-        private string m_prefixString = "Publishing Results : ";
+        private string m_prefixString = "";
 
         public void convertCase(bool convert) { m_convertCase = convert; }
 
@@ -111,14 +112,18 @@ namespace IndianBridge.GoogleAPIs
             string siteRoot = values.Item2;
             m_runningInBackground = true;
             m_worker = sender as BackgroundWorker;
+            m_e = e;
             uploadDirectoryInternal(directory, siteRoot);
+            if (cancel()) m_e.Cancel = true;
         }
 
         public void uploadDirectory(String directory, String siteRoot)
         {
             m_runningInBackground = false;
             m_worker = null;
+            m_e = null;
             uploadDirectoryInternal(directory, siteRoot);
+            if (cancel()) m_e.Cancel = true;
         }
 
         public void uploadDirectoryInternal(String directory, String siteRoot)
@@ -132,7 +137,9 @@ namespace IndianBridge.GoogleAPIs
             try
             {
                 handleRootIndexHtml(directory, siteRoot);
+                if (cancel()) return;
                 uploadPath(directory, siteRoot);
+                if (cancel()) return;
                 writeHashTableFile(m_hashTableFileName);
             }
             catch (Exception e)
@@ -156,6 +163,7 @@ namespace IndianBridge.GoogleAPIs
                         string html = File.ReadAllText(file);
                         DateTime lastUpdateTime = File.GetLastWriteTime(file);
                         updateWebpage(siteRoot, Path.GetFileName(path), html, "", lastUpdateTime);
+                        if (cancel()) return;
                     }
                 }
             }
@@ -171,6 +179,7 @@ namespace IndianBridge.GoogleAPIs
                     if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower() != "index")
                     {
                         updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)), File.GetLastWriteTime(path));
+                        if (cancel()) return;
                     }
                     return;
                 }
@@ -203,7 +212,9 @@ namespace IndianBridge.GoogleAPIs
                             else html = getSubPageListing();
                         }
                         updateWebpage(siteRoot, dirName, html, pageName, lastUpdateTime,indexHtmlPath);
+                        if (cancel()) return;
                         uploadPath(dir, siteRoot + "/" + pageName);
+                        if (cancel()) return;
                     }
                     String[] files = Directory.GetFiles(path);
                     foreach (String file in files) uploadPath(file, siteRoot);
@@ -230,6 +241,7 @@ namespace IndianBridge.GoogleAPIs
 
         public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified, string indexHtmlPath="")
         {
+            if (cancel()) return null;
             String url = "https://sites.google.com/feeds/content/site/" + m_siteName + "?path=" + path + (pageName==""?"":"/") + pageName;
             printMessage(url);
             try
@@ -302,8 +314,14 @@ namespace IndianBridge.GoogleAPIs
             }
         }
 
+        private bool cancel()
+        {
+            return m_runningInBackground && m_worker.CancellationPending;
+        }
+
         public AtomEntry createWebPage(String originalUrl, String path, String title, String html, String pageName, DateTime lastModified, string indexHtmlPath="")
         {
+            if (cancel()) return null;
             String parentUrl = originalUrl.Substring(0, originalUrl.LastIndexOf("/"));
             pageName = originalUrl.Substring(originalUrl.LastIndexOf("/")+1);
             AtomEntry parent = m_service.Get(parentUrl);

@@ -32,7 +32,7 @@ namespace IndianBridgeScorer
 
         private void initialize()
         {
-            this.Text = "Pairs Scorer for " + m_eventName;
+            this.Text = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.TourneyNameFieldName) + " : " + m_eventName;
             m_databaseFileName = Constants.getEventScoresFileName(m_eventName);
             m_localWebpagesRoot = Constants.getEventWebpagesFolder(m_eventName);
             m_resultsWebsite = Constants.getEventResultsWebsite(m_eventName);
@@ -95,38 +95,10 @@ namespace IndianBridgeScorer
             loadSummaryIntoDatabase();
         }
 
-        private void publishResultsProgress(object sender, ProgressChangedEventArgs e)
+        private void publishResultsCompleted()
         {
-            operationStatus.ForeColor = Color.Orange;
-            operationStatus.Text = e.UserState as string;
-            operationProgressBar.Value = e.ProgressPercentage;
+            MessageBox.Show("Results published successfully to " + m_resultsWebsite, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        private void publishResultsCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if ((e.Cancelled == true))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Cancelled!";
-                operationProgressBar.Value = 0;
-            }
-
-            else if (!(e.Error == null))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Error: ";
-                Utilities.showErrorMessage(e.Error.Message);
-                operationProgressBar.Value = 0;
-            }
-            else
-            {
-                operationStatus.ForeColor = Color.Green;
-                operationStatus.Text = "Results published successfully to "+m_resultsWebsite;
-                operationProgressBar.Value = 100;
-                operationCancelButton.Text = "";
-            }
-        }
-
 
         private void publishResultsInternal()
         {
@@ -141,148 +113,41 @@ namespace IndianBridgeScorer
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
             SitesAPI sa = new SitesAPI(siteName, username, password, true, false);
-            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork +=
-                            new DoWorkEventHandler(sa.uploadDirectoryInBackground);
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(publishResultsCompleted);
-            backgroundWorker1.ProgressChanged +=
-                new ProgressChangedEventHandler(publishResultsProgress);
-            if (backgroundWorker1.IsBusy != true)
-            {
-                operationStatus.ForeColor = Color.Orange;
-                operationStatus.Text = "Publish Results : Starting...";
-                operationCancelButton.Text = "Cancel Publish Results";
-                operationProgressBar.Value = 0;
-                Tuple<string, string> values = new Tuple<string, string>(m_eventInformation.webpagesDirectory, pagePath);
-                backgroundWorker1.RunWorkerAsync(values);
-            }
-            else
-            {
-                Utilities.showWarningessage("A Publish Results operation is already running! To start a new one cancel the previous one using the button in the status bar or wait for it to complete.");
-            }
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", sa.uploadDirectoryInBackground, publishResultsCompleted, operationStatus,
+operationProgressBar, operationCancelButton, null);
+            Tuple<string, string> values = new Tuple<string, string>(m_eventInformation.webpagesDirectory, pagePath);
+            cbw.run(values);
         }
 
-        private void loadSummaryProgress(object sender, ProgressChangedEventArgs e)
-        {
-            operationStatus.ForeColor = Color.Orange;
-            operationStatus.Text = e.UserState as string;
-            operationProgressBar.Value = e.ProgressPercentage;
-        }
 
-        private void loadSummaryCompleted(object sender, RunWorkerCompletedEventArgs e)
+ 
+        private void loadSummaryCompleted()
         {
-            if ((e.Cancelled == true))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Cancelled!";
-                operationProgressBar.Value = 0;
-            }
-
-            else if (!(e.Error == null))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Error: ";
-                Utilities.showErrorMessage(e.Error.Message);
-                operationProgressBar.Value = 0;
-            }
-            else
-            {
-                operationStatus.ForeColor = Color.Green;
-                operationStatus.Text = "Done!";
-                operationProgressBar.Value = 100;
-                m_databaseParameters = std.getDatabaseParameters();
-                createWebpages();
-            }
+            m_databaseParameters = std.getDatabaseParameters();
+            createWebpages();
         }
 
         PairsSummaryToDatabase std;
         private void loadSummaryIntoDatabase()
         {
             std = new PairsSummaryToDatabase(m_eventInformation);
-            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork +=
-                            new DoWorkEventHandler(std.loadSummaryIntoDatabaseInBackground);
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(loadSummaryCompleted);
-            backgroundWorker1.ProgressChanged +=
-                new ProgressChangedEventHandler(loadSummaryProgress);
-            if (backgroundWorker1.IsBusy != true)
-            {
-                operationStatus.ForeColor = Color.Orange;
-                operationStatus.Text = "Load Summary : Starting...";
-                operationCancelButton.Text = "Cancel Load Summary";
-                operationProgressBar.Value = 0;
-                backgroundWorker1.RunWorkerAsync();
-            }
-            else
-            {
-                Utilities.showWarningessage("A Load Summary operation is already running! To start a new one cancel the previous one using the button in the status bar or wait for it to complete.");
-            }
-        }
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Load Summary", std.loadSummaryIntoDatabaseInBackground, loadSummaryCompleted, operationStatus,
+                operationProgressBar, operationCancelButton, null);
+            cbw.run();
 
+         }
 
-        private void createWebpagesProgress(object sender, ProgressChangedEventArgs e)
+        private void createWebpagesCompleted()
         {
-            operationStatus.ForeColor = Color.Orange;
-            operationStatus.Text = e.UserState as string;
-            operationProgressBar.Value = e.ProgressPercentage;
-        }
-
-        private void createWebpagesCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if ((e.Cancelled == true))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Cancelled!";
-                operationProgressBar.Value = 0;
-            }
-
-            else if (!(e.Error == null))
-            {
-                operationStatus.ForeColor = Color.Red;
-                operationStatus.Text = "Error: ";
-                Utilities.showErrorMessage(e.Error.Message);
-                operationProgressBar.Value = 0;
-            }
-            else
-            {
-                operationStatus.ForeColor = Color.Green;
-                operationStatus.Text = "Done!";
-                operationProgressBar.Value = 100;
-                publishResultsInternal();
-            }
+            publishResultsInternal();
         }
 
         private void createWebpages()
         {
             PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
-            BackgroundWorker backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork +=
-                            new DoWorkEventHandler(dtw.createWebpagesInBackground);
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(createWebpagesCompleted);
-            backgroundWorker1.ProgressChanged +=
-                new ProgressChangedEventHandler(createWebpagesProgress);
-            if (backgroundWorker1.IsBusy != true)
-            {
-                operationStatus.ForeColor = Color.Orange;
-                operationStatus.Text = "Create Local Webpages : Starting...";
-                operationCancelButton.Text = "Cancel Create Local Webpages";
-                operationProgressBar.Value = 0;
-                backgroundWorker1.RunWorkerAsync();
-            }
-            else
-            {
-                Utilities.showWarningessage("A Create Webpages operation is already running! To start a new one cancel the previous one using the button in the status bar or wait for it to complete.");
-            }
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", dtw.createWebpagesInBackground, createWebpagesCompleted, operationStatus,
+    operationProgressBar, operationCancelButton, null);
+            cbw.run();
         }
-
     }
 }
