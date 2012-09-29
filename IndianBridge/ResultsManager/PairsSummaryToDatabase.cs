@@ -3,6 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using IndianBridge.Common;
+using System.ComponentModel;
 
 namespace IndianBridge.ResultsManager
 {
@@ -10,6 +11,8 @@ namespace IndianBridge.ResultsManager
     {
         private PairsEventInformation m_eventInformation;
         private PairsDatabaseParameters m_databaseParameters;
+        private BackgroundWorker m_worker;
+        private bool m_runningInBackground = false;
 
         public PairsDatabaseParameters getDatabaseParameters() { return m_databaseParameters; }
 
@@ -20,7 +23,29 @@ namespace IndianBridge.ResultsManager
 
         private  void printMessage(String message) { Trace.WriteLine(message); }
 
+        private void reportProgress(int progress,string status)
+        {
+            if (m_runningInBackground)
+            {
+                m_worker.ReportProgress(progress, status);
+            }
+        }
+
+        public void loadSummaryIntoDatabaseInBackground(object sender, DoWorkEventArgs e)
+        {
+            m_runningInBackground = true;
+            m_worker = sender as BackgroundWorker;
+            loadSummaryIntoDatabaseInternal();
+        }
+
         public void loadSummaryIntoDatabase()
+        {
+            m_runningInBackground = false;
+            m_worker = null;
+            loadSummaryIntoDatabaseInternal();
+        }
+
+        private void loadSummaryIntoDatabaseInternal()
         {
             m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(m_eventInformation.databaseFileName));
@@ -29,6 +54,7 @@ namespace IndianBridge.ResultsManager
             System.IO.File.Copy(sourceFileName, m_eventInformation.databaseFileName);
             PairsGeneral.loadPairsDatabaseInformation(m_eventInformation.databaseFileName, out m_databaseParameters);
             printMessage("Updating Event Information...");
+            reportProgress(0,"Load Summary : Reading Event Information");
             DataTable eventInfoTable = m_databaseParameters.m_ds.Tables["Event_Information"];
             eventInfoTable.Clear();
             DataRow dRow = eventInfoTable.NewRow();
@@ -41,6 +67,7 @@ namespace IndianBridge.ResultsManager
             eventInfoTable.Rows.Add(dRow);
             printMessage("Uploading Event Information Table to Database...");
             m_databaseParameters.m_daEventInformation.Update(m_databaseParameters.m_ds, "Event_Information");
+            reportProgress(10, "Load Summary : Processing Summaries");
             printMessage("Processing Summaries...");
             String[] lines = m_eventInformation.rawText.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length < 2)
@@ -60,6 +87,7 @@ namespace IndianBridge.ResultsManager
                 lineNumber = getNextSummaryLine_(lines, lineNumber);
             }
 
+            reportProgress(50, "Load Summary : Calculating Scores");
             printMessage("Calculating Ranks...");
             // Combined Ranking
             doRanking_();
@@ -70,6 +98,7 @@ namespace IndianBridge.ResultsManager
                 doRanking_(PairsGeneral.NORTH_SOUTH_SECTION_NAME, "Session_Rank");
                 doRanking_(PairsGeneral.EAST_WEST_SECTION_NAME, "Session_Rank");
             }
+            reportProgress(75, "Load Summary : Saving to database");
             printMessage("Uploading Pair Information Table to Database...");
             m_databaseParameters.m_daPairInformation.Update(m_databaseParameters.m_ds, "Pair_Information");
             printMessage("Uploading Pair Wise Scores Table to Database...");

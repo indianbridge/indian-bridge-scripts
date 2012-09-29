@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using IndianBridge.Common;
+using System.ComponentModel;
 
 namespace IndianBridge.ResultsManager
 {
@@ -44,6 +45,11 @@ namespace IndianBridge.ResultsManager
         private String m_prefix = "";
         private string m_currentPage = "";
         private int m_numberOfBoards = 0;
+        private int totalNumberOfPagesToBeCreated = 0;
+        private int numberOfPagesCreatedSoFar = 0;
+        private BackgroundWorker m_worker;
+        private bool m_runningInBackground = false;
+        private string m_prefixString = "Creating Local Webpages : ";
 
         public PairsDatabaseToWebpages(PairsEventInformation eventInformation, PairsDatabaseParameters databaseParameters)
         {
@@ -52,6 +58,16 @@ namespace IndianBridge.ResultsManager
         }
 
         private void printMessage(String message) { Trace.WriteLine(message); }
+
+        private void reportProgress(string status)
+        {
+            numberOfPagesCreatedSoFar++;
+            if (m_runningInBackground)
+            {
+                double percentage = ((double)numberOfPagesCreatedSoFar / (double)totalNumberOfPagesToBeCreated) * 100;
+                m_worker.ReportProgress(Convert.ToInt32(percentage), status);
+            }
+        }
 
         private string getPrefix()
         {
@@ -69,7 +85,22 @@ namespace IndianBridge.ResultsManager
             return page;
         }
 
+        public void createWebpagesInBackground(object sender, DoWorkEventArgs e)
+        {
+            m_runningInBackground = true;
+            m_worker = sender as BackgroundWorker;
+            numberOfPagesCreatedSoFar = 0;
+            createWebpagesInternal();
+        }
+
         public void createWebpages_()
+        {
+            m_runningInBackground = false;
+            m_worker = null;
+            createWebpagesInternal();
+        }
+
+        private void createWebpagesInternal()
         {
             String rootFolder = m_eventInformation.webpagesDirectory;
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
@@ -80,6 +111,9 @@ namespace IndianBridge.ResultsManager
                 if (m_eventInformation.hasDirectionField) m_sectionNames.Add(SINGLE_SECTION_NAME);
                 else { m_sectionNames.Add(NORTH_SOUTH_SECTION_NAME); m_sectionNames.Add(EAST_WEST_SECTION_NAME); }
                 m_numberOfBoards = Convert.ToInt16(m_databaseParameters.m_ds.Tables["Board_Wise_Scores"].Select("Board_Number=MAX(Board_Number)")[0]["Board_Number"]);
+                totalNumberOfPagesToBeCreated = 1 + m_sectionNames.Count + m_sectionNames.Count + m_numberOfBoards;
+                foreach (String sectionName in m_sectionNames)
+                    totalNumberOfPagesToBeCreated += (m_databaseParameters.m_ds.Tables["Pair_Information"].Select("Section_Name='" + sectionName + "'")).Length;
                 Parameters parameters = createDefaultParameters();
                 parameters.columns.Add("Rank", "{Event_Rank}");
                 parameters.columns.Add("Pair Number", "[_makePairNumberLink]");
@@ -95,6 +129,7 @@ namespace IndianBridge.ResultsManager
                 parameters.headerTemplate = headerify_("Combined Ranking sorted by Rank<br/>[_commonPageHeader]");
                 parameters.tableName = "Pair_Information";
                 printMessage("Creating Combined Ranking Leaderboard...");
+                reportProgress(m_prefixString + "Creating Combined Leaderboard");
                 createPage_(parameters);
                 foreach (String sectionName in m_sectionNames)
                 {
@@ -108,6 +143,7 @@ namespace IndianBridge.ResultsManager
                     parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
                     parameters.headerTemplate = headerify_("Ranking for " + parameters.sectionName + " sorted by Rank<br/>[_commonPageHeader]");
                     printMessage("Creating Leaderboard for " + sectionName);
+                    reportProgress(m_prefixString + "Creating "+sectionName+" Leaderboard");
                     createPage_(parameters);
                 }
                 parameters.columns.Clear();
@@ -127,6 +163,7 @@ namespace IndianBridge.ResultsManager
                     parameters.filterCriteria = "Section_Name='" + parameters.sectionName + "'";
                     parameters.headerTemplate = headerify_("Pair Wise Scores " + parameters.sectionName + "<br/>[_commonPageHeader]");
                     printMessage("Creating pair wise scores for " + sectionName);
+                    reportProgress(m_prefixString + "Creating "+sectionName+ " pairwise scores");
                     createPage_(parameters);
                 }
                 createBoardPages_(rootFolder);
@@ -211,6 +248,7 @@ namespace IndianBridge.ResultsManager
                     parameters.headerTemplate = headerify_("Summary for Pair " + i + " [_getPairInfo]<br/>[_commonPageHeader]");
                     parameters.tableName = "Pair_Wise_Scores";
                     printMessage("Creating page for pair " + i + " in " + sectionName);
+                    reportProgress(m_prefixString + "Creating "+sectionName+" Pair "+i+" page");
                     createPage_(parameters);
                 }
 
@@ -386,6 +424,7 @@ namespace IndianBridge.ResultsManager
                 parameters.headerTemplate = headerify_("Summary for Board " + i + "<br/>" + "Dealer : {Dealer} Vul : {Vulnerability}<br/>[_commonPageHeader]");
                 parameters.tableName = "Board_Wise_Scores";
                 printMessage("Creating page for board " + i);
+                reportProgress(m_prefixString + "Creating board "+i+" page");
                 createPage_(parameters);
             }
         }

@@ -16,32 +16,11 @@ using System.Drawing.Printing;
 namespace IndianBridgeScorer
 {
 
-    struct EventParameters
-    {
-        Dictionary<string, int> m_parameters;
-
-        public EventParameters(int numberOfTeams=0, int numberOfBoards=0, int numberOfRounds=0)
-        {
-            m_parameters = new Dictionary<string, int>();
-            m_parameters[PDScorer.numberOfTeamsString] = numberOfTeams;
-            m_parameters[PDScorer.numberOfBoardsString] = numberOfBoards;
-            m_parameters[PDScorer.numberOfRoundsString] = numberOfRounds;
-        }
-
-        public int getNumberOfTeams() { return m_parameters[PDScorer.numberOfTeamsString]; }
-        public int getNumberOfBoards() { return m_parameters[PDScorer.numberOfBoardsString]; }
-        public int getNumberOfRounds() { return m_parameters[PDScorer.numberOfRoundsString]; }
-
-        public void setNumberOfTeams(int numberOfTeams) { m_parameters[PDScorer.numberOfTeamsString] = numberOfTeams; }
-        public void setNumberOfBoards(int numberOfBoards) { m_parameters[PDScorer.numberOfBoardsString] = numberOfBoards; }
-        public void setNumberOfRounds(int numberOfRounds) { m_parameters[PDScorer.numberOfRoundsString] = numberOfRounds; }
-    }
-
     public partial class PDScorer : Form
     {
         //private EventParameters m_eventParameters = new EventParameters();
         private string m_databaseFileName = "";
-        private string m_localWebpagesRoot = "";
+        //private string m_localWebpagesRoot = "";
         private string m_resultsWebsite = "";
         private string m_eventName;
         public static string infoTableName = "Info";

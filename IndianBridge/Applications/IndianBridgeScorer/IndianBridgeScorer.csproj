@@ -49,30 +49,12 @@
   <ItemGroup>
     <Compile Include="Constants.cs" />
     <Compile Include="PropertyGridClasses.cs" />
-    <Compile Include="PublishSwissTeamResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PublishSwissTeamResults.Designer.cs">
-      <DependentUpon>PublishSwissTeamResults.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreateSwissTeamResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateSwissTeamResults.Designer.cs">
-      <DependentUpon>CreateSwissTeamResults.cs</DependentUpon>
-    </Compile>
     <Compile Include="SwissTeamsDatabaseToWebpages.cs" />
     <Compile Include="PDScorer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="PDScorer.Designer.cs">
       <DependentUpon>PDScorer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreateAndPublishKnockoutResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateAndPublishKnockoutResults.Designer.cs">
-      <DependentUpon>CreateAndPublishKnockoutResults.cs</DependentUpon>
     </Compile>
     <Compile Include="EventManagement.cs">
       <SubType>Form</SubType>
@@ -88,31 +70,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CreateAndPublishTeamResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateAndPublishTeamResults.Designer.cs">
-      <DependentUpon>CreateAndPublishTeamResults.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CreateAndPublishPairsResults.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CreateAndPublishPairsResults.Designer.cs">
-      <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
-    </Compile>
     <Compile Include="SetTourneyInfo.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SetTourneyInfo.Designer.cs">
       <DependentUpon>SetTourneyInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="TeamScorer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TeamScorer.Designer.cs">
-      <DependentUpon>TeamScorer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TeamsDatabaseToWebpages.cs" />
     <Compile Include="TeamsScorer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,17 +88,8 @@
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="PublishSwissTeamResults.resx">
-      <DependentUpon>PublishSwissTeamResults.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateSwissTeamResults.resx">
-      <DependentUpon>CreateSwissTeamResults.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="PDScorer.resx">
       <DependentUpon>PDScorer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateAndPublishKnockoutResults.resx">
-      <DependentUpon>CreateAndPublishKnockoutResults.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EventManagement.resx">
       <DependentUpon>EventManagement.cs</DependentUpon>
@@ -152,17 +106,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="CreateAndPublishTeamResults.resx">
-      <DependentUpon>CreateAndPublishTeamResults.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="CreateAndPublishPairsResults.resx">
-      <DependentUpon>CreateAndPublishPairsResults.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="SetTourneyInfo.resx">
       <DependentUpon>SetTourneyInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TeamScorer.resx">
-      <DependentUpon>TeamScorer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TeamsScorer.resx">
       <DependentUpon>TeamsScorer.cs</DependentUpon>
