@@ -7,6 +7,7 @@ using Google.GData.Client;
 using System.Diagnostics;
 using IndianBridge.Common;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace IndianBridge.GoogleAPIs
 {
@@ -21,6 +22,11 @@ namespace IndianBridge.GoogleAPIs
         private string m_hashTableFileName = "";
         private bool m_replaceLinks = false;
         private bool m_convertCase = false;
+        private BackgroundWorker m_worker;
+        private bool m_runningInBackground = false;
+        private int totalPagesToUpload = 0;
+        private int numberOfPagesAlreadyUploaded = 0;
+        private string m_prefixString = "Publishing Results : ";
 
         public void convertCase(bool convert) { m_convertCase = convert; }
 
@@ -35,7 +41,6 @@ namespace IndianBridge.GoogleAPIs
                     entry.Title.Text = entry.Title.Text.Substring(0, entry.Title.Text.Length - 1);
                 else entry.Title.Text += " ";
                 service.Update(entry);
-                //entry.Update();
             }
             catch (Exception ex)
             {
@@ -64,7 +69,6 @@ namespace IndianBridge.GoogleAPIs
         private void printMessage(String message)
         {
             Trace.WriteLine(message);
-            //Debug.WriteLine(message);
         }
 
         private void startHTTPTrafficLogging()
@@ -99,12 +103,32 @@ namespace IndianBridge.GoogleAPIs
 
         private String makeIdentifier(String text) { return text.Replace(" ", "-"); }
 
+
+        public void uploadDirectoryInBackground(object sender, DoWorkEventArgs e)
+        {
+            Tuple<string, string> values = (Tuple<string, string>)e.Argument;
+            string directory = values.Item1;
+            string siteRoot = values.Item2;
+            m_runningInBackground = true;
+            m_worker = sender as BackgroundWorker;
+            uploadDirectoryInternal(directory, siteRoot);
+        }
+
         public void uploadDirectory(String directory, String siteRoot)
+        {
+            m_runningInBackground = false;
+            m_worker = null;
+            uploadDirectoryInternal(directory, siteRoot);
+        }
+
+        public void uploadDirectoryInternal(String directory, String siteRoot)
         {
             if (!Directory.Exists(directory))
                 throw new System.ArgumentException("Only a directory structure can be uploaded");
-
+            DirectoryInfo dir = new DirectoryInfo(directory);
+            totalPagesToUpload = dir.GetDirectories("*", SearchOption.AllDirectories).Length + dir.GetFiles("*", SearchOption.AllDirectories).Length;
             printMessage("Uploading " + directory + " to " + siteRoot);
+            numberOfPagesAlreadyUploaded = 0;
             try
             {
                 handleRootIndexHtml(directory, siteRoot);
@@ -246,6 +270,8 @@ namespace IndianBridge.GoogleAPIs
                         printMessage("NOT UPDATED. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
                     }
                 }
+                numberOfPagesAlreadyUploaded++;
+                reportProgress(title);
                 return entry;
 
             }
@@ -267,11 +293,19 @@ namespace IndianBridge.GoogleAPIs
             return null;
         }
 
+        private void reportProgress(string title)
+        {
+            if (m_runningInBackground)
+            {
+                double percentage = ((double)numberOfPagesAlreadyUploaded / (double)totalPagesToUpload) * 100;
+                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString+"Published " + title);
+            }
+        }
+
         public AtomEntry createWebPage(String originalUrl, String path, String title, String html, String pageName, DateTime lastModified, string indexHtmlPath="")
         {
             String parentUrl = originalUrl.Substring(0, originalUrl.LastIndexOf("/"));
             pageName = originalUrl.Substring(originalUrl.LastIndexOf("/")+1);
-            //printMessage("Creating page " + parentUrl + "/" + pageName);
             AtomEntry parent = m_service.Get(parentUrl);
             SiteEntry entry = new SiteEntry();
             AtomCategory category = new AtomCategory(SitesService.WEBPAGE_TERM, SitesService.KIND_SCHEME);
@@ -289,6 +323,8 @@ namespace IndianBridge.GoogleAPIs
             newEntry = m_service.Insert(new Uri(url), entry);
             m_lastRunTimes[originalUrl] = lastModified;
             printMessage("CREATED.");
+            numberOfPagesAlreadyUploaded++;
+            reportProgress(title);
             return newEntry;
         }
         private string getParentPage(string path)

@@ -46,6 +46,8 @@ namespace IndianBridgeScorer
             Constants.CurrentTourneyFolderName = selectedFolder;
             loadTourneyInfo();
             loadTourneyEvents();
+            Constants.CurrentTourneyName = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.TourneyNameFieldName);
+            Constants.CurrentTourneyResultsWebsite = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.ResultsWebsiteFieldName);
             EventManagement eventManagement = new EventManagement();
             this.Hide();
             eventManagement.ShowDialog();
@@ -102,7 +104,6 @@ namespace IndianBridgeScorer
                 }
                 Directory.Delete(Constants.getCurrentTourneyFolder(),true);
             }
-            
             File.Copy(Constants.getRootTourneyInformationFile(), Constants.getCurrentTourneyInformationFileName(), true);
             loadTourney(Constants.CurrentTourneyFolderName);
         }

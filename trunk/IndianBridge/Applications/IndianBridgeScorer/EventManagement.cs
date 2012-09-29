@@ -187,6 +187,8 @@ namespace IndianBridgeScorer
                 tourneyInfoPropertyGrid.Refresh();
             }
             m_tourneyInfo.save();
+            Constants.CurrentTourneyName = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.TourneyNameFieldName);
+            Constants.CurrentTourneyResultsWebsite = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.ResultsWebsiteFieldName);
             Utilities.showBalloonNotification("Save Success", "Saved Tourney Info to Database");
         }
 

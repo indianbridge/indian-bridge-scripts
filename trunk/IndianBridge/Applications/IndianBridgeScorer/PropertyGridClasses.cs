@@ -19,14 +19,74 @@ namespace IndianBridgeScorer
         TeamNumber
     };
 
+    public class ResultsPublishParameters
+    {
+        private string m_niniFileName = "";
+        private string m_eventName = "";
+        private double fontSize = 1.5;
+        private string resultsWebsite = "";
+        private bool m_autoSave = false;
+        public ResultsPublishParameters(string eventName, string niniFileName, bool autoSave = false)
+        {
+            m_eventName = eventName;
+            m_autoSave = autoSave;
+            m_niniFileName = niniFileName;
+            if (!File.Exists(m_niniFileName))
+            {
+                create();
+            }
+            load();
+        }
+
+        public void create()
+        {
+            List<NiniField> fields = new List<NiniField>();
+            fields.Add(new NiniField("Font_Size", "Number", "1", ""));
+            fields.Add(new NiniField("Results_Website", "String", "", ""));
+            NiniUtilities.createNiniFile(m_niniFileName, fields);
+        }
+
+        public void save()
+        {
+            NiniUtilities.saveNiniConfig(m_niniFileName);
+        }
+
+        public void load()
+        {
+            NiniUtilities.loadNiniConfig(m_niniFileName);
+            fontSize = NiniUtilities.getDoubleValue(m_niniFileName, Constants.FontSizeFieldName);
+            resultsWebsite = NiniUtilities.getStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName);
+        }
+
+
+        [CategoryAttribute("Results Publish Parameters")]
+        public double FontSize
+        {
+            get { return fontSize; }
+            set { 
+                fontSize = value;
+                NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
+            }
+        }
+
+        [CategoryAttribute("Results Publish Parameters")]
+        public string ResultsWebsite
+        {
+            get { return resultsWebsite; }
+            set { 
+                resultsWebsite = value;
+                NiniUtilities.setStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
+            }
+        }
+
+    }
+
     public class SwissTeamScoringParameters
     {
         private string m_niniFileName = "";
         private string m_eventName = "";
         private ScoringTypeValues scoringType = ScoringTypeValues.IMP;
         private TiebreakerMethodValues tiebreakerMethod = TiebreakerMethodValues.TeamNumber;
-        private double fontSize = 1.5;
-        private string resultsWebsite = "";
         private bool m_autoSave = false;
 
         public SwissTeamScoringParameters(string eventName, string niniFileName, bool autoSave = false)
@@ -46,8 +106,6 @@ namespace IndianBridgeScorer
             List<NiniField> fields = new List<NiniField>();
             fields.Add(new NiniField("Scoring_Type", "List", "IMP", "IMP,VP"));
             fields.Add(new NiniField("Tiebreaker_Method", "List", "Quotient", "Quotient,Team_Number"));
-            fields.Add(new NiniField("Font_Size", "Number", "1", ""));
-            fields.Add(new NiniField("Results_Website", "String", "", ""));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
@@ -61,11 +119,9 @@ namespace IndianBridgeScorer
             NiniUtilities.loadNiniConfig(m_niniFileName);
             scoringType = (ScoringTypeValues)Enum.Parse(typeof(ScoringTypeValues), NiniUtilities.getStringValue(m_niniFileName, Constants.ScoringTypeFieldName), true);
             tiebreakerMethod = (TiebreakerMethodValues)Enum.Parse(typeof(TiebreakerMethodValues), NiniUtilities.getStringValue(m_niniFileName, Constants.TiebreakerMethodFieldName), true);
-            fontSize = NiniUtilities.getDoubleValue(m_niniFileName, Constants.FontSizeFieldName);
-            resultsWebsite = NiniUtilities.getStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName);
         }
 
-
+        [CategoryAttribute("Scoring Parameters")]
         public ScoringTypeValues ScoringType
         {
             get { return scoringType; }
@@ -75,31 +131,13 @@ namespace IndianBridgeScorer
             }
         }
 
-
+        [CategoryAttribute("Scoring Parameters")]
         public TiebreakerMethodValues TiebreakerMethod
         {
             get { return tiebreakerMethod; }
             set { 
                 tiebreakerMethod = value;
                 NiniUtilities.setStringValue(m_niniFileName, Constants.TiebreakerMethodFieldName, tiebreakerMethod.ToString(), m_autoSave);
-            }
-        }
-
-        public double FontSize
-        {
-            get { return fontSize; }
-            set { 
-                fontSize = value;
-                NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
-            }
-        }
-
-        public string ResultsWebsite
-        {
-            get { return resultsWebsite; }
-            set { 
-                resultsWebsite = value;
-                NiniUtilities.setStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
             }
         }
     }
@@ -155,7 +193,7 @@ namespace IndianBridgeScorer
             useBorder = NiniUtilities.getBooleanValue(m_niniFileName, Constants.UseBorderFieldName);
         }
 
-
+        [CategoryAttribute("Print Draw Parameters")]
         public int DrawForRound
         {
             get { return drawForRound; }
@@ -165,6 +203,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Print Draw Parameters")]
         public double FontSize
         {
             get { return fontSize; }
@@ -174,6 +213,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Print Draw Parameters")]
         public double PaddingSize
         {
             get { return paddingSize; }
@@ -183,6 +223,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Print Draw Parameters")]
         public bool VPsInSeparateColumn
         {
             get { return vpsInSeparateColumn; }
@@ -192,6 +233,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Print Draw Parameters")]
         public bool UseBorder
         {
             get { return useBorder; }
@@ -253,6 +295,7 @@ namespace IndianBridgeScorer
             roundsScored = 0;
         }
 
+        [CategoryAttribute("Swiss Team Event Computed Parameters")]
         public int DrawsCompleted
         {
             get { return drawsCompleted; }
@@ -262,6 +305,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Swiss Team Event Computed Parameters")]
         public int RoundsCompleted
         {
             get { return roundsCompleted; }
@@ -271,6 +315,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Swiss Team Event Computed Parameters")]
         public int RoundsScored
         {
             get { return roundsScored; }
@@ -337,7 +382,7 @@ namespace IndianBridgeScorer
             previousNumberOfTeams = numberOfTeams;
         }
 
-        [DescriptionAttribute("Number of Teams in the Swiss League")]
+        [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Teams in the Swiss League")]
         public int NumberOfTeams
         {
             get { return numberOfTeams; }
@@ -355,7 +400,7 @@ namespace IndianBridgeScorer
             }
         }
 
-        [DescriptionAttribute("Number of Rounds in the Round Robin")]
+        [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Rounds in the Round Robin")]
         public int NumberOfRounds
         {
             get { return numberOfRounds; }
@@ -373,7 +418,7 @@ namespace IndianBridgeScorer
             }
         }
 
-        [DescriptionAttribute("Number of Boards to be played in each Round! This is used to load the appropriate VP Scale to convert IMPS to VPs. Set this to 0 to ignore and enter VPs directly.")]
+        [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Boards to be played in each Round! This is used to load the appropriate VP Scale to convert IMPS to VPs. Set this to 0 to ignore and enter VPs directly.")]
         public int NumberOfBoardsPerRound
         {
             get { return numberOfBoardsPerRound; }
@@ -391,7 +436,7 @@ namespace IndianBridgeScorer
             }
         }
 
-        [DescriptionAttribute("Number of Qualifiers for the next round")]
+        [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Qualifiers for the next round")]
         public int NumberOfQualifiers
         {
             get { return numberOfQualifiers; }
@@ -449,6 +494,7 @@ namespace IndianBridgeScorer
             resultsWebsite = NiniUtilities.getStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, "");
         }
 
+        [CategoryAttribute("Tourney Setup Parameters"), DescriptionAttribute("Name of your tourney. You will not be able to change this later so choose carefully. The tourney name will determine the folder in which all data will be stored.")]
         public string TourneyName
         {
             get { return tourneyName; }
@@ -466,6 +512,7 @@ namespace IndianBridgeScorer
             }
         }
 
+        [CategoryAttribute("Tourney Setup Parameters"), DescriptionAttribute("The website where results should be published. Just specify the root of the results page. A separate sub page will be created for each event (using the name of the event).")]
         public string ResultsWebsite
         {
             get { return resultsWebsite; }

@@ -23,12 +23,19 @@ namespace IndianBridgeScorer
         public static string SwissTeamEventPrintDrawParametersFileName = "SwissTeamPrintDrawParameters.ini";
         public static string SwissTeamEventPrintDrawFileName = "DrawForPrinting.html";
         public static string SwissTeamEventScoringParametersFileName = "SwissTeamEventScoringParameters.ini";
+        public static string ResultsPublishParametersFileName = "ResultsPublishParameters.ini";
 
         // Table Name Constants
         public static string TourneyEventsTableName = "Tourney_Events";
+        public static string EventNamesTableName = "Teams";
+        public static string EventScoresTableName = "Scores";
+        public static string EventComputedScoresTableName = "ComputedScores";
+        public static string VPScaleTableName = "VPScales";
 
         // Information Constants
         public static string CurrentTourneyFolderName = "";
+        public static string CurrentTourneyName = "";
+        public static string CurrentTourneyResultsWebsite = "";
 
         // Computed Path Constants
         // General
@@ -51,7 +58,12 @@ namespace IndianBridgeScorer
         public static string getSwissTeamPrintDrawParametersFileName(string eventName) { return Path.Combine(getEventDatabasesFolder(eventName), SwissTeamEventPrintDrawParametersFileName); }
         public static string getSwissTeamPrintDrawFileName(string eventName) { return Path.Combine(getEventDatabasesFolder(eventName), SwissTeamEventPrintDrawFileName); }
         public static string getSwissTeamScoringParametersFileName(string eventName) { return Path.Combine(getEventDatabasesFolder(eventName), SwissTeamEventScoringParametersFileName); }
+        public static string getResultsPublishParametersFileName(string eventName) { return Path.Combine(getEventDatabasesFolder(eventName), ResultsPublishParametersFileName); }
         public static string getEventWebpagesFolder(string eventName) { return getFolder(Path.Combine(getCurrentTourneyWebpagesFolder(), Utilities.makeIdentifier_(eventName))); }
+        public static string getEventResultsWebsite(string eventName) { 
+            if (string.IsNullOrWhiteSpace(CurrentTourneyResultsWebsite)) return "";
+            return CurrentTourneyResultsWebsite+"/"+Utilities.makeIdentifier_(eventName);
+        }
 
         // Field Names
         public static string TourneyNameFieldName = "Tourney_Name";

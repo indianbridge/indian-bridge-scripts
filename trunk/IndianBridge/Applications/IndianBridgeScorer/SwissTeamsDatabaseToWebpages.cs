@@ -8,6 +8,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using IndianBridge.Common;
+using System.ComponentModel;
 
 namespace IndianBridgeScorer
 {
@@ -15,11 +16,15 @@ namespace IndianBridgeScorer
     {
         private string m_databaseFileName = "";
         private string m_webpagesRootDirectory = "";
-        private String m_prefix = "";
+        private string m_prefix = "";
         private int m_roundsCompleted = 0;
         private int m_drawsCompleted = 0;
         private int m_numberOfTeams = 0;
         private int m_numberOfRounds = 0;
+        private int totalNumberOfPagesToBeCreated = 0;
+        private int numberOfPagesCreatedSoFar = 0;
+        private BackgroundWorker m_worker;
+        private bool m_runningInBackground = false;
 
         public SwissTeamsDatabaseToWebpages(string eventName, string databaseFileName, string webpagesRoot)
         {
@@ -31,11 +36,47 @@ namespace IndianBridgeScorer
             m_numberOfRounds = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfRoundsFieldName);
             m_roundsCompleted = NiniUtilities.getIntValue(scoringFileName, Constants.RoundsCompletedFieldName);
             m_drawsCompleted = NiniUtilities.getIntValue(scoringFileName, Constants.DrawsCompletedFieldName);
-
-
         }
 
-        private void printMessage(String message) { Trace.WriteLine(message); }
+        public void createWebpagesInBackground(object sender,DoWorkEventArgs e)
+        {
+            m_runningInBackground = true;
+            m_worker = sender as BackgroundWorker;
+            createWebpagesInternal();
+        }
+
+        public void createWebpages_()
+        {
+            m_runningInBackground = false;
+            m_worker = null;
+            createWebpagesInternal();
+        }
+
+        private void createWebpagesInternal()
+        {
+            numberOfPagesCreatedSoFar = 0;
+            totalNumberOfPagesToBeCreated = 1 + 1 + m_numberOfTeams + m_numberOfRounds;
+            string rootFolder = m_webpagesRootDirectory;
+            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
+            createLeaderboard();
+            createNamesPage();
+            createTeamPages();
+            createRoundPages();
+        }
+
+        private void printMessage(String message) { 
+            Trace.WriteLine(message);   
+        }
+
+        private void reportProgress(string title)
+        {
+            numberOfPagesCreatedSoFar++;
+            if (m_runningInBackground)
+            {
+                double percentage = ((double)numberOfPagesCreatedSoFar / (double)totalNumberOfPagesToBeCreated) * 100;
+                m_worker.ReportProgress(Convert.ToInt32(percentage), "Created " + title+ " Page");
+            }
+        }
 
         private string getPage(string path)
         {
@@ -75,11 +116,12 @@ namespace IndianBridgeScorer
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerTemplate;
-            parameters.tableName = TeamScorer.computedScoresTableName;          
+            parameters.tableName = Constants.EventComputedScoresTableName;          
             createPage_(parameters);
             m_prefix = "./";
             parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
             createPage_(parameters);
+            reportProgress("Leaderboard");
         }
 
         private void createNamesPage()
@@ -97,8 +139,9 @@ namespace IndianBridgeScorer
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = "<h2>Team Compositions</h2>" + "<br/>[_commonPageHeader]";
-            parameters.tableName = TeamScorer.namesTableName;
+            parameters.tableName = Constants.EventNamesTableName;
             createPage_(parameters);
+            reportProgress("Names");
         }
 
         private void createTeamPages() {
@@ -116,7 +159,7 @@ namespace IndianBridgeScorer
         private double getDoubleValue(DataRow dRow, string columnName) { return AccessDatabaseUtilities.getDoubleValue(dRow, columnName); }
         private string getTeamMemberNames(DataRow dRow)
         {
-            DataRow[] dRows = getTable(TeamScorer.namesTableName).Select("Team_Number = " + (int)dRow["Team_Number"]);
+            DataRow[] dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + (int)dRow["Team_Number"]);
             Debug.Assert(dRows.Length == 1);
             return (string)dRows[0]["Member_Names"];
         }
@@ -167,7 +210,7 @@ namespace IndianBridgeScorer
             m_prefix = "../";
             StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "teams","team" + teamNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
-            DataRow[] foundRows = getTable(TeamScorer.namesTableName).Select("Team_Number = "+teamNumber);
+            DataRow[] foundRows = getTable(Constants.EventNamesTableName).Select("Team_Number = "+teamNumber);
             Debug.Assert(foundRows.Length == 1);
             DataRow dRow = foundRows[0];
             string headerTemplate = "<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>" + "<br/>[_commonPageHeader]";
@@ -186,7 +229,7 @@ namespace IndianBridgeScorer
             {
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add(getRoundNumberLink(i));
-                foundRows = getTable(TeamScorer.scoresTableName).Select("Round_Number = " + i + " AND Team_1_Number = " + teamNumber);
+                foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + i + " AND Team_1_Number = " + teamNumber);
                 if (foundRows.Length > 0)
                 {
                     dRow = foundRows[0];
@@ -198,7 +241,7 @@ namespace IndianBridgeScorer
                 }
                 else
                 {
-                    foundRows = getTable(TeamScorer.scoresTableName).Select("Round_Number = " + i + " AND Team_2_Number = " + teamNumber);
+                    foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + i + " AND Team_2_Number = " + teamNumber);
                     if (foundRows.Length < 1)
                     {
                         tableRow.Add("-");
@@ -215,7 +258,7 @@ namespace IndianBridgeScorer
                         tableRow.Add("" + getDoubleValue(dRow,"Team_2_VP_Adjustment"));
                     }
                 }
-                foundRows = getTable(TeamScorer.computedScoresTableName).Select("Team_Number = " + teamNumber);
+                foundRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + teamNumber);
                 Debug.Assert(foundRows.Length <= 1);
                 if (foundRows.Length < 1)
                 {
@@ -248,6 +291,7 @@ namespace IndianBridgeScorer
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
+            reportProgress("Team "+teamNumber);
         }
 
         private void createRoundPages()
@@ -268,7 +312,7 @@ namespace IndianBridgeScorer
             m_prefix = "../";
             StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "rounds", "round" + roundNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
-            DataRow[] foundRows = getTable(TeamScorer.scoresTableName).Select("Round_Number = " + roundNumber, "Table_Number ASC");
+            DataRow[] foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + roundNumber, "Table_Number ASC");
             DataRow dRow = (foundRows.Length>0)?foundRows[0]:null;
             string headerTemplate = "<h2>Scores for Round " + roundNumber + "</h2>" + "<br/>[_commonPageHeader]";
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
@@ -308,7 +352,7 @@ namespace IndianBridgeScorer
                 parameters.sortCriteria = "Rank_After_Round_" + roundNumber + " ASC";
                 parameters.filterCriteria = "";
                 parameters.headerTemplate = headerTemplate;
-                parameters.tableName = TeamScorer.computedScoresTableName;          
+                parameters.tableName = Constants.EventComputedScoresTableName;          
 
                 sw.WriteLine(createTable_(parameters));
                 sw.WriteLine("</td></tr></tbody></table>");
@@ -316,6 +360,7 @@ namespace IndianBridgeScorer
             }
             sw.WriteLine("</body></html>");
             sw.Close();
+            reportProgress("Round "+roundNumber);
         }
 
         private string createRoundTable(int roundNumber, DataRow[] foundRows, bool showVPs= true)
@@ -370,15 +415,7 @@ namespace IndianBridgeScorer
 
         }
 
-        public void createWebpages_()
-        {
-            String rootFolder = m_webpagesRootDirectory;
-            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
-            createLeaderboard();
-            createNamesPage();
-            createTeamPages();
-            createRoundPages();
-        }
+
 
         private string createTable_(Utilities.HTMLTableParameters parameters)
         {
@@ -495,7 +532,7 @@ namespace IndianBridgeScorer
             if (teamNumberObject == DBNull.Value) return "-";
             int teamNumber = (int)teamNumberObject;
             if (teamNumber <= 0 || teamNumber > m_numberOfTeams) return "BYE";
-            DataRow[] dRows = getTable(TeamScorer.namesTableName).Select("Team_Number = " + teamNumber);
+            DataRow[] dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + teamNumber);
             Debug.Assert(dRows.Length == 1);
             DataRow dRow = dRows[0];
             result = "<a href='" + m_prefix + "teams" + "/team" + dRow["Team_Number"] + "score.html'>" + (showNumber?dRow["Team_Number"]+" ":"") + (showName?dRow["Team_Name"]:"") + "</a>";
