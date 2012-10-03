@@ -35,7 +35,7 @@ namespace IndianBridgeScorer
             this.Text = "Tourney Name : " + m_tourneyName;
             m_tourneyInfo = new TourneyInfo(Constants.getCurrentTourneyInformationFileName(),false);
             this.tourneyInfoPropertyGrid.SelectedObject = m_tourneyInfo;
-            AccessDatabaseUtilities.loadDatabaseToTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            AccessDatabaseUtilities.loadDatabaseToTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             loadEvents();
         }
 
@@ -43,7 +43,7 @@ namespace IndianBridgeScorer
         {
             eventsDataGridView.DataSource = null;
             eventsDataGridView.Columns.Clear();
-            eventsDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            eventsDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             var buttonCol = new DataGridViewButtonColumn();
             buttonCol.Name = "Show Event";
             buttonCol.HeaderText = "Show Event";
@@ -76,23 +76,28 @@ namespace IndianBridgeScorer
 
         public void createEvent(string eventName)
         {
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             DataRow dRow = table.Rows.Find(eventName);
             string eventType = (string)dRow["Event_Type"];
-            switch (eventType)
-            {
-                case "Team":
+            if (eventType == Constants.EventType.TeamsSwissLeague) {
+           
                     TeamsScorer ts = new TeamsScorer(eventName);
                     m_scorers[eventName] = ts;
-                    break;
-                case "Pairs":
+            }
+            else if (eventType == Constants.EventType.TeamsKnockout) {
+                    KnockoutScorer ks = new KnockoutScorer(eventName);
+                    m_scorers[eventName] = ks;
+            }
+            else if (eventType == Constants.EventType.Pairs) {
                     PairsScorer ps = new PairsScorer(eventName);
                     m_scorers[eventName] = ps;
-                    break;
-                case "PD":
+            }
+            else if (eventType == Constants.EventType.PD) {
                     PDScorer pds = new PDScorer(eventName);
                     m_scorers[eventName] = pds;
-                    break;
+            }
+            else {
+                Utilities.showErrorMessage("Unknown Event Type : " + eventType);
             }
         }
 
@@ -100,13 +105,15 @@ namespace IndianBridgeScorer
         {
             DialogResult result = MessageBox.Show("Are you sure?" + Environment.NewLine + "All information for this event will be deleted", "Confirm Delete", MessageBoxButtons.YesNo);
             if (result == DialogResult.No) return;
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             DataRow dRow = table.Rows.Find(eventName);
             dRow.Delete();
-            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             if (m_scorers.ContainsKey(eventName) && m_scorers[eventName] != null && !m_scorers[eventName].IsDisposed) m_scorers[eventName].Close();
             m_scorers[eventName] = null;
             m_scorers.Remove(eventName);
+            Directory.Delete(Constants.getEventDatabasesFolder(eventName), true);
+            Directory.Delete(Constants.getEventWebpagesFolder(eventName),true);
         }
 
         private void addEvent(string eventType)
@@ -117,7 +124,7 @@ namespace IndianBridgeScorer
                 MessageBox.Show("Event Name cannot be empty!", "Empty Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             DataRow dRow = table.Rows.Find(eventName);
             if (dRow != null)
             {
@@ -128,7 +135,7 @@ namespace IndianBridgeScorer
             dRow["Event_Name"] = eventName;
             dRow["Event_Type"] = eventType;
             table.Rows.Add(dRow);
-            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TourneyEventsTableName);
+            AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
         }
 
         private void eventsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -154,17 +161,17 @@ namespace IndianBridgeScorer
 
         private void addNewTeamEventButton_Click(object sender, EventArgs e)
         {
-            addEvent("Team");
+            addEvent(Constants.EventType.TeamsSwissLeague);
         }
 
         private void addNewPairEventButton_Click(object sender, EventArgs e)
         {
-            addEvent("Pairs");
+            addEvent(Constants.EventType.Pairs);
         }
 
         private void addNewPDEventButton_Click(object sender, EventArgs e)
         {
-            addEvent("PD");
+            addEvent(Constants.EventType.PD);
         }
 
         private void cancelButton_Click(object sender, EventArgs e)
@@ -190,6 +197,23 @@ namespace IndianBridgeScorer
             Constants.CurrentTourneyName = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.TourneyNameFieldName);
             Constants.CurrentTourneyResultsWebsite = NiniUtilities.getStringValue(Constants.getCurrentTourneyInformationFileName(), Constants.ResultsWebsiteFieldName);
             Utilities.showBalloonNotification("Save Success", "Saved Tourney Info to Database");
+        }
+
+        private void addNewKnockoutButton_Click(object sender, EventArgs e)
+        {
+            addEvent(Constants.EventType.TeamsKnockout);
+        }
+
+        private void generateFollowOnSwissButton_Click(object sender, EventArgs e)
+        {
+            CreateNewEvents cne = new CreateNewEvents(false);
+            cne.ShowDialog();
+        }
+
+        private void generateFollowOnKnockout_Click(object sender, EventArgs e)
+        {
+            CreateNewEvents cne = new CreateNewEvents(true);
+            cne.ShowDialog();
         }
 
     }

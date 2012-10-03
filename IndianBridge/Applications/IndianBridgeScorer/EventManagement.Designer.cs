@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.eventsDataGridView = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tourneyInfoPropertyGrid = new System.Windows.Forms.PropertyGrid();
@@ -39,9 +39,11 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.addNewPDEventButton = new System.Windows.Forms.Button();
-            this.addNewTeamEventButton = new System.Windows.Forms.Button();
+            this.addNewSwissTeamEventButton = new System.Windows.Forms.Button();
             this.addNewPairEventButton = new System.Windows.Forms.Button();
-            this.addKnockoutButton = new System.Windows.Forms.Button();
+            this.generateFollowOnKnockout = new System.Windows.Forms.Button();
+            this.addNewKnockoutButton = new System.Windows.Forms.Button();
+            this.generateFollowOnSwissButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.eventsDataGridView)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -54,23 +56,23 @@
             this.eventsDataGridView.AllowUserToAddRows = false;
             this.eventsDataGridView.AllowUserToDeleteRows = false;
             this.eventsDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.eventsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.eventsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.eventsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.eventsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.eventsDataGridView.DefaultCellStyle = dataGridViewCellStyle8;
             this.eventsDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.eventsDataGridView.Location = new System.Drawing.Point(3, 16);
             this.eventsDataGridView.Name = "eventsDataGridView";
@@ -164,10 +166,12 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel2.Controls.Add(this.addKnockoutButton, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.addNewPDEventButton, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this.addNewTeamEventButton, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.addNewPairEventButton, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.generateFollowOnSwissButton, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.addNewSwissTeamEventButton, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.generateFollowOnKnockout, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.addNewPDEventButton, 2, 1);
+            this.tableLayoutPanel2.Controls.Add(this.addNewPairEventButton, 2, 0);
+            this.tableLayoutPanel2.Controls.Add(this.addNewKnockoutButton, 1, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 284);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -180,9 +184,9 @@
             // addNewPDEventButton
             // 
             this.addNewPDEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addNewPDEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewPDEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addNewPDEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewPDEventButton.Location = new System.Drawing.Point(551, 3);
+            this.addNewPDEventButton.Location = new System.Drawing.Point(551, 53);
             this.addNewPDEventButton.Name = "addNewPDEventButton";
             this.addNewPDEventButton.Size = new System.Drawing.Size(257, 43);
             this.addNewPDEventButton.TabIndex = 11;
@@ -190,25 +194,25 @@
             this.addNewPDEventButton.UseVisualStyleBackColor = false;
             this.addNewPDEventButton.Click += new System.EventHandler(this.addNewPDEventButton_Click);
             // 
-            // addNewTeamEventButton
+            // addNewSwissTeamEventButton
             // 
-            this.addNewTeamEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addNewTeamEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addNewTeamEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewTeamEventButton.Location = new System.Drawing.Point(3, 3);
-            this.addNewTeamEventButton.Name = "addNewTeamEventButton";
-            this.addNewTeamEventButton.Size = new System.Drawing.Size(257, 43);
-            this.addNewTeamEventButton.TabIndex = 4;
-            this.addNewTeamEventButton.Text = "Add New Team Event";
-            this.addNewTeamEventButton.UseVisualStyleBackColor = false;
-            this.addNewTeamEventButton.Click += new System.EventHandler(this.addNewTeamEventButton_Click);
+            this.addNewSwissTeamEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.addNewSwissTeamEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewSwissTeamEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.addNewSwissTeamEventButton.Location = new System.Drawing.Point(3, 3);
+            this.addNewSwissTeamEventButton.Name = "addNewSwissTeamEventButton";
+            this.addNewSwissTeamEventButton.Size = new System.Drawing.Size(257, 43);
+            this.addNewSwissTeamEventButton.TabIndex = 4;
+            this.addNewSwissTeamEventButton.Text = "Add New Swiss Teams";
+            this.addNewSwissTeamEventButton.UseVisualStyleBackColor = false;
+            this.addNewSwissTeamEventButton.Click += new System.EventHandler(this.addNewTeamEventButton_Click);
             // 
             // addNewPairEventButton
             // 
             this.addNewPairEventButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addNewPairEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewPairEventButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addNewPairEventButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addNewPairEventButton.Location = new System.Drawing.Point(277, 3);
+            this.addNewPairEventButton.Location = new System.Drawing.Point(551, 3);
             this.addNewPairEventButton.Name = "addNewPairEventButton";
             this.addNewPairEventButton.Size = new System.Drawing.Size(257, 43);
             this.addNewPairEventButton.TabIndex = 10;
@@ -216,17 +220,44 @@
             this.addNewPairEventButton.UseVisualStyleBackColor = false;
             this.addNewPairEventButton.Click += new System.EventHandler(this.addNewPairEventButton_Click);
             // 
-            // addKnockoutButton
+            // generateFollowOnKnockout
             // 
-            this.addKnockoutButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
-            this.addKnockoutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addKnockoutButton.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.addKnockoutButton.Location = new System.Drawing.Point(3, 53);
-            this.addKnockoutButton.Name = "addKnockoutButton";
-            this.addKnockoutButton.Size = new System.Drawing.Size(257, 43);
-            this.addKnockoutButton.TabIndex = 12;
-            this.addKnockoutButton.Text = "Add New Knockout Event";
-            this.addKnockoutButton.UseVisualStyleBackColor = false;
+            this.generateFollowOnKnockout.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.generateFollowOnKnockout.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateFollowOnKnockout.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.generateFollowOnKnockout.Location = new System.Drawing.Point(277, 53);
+            this.generateFollowOnKnockout.Name = "generateFollowOnKnockout";
+            this.generateFollowOnKnockout.Size = new System.Drawing.Size(257, 43);
+            this.generateFollowOnKnockout.TabIndex = 13;
+            this.generateFollowOnKnockout.Text = "Generate Follow On Knockout Event";
+            this.generateFollowOnKnockout.UseVisualStyleBackColor = false;
+            this.generateFollowOnKnockout.Click += new System.EventHandler(this.generateFollowOnKnockout_Click);
+            // 
+            // addNewKnockoutButton
+            // 
+            this.addNewKnockoutButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.addNewKnockoutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewKnockoutButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.addNewKnockoutButton.Location = new System.Drawing.Point(277, 3);
+            this.addNewKnockoutButton.Name = "addNewKnockoutButton";
+            this.addNewKnockoutButton.Size = new System.Drawing.Size(257, 43);
+            this.addNewKnockoutButton.TabIndex = 14;
+            this.addNewKnockoutButton.Text = "Add New Knockout Event";
+            this.addNewKnockoutButton.UseVisualStyleBackColor = false;
+            this.addNewKnockoutButton.Click += new System.EventHandler(this.addNewKnockoutButton_Click);
+            // 
+            // generateFollowOnSwissButton
+            // 
+            this.generateFollowOnSwissButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.generateFollowOnSwissButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.generateFollowOnSwissButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.generateFollowOnSwissButton.Location = new System.Drawing.Point(3, 53);
+            this.generateFollowOnSwissButton.Name = "generateFollowOnSwissButton";
+            this.generateFollowOnSwissButton.Size = new System.Drawing.Size(257, 43);
+            this.generateFollowOnSwissButton.TabIndex = 15;
+            this.generateFollowOnSwissButton.Text = "Generate Follow On Swiss Teams";
+            this.generateFollowOnSwissButton.UseVisualStyleBackColor = false;
+            this.generateFollowOnSwissButton.Click += new System.EventHandler(this.generateFollowOnSwissButton_Click);
             // 
             // EventManagement
             // 
@@ -257,10 +288,12 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Button addNewPDEventButton;
-        private System.Windows.Forms.Button addNewTeamEventButton;
+        private System.Windows.Forms.Button addNewSwissTeamEventButton;
         private System.Windows.Forms.Button addNewPairEventButton;
         private System.Windows.Forms.PropertyGrid tourneyInfoPropertyGrid;
-        private System.Windows.Forms.Button addKnockoutButton;
+        private System.Windows.Forms.Button generateFollowOnSwissButton;
+        private System.Windows.Forms.Button generateFollowOnKnockout;
+        private System.Windows.Forms.Button addNewKnockoutButton;
 
 
     }

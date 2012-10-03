@@ -48,6 +48,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="CreateNewEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateNewEvents.Designer.cs">
+      <DependentUpon>CreateNewEvents.cs</DependentUpon>
+    </Compile>
+    <Compile Include="KnockoutTeamsDatabaseToWebpages.cs" />
+    <Compile Include="KnockoutScorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="KnockoutScorer.Designer.cs">
+      <DependentUpon>KnockoutScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LocalUtilities.cs" />
     <Compile Include="PropertyGridClasses.cs" />
     <Compile Include="SwissTeamsDatabaseToWebpages.cs" />
     <Compile Include="PDScorer.cs">
@@ -88,6 +102,12 @@
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="CreateNewEvents.resx">
+      <DependentUpon>CreateNewEvents.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KnockoutScorer.resx">
+      <DependentUpon>KnockoutScorer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PDScorer.resx">
       <DependentUpon>PDScorer.cs</DependentUpon>
     </EmbeddedResource>

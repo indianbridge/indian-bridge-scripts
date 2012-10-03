@@ -117,7 +117,7 @@ namespace IndianBridgeScorer
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerTemplate;
-            parameters.tableName = Constants.EventComputedScoresTableName;          
+            parameters.tableName = Constants.TableName.EventComputedScores;          
             createPage_(parameters);
             m_prefix = "./";
             parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
@@ -140,7 +140,7 @@ namespace IndianBridgeScorer
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = "<h2>Team Compositions</h2>" + "<br/>[_commonPageHeader]";
-            parameters.tableName = Constants.EventNamesTableName;
+            parameters.tableName = Constants.TableName.EventNames;
             createPage_(parameters);
             reportProgress("Created Names Page");
         }
@@ -160,7 +160,7 @@ namespace IndianBridgeScorer
         private double getDoubleValue(DataRow dRow, string columnName) { return AccessDatabaseUtilities.getDoubleValue(dRow, columnName); }
         private string getTeamMemberNames(DataRow dRow)
         {
-            DataRow[] dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + (int)dRow["Team_Number"]);
+            DataRow[] dRows = getTable(Constants.TableName.EventNames).Select("Team_Number = " + (int)dRow["Team_Number"]);
             Debug.Assert(dRows.Length == 1);
             return (string)dRows[0]["Member_Names"];
         }
@@ -211,10 +211,19 @@ namespace IndianBridgeScorer
             m_prefix = "../";
             StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "teams","team" + teamNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
-            DataRow[] foundRows = getTable(Constants.EventNamesTableName).Select("Team_Number = "+teamNumber);
-            Debug.Assert(foundRows.Length == 1);
-            DataRow dRow = foundRows[0];
-            string headerTemplate = "<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>" + "<br/>[_commonPageHeader]";
+            DataRow dRow = getTable(Constants.TableName.EventNames).Rows.Find(teamNumber);
+            string headerTemplate = "<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>";
+            headerTemplate += "<h3>Carryover : {Carryover}</h3>";
+            sw.WriteLine(applyTemplate_(headerTemplate, dRow));
+            string originalEventName = AccessDatabaseUtilities.getStringValue(dRow, "Original_Event_Name");
+            if (!string.IsNullOrWhiteSpace(originalEventName))
+            {
+                int originalTeamNumber = AccessDatabaseUtilities.getIntValue(dRow, "Original_Team_Number");
+                string webpagesRootDirectory = Path.Combine("..", "..", Constants.WebpagesFolderName, Utilities.makeIdentifier_(originalEventName));
+                string link = Path.Combine(webpagesRootDirectory, "teams", "team" + originalTeamNumber + "score.html");
+                sw.WriteLine("<a title='" + dRow["Member_Names"] + "' href='" + link + "'>Previous Round Scores for this team</a>");
+            }
+            headerTemplate = "<br/>[_commonPageHeader]";
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
 
             sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
@@ -230,7 +239,7 @@ namespace IndianBridgeScorer
             {
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add(getRoundNumberLink(i));
-                foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + i + " AND Team_1_Number = " + teamNumber);
+                DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + i + " AND Team_1_Number = " + teamNumber);
                 if (foundRows.Length > 0)
                 {
                     dRow = foundRows[0];
@@ -242,7 +251,7 @@ namespace IndianBridgeScorer
                 }
                 else
                 {
-                    foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + i + " AND Team_2_Number = " + teamNumber);
+                    foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + i + " AND Team_2_Number = " + teamNumber);
                     if (foundRows.Length < 1)
                     {
                         tableRow.Add("-");
@@ -259,7 +268,7 @@ namespace IndianBridgeScorer
                         tableRow.Add("" + getDoubleValue(dRow,"Team_2_VP_Adjustment"));
                     }
                 }
-                foundRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + teamNumber);
+                foundRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + teamNumber);
                 Debug.Assert(foundRows.Length <= 1);
                 if (foundRows.Length < 1)
                 {
@@ -313,7 +322,7 @@ namespace IndianBridgeScorer
             m_prefix = "../";
             StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "rounds", "round" + roundNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
-            DataRow[] foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + roundNumber, "Table_Number ASC");
+            DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + roundNumber, "Table_Number ASC");
             DataRow dRow = (foundRows.Length>0)?foundRows[0]:null;
             string headerTemplate = "<h2>Scores for Round " + roundNumber + "</h2>" + "<br/>[_commonPageHeader]";
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
@@ -353,7 +362,7 @@ namespace IndianBridgeScorer
                 parameters.sortCriteria = "Rank_After_Round_" + roundNumber + " ASC";
                 parameters.filterCriteria = "";
                 parameters.headerTemplate = headerTemplate;
-                parameters.tableName = Constants.EventComputedScoresTableName;          
+                parameters.tableName = Constants.TableName.EventComputedScores;          
 
                 sw.WriteLine(createTable_(parameters));
                 sw.WriteLine("</td></tr></tbody></table>");
@@ -500,10 +509,18 @@ namespace IndianBridgeScorer
         }
 
 
-        private String findColumnValue_(Match match, DataRow dRow)
+        private string findColumnValue_(Match match, DataRow dRow)
         {
             String columnName = match.Value.Replace("{", "").Replace("}", "");
+            if (dRow[columnName] == DBNull.Value) return "0";
             return "" + dRow[columnName];
+        }
+
+        private string getTeamMemberNames(int teamNumber)
+        {
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.EventNames);
+            DataRow dRow = table.Rows.Find(teamNumber);
+            return ""+dRow["Member_Names"];
         }
 
 
@@ -516,7 +533,8 @@ namespace IndianBridgeScorer
             result += "Team Scores : ";
             for (int i = 1; i <= m_numberOfTeams; ++i)
             {
-                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "teams" + "/team" + i + "score.html'>" + i + "</a>";
+
+                result += (i == 1 ? "" : " | ") + "<a title = '" + getTeamMemberNames(i) +"' href='" + m_prefix + "teams" + "/team" + i + "score.html'>" + i + "</a>";
             }
             result += "<br/>";
             result += "Round Scores : ";
@@ -533,10 +551,8 @@ namespace IndianBridgeScorer
             if (teamNumberObject == DBNull.Value) return "-";
             int teamNumber = (int)teamNumberObject;
             if (teamNumber <= 0 || teamNumber > m_numberOfTeams) return "BYE";
-            DataRow[] dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + teamNumber);
-            Debug.Assert(dRows.Length == 1);
-            DataRow dRow = dRows[0];
-            result = "<a href='" + m_prefix + "teams" + "/team" + dRow["Team_Number"] + "score.html'>" + (showNumber?dRow["Team_Number"]+" ":"") + (showName?dRow["Team_Name"]:"") + "</a>";
+            DataRow dRow = getTable(Constants.TableName.EventNames).Rows.Find(teamNumber);
+            result = "<a title='"+dRow["Member_Names"]+"' href='" + m_prefix + "teams" + "/team" + dRow["Team_Number"] + "score.html'>" + (showNumber?dRow["Team_Number"]+" ":"") + (showName?dRow["Team_Name"]:"") + "</a>";
             return result;
         }
 
