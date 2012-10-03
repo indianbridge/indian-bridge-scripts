@@ -81,9 +81,9 @@ namespace IndianBridgeScorer
                 fields.Add(new DatabaseField("Event_Type", "TEXT", 255));
                 List<string> primaryKeyFields = new List<string>();
                 primaryKeyFields.Add("Event_Name");
-                AccessDatabaseUtilities.createTable(databaseFileName, Constants.TourneyEventsTableName, fields, primaryKeyFields);
+                AccessDatabaseUtilities.createTable(databaseFileName, Constants.TableName.TourneyEvents, fields, primaryKeyFields);
             }
-            else AccessDatabaseUtilities.loadDatabaseToTable(databaseFileName, Constants.TourneyEventsTableName);
+            else AccessDatabaseUtilities.loadDatabaseToTable(databaseFileName, Constants.TableName.TourneyEvents);
         }
 
 

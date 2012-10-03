@@ -83,6 +83,20 @@ namespace IndianBridge.Common
             }
         }
 
+        public static void SetDataGridViewProperties(Control controlContainer)
+        {
+            foreach (Control control in controlContainer.Controls)
+            {
+                if (control is DataGridView)
+                {
+                    DataGridView dgv = control as DataGridView;
+                    dgv.KeyDown += new KeyEventHandler(Utilities.handleCopyPaste);
+                    dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                }
+                else if (control.HasChildren) SetDataGridViewProperties(control);
+            }
+        }
+
         public static bool confirmReload(string tableName)
         {
             DialogResult result = MessageBox.Show("Are you sure? Any changes you have made to the " + tableName + " table above will be lost!", "Confirm reload!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -154,12 +168,14 @@ namespace IndianBridge.Common
         }
 
 
-        public static bool HasNull(DataTable table)
+        public static bool HasNull(DataTable table, List<string> skipColumnNames = null)
         {
             foreach (DataColumn column in table.Columns)
             {
-                if (table.Rows.OfType<DataRow>().Any(r => r.IsNull(column)))
-                    return true;
+                if (skipColumnNames == null || !skipColumnNames.Contains(column.ColumnName))
+                {
+                    if (table.Rows.OfType<DataRow>().Any(r => r.IsNull(column))) return true;
+                }
             }
 
             return false;

@@ -41,11 +41,7 @@ namespace IndianBridgeScorer
             m_databaseFileName = Constants.getEventScoresFileName(m_eventName);
             // Save all tabs
             Utilities.saveTabs(mainControlTab);
-            // Enable copy paste in all datagridview's
-            foreach (DataGridView control in this.Controls.OfType<DataGridView>())
-            {
-                control.KeyDown += new KeyEventHandler(Utilities.handleCopyPaste);
-            }
+            Utilities.SetDataGridViewProperties(this);
             if (!File.Exists(m_databaseFileName)) createDatabases();
             loadDatabases();
             if (!isEventSetup())
@@ -67,6 +63,7 @@ namespace IndianBridgeScorer
             showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
         }
 
+
         private void updateTeamEventParameters()
         {
             showTeamScoresCombobox.Items.Clear();
@@ -82,7 +79,7 @@ namespace IndianBridgeScorer
         {
             int numberOfBoards = m_swissTeamEventInfo.NumberOfBoardsPerRound;
             string query = " WHERE VP_Scale=30 AND Number_Of_Boards_Lower<=" + numberOfBoards + " AND Number_Of_Boards_Upper>=" + numberOfBoards;
-            DataTable table = AccessDatabaseUtilities.loadDatabaseToTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.VPScaleTableName + ".mdb"), Constants.VPScaleTableName, query);
+            DataTable table = AccessDatabaseUtilities.loadDatabaseToTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale, query);
             DataView dView = new DataView(table);
             dView.RowFilter = "";
             dView.Sort = "Number_Of_IMPs_Lower ASC";
@@ -102,9 +99,9 @@ namespace IndianBridgeScorer
             resultsPublishPropertyGrid.SelectedObject = m_resultsPublishParameters;
             if (string.IsNullOrWhiteSpace(m_resultsPublishParameters.ResultsWebsite)) 
             m_resultsPublishParameters.ResultsWebsite = Constants.getEventResultsWebsite(m_eventName);
-            namesDataGridView.DataSource = loadTable(Constants.EventNamesTableName);
-            loadTable(Constants.EventScoresTableName);
-            loadTable(Constants.EventComputedScoresTableName);
+            namesDataGridView.DataSource = loadTable(Constants.TableName.EventNames);
+            loadTable(Constants.TableName.EventScores);
+            loadTable(Constants.TableName.EventComputedScores);
             loadVPScaleTable();
             updateTeamEventParameters();
             m_swissTeamPrintDrawParameters.DrawForRound = m_swissTeamScoringProgressParameters.DrawsCompleted;
@@ -126,9 +123,15 @@ namespace IndianBridgeScorer
             fields.Add(new DatabaseField("Team_Number", "INTEGER"));
             fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
             fields.Add(new DatabaseField("Member_Names", "TEXT", 255));
+            fields.Add(new DatabaseField("Carryover", "NUMBER"));
+            fields.Add(new DatabaseField("Original_Team_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Original_Event_Name", "TEXT",255));
+            fields.Add(new DatabaseField("Total_Score", "NUMBER"));
+            fields.Add(new DatabaseField("Tiebreaker_Score", "NUMBER"));
+            fields.Add(new DatabaseField("Rank", "INTEGER"));
             List<string> primaryKeys = new List<string>();
             primaryKeys.Add("Team_Number");
-            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.EventNamesTableName, fields, primaryKeys);
+            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventNames, fields, primaryKeys);
         }
 
         private void createScoresTable()
@@ -147,7 +150,7 @@ namespace IndianBridgeScorer
             List<string> primaryKeys = new List<string>();
             primaryKeys.Add("Round_Number");
             primaryKeys.Add("Table_Number");
-            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.EventScoresTableName, fields, primaryKeys);
+            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventScores, fields, primaryKeys);
         }
 
         private void createComputedScoresTable()
@@ -156,7 +159,7 @@ namespace IndianBridgeScorer
             List<string> primaryKeys = new List<string>();
             fields.Add(new DatabaseField("Team_Number", "INTEGER"));
             primaryKeys.Add("Team_Number");
-            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.EventComputedScoresTableName, fields, primaryKeys);
+            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventComputedScores, fields, primaryKeys);
         }
 
         private bool isEventSetup()
@@ -256,7 +259,7 @@ namespace IndianBridgeScorer
                     fields.Add(new DatabaseField("Tiebreaker_After_Round_" + i, "NUMBER"));
                 }
 
-                AccessDatabaseUtilities.addColumn(m_databaseFileName, Constants.EventComputedScoresTableName, fields);
+                AccessDatabaseUtilities.addColumn(m_databaseFileName, Constants.TableName.EventComputedScores, fields);
             }
             else if (newNumberOfRounds < previousNumberOfRounds)
             {
@@ -267,24 +270,23 @@ namespace IndianBridgeScorer
                     fields.Add(new DatabaseField("Tiebreaker_After_Round_" + i, "NUMBER"));
                 }
 
-                AccessDatabaseUtilities.dropColumn(m_databaseFileName, Constants.EventComputedScoresTableName, fields);
+                AccessDatabaseUtilities.dropColumn(m_databaseFileName, Constants.TableName.EventComputedScores, fields);
             }
-            DataTable table = getTable(Constants.EventComputedScoresTableName);
+            DataTable table = getTable(Constants.TableName.EventComputedScores);
             foreach (DataRow dRow in table.Rows) dRow.Delete();
-            //table.Rows.Clear();
-            saveTable(Constants.EventComputedScoresTableName);
+            saveTable(Constants.TableName.EventComputedScores);
             for (int i = 1; i <= newNumberOfTeams; ++i)
             {
                 DataRow dRow = table.NewRow();
                 dRow["Team_Number"] = i;
                 table.Rows.Add(dRow);
             }
-            saveTable(Constants.EventComputedScoresTableName);
+            saveTable(Constants.TableName.EventComputedScores);
         }
 
         private void updateScoresTable(int previousNumberOfRounds, int newNumberOfRounds, int previousNumberOfTeams, int newNumberOfTeams)
         {
-            DataTable table = getTable(Constants.EventScoresTableName);
+            DataTable table = getTable(Constants.TableName.EventScores);
             int numberOfMatches = (newNumberOfTeams / 2) + newNumberOfTeams % 2;
             int previousNumberOfMatches = (previousNumberOfTeams / 2) + previousNumberOfTeams % 2;
             if (newNumberOfRounds > previousNumberOfRounds)
@@ -337,12 +339,12 @@ namespace IndianBridgeScorer
                     }
                 }
             }
-            saveTable(Constants.EventScoresTableName);
+            saveTable(Constants.TableName.EventScores);
         }
 
         private void updateNamesTable(int newNumberOfTeams, int previousNumberOfTeams)
         {
-            DataTable table = getTable(Constants.EventNamesTableName);
+            DataTable table = getTable(Constants.TableName.EventNames);
             if (newNumberOfTeams > previousNumberOfTeams)
             {
                 for (int i = previousNumberOfTeams + 1; i <= newNumberOfTeams; ++i)
@@ -350,6 +352,9 @@ namespace IndianBridgeScorer
                     DataRow dRow = table.NewRow();
                     dRow["Team_Number"] = i;
                     dRow["Team_Name"] = "Team " + i;
+                    dRow["Total_Score"] = 0;
+                    dRow["Tiebreaker_Score"] = 0;
+                    dRow["Rank"] = 1;
                     table.Rows.Add(dRow);
                 }
             }
@@ -361,33 +366,33 @@ namespace IndianBridgeScorer
                     dRow.Delete();
                 }
             }
-            saveTable(Constants.EventNamesTableName);
+            saveTable(Constants.TableName.EventNames);
         }
 
         private void namesDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            Utilities.setReadOnlyAndVisibleColumns(namesDataGridView, new string[] { "Team_Number" }, null);
+            Utilities.setReadOnlyAndVisibleColumns(namesDataGridView, null, new string[] {"Total_Score","Tiebreaker_Score","Rank"});
         }
 
         private void saveNamesButton_Click(object sender, EventArgs e)
         {
-            saveTable(Constants.EventNamesTableName);
-            Utilities.showBalloonNotification("Save Completed", Constants.EventNamesTableName+" saved to Database successfully");
+            saveTable(Constants.TableName.EventNames);
+            Utilities.showBalloonNotification("Save Completed", Constants.TableName.EventNames+" saved to Database successfully");
         }
 
         private void reloadNamesButton_Click(object sender, EventArgs e)
         {
-            if (Utilities.confirmReload(Constants.EventNamesTableName))
+            if (Utilities.confirmReload(Constants.TableName.EventNames))
             {
-                loadTable(Constants.EventNamesTableName);
-                Utilities.showBalloonNotification("Reload Completed", Constants.EventNamesTableName+" reloaded from database successfully");
+                loadTable(Constants.TableName.EventNames);
+                Utilities.showBalloonNotification("Reload Completed", Constants.TableName.EventNames+" reloaded from database successfully");
             }
         }
 
         private void showDraw()
         {
             int selectedRound = int.Parse(showingDrawCombobox.Text);
-            DataView dView = new DataView(getTable(Constants.EventScoresTableName));
+            DataView dView = new DataView(getTable(Constants.TableName.EventScores));
             dView.RowFilter = "Round_Number = " + selectedRound;
             dView.Sort = "Table_Number ASC";
             drawDataGridView.DataSource = dView;
@@ -451,27 +456,34 @@ namespace IndianBridgeScorer
             Utilities.setReadOnlyAndVisibleColumns(drawDataGridView, readOnlyColumns, hideColumns);
         }
 
+        private int getTeamNumber(int rowNumber)
+        {
+            DataTable table = getTable(Constants.TableName.EventNames);
+            return (int)table.Rows[rowNumber-1]["Team_Number"];
+        }
+
         private void randomDrawButton_Click(object sender, EventArgs e)
         {
             int drawRoundNumber = int.Parse(showingDrawCombobox.Text);
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
-            int totalTeams = numberOfTeams + (numberOfTeams % 2);
-            bool[] assigned = new bool[totalTeams];
-            for (int i = 0; i < totalTeams; ++i) assigned[i] = false;
-            int[] teamNumber = new int[totalTeams];
-            for (int i = 0; i < totalTeams; ++i) teamNumber[i] = i + 1;
+            bool[] assigned = new bool[numberOfTeams+1];
+            for (int i = 0; i <= numberOfTeams; ++i) assigned[i] = false;
+            int[] teamNumber = new int[numberOfTeams+1];
+            teamNumber[0] = 0;
+            for (int i = 1; i <= numberOfTeams; ++i) teamNumber[i] = getTeamNumber(i);
             int numberOfMatches = (numberOfTeams / 2) + (numberOfTeams % 2);
             if (!createMatch(drawRoundNumber, 1, numberOfMatches, assigned, teamNumber))
             {
                 MessageBox.Show("Unable to generate random draw for round : " + drawRoundNumber + Environment.NewLine + "Please generate by hand and enter directly.", "Random Draw Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                loadTable(Constants.EventScoresTableName);
+                loadTable(Constants.TableName.EventScores);
             }
         }
 
         private bool allAssigned(bool[] assigned)
         {
-            for (int i = 0; i < assigned.Length; ++i)
+            for (int i = 1; i < assigned.Length; ++i)
                 if (!assigned[i]) return false;
+            if (m_swissTeamEventInfo.NumberOfTeams % 2 == 1 && !assigned[0]) return false;
             return true;
         }
 
@@ -481,6 +493,7 @@ namespace IndianBridgeScorer
             {
                 if (!assigned[i]) return i;
             }
+            if (m_swissTeamEventInfo.NumberOfTeams % 2 == 1 && !assigned[0]) return 0;
             return -1;
         }
 
@@ -490,11 +503,12 @@ namespace IndianBridgeScorer
             bool flag = true;
             int index2 = startIndex;
             int team1 = teamNumber[index1];
-            DataTable table = getTable(Constants.EventScoresTableName);
+            DataTable table = getTable(Constants.TableName.EventScores);
             while (flag)
             {
+                if (index2 == 0) return -1;
                 index2 = findFirstUnassigned(index2 + 1, assigned);
-                Console.WriteLine("index2 = " + index2);
+                Console.WriteLine("Index2 : " + index2);
                 if (index2 == -1) return -1;
                 int team2 = teamNumber[index2];
                 if (team1 < 1 || team1 > numberOfTeams)
@@ -527,11 +541,12 @@ namespace IndianBridgeScorer
 
         private bool createMatch(int drawRoundNumber, int matchNumber, int numberOfMatches, bool[] assigned, int[] teamNumber)
         {
-            //Console.WriteLine("Match : " + matchNumber);
+            Console.WriteLine("Match Number : " + matchNumber);
             if (matchNumber > numberOfMatches) return true;
-            int index1 = findFirstUnassigned(0, assigned);
+            int index1 = findFirstUnassigned(1, assigned);
             Debug.Assert(index1 != -1, "For Match Number : " + matchNumber + " unable to find unassigned team");
             int team1 = teamNumber[index1];
+            Console.WriteLine("Team 1 : " + team1);
             assigned[index1] = true;
             int index2 = index1;
             bool[] localAssigned = new bool[assigned.Length];
@@ -539,10 +554,15 @@ namespace IndianBridgeScorer
             while (true)
             {
                 index2 = findOpponent(drawRoundNumber, index1, index2, assigned, teamNumber);
-                if (index2 == -1) return false;
+                if (index2 == -1)
+                {
+                    Console.WriteLine("Cannot find Team 2");
+                    return false;
+                }
                 int team2 = teamNumber[index2];
+                Console.WriteLine("Team 2 : " + team2);
                 assigned[index2] = true;
-                DataRow[] dRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + drawRoundNumber + " AND Table_Number = " + matchNumber);
+                DataRow[] dRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + drawRoundNumber + " AND Table_Number = " + matchNumber);
                 Debug.Assert(dRows.Length == 1, "Cannot find exactly one row with Round Number : " + drawRoundNumber + " and Table Number : " + matchNumber);
                 DataRow dRow = dRows[0];
                 dRow["Team_1_Number"] = team1;
@@ -575,17 +595,16 @@ namespace IndianBridgeScorer
         {
             int drawRoundNumber = int.Parse(showingDrawCombobox.Text);
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
-            int totalTeams = numberOfTeams + (numberOfTeams % 2);
-            bool[] assigned = new bool[totalTeams];
-            for (int i = 0; i < totalTeams; ++i) assigned[i] = false;
+            bool[] assigned = new bool[numberOfTeams+1];
+            for (int i = 0; i <= numberOfTeams; ++i) assigned[i] = false;
             int numberOfMatches = (numberOfTeams / 2) + (numberOfTeams % 2);
-            int[] teamNumber = new int[totalTeams];
-            if (totalTeams > numberOfTeams) teamNumber[totalTeams - 1] = 0;
+            int[] teamNumber = new int[numberOfTeams+1];
+            teamNumber[0] = 0;
             if (roundNumber > 0)
             {
-                DataTable table = getTable(Constants.EventComputedScoresTableName);
+                DataTable table = getTable(Constants.TableName.EventComputedScores);
                 DataRow[] dRows = table.Select("", "Rank_After_Round_" + roundNumber + " ASC");
-                int count = 0;
+                int count = 1;
                 foreach (DataRow foundRow in dRows)
                 {
                     teamNumber[count++] = (int)foundRow["Team_Number"];
@@ -593,12 +612,12 @@ namespace IndianBridgeScorer
             }
             else
             {
-                for (int count = 0; count < totalTeams; count++) teamNumber[count] = count + 1;
+                for (int i = 1; i <= numberOfTeams; ++i) teamNumber[i] = getTeamNumber(i);
             }
             if (!createMatch(drawRoundNumber, 1, numberOfMatches, assigned, teamNumber))
             {
                 MessageBox.Show("Unable to generate draw based on scores after round : " + drawRoundNumber + Environment.NewLine + "Please generate by hand and enter directly.", "Round Score Based Draw Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                loadTable(Constants.EventScoresTableName);
+                loadTable(Constants.TableName.EventScores);
             }
         }
 
@@ -616,7 +635,7 @@ namespace IndianBridgeScorer
                 DialogResult result = MessageBox.Show("Following Warning were found. Do you still want to accept draw?" + Environment.NewLine + message, "Possible Errors in Draw!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result == DialogResult.No) return;
             }
-            saveTable(Constants.EventScoresTableName);
+            saveTable(Constants.TableName.EventScores);
             Utilities.showBalloonNotification("Save Completed", "Saved Round " + showingDrawCombobox.Text + " Draw to Database");
             int value = int.Parse(showingDrawCombobox.Text);
             m_swissTeamScoringProgressParameters.DrawsCompleted = value;
@@ -626,21 +645,7 @@ namespace IndianBridgeScorer
             m_swissTeamPrintDrawParameters.DrawForRound = value;
             printDrawPropertyGrid.Refresh();
             generateDrawHtml();
-        }
-
-        /*private void setIntScoringParameterValue(string parameterName, int value)
-        {
-            int currentValue = NiniUtilities.getIntValue(m_scoringParametersNiniFileName, parameterName);
-            if (value > currentValue)
-            {
-                NiniUtilities.setIntValue(m_scoringParametersNiniFileName, parameterName, value);
-                populateComboboxes();
-                updateComboboxes();
-                NiniUtilities.saveNiniConfig(m_scoringParametersNiniFileName);
-            }
-            
-        }*/
-         
+        }         
 
         private string checkDrawForErrors()
         {
@@ -648,7 +653,6 @@ namespace IndianBridgeScorer
             string message = "";
             if (drawDataGridView.Columns.Contains("Team_1_Number"))
             {
-                int totalTeams = numberOfTeams + (numberOfTeams % 2);
                 DataView dView = ((DataView)drawDataGridView.DataSource);
                 int row = 1;
                 Object value;
@@ -658,22 +662,38 @@ namespace IndianBridgeScorer
                     value = dRow["Team_1_Number"];
                     if (value == DBNull.Value)
                     {
-                        message += Environment.NewLine + "Team 1 Number in row " + row + " is empty";
+                        Utilities.appendToMessage(ref message, "Team 1 Number in row " + row + " is empty");
                     }
                     else
                     {
                         int team1Number = (int)dRow["Team_1_Number"];
-                        if (team1Number < 1 - numberOfTeams % 2 || team1Number > totalTeams) message += Environment.NewLine + "Team 1 Number in row " + row + " is not between " + (1 - numberOfTeams % 2) + " and " + totalTeams;
+                        if (team1Number != 0)
+                        {
+                            DataRow foundRow = getTable(Constants.TableName.EventNames).Rows.Find(team1Number);
+                            if (foundRow == null) Utilities.appendToMessage(ref message, "Team 1 Number in row " + row + " does not match any team numbers specified in the Names Database");
+                        }
+                        else if (numberOfTeams % 2 == 0)
+                        {
+                            Utilities.appendToMessage(ref message, "Bye team number (0) has been specified as Team 1 in row " + row + " even though there are even number of teams.");
+                        }
                     }
                     value = dRow["Team_2_Number"];
                     if (value == DBNull.Value)
                     {
-                        message += Environment.NewLine + "Team 2 Number in row " + row + " is empty";
+                        Utilities.appendToMessage(ref message, "Team 2 Number in row " + row + " is empty");
                     }
                     else
                     {
                         int team2Number = (int)dRow["Team_2_Number"];
-                        if (team2Number < 1 - numberOfTeams % 2 || team2Number > totalTeams) message += Environment.NewLine + "Team 2 Number in row " + row + " is not between " + (1 - numberOfTeams % 2) + " and " + totalTeams;
+                        if (team2Number != 0)
+                        {
+                            DataRow foundRow = getTable(Constants.TableName.EventNames).Rows.Find(team2Number);
+                            if (foundRow == null) Utilities.appendToMessage(ref message, "Team 2 Number in row " + row + " does not match any team numbers specified in the Names Database");
+                        }
+                        else if (numberOfTeams % 2 == 0)
+                        {
+                            Utilities.appendToMessage(ref message, "Bye team number (0) has been specified as Team 2 in row " + row + " even though there are even number of teams.");
+                        }
                     }
                     row++;
                 }
@@ -687,21 +707,11 @@ namespace IndianBridgeScorer
             public List<int> team2Occurence;
         };
 
-        private int doesMatchExist(int team1Number, int team2Number, int totalTeams)
+        private int doesMatchExist(int team1Number, int team2Number)
         {
             DataTable table = ((DataView)drawDataGridView.DataSource).Table;
             DataRow[] dRows = table.Select("Round_Number < " + showingDrawCombobox.Text + " AND Team_1_Number = " + team1Number + " AND Team_2_Number = " + team2Number);
             if (dRows.Length > 0) return (int)dRows[0]["Round_Number"];
-            if (team1Number == totalTeams)
-            {
-                dRows = table.Select("Round_Number < " + showingDrawCombobox.Text + " AND Team_1_Number = 0 AND Team_2_Number = " + team2Number);
-                if (dRows.Length > 0) return (int)dRows[0]["Round_Number"];
-            }
-            if (team2Number == totalTeams)
-            {
-                dRows = table.Select("Round_Number < " + showingDrawCombobox.Text + " AND Team_1_Number = " + team1Number + " AND Team_2_Number = 0");
-                if (dRows.Length > 0) return (int)dRows[0]["Round_Number"];
-            }
             return -1;
         }
 
@@ -711,9 +721,8 @@ namespace IndianBridgeScorer
             string message = "";
             if (drawDataGridView.Columns.Contains("Team_1_Number"))
             {
-                int totalTeams = numberOfTeams + (numberOfTeams % 2);
-                Occurences[] occurences = new Occurences[totalTeams];
-                for (int i = 0; i < totalTeams; ++i)
+                Occurences[] occurences = new Occurences[numberOfTeams + 1];
+                for (int i = 0; i <= numberOfTeams; ++i)
                 {
                     occurences[i].count = 0;
                     occurences[i].team1Occurence = new List<int>();
@@ -725,21 +734,19 @@ namespace IndianBridgeScorer
                 {
                     DataRow dRow = rowView.Row;
                     int team1Number = (int)dRow["Team_1_Number"];
-                    if (team1Number == 0) team1Number = totalTeams;
                     int team2Number = (int)dRow["Team_2_Number"];
-                    if (team2Number == 0) team2Number = totalTeams;
-                    int previousRound = doesMatchExist(team1Number, team2Number, totalTeams);
+                    int previousRound = doesMatchExist(team1Number, team2Number);
                     if (previousRound != -1)
                     {
                         message += Environment.NewLine + team1Number + " and " + team2Number + " have already played in round " + previousRound + " and are matched in this round in row " + row;
                     }
-                    occurences[team1Number - 1].count++;
-                    occurences[team1Number - 1].team1Occurence.Add(row);
-                    occurences[team2Number - 1].count++;
-                    occurences[team2Number - 1].team2Occurence.Add(row);
+                    occurences[team1Number].count++;
+                    occurences[team1Number].team1Occurence.Add(row);
+                    occurences[team2Number].count++;
+                    occurences[team2Number].team2Occurence.Add(row);
                     row++;
                 }
-                for (int i = 0; i < numberOfTeams; ++i)
+                for (int i = 1; i <= numberOfTeams; ++i)
                 {
                     if (occurences[i].count == 0)
                     {
@@ -760,9 +767,9 @@ namespace IndianBridgeScorer
                         message += ")";
                     }
                 }
-                if (totalTeams > numberOfTeams)
+                if (numberOfTeams % 1 != 0)
                 {
-                    int i = totalTeams - 1;
+                    int i = 0;
                     if (occurences[i].count == 0)
                     {
                         message += Environment.NewLine + "No team has a bye even though there are an odd number of teams.";
@@ -790,7 +797,7 @@ namespace IndianBridgeScorer
         {
             if (Utilities.confirmReload("Draw"))
             {
-                loadTable(Constants.EventScoresTableName);
+                loadTable(Constants.TableName.EventScores);
                 Utilities.showBalloonNotification("Reload Completed", "Reloaded Round " + showingDrawCombobox.Text + " Draw from Database");
             }
         }
@@ -827,7 +834,7 @@ namespace IndianBridgeScorer
             if (vpsInSeparateColumn) tableHeader.Add("VPs");
             tableHeader.Add("Team2");
             sw.WriteLine(Utilities.makeTableHeader_(tableHeader, true) + "</tr></thead><tbody>");
-            DataRow[] foundRows = getTable(Constants.EventScoresTableName).Select("Round_Number = " + drawForRound, "Table_Number ASC");
+            DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + drawForRound, "Table_Number ASC");
             int i = 0;
             foreach (DataRow dRow in foundRows)
             {
@@ -863,7 +870,7 @@ namespace IndianBridgeScorer
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             if (teamNumber < 1 || teamNumber > numberOfTeams) return "BYE";
             int scoreRound = (string.IsNullOrWhiteSpace(drawBasedOnCombobox.Text))?0:int.Parse(drawBasedOnCombobox.Text);
-            DataRow[] dRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + teamNumber);
+            DataRow[] dRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + teamNumber);
             Debug.Assert(dRows.Length == 1);
             double score = (scoreRound < 1) ? 0 : getDoubleValue(dRows[0], "Score_After_Round_" + scoreRound);
             return "" + score;
@@ -874,7 +881,7 @@ namespace IndianBridgeScorer
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             int teamNumber = (int)dRow[columnName];
             if (teamNumber < 1 || teamNumber > numberOfTeams) return "BYE";
-            DataRow[] dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + teamNumber);
+            DataRow[] dRows = getTable(Constants.TableName.EventNames).Select("Team_Number = " + teamNumber);
             string teamName = (string)dRows[0]["Team_Name"];
             return "" + teamNumber + " " + teamName;
         }
@@ -884,11 +891,11 @@ namespace IndianBridgeScorer
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             int number = (int)dRow[columnName];
             if (number < 1 || number > numberOfTeams) return "BYE";
-            DataRow[] dRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + number);
+            DataRow[] dRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + number);
             Debug.Assert(dRows.Length == 1);
             int scoreRound = (string.IsNullOrWhiteSpace(drawBasedOnCombobox.Text))?0:int.Parse(drawBasedOnCombobox.Text);
             double score = (scoreRound < 1) ? 0 : getDoubleValue(dRows[0], "Score_After_Round_" + scoreRound);
-            dRows = getTable(Constants.EventNamesTableName).Select("Team_Number = " + number);
+            dRows = getTable(Constants.TableName.EventNames).Select("Team_Number = " + number);
             string teamName = (string)dRows[0]["Team_Name"];
             return "" + number + " " + teamName + " (" + score + ")";
         }
@@ -903,7 +910,7 @@ namespace IndianBridgeScorer
         {
             if (string.IsNullOrWhiteSpace(showingScoresForRoundCombobox.Text)) return;
             int selectedRound = int.Parse(showingScoresForRoundCombobox.Text);
-            DataView dView = new DataView(getTable(Constants.EventScoresTableName));
+            DataView dView = new DataView(getTable(Constants.TableName.EventScores));
             dView.RowFilter = "Round_Number = " + selectedRound;
             dView.Sort = "Table_Number ASC";
             scoresDataGridView.DataSource = dView;
@@ -948,7 +955,7 @@ namespace IndianBridgeScorer
             double team2IMPs = value == DBNull.Value ? 0 : (double)value;
             double difference = team1IMPs - team2IMPs;
             double absoluteDifference = Math.Abs(difference);
-            DataTable table  = AccessDatabaseUtilities.getDataTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.VPScaleTableName + ".mdb"), Constants.VPScaleTableName);
+            DataTable table  = AccessDatabaseUtilities.getDataTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale);
             DataRow[] dRows = table.Select("Number_Of_IMPs_Lower<=" + absoluteDifference + " AND Number_Of_IMPs_Upper>=" + absoluteDifference);
             Debug.Assert(dRows.Length == 1, "There should be exactly one row in VP Scale for given number of imps");
             int team1VPs = (difference >= 0) ? (int)dRows[0]["Team_1_VPs"] : (int)dRows[0]["Team_2_VPs"];
@@ -988,22 +995,22 @@ namespace IndianBridgeScorer
 
         private void reloadVPScaleButton_Click(object sender, EventArgs e)
         {
-            if (Utilities.confirmReload(Constants.VPScaleTableName))
+            if (Utilities.confirmReload(Constants.TableName.VPScale))
             {
                 loadVPScaleTable();
-                Utilities.showBalloonNotification("Reload Done", "Reloaded "+Constants.VPScaleTableName+" from database successfully");
+                Utilities.showBalloonNotification("Reload Done", "Reloaded "+Constants.TableName.VPScale+" from database successfully");
             }
         }
 
         private void saveVPScaleButton_Click(object sender, EventArgs e)
         {
-            AccessDatabaseUtilities.saveTableToDatabase(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.VPScaleTableName + ".mdb"), Constants.VPScaleTableName);
-            Utilities.showBalloonNotification("Save Done", "Saved " + Constants.VPScaleTableName + " to database successfully");
+            AccessDatabaseUtilities.saveTableToDatabase(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale);
+            Utilities.showBalloonNotification("Save Done", "Saved " + Constants.TableName.VPScale + " to database successfully");
         }
 
         private void saveScoresButton_Click(object sender, EventArgs e)
         {
-            saveTable(Constants.EventScoresTableName);
+            saveTable(Constants.TableName.EventScores);
             string roundCompletedString = showingScoresForRoundCombobox.Text;
             if (string.IsNullOrWhiteSpace(roundCompletedString)) return;
             int roundCompleted = int.Parse(showingScoresForRoundCombobox.Text);
@@ -1012,6 +1019,7 @@ namespace IndianBridgeScorer
             Utilities.showBalloonNotification("Saved Scores", "Saved Round " + roundCompleted + " scores and re-calculated leaderboard");
             createLocalWebpages();
             showUrl(Path.Combine(Constants.getEventWebpagesFolder(m_eventName), "leaderboard/index.html"));
+            mainControlTab.SelectedTab = mainControlTab.TabPages["viewResultsTab"];
         }
 
         private void publishResultsCompleted()
@@ -1062,6 +1070,22 @@ namespace IndianBridgeScorer
             displayWebBrowser.Url = new Uri(filename);
         }
 
+        private void copyTotalAndRank(int roundNumber)
+        {
+            DataTable table = getTable(Constants.TableName.EventNames);
+            DataTable computedScoresTable = getTable(Constants.TableName.EventComputedScores);
+            foreach (DataRow dRow in table.Rows)
+            {
+                int teamNumber = getIntValue(dRow, "Team_Number");
+                DataRow foundRow = computedScoresTable.Rows.Find(teamNumber);
+                Debug.Assert(foundRow != null);
+                dRow["Total_Score"] = getDoubleValue(foundRow, "Score_After_Round_" + roundNumber);
+                dRow["Tiebreaker_Score"] = getDoubleValue(foundRow, "Tiebreaker_After_Round_" + roundNumber);
+                dRow["Rank"] = getDoubleValue(foundRow, "Rank_After_Round_" + roundNumber);
+            }
+            saveTable(Constants.TableName.EventNames);
+        }
+
         private void doScoring(string roundChanged)
         {
             int roundsScored = int.Parse(roundChanged); ;
@@ -1072,7 +1096,8 @@ namespace IndianBridgeScorer
                 doTieBreaker(i);
                 doRanking(i);
             }
-            saveTable(Constants.EventComputedScoresTableName);
+            copyTotalAndRank(roundsCompleted);
+            saveTable(Constants.TableName.EventComputedScores);
             m_swissTeamScoringProgressParameters.RoundsScored = roundsCompleted;
             populateComboboxes();
             updateComboboxes();
@@ -1080,8 +1105,9 @@ namespace IndianBridgeScorer
 
         private void doScoring(int roundNumber)
         {
-            DataTable table = getTable(Constants.EventScoresTableName);
-            DataTable computedScoresTable = getTable(Constants.EventComputedScoresTableName);
+            DataTable namesTable = getTable(Constants.TableName.EventNames);
+            DataTable table = getTable(Constants.TableName.EventScores);
+            DataTable computedScoresTable = getTable(Constants.TableName.EventComputedScores);
             DataRow[] dRows = table.Select("Round_Number = " + roundNumber);
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             foreach (DataRow dRow in dRows)
@@ -1094,16 +1120,18 @@ namespace IndianBridgeScorer
                 double team2Adjustment = getDoubleValue(dRow, "Team_2_VP_Adjustment");
                 if (team1Number > 0 && team1Number <= numberOfTeams)
                 {
+                    DataRow foundRow = namesTable.Rows.Find(team1Number);
                     DataRow dComputedRow = computedScoresTable.Rows.Find(team1Number);
                     Debug.Assert(dComputedRow != null, "Row for team number " + team1Number + " was not found in computed scores table");
-                    double previousScore = (roundNumber == 1) ? 0 : getDoubleValue(dComputedRow, "Score_After_Round_" + (roundNumber - 1));
+                    double previousScore = (roundNumber == 1) ? getDoubleValue(foundRow,"Carryover") : getDoubleValue(dComputedRow, "Score_After_Round_" + (roundNumber - 1));
                     dComputedRow["Score_After_Round_" + roundNumber] = previousScore + team1VPs + team1Adjustment;
                 }
                 if (team2Number > 0 && team2Number <= numberOfTeams)
                 {
+                    DataRow foundRow = namesTable.Rows.Find(team2Number);
                     DataRow dComputedRow = computedScoresTable.Rows.Find(team2Number);
                     Debug.Assert(dComputedRow != null, "Row for team number " + team2Number + " was not found in computed scores table");
-                    double previousScore = (roundNumber == 1) ? 0 : getDoubleValue(dComputedRow, "Score_After_Round_" + (roundNumber - 1));
+                    double previousScore = (roundNumber == 1) ? getDoubleValue(foundRow, "Carryover") : getDoubleValue(dComputedRow, "Score_After_Round_" + (roundNumber - 1));
                     dComputedRow["Score_After_Round_" + roundNumber] = previousScore + team2VPs + team2Adjustment;
                 }
             }
@@ -1114,7 +1142,7 @@ namespace IndianBridgeScorer
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             for (int i = 1; i <= numberOfTeams; ++i)
             {
-                DataRow dComputedRow = getTable(Constants.EventComputedScoresTableName).Rows.Find(i);
+                DataRow dComputedRow = getTable(Constants.TableName.EventComputedScores).Rows.Find(i);
                 Debug.Assert(dComputedRow != null, "Row for team number " + i + " was not found in computed scores table");
                 if (m_swissTeamScoringParameters.TiebreakerMethod == TiebreakerMethodValues.TeamNumber)
                 {
@@ -1129,7 +1157,7 @@ namespace IndianBridgeScorer
 
         private void calculateTieBreakerQuotient(DataRow dComputedRow, int teamNumber, int roundNumber)
         {
-            DataTable table = getTable(Constants.EventScoresTableName);
+            DataTable table = getTable(Constants.TableName.EventScores);
             int numberOfTeams = m_swissTeamEventInfo.NumberOfTeams;
             int count = 0;
             double tieBreakerScore = 0;
@@ -1142,7 +1170,7 @@ namespace IndianBridgeScorer
                     if (opponent > 0 && opponent <= numberOfTeams)
                     {
                         double vps = getDoubleValue(dRow, "Team_1_VPs") + getDoubleValue(dRow, "Team_1_VP_Adjustment");
-                        DataRow[] foundRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + opponent);
+                        DataRow[] foundRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + opponent);
                         Debug.Assert(foundRows.Length == 1);
                         double score = getDoubleValue(foundRows[0], "Score_After_Round_" + roundNumber);
                         tieBreakerScore += (score * vps);
@@ -1160,7 +1188,7 @@ namespace IndianBridgeScorer
                     if (opponent > 0 && opponent <= numberOfTeams)
                     {
                         double vps = getDoubleValue(dRow, "Team_2_VPs") + getDoubleValue(dRow, "Team_2_VP_Adjustment");
-                        DataRow[] foundRows = getTable(Constants.EventComputedScoresTableName).Select("Team_Number = " + opponent);
+                        DataRow[] foundRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + opponent);
                         Debug.Assert(foundRows.Length == 1);
                         double score = getDoubleValue(foundRows[0], "Score_After_Round_" + roundNumber);
                         tieBreakerScore += (score * vps);
@@ -1173,7 +1201,7 @@ namespace IndianBridgeScorer
 
         private void doRanking(int roundNumber)
         {
-            DataTable table = getTable(Constants.EventComputedScoresTableName);
+            DataTable table = getTable(Constants.TableName.EventComputedScores);
             DataRow[] foundRows = table.Select("", "Score_After_Round_" + roundNumber + " DESC, Tiebreaker_After_Round_" + roundNumber + " DESC");
             int rank = 1;
             double previousValue = 0;
@@ -1226,10 +1254,10 @@ namespace IndianBridgeScorer
 
         private void reloadScoresButton_Click(object sender, EventArgs e)
         {
-            if (Utilities.confirmReload(Constants.EventScoresTableName))
+            if (Utilities.confirmReload(Constants.TableName.EventScores))
             {
-                loadTable(Constants.EventScoresTableName);
-                Utilities.showBalloonNotification("Reload Done", "Reloaded " + Constants.EventScoresTableName + " from database successfully");
+                loadTable(Constants.TableName.EventScores);
+                Utilities.showBalloonNotification("Reload Done", "Reloaded " + Constants.TableName.EventScores + " from database successfully");
             }
         }
 

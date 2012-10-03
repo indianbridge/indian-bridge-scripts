@@ -24,13 +24,31 @@ namespace IndianBridgeScorer
         public static string SwissTeamEventPrintDrawFileName = "DrawForPrinting.html";
         public static string SwissTeamEventScoringParametersFileName = "SwissTeamEventScoringParameters.ini";
         public static string ResultsPublishParametersFileName = "ResultsPublishParameters.ini";
+        public static string KnockoutInfoFileName = "KnockoutInfo.ini";
+        public static string KnockoutScoresFileName = "KnockoutScores.mdb";
+
+        // Event Type Constants
+        public static class EventType {
+            public static string TeamsSwissLeague = "TeamsSwissLeague";
+            public static string TeamsKnockout = "TeamsKnockout";
+            public static string Pairs = "Pairs";
+            public static string PD = "PD";
+        }
+
 
         // Table Name Constants
-        public static string TourneyEventsTableName = "Tourney_Events";
-        public static string EventNamesTableName = "Teams";
-        public static string EventScoresTableName = "Scores";
-        public static string EventComputedScoresTableName = "ComputedScores";
-        public static string VPScaleTableName = "VPScales";
+        public static class TableName
+        {
+            public static string TourneyEvents = "Tourney_Events";
+            public static string EventNames = "Teams";
+            public static string EventScores = "Scores";
+            public static string EventComputedScores = "ComputedScores";
+            public static string VPScale = "VPScales";
+            public static string KnockoutSessions = "KnockoutSessions";
+            public static string KnockoutTeams = "KnockoutTeams";
+            public static string KnockoutScores = "KnockoutScores";
+        }
+
 
         // Information Constants
         public static string CurrentTourneyFolderName = "";
@@ -64,6 +82,8 @@ namespace IndianBridgeScorer
             if (string.IsNullOrWhiteSpace(CurrentTourneyResultsWebsite)) return "";
             return CurrentTourneyResultsWebsite+"/"+Utilities.makeIdentifier_(eventName);
         }
+        public static string getKnockoutEventInfoFileName(string eventName) { return Path.Combine(getFolder(getEventDatabasesFolder(eventName)), KnockoutInfoFileName); }
+        public static string getKnockoutEventScoresFileName(string eventName) { return Path.Combine(getFolder(getEventDatabasesFolder(eventName)), KnockoutScoresFileName); }
 
         // Field Names
         public static string TourneyNameFieldName = "Tourney_Name";
@@ -95,5 +115,7 @@ namespace IndianBridgeScorer
             DateTime eventDate = DateTime.Now;
             return Utilities.makeIdentifier_(tourneyName) + "_" + eventDate.ToString("yyyy_MM_dd");
         }
+        public static string[] KnockoutSessionNames = new string[] { "Finals", "Semi_Finals", "Quarter_Finals", "Pre_Quarter_Finals" };
+
     }
 }

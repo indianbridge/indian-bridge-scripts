@@ -77,7 +77,7 @@ namespace IndianBridge.Common
         }
 
 
-        public static DataTable loadDatabaseToTable(string databaseFileName, string tableName, string query = "")
+        public static DataTable loadDatabaseToTable(string databaseFileName, string tableName, string query = "", List<string> removeColumnNames=null)
         {
             string key = makeKey_(databaseFileName, tableName);
             string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + databaseFileName + ";";
@@ -90,6 +90,10 @@ namespace IndianBridge.Common
             if (m_ds.Tables.Contains(key))
             {
                 m_ds.Tables[key].Rows.Clear();
+                if (removeColumnNames != null)
+                {
+                    foreach (string columnName in removeColumnNames) m_ds.Tables[key].Columns.Remove(columnName);
+                }
             }
             m_dataAdapters[key].Fill(m_ds, key);
             List<string> primaryKeyStrings = getPrimaryKeys(connection, tableName);

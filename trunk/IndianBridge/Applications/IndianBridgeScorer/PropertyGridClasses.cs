@@ -5,6 +5,9 @@ using System.Text;
 using IndianBridge.Common;
 using System.IO;
 using System.ComponentModel;
+using System.Data;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace IndianBridgeScorer
 {
@@ -18,6 +21,298 @@ namespace IndianBridgeScorer
         Quotient,
         TeamNumber
     };
+
+    public class KnockoutSessions
+    {
+        private string m_niniFileName = "";
+        private string m_databaseFileName = "";
+        private string m_eventName = "";
+        private bool m_autoSave = false;
+        private int numberOfTeams = 8;
+        private int oldNumberOfTeams = 8;
+        private Dictionary<int, int> oldNumberOfSessions = new Dictionary<int, int>();
+        private bool calledFromNumberOfTeams = false;
+        private bool calledFromNumberOfRounds = false;
+        private PropertyGrid m_grid = null;
+
+        [CategoryAttribute("Knockout Parameters"), DescriptionAttribute("Number of Teams in the Knockout. Number of Rounds will be updated automatically")]
+        public int NumberOfTeams
+        {
+            get { return numberOfTeams; }
+            set {
+                calledFromNumberOfTeams = true;
+                double rounds = Math.Log(value,2);
+                if (rounds%1 != 0) {
+                    Utilities.showErrorMessage("Number of Teams has to be a power of 2 like, 2,4,8,16 etc. Other values cannot be handled by software.");
+                    return;
+                }
+                numberOfTeams = value;
+                NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
+                if (!calledFromNumberOfRounds)
+                {
+                    NumberOfRounds = Convert.ToInt32(rounds);
+                    update();
+                }
+                calledFromNumberOfTeams = false;
+                if(m_grid != null) m_grid.Refresh();
+            }
+        }
+        private int numberOfRounds = 3;
+        private int oldNumberOfRounds = 3;
+
+        [CategoryAttribute("Knockout Parameters"), DescriptionAttribute("Number of Rounds in the Knockout. Number of Teams will be updated automatically")]
+        public int NumberOfRounds
+        {
+            get { return numberOfRounds; }
+            set {
+                calledFromNumberOfRounds = true;
+                numberOfRounds = value;
+                NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
+                if (!calledFromNumberOfTeams)
+                {
+                    NumberOfTeams = Convert.ToInt32(Math.Pow(2, value));
+                    update();
+                }
+                calledFromNumberOfRounds = false;
+                if (m_grid != null) m_grid.Refresh();
+            }
+        }
+        public KnockoutSessions(string eventName, string niniFileName, string databaseFileName, bool autoSave = false) :
+            this(null, eventName, niniFileName, databaseFileName, autoSave) {}
+
+        public KnockoutSessions(PropertyGrid grid, string eventName, string niniFileName, string databaseFileName, bool autoSave = false)
+        {
+            m_grid = grid;
+            if (m_grid != null) m_grid.SelectedObject = this;
+            m_eventName = eventName;
+            m_autoSave = autoSave;
+            m_niniFileName = niniFileName;
+            m_databaseFileName = databaseFileName;
+            if (!File.Exists(m_niniFileName))
+            {
+                create();
+            }
+            if (!File.Exists(m_databaseFileName))
+            {
+                AccessDatabaseUtilities.createDatabase(m_databaseFileName);
+                createTeamsTable();
+                createSessionsTable();
+            }
+            load();
+        }
+
+        public void updateSessions()
+        {
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            foreach (DataRow dRow in table.Rows)
+            {
+                List<string> removeColumns = null;
+                int roundNumber = (int)dRow["Round_Number"];
+                int numberOfSessions = (int)dRow["Number_Of_Sessions"];
+                if (numberOfSessions > oldNumberOfSessions[roundNumber])
+                {
+                    List<DatabaseField> fields = new List<DatabaseField>();
+                    for (int i = oldNumberOfSessions[roundNumber] + 1; i <= numberOfSessions; ++i)
+                    {
+                        fields.Add(new DatabaseField("Session_" + i + "_Score", "NUMBER"));
+                    }
+                    AccessDatabaseUtilities.addColumn(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields);
+                }
+                else if (oldNumberOfSessions[roundNumber] > numberOfSessions)
+                {
+                    removeColumns = new List<string>();
+                    List<DatabaseField> fields = new List<DatabaseField>();
+                    for (int i = numberOfSessions + 1; i <= oldNumberOfSessions[roundNumber]; ++i)
+                    {
+                        fields.Add(new DatabaseField("Session_" + i + "_Score", "NUMBER"));
+                        removeColumns.Add("Session_" + i + "_Score");
+                    }
+                    AccessDatabaseUtilities.dropColumn(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields);
+                }
+                oldNumberOfSessions[roundNumber] = numberOfSessions;
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber,"",removeColumns);
+            }
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
+        }
+
+        public void update()
+        {
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            DataTable teamsTable = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            if (numberOfRounds > oldNumberOfRounds)
+            {
+                for (int i = oldNumberOfRounds + 1; i <= numberOfRounds; ++i)
+                {
+                    DataRow dRow = table.NewRow();
+                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                    dRow["Round_Number"] = i;
+                    dRow["Round_Name"] = sessionName;
+                    dRow["Number_Of_Sessions"] = 3;
+                    table.Rows.Add(dRow);
+                    createRoundScoresTable(i);
+                }
+                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
+                for (int i = oldNumberOfTeams + 1; i <= numberOfTeams; ++i)
+                {
+                    DataRow dRow = teamsTable.NewRow();
+                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                    dRow["Team_Number"] = i;
+                    dRow["Team_Name"] = "Team " + i;
+                    teamsTable.Rows.Add(dRow);
+                }
+                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            }
+            else if (numberOfRounds < oldNumberOfRounds)
+            {
+                for (int i = numberOfRounds + 1; i <= oldNumberOfRounds; ++i)
+                {
+                    table.Rows.Find(i).Delete();
+                    AccessDatabaseUtilities.dropTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);
+                    oldNumberOfSessions.Remove(i);
+                }
+                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
+                for (int i = numberOfTeams + 1; i <= oldNumberOfTeams; ++i)
+                {
+                    teamsTable.Rows.Find(i).Delete();
+                }
+                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            }
+            oldNumberOfRounds = numberOfRounds;
+            oldNumberOfTeams = numberOfTeams;
+        }
+
+
+        public void create()
+        {
+            List<NiniField> fields = new List<NiniField>();
+            fields.Add(new NiniField(Constants.NumberOfTeamsFieldName, "Integer", "8", ""));
+            fields.Add(new NiniField(Constants.NumberOfRoundsFieldName, "Integer", "3", ""));
+            NiniUtilities.createNiniFile(m_niniFileName, fields);
+        }
+
+        private void createSessionsTable()
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Round_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Round_Name", "TEXT", 255));
+            fields.Add(new DatabaseField("Number_Of_Sessions", "INTEGER"));
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Round_Number");
+            DataTable table = AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.KnockoutSessions, fields, primaryKeys);
+            for (int i = 1; i <= numberOfRounds; i++)
+            {
+                DataRow dRow = table.NewRow();
+                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Convert.ToInt32(Math.Pow(2, i)));
+                dRow["Round_Number"] = i;
+                dRow["Round_Name"] = sessionName;
+                dRow["Number_Of_Sessions"] = 3;
+                table.Rows.Add(dRow);
+                createRoundScoresTable(i);
+            }
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
+        }
+
+        private void createTeamsTable()
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Team_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
+            fields.Add(new DatabaseField("Member_Names", "TEXT", 255));
+            fields.Add(new DatabaseField("Original_Team_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Original_Event_Name", "TEXT", 255));
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Team_Number");
+            DataTable table = AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.KnockoutTeams, fields, primaryKeys);
+            for (int i = 1; i <= numberOfTeams; i++)
+            {
+                DataRow dRow = table.NewRow();
+                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                dRow["Team_Number"] = i;
+                dRow["Team_Name"] = "Team " + i;
+                table.Rows.Add(dRow);
+            }
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutTeams);
+        }
+
+        public void initializeMatches()
+        {
+            DataTable teamsTable = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            for (int i = 1; i <= numberOfRounds; ++i)
+            {
+                DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);
+                int totalTeams = Convert.ToInt32(Math.Pow(2, i));
+                int numberOfMatches = totalTeams / 2;
+                for (int j = 1; j <= numberOfMatches; ++j)
+                {
+                    DataRow team1Row = teamsTable.Rows[j - 1];
+                    DataRow team2Row = teamsTable.Rows[totalTeams - j];
+                    DataRow[] dRows = table.Select("Match_Number = " + j);
+                    Debug.Assert(dRows.Length == 2);
+                    dRows[0]["Team_Number"] = AccessDatabaseUtilities.getIntValue(team1Row, "Team_Number");
+                    dRows[0]["Team_Name"] = AccessDatabaseUtilities.getStringValue(team1Row, "Team_Name");
+                    dRows[1]["Team_Number"] = AccessDatabaseUtilities.getIntValue(team2Row, "Team_Number");
+                    dRows[1]["Team_Name"] = AccessDatabaseUtilities.getStringValue(team2Row, "Team_Name");
+                }
+                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);
+            }
+        }
+
+        private void createRoundScoresTable(int roundNumber)
+        {
+            List<DatabaseField> fields = new List<DatabaseField>();
+            fields.Add(new DatabaseField("Match_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_Number", "INTEGER"));
+            fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
+            fields.Add(new DatabaseField("Carryover", "NUMBER"));
+            fields.Add(new DatabaseField("Total", "NUMBER"));
+            DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            DataRow dRow = table.Rows.Find(roundNumber);
+            int numberOfSessions = (int)dRow["Number_Of_Sessions"];
+            oldNumberOfSessions[roundNumber] = numberOfSessions;
+            for (int i = 1; i <= numberOfSessions; ++i)
+            {
+                fields.Add(new DatabaseField("Session_"+i+"_Score", "NUMBER"));
+            }
+            List<string> primaryKeys = new List<string>();
+            primaryKeys.Add("Match_Number");
+            primaryKeys.Add("Team_Number");
+            DataTable scoresTable = AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.KnockoutScores+"_"+roundNumber, fields, primaryKeys);
+            int numberOfMatches = Convert.ToInt32(Math.Pow(2,roundNumber-1));
+            for (int i = 1; i <= numberOfMatches; ++i)
+            {
+                DataRow dScoresRow = scoresTable.NewRow();
+                dScoresRow["Match_Number"] = i;
+                int teamNumber = i;
+                dScoresRow["Team_Number"] = i;
+                dScoresRow["Team_Name"] = LocalUtilities.getTeamName(m_databaseFileName, Constants.TableName.KnockoutTeams,i);
+                scoresTable.Rows.Add(dScoresRow);
+                dScoresRow = scoresTable.NewRow();
+                dScoresRow["Match_Number"] = i;
+                teamNumber = 2 * numberOfMatches - (i - 1);
+                dScoresRow["Team_Number"] = teamNumber;
+                dScoresRow["Team_Name"] = LocalUtilities.getTeamName(m_databaseFileName, Constants.TableName.KnockoutTeams, teamNumber);
+                scoresTable.Rows.Add(dScoresRow);
+            }
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
+        }
+
+        public void save()
+        {
+            NiniUtilities.saveNiniConfig(m_niniFileName);
+        }
+
+        public void load()
+        {
+            NiniUtilities.loadNiniConfig(m_niniFileName);
+            numberOfTeams = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName);
+            numberOfRounds = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName);
+            AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            for (int i = 1; i <= numberOfRounds; i++)
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);
+        }
+
+    }
 
     public class ResultsPublishParameters
     {
@@ -41,8 +336,8 @@ namespace IndianBridgeScorer
         public void create()
         {
             List<NiniField> fields = new List<NiniField>();
-            fields.Add(new NiniField("Font_Size", "Number", "1", ""));
-            fields.Add(new NiniField("Results_Website", "String", "", ""));
+            fields.Add(new NiniField(Constants.FontSizeFieldName, "Number", "1", ""));
+            fields.Add(new NiniField(Constants.ResultsWebsiteFieldName, "String", "", ""));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
@@ -104,8 +399,8 @@ namespace IndianBridgeScorer
         public void create()
         {
             List<NiniField> fields = new List<NiniField>();
-            fields.Add(new NiniField("Scoring_Type", "List", "IMP", "IMP,VP"));
-            fields.Add(new NiniField("Tiebreaker_Method", "List", "Quotient", "Quotient,Team_Number"));
+            fields.Add(new NiniField(Constants.ScoringTypeFieldName, "List", "IMP", "IMP,VP"));
+            fields.Add(new NiniField(Constants.TiebreakerMethodFieldName, "List", "Quotient", "Quotient,Team_Number"));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
@@ -170,11 +465,11 @@ namespace IndianBridgeScorer
         public void create()
         {
             List<NiniField> fields = new List<NiniField>();
-            fields.Add(new NiniField("Draw_For_Round", "Integer", "0", ""));
-            fields.Add(new NiniField("Font_Size", "Number", "1.5", ""));
-            fields.Add(new NiniField("Padding_Size", "Number", "5", ""));
-            fields.Add(new NiniField("VPs_In_Separate_Column", "Boolean", "True", ""));
-            fields.Add(new NiniField("Use_Border", "Boolean", "True", ""));
+            fields.Add(new NiniField(Constants.DrawForRoundFieldName, "Integer", "0", ""));
+            fields.Add(new NiniField(Constants.FontSizeFieldName, "Number", "1.5", ""));
+            fields.Add(new NiniField(Constants.PaddingSizeFieldName, "Number", "5", ""));
+            fields.Add(new NiniField(Constants.VPSInSeparateColumnFieldName, "Boolean", "True", ""));
+            fields.Add(new NiniField(Constants.UseBorderFieldName, "Boolean", "True", ""));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
