@@ -21,6 +21,7 @@ namespace IndianBridgeScorer
         private string m_niniFileName = "";
         private string m_databaseFileName = "";
         private KnockoutSessions m_knockoutSessions = null;
+        private ResultsPublishParameters m_resultsPublishParameters;
 
         public KnockoutScorer(string eventName)
         {
@@ -39,6 +40,11 @@ namespace IndianBridgeScorer
             knockoutSessionsDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
             knockoutNamesDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutTeams);
             populateKnockoutRounds();
+            m_resultsPublishParameters = new ResultsPublishParameters(m_eventName, Constants.getResultsPublishParametersFileName(m_eventName), true);
+            resultsPublishPropertyGrid.SelectedObject = m_resultsPublishParameters;
+            if (string.IsNullOrWhiteSpace(m_resultsPublishParameters.ResultsWebsite))
+                m_resultsPublishParameters.ResultsWebsite = Constants.getEventResultsWebsite(m_eventName);
+
         }
 
         private void populateKnockoutRounds()
@@ -194,8 +200,11 @@ namespace IndianBridgeScorer
 
         private void regenerateWebpageButton_Click(object sender, EventArgs e)
         {
+            double oldFontSize = Utilities.fontSize;
+            Utilities.fontSize = m_resultsPublishParameters.FontSize;
             KnockoutTeamsDatabaseToWebpages ktdw = new KnockoutTeamsDatabaseToWebpages(m_eventName, m_databaseFileName, Constants.getEventWebpagesFolder(m_eventName));
             ktdw.createWebpages_();
+            Utilities.fontSize = oldFontSize;
             showUrl();
         }
 
@@ -212,6 +221,28 @@ namespace IndianBridgeScorer
         private void knockoutNamesDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             Utilities.setReadOnlyAndVisibleColumns(knockoutNamesDataGridView, new string[] {"Team_Number","Original_Team_Number","Original_Event_Name"}, null);
+        }
+
+        private void publishResultsButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(m_resultsPublishParameters.ResultsWebsite))
+            {
+                MessageBox.Show("Please provide a results website to publish to.");
+                return;
+            }
+            string siteName, pagePath;
+            Utilities.getGoogleSiteComponents(m_resultsPublishParameters.ResultsWebsite, out siteName, out pagePath);
+            String username = "indianbridge.dummy@gmail.com";
+            String password = "kibitzer";
+            SitesAPI sa = new SitesAPI(siteName, username, password, true, false);
+            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Publish Results", sa.uploadDirectoryInBackground, null, publishResultsStatus,
+                publishResultsProgressBar, cancelPublishResultsButton, null);
+            double oldFontSize = Utilities.fontSize;
+            Utilities.fontSize = m_resultsPublishParameters.FontSize;
+            Tuple<string, string> values = new Tuple<string, string>(Constants.getEventWebpagesFolder(m_eventName), pagePath);
+            cbw.run(values);
+            Utilities.fontSize = oldFontSize;
+
         }
 
     }

@@ -1025,6 +1025,7 @@ namespace IndianBridgeScorer
         private void publishResultsCompleted()
         {
             publishResultsStatusTextbox.Text = ("Results published succesfully at " + m_resultsPublishParameters.ResultsWebsite);
+            Utilities.fontSize = oldFontSize;
         }
 
 
