@@ -54,6 +54,7 @@
     <Compile Include="CreateNewEvents.Designer.cs">
       <DependentUpon>CreateNewEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="ImportTourneyFromGoogleSpreadsheet.cs" />
     <Compile Include="KnockoutTeamsDatabaseToWebpages.cs" />
     <Compile Include="KnockoutScorer.cs">
       <SubType>Form</SubType>

@@ -119,7 +119,8 @@ namespace IndianBridgeScorer
                 if (!string.IsNullOrWhiteSpace(html))
                 {
                     scoresAvailable = true;
-                    sw.Write(html);
+                    sw.Write(html+Environment.NewLine);
+                    sw.Write("<hr/>" + Environment.NewLine);
                 }
             }
             if (!scoresAvailable)
@@ -159,25 +160,10 @@ namespace IndianBridgeScorer
             ArrayList tableHeader = new ArrayList();
             ArrayList tableRow = new ArrayList();
             tableHeader.Add(roundName);
-            html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-            for (int i = 1; i <= numberOfMatches/2; ++i)
-            {
-                tableRow.Clear();
-                DataRow[] foundRows = table.Select("Match_Number = " + i);
-                Debug.Assert(foundRows.Length == 2);
-                tableRow.Add(createMatchTable(foundRows,numberOfSessions));
-                html += ("<tr>" + Utilities.makeTableCell_(tableRow, 1) + "</tr>");
-            }
-            html+=("</tbody></table>");
-            return html;
-        }
-
-        private string createMatchTable(DataRow[] dRows, int numberOfSessions)
-        {
-            string html = "";
+            html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody><tr>");
             html += (Utilities.makeTablePreamble_() + "<thead><tr>");
-            ArrayList tableHeader = new ArrayList();
-            ArrayList tableRow = new ArrayList();
+            tableHeader = new ArrayList();
+            tableHeader.Add("Match No.");
             tableHeader.Add("Team");
             tableHeader.Add("Carryover");
             for (int i = 1; i <= numberOfSessions; ++i)
@@ -186,29 +172,56 @@ namespace IndianBridgeScorer
             }
             tableHeader.Add("Total");
             html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            for (int i = 1; i <= numberOfMatches/2; ++i)
+            {
+                DataRow[] foundRows = table.Select("Match_Number = " + i);
+                Debug.Assert(foundRows.Length == 2);
+                html += createMatchRows(foundRows, numberOfSessions,i, i!=1);
+            }
+            html+=("</tbody></table>");
+            return html;
+        }
+
+        private string addEmptyRows(int numberOfSessions)
+        {
+            string html = "";
+            html += "<tr>";
+            for (int i = 0; i < 4 + numberOfSessions; ++i) html += "<td style='background-color:#acf;height=1em'></td>";
+            html += "</tr>" + Environment.NewLine;
+            return html;
+        }
+
+        private string createMatchRows(DataRow[] dRows, int numberOfSessions, int matchNumber, bool addExtraRowInFront = false)
+        {
+            string html = "";
+            if (addExtraRowInFront)
+            {
+                html += addEmptyRows(numberOfSessions);
+            }
             for (int j = 0; j < 2; ++j)
             {
+                html += ("<tr>");
                 int otherRow = 1 - j;
-                tableRow.Clear();
                 int teamNumber = (int)dRows[j]["Team_Number"];
                 double total = (double)dRows[j]["Total"];
                 double otherTotal = (double)dRows[otherRow]["Total"];
-                if (total > otherTotal) tableRow.Add("<b>" + getTeamLink(teamNumber, true, true) + "</b>");
-                else tableRow.Add(getTeamLink(teamNumber, true, true));
-                tableRow.Add("" + AccessDatabaseUtilities.getDoubleValue(dRows[j], "Carryover"));
+                if (j == 0) html += Utilities.makeTableCell_("" + matchNumber, 1, false, 2);
+                int rowIndex = (total > otherTotal) ? 0 : 1;
+                if (total > otherTotal) html += Utilities.makeTableCell_("<b>" + getTeamLink(teamNumber, true, true) + "</b>",rowIndex);
+                else html += Utilities.makeTableCell_(getTeamLink(teamNumber, true, true), rowIndex);
+                html += Utilities.makeTableCell_("" + AccessDatabaseUtilities.getDoubleValue(dRows[j], "Carryover"), rowIndex);
                 for (int k = 1; k <= numberOfSessions; ++k)
                 {
                     string columnName = "Session_" + k + "_Score";
                     double sessionScore = AccessDatabaseUtilities.getDoubleValue(dRows[j], columnName);
                     double otherSessionScore = AccessDatabaseUtilities.getDoubleValue(dRows[otherRow], columnName);
-                    if (sessionScore > otherSessionScore) tableRow.Add("<b>" + sessionScore + "</b>");
-                    else tableRow.Add("" + sessionScore);
+                    if (sessionScore > otherSessionScore) html += Utilities.makeTableCell_("<b>" + sessionScore + "</b>", rowIndex);
+                    else html += Utilities.makeTableCell_("" + sessionScore, rowIndex);
                 }
-                if (total > otherTotal) tableRow.Add("<b>" + total + "</b>");
-                else tableRow.Add("" + total);
-                html += ("<tr>" + Utilities.makeTableCell_(tableRow, (total > otherTotal) ? 0 : 1) + "</tr>");
-            }
-            html += ("</tbody></table>");
+                if (total > otherTotal) html += Utilities.makeTableCell_("<b>" + total + "</b>", rowIndex);
+                else html += Utilities.makeTableCell_("" + total, rowIndex);
+                html += ("</tr>" + Environment.NewLine);
+            }     
             return html;
         }
 

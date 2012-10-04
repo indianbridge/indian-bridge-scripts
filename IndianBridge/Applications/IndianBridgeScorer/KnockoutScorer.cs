@@ -122,17 +122,10 @@ namespace IndianBridgeScorer
                     total += (value == DBNull.Value) ? 0 : (double)value;
                 }
                 dgv.Rows[e.RowIndex].Cells["Total"].Value = total;
-                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
-                checkRoundCompletion(roundNumber, numberOfSessions);
             }
             else if (columnName == "Team_Number")
             {
                 dgv.Rows[e.RowIndex].Cells["Team_Name"].Value = LocalUtilities.getTeamName(m_databaseFileName, Constants.TableName.KnockoutTeams, (int)dgv.Rows[e.RowIndex].Cells["Team_Number"].Value);
-                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
-            }
-            else
-            {
-                AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
             }
         }
 
@@ -243,6 +236,25 @@ namespace IndianBridgeScorer
             cbw.run(values);
             Utilities.fontSize = oldFontSize;
 
+        }
+
+        private void reloadKnockoutScoresButton_Click(object sender, EventArgs e)
+        {
+            if (Utilities.confirmReload("Knockout Scores"))
+            {
+                int roundNumber = knockoutRoundsCombobox.SelectedIndex + 1;
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
+            }
+        }
+
+        private void saveKnockoutScoresButton_Click(object sender, EventArgs e)
+        {
+            int roundNumber = knockoutRoundsCombobox.SelectedIndex + 1;
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
+            DataTable sessionsTable = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            DataRow dRow = sessionsTable.Rows.Find(roundNumber);
+            int numberOfSessions = (int)dRow["Number_Of_Sessions"];
+            checkRoundCompletion(roundNumber, numberOfSessions);
         }
 
     }
