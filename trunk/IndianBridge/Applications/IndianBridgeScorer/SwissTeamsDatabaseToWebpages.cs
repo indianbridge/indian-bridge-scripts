@@ -219,7 +219,7 @@ namespace IndianBridgeScorer
             if (!string.IsNullOrWhiteSpace(originalEventName))
             {
                 int originalTeamNumber = AccessDatabaseUtilities.getIntValue(dRow, "Original_Team_Number");
-                string webpagesRootDirectory = Path.Combine("..", "..", Constants.WebpagesFolderName, Utilities.makeIdentifier_(originalEventName));
+                string webpagesRootDirectory = Path.Combine("..", "..", Utilities.makeIdentifier_(originalEventName));
                 string link = Path.Combine(webpagesRootDirectory, "teams", "team" + originalTeamNumber + "score.html");
                 sw.WriteLine("<a title='" + dRow["Member_Names"] + "' href='" + link + "'>Previous Round Scores for this team</a>");
             }

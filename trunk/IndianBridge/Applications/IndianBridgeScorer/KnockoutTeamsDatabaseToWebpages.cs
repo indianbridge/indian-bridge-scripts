@@ -134,20 +134,6 @@ namespace IndianBridgeScorer
         {
             DateTime indianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Utilities.INDIAN_ZONE);
             String result = "Page Updated on " + indianTime.ToString() + " IST<br/>";
-            /*result += "<a href='" + m_prefix + "knockout/index.html'>Knockout</a>";
-            result += " | <a href='" + m_prefix + "leaderboard/index.html'>Round Robin Leaderboard</a>";
-            result += " | <a href='" + m_prefix + "names/index.html'>Team Compositions</a><br/>";
-            result += "Team Scores : ";
-            for (int i = 1; i <= m_numberOfTeams; ++i)
-            {
-                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "teams" + "/team" + i + "score.html'>" + i + "</a>";
-            }
-            result += "<br/>";
-            result += "Round Scores : ";
-            for (int i = 1; i <= m_numberOfRounds; ++i)
-            {
-                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "rounds" + "/round" + i + "score.html'>" + i + "</a>";
-            }*/
             return result;
         }
 
@@ -155,7 +141,6 @@ namespace IndianBridgeScorer
         {
             printMessage("Creating Knockout Pages");
             if (!Directory.Exists(m_webpagesRootDirectory)) Directory.CreateDirectory(m_webpagesRootDirectory);
-            //m_prefix = "./";
             string fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
             writeKnockoutPage(fileName);
         }
