@@ -30,7 +30,7 @@ namespace IndianBridgeScorer
         private bool m_autoSave = false;
         private int numberOfTeams = 8;
         private int oldNumberOfTeams = 8;
-        private Dictionary<int, int> oldNumberOfSessions = new Dictionary<int, int>();
+        private Dictionary<int, int> m_oldNumberOfSessions = new Dictionary<int, int>();
         private bool calledFromNumberOfTeams = false;
         private bool calledFromNumberOfRounds = false;
         private PropertyGrid m_grid = null;
@@ -109,27 +109,27 @@ namespace IndianBridgeScorer
                 List<string> removeColumns = null;
                 int roundNumber = (int)dRow["Round_Number"];
                 int numberOfSessions = (int)dRow["Number_Of_Sessions"];
-                if (numberOfSessions > oldNumberOfSessions[roundNumber])
+                if (numberOfSessions > m_oldNumberOfSessions[roundNumber])
                 {
                     List<DatabaseField> fields = new List<DatabaseField>();
-                    for (int i = oldNumberOfSessions[roundNumber] + 1; i <= numberOfSessions; ++i)
+                    for (int i = m_oldNumberOfSessions[roundNumber] + 1; i <= numberOfSessions; ++i)
                     {
                         fields.Add(new DatabaseField("Session_" + i + "_Score", "NUMBER"));
                     }
                     AccessDatabaseUtilities.addColumn(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields);
                 }
-                else if (oldNumberOfSessions[roundNumber] > numberOfSessions)
+                else if (m_oldNumberOfSessions[roundNumber] > numberOfSessions)
                 {
                     removeColumns = new List<string>();
                     List<DatabaseField> fields = new List<DatabaseField>();
-                    for (int i = numberOfSessions + 1; i <= oldNumberOfSessions[roundNumber]; ++i)
+                    for (int i = numberOfSessions + 1; i <= m_oldNumberOfSessions[roundNumber]; ++i)
                     {
                         fields.Add(new DatabaseField("Session_" + i + "_Score", "NUMBER"));
                         removeColumns.Add("Session_" + i + "_Score");
                     }
                     AccessDatabaseUtilities.dropColumn(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields);
                 }
-                oldNumberOfSessions[roundNumber] = numberOfSessions;
+                m_oldNumberOfSessions[roundNumber] = numberOfSessions;
                 AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber,"",removeColumns);
             }
             AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
@@ -168,7 +168,7 @@ namespace IndianBridgeScorer
                 {
                     table.Rows.Find(i).Delete();
                     AccessDatabaseUtilities.dropTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);
-                    oldNumberOfSessions.Remove(i);
+                    m_oldNumberOfSessions.Remove(i);
                 }
                 AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
                 for (int i = numberOfTeams + 1; i <= oldNumberOfTeams; ++i)
@@ -268,7 +268,7 @@ namespace IndianBridgeScorer
             DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
             DataRow dRow = table.Rows.Find(roundNumber);
             int numberOfSessions = (int)dRow["Number_Of_Sessions"];
-            oldNumberOfSessions[roundNumber] = numberOfSessions;
+            m_oldNumberOfSessions[roundNumber] = numberOfSessions;
             for (int i = 1; i <= numberOfSessions; ++i)
             {
                 fields.Add(new DatabaseField("Session_"+i+"_Score", "NUMBER"));
@@ -306,7 +306,13 @@ namespace IndianBridgeScorer
             NiniUtilities.loadNiniConfig(m_niniFileName);
             numberOfTeams = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName);
             numberOfRounds = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName);
-            AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            DataTable table = AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+            foreach (DataRow dRow in table.Rows)
+            {
+                int roundNumber = (int)dRow["Round_Number"];
+                int numberOfSessions = (int)dRow["Number_Of_Sessions"];
+                m_oldNumberOfSessions[roundNumber] = numberOfSessions;
+            }
             AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutTeams);
             for (int i = 1; i <= numberOfRounds; i++)
                 AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + i);

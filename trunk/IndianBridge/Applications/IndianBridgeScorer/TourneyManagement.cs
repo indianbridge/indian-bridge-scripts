@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using IndianBridge.Common;
+using IndianBridge.GoogleAPIs;
 
 namespace IndianBridgeScorer
 {
@@ -119,6 +120,13 @@ namespace IndianBridgeScorer
                 tourneyListCombobox.Items.Remove(Constants.CurrentTourneyFolderName);
                 Constants.CurrentTourneyFolderName = oldFolderName;
             }
+        }
+
+        private void importTourneyButton_Click(object sender, EventArgs e)
+        {
+            ImportTourneyFromGoogleSpreadsheet.importTourney();
+            MessageBox.Show("Imported Successfully!");
+            loadExistingTourneys();
         }
     }
 }
