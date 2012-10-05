@@ -227,15 +227,15 @@ namespace IndianBridge.Common
         public static String makeTableCell_(ArrayList text, int row, bool usePadding = false)
         {
             var retVal = "";
-            foreach (String i in text) retVal += makeTableCell_(i, row, usePadding);
+            foreach (String i in text) retVal += makeTableCell_(i, row, usePadding,0);
             return retVal;
         }
-        public static String makeTableCell_(String text, int row, bool usePadding = false)
+        public static String makeTableCell_(String text, int row, bool usePadding = false, int rowSpan = 0)
         {
             string borderText = (useBorder ? "border: 1px solid #000;" : "border: 1px solid #cef;");
             string paddingText = (usePadding ? "padding: " + paddingSize + "px " + paddingSize + "px;" : "");
-            if (row % 2 == 0) return "<td style=\'" + paddingText + "background-color: #def;" + borderText + "\'>" + text + "</td>";
-            else return "<td style=\'" + paddingText + "" + borderText + "\'>" + text + "</td>";
+            if (row % 2 == 0) return "<td "+(rowSpan<1?"":"rowspan="+rowSpan+" ")+"style=\'" + paddingText + "background-color: #def;" + borderText + "\'>" + text + "</td>";
+            else return "<td " + (rowSpan < 1 ? "" : "rowspan=" + rowSpan+" ") + "style=\'" + paddingText + "" + borderText + "\'>" + text + "</td>";
         }
         public static void createDatabase(string databaseFileName)
         {
