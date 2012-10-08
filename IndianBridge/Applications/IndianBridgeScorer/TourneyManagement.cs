@@ -122,11 +122,17 @@ namespace IndianBridgeScorer
             }
         }
 
+
         private void importTourneyButton_Click(object sender, EventArgs e)
         {
-            ImportTourneyFromGoogleSpreadsheet.importTourney();
-            MessageBox.Show("Imported Successfully!");
-            loadExistingTourneys();
+            DownloadTourney dt = new DownloadTourney();
+            if (dt.ShowDialog() == DialogResult.Cancel) return;
+            loadTourney(dt.selectedTourney);
+            //DocsAPI da = new DocsAPI("indianbridge.dummy@gmail.com","kibitzer");
+            //CustomBackgroundWorker cbw = new CustomBackgroundWorker("List Online Tourneys", da.getListOfFoldersInBackground, tourneysImported,null,null,null,null);
+            //ImportTourneyFromGoogleSpreadsheet.importTourney();
+            //MessageBox.Show("Imported Successfully!");
+            //loadExistingTourneys();
         }
     }
 }

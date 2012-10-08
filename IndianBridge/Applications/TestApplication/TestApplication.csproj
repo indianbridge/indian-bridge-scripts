@@ -35,18 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetOpenAuth">
-      <HintPath>..\..\ExternalAssemblies\google-api-dotnet-client\Lib\DotNetOpenAuth.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis">
-      <HintPath>..\..\ExternalAssemblies\google-api-dotnet-client\Lib\Google.Apis.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Authentication.OAuth2">
-      <HintPath>..\..\ExternalAssemblies\google-api-dotnet-client\Lib\Google.Apis.Authentication.OAuth2.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Drive.v2">
-      <HintPath>..\..\ExternalAssemblies\google-api-dotnet-client\Services\DriveService\Google.Apis.Drive.v2.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,6 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadingEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadingEvents.Designer.cs">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +62,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="LoadingEvents.resx">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -91,6 +88,16 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.csproj">
+      <Project>{1C337ECB-18C4-4F1E-8557-C29696777EC6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GoogleAPIs\GoogleAPIs.csproj">
+      <Project>{042A360C-0A60-43EE-87E6-0FBD16EC7BDF}</Project>
+      <Name>GoogleAPIs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

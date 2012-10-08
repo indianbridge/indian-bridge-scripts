@@ -42,12 +42,22 @@
             this.websiteAddress_textBox = new System.Windows.Forms.TextBox();
             this.SelectSummaryFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.operationStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.operationProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.operationCancelButton = new System.Windows.Forms.ToolStripButton();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.publishStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.publishProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.publishCancelButton = new System.Windows.Forms.ToolStripButton();
+            this.statusStrip2 = new System.Windows.Forms.StatusStrip();
+            this.statusStrip3 = new System.Windows.Forms.StatusStrip();
+            this.loadSummaryStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.loadSummaryProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.loadSummaryCancelButton = new System.Windows.Forms.ToolStripButton();
+            this.createWebpagesStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.createWebpagesProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.createWebpagesCancelButton = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.statusStrip2.SuspendLayout();
+            this.statusStrip3.SuspendLayout();
             this.SuspendLayout();
             // 
             // loadResults
@@ -166,37 +176,18 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.operationStatus,
-            this.operationProgressBar,
-            this.operationCancelButton});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 167);
+            this.publishStatus,
+            this.publishProgressBar,
+            this.publishCancelButton});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 211);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(741, 23);
+            this.statusStrip1.Size = new System.Drawing.Size(738, 23);
             this.statusStrip1.TabIndex = 11;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // operationStatus
-            // 
-            this.operationStatus.Name = "operationStatus";
-            this.operationStatus.Size = new System.Drawing.Size(104, 18);
-            this.operationStatus.Text = "Operation Status : ";
-            // 
-            // operationProgressBar
-            // 
-            this.operationProgressBar.Name = "operationProgressBar";
-            this.operationProgressBar.Size = new System.Drawing.Size(100, 17);
-            // 
-            // operationCancelButton
-            // 
-            this.operationCancelButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.operationCancelButton.Image = ((System.Drawing.Image)(resources.GetObject("operationCancelButton.Image")));
-            this.operationCancelButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.operationCancelButton.Name = "operationCancelButton";
-            this.operationCancelButton.Size = new System.Drawing.Size(103, 21);
-            this.operationCancelButton.Text = "Cancel Operation";
-            // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.statusStrip3);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.loadResults);
             this.panel1.Controls.Add(this.websiteAddress_textBox);
@@ -211,15 +202,101 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(741, 167);
+            this.panel1.Size = new System.Drawing.Size(738, 188);
             this.panel1.TabIndex = 12;
+            // 
+            // publishStatus
+            // 
+            this.publishStatus.Name = "publishStatus";
+            this.publishStatus.Size = new System.Drawing.Size(87, 18);
+            this.publishStatus.Text = "Publish Status :";
+            // 
+            // publishProgressBar
+            // 
+            this.publishProgressBar.Name = "publishProgressBar";
+            this.publishProgressBar.Size = new System.Drawing.Size(50, 17);
+            // 
+            // publishCancelButton
+            // 
+            this.publishCancelButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.publishCancelButton.Image = ((System.Drawing.Image)(resources.GetObject("publishCancelButton.Image")));
+            this.publishCancelButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.publishCancelButton.Name = "publishCancelButton";
+            this.publishCancelButton.Size = new System.Drawing.Size(89, 21);
+            this.publishCancelButton.Text = "Cancel Publish";
+            // 
+            // statusStrip2
+            // 
+            this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.createWebpagesStatus,
+            this.createWebpagesProgressBar,
+            this.createWebpagesCancelButton});
+            this.statusStrip2.Location = new System.Drawing.Point(0, 188);
+            this.statusStrip2.Name = "statusStrip2";
+            this.statusStrip2.Size = new System.Drawing.Size(738, 23);
+            this.statusStrip2.TabIndex = 13;
+            this.statusStrip2.Text = "statusStrip2";
+            // 
+            // statusStrip3
+            // 
+            this.statusStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.loadSummaryStatus,
+            this.loadSummaryProgressBar,
+            this.loadSummaryCancelButton});
+            this.statusStrip3.Location = new System.Drawing.Point(0, 165);
+            this.statusStrip3.Name = "statusStrip3";
+            this.statusStrip3.Size = new System.Drawing.Size(738, 23);
+            this.statusStrip3.TabIndex = 11;
+            this.statusStrip3.Text = "statusStrip3";
+            // 
+            // loadSummaryStatus
+            // 
+            this.loadSummaryStatus.Name = "loadSummaryStatus";
+            this.loadSummaryStatus.Size = new System.Drawing.Size(128, 18);
+            this.loadSummaryStatus.Text = "Load Summary Status :";
+            this.loadSummaryStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // loadSummaryProgressBar
+            // 
+            this.loadSummaryProgressBar.Name = "loadSummaryProgressBar";
+            this.loadSummaryProgressBar.Size = new System.Drawing.Size(50, 17);
+            // 
+            // loadSummaryCancelButton
+            // 
+            this.loadSummaryCancelButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.loadSummaryCancelButton.Image = ((System.Drawing.Image)(resources.GetObject("loadSummaryCancelButton.Image")));
+            this.loadSummaryCancelButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.loadSummaryCancelButton.Name = "loadSummaryCancelButton";
+            this.loadSummaryCancelButton.Size = new System.Drawing.Size(130, 21);
+            this.loadSummaryCancelButton.Text = "Cancel Load Summary";
+            // 
+            // createWebpagesStatus
+            // 
+            this.createWebpagesStatus.Name = "createWebpagesStatus";
+            this.createWebpagesStatus.Size = new System.Drawing.Size(140, 18);
+            this.createWebpagesStatus.Text = "Create Webpages Status :";
+            // 
+            // createWebpagesProgressBar
+            // 
+            this.createWebpagesProgressBar.Name = "createWebpagesProgressBar";
+            this.createWebpagesProgressBar.Size = new System.Drawing.Size(50, 17);
+            // 
+            // createWebpagesCancelButton
+            // 
+            this.createWebpagesCancelButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.createWebpagesCancelButton.Image = ((System.Drawing.Image)(resources.GetObject("createWebpagesCancelButton.Image")));
+            this.createWebpagesCancelButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.createWebpagesCancelButton.Name = "createWebpagesCancelButton";
+            this.createWebpagesCancelButton.Size = new System.Drawing.Size(84, 21);
+            this.createWebpagesCancelButton.Text = "Cancel Create";
             // 
             // SubmitPairsResults
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(741, 190);
+            this.ClientSize = new System.Drawing.Size(738, 234);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.statusStrip2);
             this.Controls.Add(this.statusStrip1);
             this.Name = "SubmitPairsResults";
             this.Text = "SubmitPairsResults";
@@ -227,6 +304,10 @@
             this.statusStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.statusStrip2.ResumeLayout(false);
+            this.statusStrip2.PerformLayout();
+            this.statusStrip3.ResumeLayout(false);
+            this.statusStrip3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -247,9 +328,17 @@
         private System.Windows.Forms.TextBox websiteAddress_textBox;
         private System.Windows.Forms.OpenFileDialog SelectSummaryFileDialog;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel operationStatus;
-        private System.Windows.Forms.ToolStripProgressBar operationProgressBar;
-        private System.Windows.Forms.ToolStripButton operationCancelButton;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.ToolStripStatusLabel publishStatus;
+        private System.Windows.Forms.ToolStripProgressBar publishProgressBar;
+        private System.Windows.Forms.ToolStripButton publishCancelButton;
+        private System.Windows.Forms.StatusStrip statusStrip3;
+        private System.Windows.Forms.ToolStripStatusLabel loadSummaryStatus;
+        private System.Windows.Forms.ToolStripProgressBar loadSummaryProgressBar;
+        private System.Windows.Forms.ToolStripButton loadSummaryCancelButton;
+        private System.Windows.Forms.StatusStrip statusStrip2;
+        private System.Windows.Forms.ToolStripStatusLabel createWebpagesStatus;
+        private System.Windows.Forms.ToolStripProgressBar createWebpagesProgressBar;
+        private System.Windows.Forms.ToolStripButton createWebpagesCancelButton;
     }
 }

@@ -54,6 +54,12 @@
     <Compile Include="CreateNewEvents.Designer.cs">
       <DependentUpon>CreateNewEvents.cs</DependentUpon>
     </Compile>
+    <Compile Include="DownloadTourney.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DownloadTourney.Designer.cs">
+      <DependentUpon>DownloadTourney.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImportTourneyFromGoogleSpreadsheet.cs" />
     <Compile Include="KnockoutTeamsDatabaseToWebpages.cs" />
     <Compile Include="KnockoutScorer.cs">
@@ -61,6 +67,12 @@
     </Compile>
     <Compile Include="KnockoutScorer.Designer.cs">
       <DependentUpon>KnockoutScorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadingEvents.Designer.cs">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
     </Compile>
     <Compile Include="LocalUtilities.cs" />
     <Compile Include="PropertyGridClasses.cs" />
@@ -103,11 +115,23 @@
     <Compile Include="TourneyManagement.Designer.cs">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
     </Compile>
+    <Compile Include="UploadTourney.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UploadTourney.Designer.cs">
+      <DependentUpon>UploadTourney.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="CreateNewEvents.resx">
       <DependentUpon>CreateNewEvents.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DownloadTourney.resx">
+      <DependentUpon>DownloadTourney.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="KnockoutScorer.resx">
       <DependentUpon>KnockoutScorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadingEvents.resx">
+      <DependentUpon>LoadingEvents.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PDScorer.resx">
       <DependentUpon>PDScorer.cs</DependentUpon>
@@ -135,6 +159,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TourneyManagement.resx">
       <DependentUpon>TourneyManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UploadTourney.resx">
+      <DependentUpon>UploadTourney.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

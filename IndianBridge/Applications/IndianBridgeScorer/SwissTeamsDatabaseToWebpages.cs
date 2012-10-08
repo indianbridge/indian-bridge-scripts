@@ -29,6 +29,11 @@ namespace IndianBridgeScorer
 
         public SwissTeamsDatabaseToWebpages(string eventName, string databaseFileName, string webpagesRoot)
         {
+            setParameters(eventName, databaseFileName, webpagesRoot);
+        }
+
+        public void setParameters(string eventName, string databaseFileName, string webpagesRoot)
+        {
             m_databaseFileName = databaseFileName;
             m_webpagesRootDirectory = webpagesRoot;
             string scoringFileName = Constants.getEventScoringProgressParametersFileName(eventName);

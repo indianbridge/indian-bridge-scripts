@@ -17,7 +17,7 @@ namespace IndianBridge.Common
         private DoWorkHandlerDelegate m_doWorkHandler = null;
         private delegate void RunWorkerCompletedEventHandlerDelegate(object o, RunWorkerCompletedEventArgs e);
         private RunWorkerCompletedEventHandlerDelegate m_runWorkerCompletedHandler = null;
-        public delegate void RunAfterCompletionDelegate();
+        public delegate void RunAfterCompletionDelegate(bool success);
         private RunAfterCompletionDelegate m_runAfterCompletion = null;
         private delegate void ProgressChangedEventHandlerDelegate(object o, ProgressChangedEventArgs e);
         private ProgressChangedEventHandlerDelegate m_progressChangedHandler = null;
@@ -25,7 +25,6 @@ namespace IndianBridge.Common
         private ToolStripProgressBar m_statusProgressBar = null;
         private ToolStripButton m_statusButton = null;
         private TextBox m_statusTextbox = null;
-
 
         public CustomBackgroundWorker(string workerName,DoWorkHandlerDelegate doWorkHandler, RunAfterCompletionDelegate runAfterCompletion,
             ToolStripStatusLabel statusLabel, ToolStripProgressBar statusProgressBar, ToolStripButton statusButton, TextBox statusTextbox)
@@ -76,6 +75,7 @@ namespace IndianBridge.Common
                 percentage = 0;
                 message = m_workerName+" : Cancelled";
                 detailedMessage = "Cancelled by user after only " + ((m_statusProgressBar == null)?"unknown":""+m_statusProgressBar.Value) + " % completed!";
+                if (m_runAfterCompletion != null) m_runAfterCompletion(false);
             }
 
             else if (e.Error != null)
@@ -85,13 +85,14 @@ namespace IndianBridge.Common
                 detailedMessage = "Following error(s) noted after " + ((m_statusProgressBar == null) ? "unknown" : "" + m_statusProgressBar.Value) + "% completed!";
                 detailedMessage += Environment.NewLine + e.Error.Message;
                 if (m_statusTextbox == null) Utilities.showErrorMessage(detailedMessage);
+                if (m_runAfterCompletion != null) m_runAfterCompletion(false);
             }
             else
             {
                 percentage = 100;
                 message = m_workerName+" : Success";
                 detailedMessage = (m_workerName+" completed successfully");
-                if (m_runAfterCompletion != null) m_runAfterCompletion();
+                if (m_runAfterCompletion != null) m_runAfterCompletion(true);
             }
             setStatus(percentage, message, detailedMessage, "");
         }
@@ -119,6 +120,7 @@ namespace IndianBridge.Common
 
         private void cancelOperation(object sender, EventArgs e)
         {
+            m_statusButton.Text = "Cancelling";
             if (m_worker != null && m_worker.IsBusy) m_worker.CancelAsync();
         }
     }
