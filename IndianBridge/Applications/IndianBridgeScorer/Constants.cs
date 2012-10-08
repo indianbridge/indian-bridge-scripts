@@ -113,7 +113,7 @@ namespace IndianBridgeScorer
         public static string generateTourneyFolder(string tourneyName)
         {
             DateTime eventDate = DateTime.Now;
-            return Utilities.makeIdentifier_(tourneyName) + "_" + eventDate.ToString("yyyy_MM_dd");
+            return eventDate.ToString("yyyy_MM_dd") + "-" + Utilities.makeIdentifier_(tourneyName, "_");
         }
         public static string[] KnockoutSessionNames = new string[] { "Finals", "Semi_Finals", "Quarter_Finals", "Pre_Quarter_Finals" };
 

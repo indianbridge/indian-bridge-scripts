@@ -263,10 +263,10 @@ namespace IndianBridge.Common
             }
         }
 
-        public static String makeIdentifier_(String variableName)
+        public static String makeIdentifier_(string variableName, string separator = "-")
         {
             Regex re = new Regex(@"\W");
-            return re.Replace(variableName, "-");
+            return re.Replace(variableName, separator);
         }
 
         public static double getDoubleValue(string value)
