@@ -51,7 +51,7 @@ namespace IndianBridge.GoogleAPIs
             return true;
         }
 
-        public SitesAPI(String sitename, String username, String password, bool replaceLinks = false, bool logHTTPTraffic = false)
+        public SitesAPI(string sitename, string username, string password, bool replaceLinks = false, bool logHTTPTraffic = false)
         {
             // Initialize member variables
             this.m_replaceLinks = replaceLinks;
@@ -66,6 +66,8 @@ namespace IndianBridge.GoogleAPIs
             m_hashTableFileName = Path.Combine(Globals.m_rootDirectory, LAST_UPDATED_TIMES_PREFIX + ".log");
             if (File.Exists(m_hashTableFileName)) readHashTableFile(m_hashTableFileName);
         }
+
+        public void setSiteName(string siteName) { m_siteName = siteName; }
 
         private void printMessage(String message)
         {

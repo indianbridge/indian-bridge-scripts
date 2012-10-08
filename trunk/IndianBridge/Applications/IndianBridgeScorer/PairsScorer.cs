@@ -95,13 +95,20 @@ namespace IndianBridgeScorer
             loadSummaryIntoDatabase();
         }
 
-        private void publishResultsCompleted()
+        private void publishResultsCompleted(bool success)
         {
-            MessageBox.Show("Results published successfully to " + m_resultsWebsite, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            m_publishResultsRunning = false;
+            if (success) MessageBox.Show("Results published successfully to " + m_resultsWebsite, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        private bool m_publishResultsRunning = false;
         private void publishResultsInternal()
         {
+            if (m_publishResultsRunning)
+            {
+                Utilities.showErrorMessage("A Publish Results operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
             string resultsWebsite = websiteAddress_textBox.Text;
             if (string.IsNullOrWhiteSpace(resultsWebsite))
             {
@@ -116,37 +123,57 @@ namespace IndianBridgeScorer
             CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", sa.uploadDirectoryInBackground, publishResultsCompleted, operationStatus,
 operationProgressBar, operationCancelButton, null);
             Tuple<string, string> values = new Tuple<string, string>(m_eventInformation.webpagesDirectory, pagePath);
+            m_publishResultsRunning = true;
             cbw.run(values);
         }
 
 
  
-        private void loadSummaryCompleted()
+        private void loadSummaryCompleted(bool success)
         {
-            m_databaseParameters = std.getDatabaseParameters();
-            createWebpages();
+            m_loadSummaryRunning = false;
+            if (success)
+            {
+                m_databaseParameters = std.getDatabaseParameters();
+                createWebpages();
+            }
         }
 
-        PairsSummaryToDatabase std;
+        private PairsSummaryToDatabase std;
+        private bool m_loadSummaryRunning = false;
         private void loadSummaryIntoDatabase()
         {
+            if (m_loadSummaryRunning)
+            {
+                Utilities.showErrorMessage("A Load Summary operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
             std = new PairsSummaryToDatabase(m_eventInformation);
             CustomBackgroundWorker cbw = new CustomBackgroundWorker("Load Summary", std.loadSummaryIntoDatabaseInBackground, loadSummaryCompleted, operationStatus,
                 operationProgressBar, operationCancelButton, null);
+            m_loadSummaryRunning = true;
             cbw.run();
 
          }
 
-        private void createWebpagesCompleted()
+        private void createWebpagesCompleted(bool success)
         {
-            publishResultsInternal();
+            m_createWebpagesRunning = false;
+            if(success) publishResultsInternal();
         }
 
+        private bool m_createWebpagesRunning = false;
         private void createWebpages()
         {
+            if (m_createWebpagesRunning)
+            {
+                Utilities.showErrorMessage("A Create Webpages operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
             PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
             CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", dtw.createWebpagesInBackground, createWebpagesCompleted, operationStatus,
     operationProgressBar, operationCancelButton, null);
+            m_createWebpagesRunning = true;
             cbw.run();
         }
     }

@@ -18,6 +18,11 @@ namespace IndianBridge.ResultsManager
 
         public PairsSummaryToDatabase(PairsEventInformation eventInformation)
         {
+            setParameters(eventInformation);
+        }
+
+        public void setParameters(PairsEventInformation eventInformation)
+        {
             m_eventInformation = eventInformation;
         }
 

@@ -18,9 +18,20 @@ namespace SubmitPairsResults
         private Boolean resultsLoaded = false, eventSelected = false, publishEnabled = false;
         private PairsEventInformation m_eventInformation = PairsGeneral.createDefaultEventInformation();
         private PairsDatabaseParameters m_databaseParameters = PairsGeneral.createDefaultDatabaseParameters();
-        SelectCalendarEvent selectCalendarEventForm;
+        private SelectCalendarEvent selectCalendarEventForm;
         private string m_googleSiteName = "indiancitybridgeresults";
         string m_googleSiteRootPageName = "";
+
+        private PairsSummaryToDatabase m_pairsSummaryToDatabase = null;
+        private CustomBackgroundWorker m_loadSummaryCBW = null;
+        private bool m_loadSummaryRunning = false;
+        private PairsDatabaseToWebpages m_databaseToWebpages = null;
+        private CustomBackgroundWorker m_createWebpagesCBW = null;
+        private bool m_createWebpagesRunning = false;
+        private SitesAPI m_sitesAPI = null;
+        private CustomBackgroundWorker m_publishResultsCBW = null;
+        private bool m_publishResultsRunning = false;
+
         public SubmitPairsResults()
         {
             InitializeComponent();
@@ -134,7 +145,7 @@ namespace SubmitPairsResults
                 eventSelected = true;
                 this.selectedCalendarEvent_textBox.Text = "Event Title : " + selectCalendarEventForm.calendarEventInfo.Item1 + ", Event Date : " + selectCalendarEventForm.calendarEventInfo.Item2.ToString("MMMM dd, yyyy") + ", Event Location : " + selectCalendarEventForm.calendarEventInfo.Item3;
                 deriveWebsiteAddress();
-                this.websiteAddress_textBox.Text = "https://sites.google.com/site/"+m_googleSiteName+m_googleSiteRootPageName;
+                this.websiteAddress_textBox.Text = "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName;
                 updateButtonStatus();
             }
             else
@@ -149,19 +160,28 @@ namespace SubmitPairsResults
             loadSummaryIntoDatabase();
         }
 
-        private void publishResultsCompleted()
+        private void publishResultsCompleted(bool success)
         {
-            string calendarMessage = "";
-            if (SelectCalendarEvent.calendarAPI.updateResults(SelectCalendarEvent.selectedEntryNumber, "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName))
+            m_publishResultsRunning = false;
+            if (success)
             {
-                calendarMessage = "Indian Bridge Calendar updated with Results";
+                string calendarMessage = "";
+                if (SelectCalendarEvent.calendarAPI.updateResults(SelectCalendarEvent.selectedEntryNumber, "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName))
+                {
+                    calendarMessage = "Indian Bridge Calendar updated with Results";
+                }
+                else calendarMessage = "Not able to update Indian Bridge Calendar";
+                MessageBox.Show("Results created and successfully uploaded to " + "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName + Environment.NewLine + calendarMessage, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else calendarMessage = "Not able to update Indian Bridge Calendar";
-            MessageBox.Show("Results created and successfully uploaded to " + "https://sites.google.com/site/" + m_googleSiteName + m_googleSiteRootPageName+Environment.NewLine+calendarMessage, "Results Uploaded Successfully", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void publishResultsInternal()
         {
+            if (m_publishResultsRunning)
+            {
+                Utilities.showErrorMessage("A Publish Results operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
             string resultsWebsite = websiteAddress_textBox.Text;
             if (string.IsNullOrWhiteSpace(resultsWebsite))
             {
@@ -170,44 +190,63 @@ namespace SubmitPairsResults
             }
             string siteName, pagePath;
             Utilities.getGoogleSiteComponents(resultsWebsite, out siteName, out pagePath);
+
             String username = "indianbridge.dummy@gmail.com";
             String password = "kibitzer";
-            SitesAPI sa = new SitesAPI(siteName, username, password, true, false);
-            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Publish Results", sa.uploadDirectoryInBackground, publishResultsCompleted, operationStatus,
-operationProgressBar, operationCancelButton, null);
+            m_sitesAPI = new SitesAPI(siteName, username, password, true, false);
+            m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", m_sitesAPI.uploadDirectoryInBackground, publishResultsCompleted, publishStatus,
+                publishProgressBar, publishCancelButton, null);
             Tuple<string, string> values = new Tuple<string, string>(m_eventInformation.webpagesDirectory, pagePath);
-            cbw.run(values);
+            m_publishResultsRunning = true;
+            m_publishResultsCBW.run(values);
         }
 
 
 
-        private void loadSummaryCompleted()
+        private void loadSummaryCompleted(bool success)
         {
-            m_databaseParameters = std.getDatabaseParameters();
-            createWebpages();
+            m_loadSummaryRunning = false;
+            if (success)
+            {
+                m_databaseParameters = m_pairsSummaryToDatabase.getDatabaseParameters();
+                createWebpages();
+            }
         }
 
-        PairsSummaryToDatabase std;
+
         private void loadSummaryIntoDatabase()
         {
-            std = new PairsSummaryToDatabase(m_eventInformation);
-            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Load Summary", std.loadSummaryIntoDatabaseInBackground, loadSummaryCompleted, operationStatus,
-                operationProgressBar, operationCancelButton, null);
-            cbw.run();
+            if (m_loadSummaryRunning)
+            {
+                Utilities.showErrorMessage("A Load Summary operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
+
+            m_pairsSummaryToDatabase = new PairsSummaryToDatabase(m_eventInformation);
+            m_loadSummaryCBW = new CustomBackgroundWorker("Load Summary", m_pairsSummaryToDatabase.loadSummaryIntoDatabaseInBackground, loadSummaryCompleted, loadSummaryStatus,
+            loadSummaryProgressBar, loadSummaryCancelButton, null);
+            m_loadSummaryRunning = true;
+            m_loadSummaryCBW.run();
 
         }
 
-        private void createWebpagesCompleted()
+        private void createWebpagesCompleted(bool success)
         {
-            publishResultsInternal();
+            m_createWebpagesRunning = false;
+            if (success) publishResultsInternal();
         }
 
         private void createWebpages()
         {
-            PairsDatabaseToWebpages dtw = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
-            CustomBackgroundWorker cbw = new CustomBackgroundWorker("Create Local Webpages", dtw.createWebpagesInBackground, createWebpagesCompleted, operationStatus,
-    operationProgressBar, operationCancelButton, null);
-            cbw.run();
+            if (m_createWebpagesRunning)
+            {
+                Utilities.showErrorMessage("A Create Webpages operation is already running. Wait for it to finish or Cancel it before starting another!");
+                return;
+            }
+            m_databaseToWebpages = new PairsDatabaseToWebpages(m_eventInformation, m_databaseParameters);
+            m_createWebpagesCBW = new CustomBackgroundWorker("Create Local Webpages", m_databaseToWebpages.createWebpagesInBackground, createWebpagesCompleted, createWebpagesStatus, createWebpagesProgressBar, createWebpagesCancelButton, null);
+            m_createWebpagesRunning = true;
+            m_createWebpagesCBW.run();
         }
     }
 }

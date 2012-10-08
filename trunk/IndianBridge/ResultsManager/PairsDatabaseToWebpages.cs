@@ -53,6 +53,11 @@ namespace IndianBridge.ResultsManager
 
         public PairsDatabaseToWebpages(PairsEventInformation eventInformation, PairsDatabaseParameters databaseParameters)
         {
+            setParameters(eventInformation, databaseParameters);
+        }
+
+        public void setParameters(PairsEventInformation eventInformation, PairsDatabaseParameters databaseParameters)
+        {
             m_eventInformation = eventInformation;
             m_databaseParameters = databaseParameters;
         }

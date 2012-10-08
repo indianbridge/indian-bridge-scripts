@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using IndianBridge.Common;
 using System.IO;
 using System.Diagnostics;
+using IndianBridge.GoogleAPIs;
 
 namespace IndianBridgeScorer
 {
@@ -215,6 +216,22 @@ namespace IndianBridgeScorer
             CreateNewEvents cne = new CreateNewEvents(true);
             cne.ShowDialog();
         }
+
+        private void uploadToGoogleDocsButton_Click(object sender, EventArgs e)
+        {
+            UploadTourney ut = new UploadTourney();
+            ut.StartPosition = FormStartPosition.CenterParent;
+            ut.ShowDialog(this);
+        }
+
+        void ChangeEnabled(bool enabled)
+        {
+            foreach (Control c in this.Controls)
+            {
+                c.Enabled = enabled;
+            }
+        } 
+
 
     }
 }
