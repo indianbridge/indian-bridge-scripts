@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
+using System.Collections;
 
 namespace IndianBridge.Common
 {
@@ -131,6 +132,29 @@ namespace IndianBridge.Common
 
 
         public static DataTable createTable(string databaseFileName, string tableName, List<DatabaseField> fields, List<string> primaryKeyFields)
+        {
+            string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + databaseFileName + ";";
+            OleDbConnection connection = new OleDbConnection(strAccessConn);
+            connection.Open();
+            string query = "CREATE TABLE " + tableName + "(";
+            foreach (DatabaseField field in fields)
+            {
+                query += ("[" + field.fieldName + "] " + field.fieldType + (field.fieldSize > 0 ? "(" + field.fieldSize + ")" : "") + ",");
+            }
+            query += ("CONSTRAINT primarykey PRIMARY KEY(");
+            for (int i = 0; i < primaryKeyFields.Count; ++i)
+            {
+                query += (primaryKeyFields[i] + (i == primaryKeyFields.Count - 1 ? "" : ","));
+            }
+            query += "))";
+            OleDbCommand myCommand = new OleDbCommand(query, connection);
+            myCommand.ExecuteNonQuery();
+            connection.Close();
+            connection = null;
+            return loadDatabaseToTable(databaseFileName, tableName);
+        }
+
+        public static DataTable createTable(string databaseFileName, string tableName, List<DatabaseField> fields, ArrayList primaryKeyFields)
         {
             string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + databaseFileName + ";";
             OleDbConnection connection = new OleDbConnection(strAccessConn);

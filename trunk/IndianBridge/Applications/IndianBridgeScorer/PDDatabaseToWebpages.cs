@@ -12,22 +12,22 @@ using System.ComponentModel;
 
 namespace IndianBridgeScorer
 {
-    public class SwissTeamsDatabaseToWebpages
+    public class PDDatabaseToWebpages
     {
         private string m_databaseFileName = "";
         private string m_webpagesRootDirectory = "";
         private string m_prefix = "";
-        private int m_roundsCompleted = 0;
-        private int m_drawsCompleted = 0;
         private int m_numberOfTeams = 0;
         private int m_numberOfRounds = 0;
+        private int m_numberOfBoardsPerRound = 0;
+        private int m_totalNumberOfBoards = 0;
         private int totalNumberOfPagesToBeCreated = 0;
         private int numberOfPagesCreatedSoFar = 0;
         private BackgroundWorker m_worker;
         private bool m_runningInBackground = false;
         private string m_prefixString = "Creating Local Webpages : ";
 
-        public SwissTeamsDatabaseToWebpages(string eventName, string databaseFileName, string webpagesRoot)
+        public PDDatabaseToWebpages(string eventName, string databaseFileName, string webpagesRoot)
         {
             setParameters(eventName, databaseFileName, webpagesRoot);
         }
@@ -36,12 +36,11 @@ namespace IndianBridgeScorer
         {
             m_databaseFileName = databaseFileName;
             m_webpagesRootDirectory = webpagesRoot;
-            string scoringFileName = Constants.getEventScoringProgressParametersFileName(eventName);
             string mainNiniFileName = Constants.getEventInformationFileName(eventName);
             m_numberOfTeams = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfTeamsFieldName);
             m_numberOfRounds = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfRoundsFieldName);
-            m_roundsCompleted = NiniUtilities.getIntValue(scoringFileName, Constants.RoundsCompletedFieldName);
-            m_drawsCompleted = NiniUtilities.getIntValue(scoringFileName, Constants.DrawsCompletedFieldName);
+            m_numberOfBoardsPerRound = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfBoardsFieldName);
+            m_totalNumberOfBoards = m_numberOfTeams * m_numberOfBoardsPerRound;
         }
 
         public void createWebpagesInBackground(object sender,DoWorkEventArgs e)
@@ -61,14 +60,74 @@ namespace IndianBridgeScorer
         private void createWebpagesInternal()
         {
             numberOfPagesCreatedSoFar = 0;
-            totalNumberOfPagesToBeCreated = 1 + 1 + m_numberOfTeams + m_numberOfRounds;
+            totalNumberOfPagesToBeCreated = 1 + 1 + m_numberOfTeams + m_numberOfRounds + m_totalNumberOfBoards;
             string rootFolder = m_webpagesRootDirectory;
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
             createLeaderboard();
             createNamesPage();
             createTeamPages();
             createRoundPages();
+            createBoardPages();
         }
+
+        private void createBoardPages()
+        {
+            printMessage("Creating Board Pages");
+            String rootFolder = Path.Combine(m_webpagesRootDirectory, "boards");
+            if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
+
+            for (int i = 1; i <= m_totalNumberOfBoards; ++i)
+            {
+                createBoardPage(i);
+            }
+        }
+
+        private void createBoardPage(int boardNumber)
+        {
+            printMessage("Creating Board Page for Round Number : " + boardNumber);
+            m_prefix = "../";
+            StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "boards", "board" + boardNumber + "score.html"));
+            sw.WriteLine("<html><head></head><body>");
+            string headerTemplate = "<h2>Scores for Board " + boardNumber + "</h2>" + "<br/>[_commonPageHeader]";
+            sw.WriteLine(applyTemplate_(headerTemplate, null));
+            sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
+            ArrayList tableHeader = new ArrayList();
+            tableHeader.Add("NS Team");
+            tableHeader.Add("EW Team");
+            tableHeader.Add("Round");
+            tableHeader.Add("NS_Score");
+            tableHeader.Add("EW_Score");
+            tableHeader.Add("NS MPs");
+            tableHeader.Add("EW MPs");
+            sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + boardNumber, "Round_Number ASC");
+            int i = 0;
+            foreach (DataRow dRow in foundRows)
+            {
+                ArrayList tableRow = new ArrayList();
+                if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"], true, true));
+                else tableRow.Add("-");
+                if (dRow["EW_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"], true, true));
+                else tableRow.Add("-");
+                if (dRow["Round_Number"] != DBNull.Value) tableRow.Add(getRoundNumberLink((int)dRow["Round_Number"]));
+                else tableRow.Add("-");
+                if (dRow["NS_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_Score"]);
+                else tableRow.Add("-");
+                if (dRow["EW_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_Score"]);
+                else tableRow.Add("-");
+                if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_MPs"]);
+                else tableRow.Add("-");
+                if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_MPs"]);
+                else tableRow.Add("-");
+                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
+                i++;
+            }
+            sw.WriteLine("</tbody></table>");
+            sw.WriteLine("</body></html>");
+            sw.Close();
+            reportProgress("Created Round " + boardNumber + " Score Page");
+        }
+
 
         private void printMessage(String message) { 
             Trace.WriteLine(message);   
@@ -99,30 +158,21 @@ namespace IndianBridgeScorer
             printMessage("Creating Leaderboard...");
             String rootFolder = Path.Combine(m_webpagesRootDirectory, "leaderboard");
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
-            string title = (m_roundsCompleted == m_numberOfRounds) ? "<h2>Final Leaderboard</h2>" : "<h2>Leaderboard after Round " + m_roundsCompleted+"</h2>";
+            string title = "<h2>Leaderboard</h2>";
             string headerTemplate = title + "<br/>[_commonPageHeader]";
-            if (m_roundsCompleted < 1)
-            {
-                StreamWriter sw = new StreamWriter(Path.Combine(rootFolder, "index.html"));
-                sw.WriteLine("<html><head></head><body>");
-                sw.WriteLine(applyTemplate_(headerTemplate, null));
-                sw.WriteLine("<h1>No Scores Available Yet!</h1>");
-                sw.WriteLine("</body></html>");
-                sw.Close();
-                return;
-            }
             Utilities.HTMLTableParameters parameters = new Utilities.HTMLTableParameters("");
-            parameters.columns.Add("Rank", "{Rank_After_Round_" + m_roundsCompleted + "}");
+            parameters.columns.Add("Rank", "{Rank}");
             parameters.columns.Add("No.", "[_makeTeamNumberLink]");
             parameters.columns.Add("Name", "[_makeTeamNameLink]");
-            parameters.columns.Add("VPs", "{Score_After_Round_" + m_roundsCompleted + "}");
-            parameters.columns.Add("Tiebreaker Quotient", "{Tiebreaker_After_Round_" + m_roundsCompleted + "}");
-            parameters.sortCriteria = "Rank_After_Round_" + m_roundsCompleted + " ASC";
+            parameters.columns.Add("Total_Score", "{Total_Score}");
+            parameters.columns.Add("Boards_Played", "{Boards_Played}");
+            parameters.columns.Add("Percentage_Score", "{Percentage_Score}");
+            parameters.sortCriteria = "Rank ASC";
             m_prefix = "../";
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerTemplate;
-            parameters.tableName = Constants.TableName.EventComputedScores;          
+            parameters.tableName = Constants.TableName.EventNames;          
             createPage_(parameters);
             m_prefix = "./";
             parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
@@ -218,89 +268,49 @@ namespace IndianBridgeScorer
             sw.WriteLine("<html><head></head><body>");
             DataRow dRow = getTable(Constants.TableName.EventNames).Rows.Find(teamNumber);
             string headerTemplate = "<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>";
-            headerTemplate += "<h3>Carryover : {Carryover}</h3>";
+            headerTemplate += "<h3>Total Score : {Total_Score}, Boards Played : {Boards_Played}, Percentage Score : {Percentage_Score}, Rank : {Rank}</h3>";
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
-            string originalEventName = AccessDatabaseUtilities.getStringValue(dRow, "Original_Event_Name");
-            if (!string.IsNullOrWhiteSpace(originalEventName))
-            {
-                int originalTeamNumber = AccessDatabaseUtilities.getIntValue(dRow, "Original_Team_Number");
-                string webpagesRootDirectory = Path.Combine("..", "..", Utilities.makeIdentifier_(originalEventName));
-                string link = Path.Combine(webpagesRootDirectory, "teams", "team" + originalTeamNumber + "score.html");
-                sw.WriteLine("<a href='" + link + "' title='" + dRow["Member_Names"] + "'>Previous Round Scores for this team</a>");
-            }
             headerTemplate = "<br/>[_commonPageHeader]";
             sw.WriteLine(applyTemplate_(headerTemplate, dRow));
 
             sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
-            tableHeader.Add("Round");
+            tableHeader.Add("Board");
             tableHeader.Add("Opponent");
-            tableHeader.Add("VPs");
-            tableHeader.Add("Adjustment");
-            tableHeader.Add("Cumulative Score After Round");
-            tableHeader.Add("Rank After Round");
+            tableHeader.Add("NS_Score");
+            tableHeader.Add("EW_Score");
+            tableHeader.Add("MPs");
             sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-            for (int i = 1; i <= m_roundsCompleted; ++i)
+            for (int i = 1; i <= m_totalNumberOfBoards; ++i)
             {
                 ArrayList tableRow = new ArrayList();
-                tableRow.Add(getRoundNumberLink(i));
-                DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + i + " AND Team_1_Number = " + teamNumber);
-                if (foundRows.Length > 0)
+                tableRow.Add(getBoardNumberLink(i));
+                DataRow[] nsRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + i + " AND NS_Team_Number = " + teamNumber);
+                DataRow[] ewRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + i + " AND EW_Team_Number = " + teamNumber);
+                if (nsRows.Length > 0 && nsRows[0]["EW_Team_Number"] != DBNull.Value)
                 {
-                    dRow = foundRows[0];
-                    int opponent = (int)dRow["Team_2_Number"];
-                    if (opponent == 0 || opponent > m_numberOfTeams) tableRow.Add("BYE");
-                    else tableRow.Add("" + getTeamLink(dRow["Team_2_Number"],true,true));
-                    tableRow.Add("" + getDoubleValue(dRow,"Team_1_VPs"));
-                    tableRow.Add("" + getDoubleValue(dRow,"Team_1_VP_Adjustment"));
+                    tableRow.Add(getTeamLink(nsRows[0]["EW_Team_Number"], true, true));
                 }
-                else
+                else if (ewRows.Length > 0 && ewRows[0]["NS_Team_Number"] != DBNull.Value)
                 {
-                    foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + i + " AND Team_2_Number = " + teamNumber);
-                    if (foundRows.Length < 1)
-                    {
-                        tableRow.Add("-");
-                        tableRow.Add("-");
-                        tableRow.Add("-");
-                    }
-                    else
-                    {
-                        dRow = foundRows[0];
-                        int opponent = (int)dRow["Team_1_Number"];
-                        if (opponent == 0 || opponent > m_numberOfTeams) tableRow.Add("BYE");
-                        else tableRow.Add("" + getTeamLink(dRow["Team_1_Number"], true, true));
-                        tableRow.Add("" + getDoubleValue(dRow,"Team_2_VPs"));
-                        tableRow.Add("" + getDoubleValue(dRow,"Team_2_VP_Adjustment"));
-                    }
+                    tableRow.Add(getTeamLink(ewRows[0]["NS_Team_Number"], true, true));
                 }
-                foundRows = getTable(Constants.TableName.EventComputedScores).Select("Team_Number = " + teamNumber);
-                Debug.Assert(foundRows.Length <= 1);
-                if (foundRows.Length < 1)
+                else tableRow.Add("-");
+                if (nsRows.Length > 0 && nsRows[0]["NS_Score"] != DBNull.Value)
                 {
-                    tableRow.Add("-");
-                    tableRow.Add("-");
+                    tableRow.Add("" + nsRows[0]["NS_Score"]);
                 }
-                else
+                else tableRow.Add("-");
+                if (ewRows.Length > 0 && ewRows[0]["NS_Score"] != DBNull.Value)
                 {
-                    dRow = foundRows[0];
-                    string columnName = "Score_After_Round_"+i;
-                    if (dRow.Table.Columns.Contains(columnName)) tableRow.Add(""+getDoubleValue(dRow,columnName));
-                    else tableRow.Add("-");
-                    columnName = "Rank_After_Round_"+i;
-                    if (dRow.Table.Columns.Contains(columnName)) tableRow.Add("" + getDoubleValue(dRow, columnName));
-                    else tableRow.Add("-");
+                    tableRow.Add("" + ewRows[0]["EW_Score"]);
                 }
-                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
-            }
-            for (int i = m_roundsCompleted + 1; i <= m_numberOfRounds; ++i)
-            {
-                ArrayList tableRow = new ArrayList();
-                tableRow.Add("" + i);
-                tableRow.Add("-");
-                tableRow.Add("-");
-                tableRow.Add("-");
-                tableRow.Add("-");
-                tableRow.Add("-");
+                else tableRow.Add("-");
+                if (nsRows.Length > 0 && nsRows[0]["NS_MPs"] != DBNull.Value)
+                {
+                    tableRow.Add("" + nsRows[0]["NS_MPs"]);
+                }
+                else tableRow.Add("-");
                 sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             sw.WriteLine("</tbody></table>");
@@ -327,140 +337,45 @@ namespace IndianBridgeScorer
             m_prefix = "../";
             StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "rounds", "round" + roundNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
-            DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + roundNumber, "Table_Number ASC");
-            DataRow dRow = (foundRows.Length>0)?foundRows[0]:null;
             string headerTemplate = "<h2>Scores for Round " + roundNumber + "</h2>" + "<br/>[_commonPageHeader]";
-            sw.WriteLine(applyTemplate_(headerTemplate, dRow));
-            if (roundNumber > m_roundsCompleted)
-            {
-                if (roundNumber <= m_drawsCompleted)
-                {
-                    sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
-                    ArrayList tableHeader = new ArrayList();
-                    tableHeader.Clear();
-                    tableHeader.Add("Round " + roundNumber + " Draw");
-                    sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-                    sw.WriteLine("<tr><td>");
-                    sw.WriteLine(createRoundTable(roundNumber, foundRows,false));
-                    sw.WriteLine("</td></tr></tbody></table>");
-                    sw.WriteLine("</tbody></table>");
-                }
-                else sw.WriteLine("<h2>No Draw or Score published yet!</h2>");
-            }
-            else
-            {
-                sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
-                ArrayList tableHeader = new ArrayList();
-                tableHeader.Clear();
-                tableHeader.Add("Round "+roundNumber+" Score");
-                tableHeader.Add("Cumulative Score and Ranking after Round " + roundNumber);
-                sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-                sw.WriteLine("<tr><td>");
-                sw.WriteLine(createRoundTable(roundNumber,foundRows));
-                sw.WriteLine("</td><td>");
-                Utilities.HTMLTableParameters parameters = new Utilities.HTMLTableParameters("");
-                parameters.columns.Add("Rank", "{Rank_After_Round_" + roundNumber + "}");
-                parameters.columns.Add("No.", "[_makeTeamNumberLink]");
-                parameters.columns.Add("Name", "[_makeTeamNameLink]");
-                parameters.columns.Add("VPs", "{Score_After_Round_" + roundNumber + "}");
-                parameters.columns.Add("Tiebreaker Quotient", "{Tiebreaker_After_Round_" + roundNumber + "}");
-                parameters.sortCriteria = "Rank_After_Round_" + roundNumber + " ASC";
-                parameters.filterCriteria = "";
-                parameters.headerTemplate = headerTemplate;
-                parameters.tableName = Constants.TableName.EventComputedScores;          
-
-                sw.WriteLine(createTable_(parameters));
-                sw.WriteLine("</td></tr></tbody></table>");
-                sw.WriteLine("</tbody></table>");
-            }
-            sw.WriteLine("</body></html>");
-            sw.Close();
-            reportProgress("Created Round "+roundNumber+" Score Page");
-        }
-
-        private string createRoundTable(int roundNumber, DataRow[] foundRows, bool showVPs= true)
-        {
-            string result = "";
-            result += (Utilities.makeTablePreamble_() + "<thead><tr>");
+            sw.WriteLine(applyTemplate_(headerTemplate, null));
+            sw.WriteLine(Utilities.makeTablePreamble_() + "<thead><tr>");
             ArrayList tableHeader = new ArrayList();
-            tableHeader.Clear();
-            tableHeader.Add("Table");
-            tableHeader.Add("Team 1");
-            if (showVPs)
-            {
-                tableHeader.Add("Team 1 VPs");
-                tableHeader.Add("Team 2 VPs");
-            }
-            tableHeader.Add("Team 2");
-            result += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            tableHeader.Add("NS Team");
+            tableHeader.Add("EW Team");
+            tableHeader.Add("Board");
+            tableHeader.Add("NS_Score");
+            tableHeader.Add("EW_Score");
+            tableHeader.Add("NS MPs");
+            tableHeader.Add("EW MPs");
+            sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
+            DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + roundNumber, "NS_Team_Number ASC");
             int i = 0;
             foreach (DataRow dRow in foundRows)
             {
                 ArrayList tableRow = new ArrayList();
-                tableRow.Add("" + (int)dRow["Table_Number"]);
-                string team1string = getTeamLink(dRow["Team_1_Number"], true, true);
-                tableRow.Add(team1string);
-                string team2string = getTeamLink(dRow["Team_2_Number"], true, true);
-                if (showVPs)
-                {
-                    if (team1string == "BYE")
-                    {
-                        tableRow.Add("BYE");
-                    }
-                    else
-                    {
-                        double team1vps = getDoubleValue(dRow, "Team_1_VPs") + getDoubleValue(dRow, "Team_1_VP_Adjustment");
-                        tableRow.Add("" + team1vps);
-                    }
-                    if (team2string == "BYE")
-                    {
-                        tableRow.Add("BYE");
-                    }
-                    else
-                    {
-                        double team2vps = getDoubleValue(dRow, "Team_2_VPs") + getDoubleValue(dRow, "Team_2_VP_Adjustment");
-                        tableRow.Add("" + team2vps);
-                    }
-                }
-                tableRow.Add(team2string);
-                result += ("<tr>" + Utilities.makeTableCell_(tableRow, i++) + "</tr>");
+                if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"],true,true));
+                else tableRow.Add("-");
+                if (dRow["EW_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"],true,true));
+                else tableRow.Add("-");
+                if (dRow["Board_Number"] != DBNull.Value) tableRow.Add(getBoardNumberLink((int)dRow["Board_Number"]));
+                else tableRow.Add("-");
+                if (dRow["NS_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_Score"]);
+                else tableRow.Add("-");
+                if (dRow["EW_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_Score"]);
+                else tableRow.Add("-");
+                if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_MPs"]);
+                else tableRow.Add("-");
+                if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_MPs"]);
+                else tableRow.Add("-");
+                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
+                i++;
             }
-            result += "</tbody></table>";
-            return result;
-
+            sw.WriteLine("</tbody></table>");
+            sw.WriteLine("</body></html>");
+            sw.Close();
+            reportProgress("Created Round "+roundNumber+" Score Page");
         }
-
-
-
-        private string createTable_(Utilities.HTMLTableParameters parameters)
-        {
-            string result = "";
-            DataRow[] foundRows = getTable(parameters.tableName).Select(parameters.filterCriteria, parameters.sortCriteria);
-            DataRow dRow = (foundRows.Length < 1) ? null : foundRows[0];
-
-            result += (Utilities.makeTablePreamble_() + "<thead><tr>");
-            ArrayList tableHeader = new ArrayList();
-            foreach (DictionaryEntry pair in parameters.columns)
-            {
-                tableHeader.Add(applyTemplate_("" + pair.Key, dRow));
-            }
-            result += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-            for (int i = 0; i < foundRows.Length; ++i)
-            {
-                DataRow row = foundRows[i];
-                ArrayList tableRow = new ArrayList();
-                foreach (DictionaryEntry pair in parameters.columns)
-                {
-                    string value = "" + pair.Value;
-                    if (value.Equals("Serial_Number", StringComparison.OrdinalIgnoreCase)) tableRow.Add("" + i);
-                    else tableRow.Add(applyTemplate_(value, row));
-                }
-                result += ("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
-            }
-            result += ("</tbody></table>");
-            return result;
-        }
-
         private void createPage_(Utilities.HTMLTableParameters parameters)
         {
             StreamWriter sw = new StreamWriter(parameters.fileName);
@@ -539,13 +454,19 @@ namespace IndianBridgeScorer
             for (int i = 1; i <= m_numberOfTeams; ++i)
             {
 
-                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "teams" + "/team" + i + "score.html' title = '" + getTeamMemberNames(i) + "'>" + i + "</a>";
+                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "teams" + "/team" + i + "score.html'  title = '" + getTeamMemberNames(i) + "'>" + i + "</a>";
             }
             result += "<br/>";
             result += "Round Scores : ";
             for (int i = 1; i <= m_numberOfRounds; ++i)
             {
                 result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "rounds" + "/round" + i + "score.html'>" + i + "</a>";
+            }
+            result += "<br/>";
+            result += "Board Scores : ";
+            for (int i = 1; i <= m_totalNumberOfBoards; ++i)
+            {
+                result += (i == 1 ? "" : " | ") + "<a href='" + m_prefix + "boards" + "/board" + i + "score.html'>" + i + "</a>";
             }
             return result;
         }
@@ -557,13 +478,18 @@ namespace IndianBridgeScorer
             int teamNumber = (int)teamNumberObject;
             if (teamNumber <= 0 || teamNumber > m_numberOfTeams) return "BYE";
             DataRow dRow = getTable(Constants.TableName.EventNames).Rows.Find(teamNumber);
-            result = "<a href='" + m_prefix + "teams" + "/team" + dRow["Team_Number"] + "score.html' title='" + dRow["Member_Names"] + "'>" + (showNumber ? dRow["Team_Number"] + " " : "") + (showName ? dRow["Team_Name"] : "") + "</a>";
+            result = "<a href='" + m_prefix + "teams" + "/team" + dRow["Team_Number"] + "score.html'  title='" + dRow["Member_Names"] + "'>" + (showNumber ? dRow["Team_Number"] + " " : "") + (showName ? dRow["Team_Name"] : "") + "</a>";
             return result;
         }
 
         private string getRoundNumberLink(int roundNumber)
         {
             return "<a href='" + m_prefix + "rounds" + "/round" + roundNumber + "score.html'>" + roundNumber + "</a>";
+        }
+
+        private string getBoardNumberLink(int roundNumber)
+        {
+            return "<a href='" + m_prefix + "boards" + "/board" + roundNumber + "score.html'>" + roundNumber + "</a>";
         }
 
         public String _makeTeamNumberLink(DataRow dRow)

@@ -86,6 +86,13 @@ namespace IndianBridgeScorer
         public static string getKnockoutEventScoresFileName(string eventName) { return Path.Combine(getFolder(getEventDatabasesFolder(eventName)), KnockoutScoresFileName); }
 
         // Field Names
+        public static class FieldName
+        {
+            public static string PDMovementType = "PD_Movement_Type";
+            public static string TotalNumberOfBoards = "Total_Boards";
+            public static string FirstBoardAtTable1AtStart = "PD_First_Board_At_Table_1_At_Start";
+            public static string SkipAfterRound = "PD_Skip_After_Round";
+        }
         public static string TourneyNameFieldName = "Tourney_Name";
         public static string ResultsWebsiteFieldName = "Results_Website";
         public static string EventNameFieldName = "Event_Name";
