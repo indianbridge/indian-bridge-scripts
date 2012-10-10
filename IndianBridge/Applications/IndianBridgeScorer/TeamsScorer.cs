@@ -51,7 +51,7 @@ namespace IndianBridgeScorer
             Utilities.SetDataGridViewProperties(this);
             if (!File.Exists(m_databaseFileName)) createDatabases();
             loadDatabases();
-            if (!isEventSetup())
+            if (!m_swissTeamEventInfo.isValid())
             {
                 // Show only event Setup Tab
                 Utilities.hideTabs(mainControlTab);
@@ -167,13 +167,6 @@ namespace IndianBridgeScorer
             fields.Add(new DatabaseField("Team_Number", "INTEGER"));
             primaryKeys.Add("Team_Number");
             AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventComputedScores, fields, primaryKeys);
-        }
-
-        private bool isEventSetup()
-        {
-            return (m_swissTeamEventInfo.NumberOfTeams >= 2 &&
-                m_swissTeamEventInfo.NumberOfRounds >= 2 &&
-                m_swissTeamEventInfo.NumberOfQualifiers >= 0);
         }
 
         private void resetScoring()

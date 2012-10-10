@@ -39,10 +39,12 @@ namespace IndianBridgeScorer
         public int NumberOfTeams
         {
             get { return numberOfTeams; }
-            set {
+            set
+            {
                 calledFromNumberOfTeams = true;
-                double rounds = Math.Log(value,2);
-                if (rounds%1 != 0) {
+                double rounds = Math.Log(value, 2);
+                if (rounds % 1 != 0)
+                {
                     Utilities.showErrorMessage("Number of Teams has to be a power of 2 like, 2,4,8,16 etc. Other values cannot be handled by software.");
                     return;
                 }
@@ -54,7 +56,7 @@ namespace IndianBridgeScorer
                     update();
                 }
                 calledFromNumberOfTeams = false;
-                if(m_grid != null) m_grid.Refresh();
+                if (m_grid != null) m_grid.Refresh();
             }
         }
         private int numberOfRounds = 3;
@@ -64,7 +66,8 @@ namespace IndianBridgeScorer
         public int NumberOfRounds
         {
             get { return numberOfRounds; }
-            set {
+            set
+            {
                 calledFromNumberOfRounds = true;
                 numberOfRounds = value;
                 NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
@@ -78,7 +81,7 @@ namespace IndianBridgeScorer
             }
         }
         public KnockoutSessions(string eventName, string niniFileName, string databaseFileName, bool autoSave = false) :
-            this(null, eventName, niniFileName, databaseFileName, autoSave) {}
+            this(null, eventName, niniFileName, databaseFileName, autoSave) { }
 
         public KnockoutSessions(PropertyGrid grid, string eventName, string niniFileName, string databaseFileName, bool autoSave = false)
         {
@@ -130,7 +133,7 @@ namespace IndianBridgeScorer
                     AccessDatabaseUtilities.dropColumn(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields);
                 }
                 m_oldNumberOfSessions[roundNumber] = numberOfSessions;
-                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber,"",removeColumns);
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, "", removeColumns);
             }
             AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutSessions);
         }
@@ -144,7 +147,7 @@ namespace IndianBridgeScorer
                 for (int i = oldNumberOfRounds + 1; i <= numberOfRounds; ++i)
                 {
                     DataRow dRow = table.NewRow();
-                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i - 1] : "Round_of_" + Math.Pow(2, i));
                     dRow["Round_Number"] = i;
                     dRow["Round_Name"] = sessionName;
                     dRow["Number_Of_Sessions"] = 3;
@@ -155,7 +158,7 @@ namespace IndianBridgeScorer
                 for (int i = oldNumberOfTeams + 1; i <= numberOfTeams; ++i)
                 {
                     DataRow dRow = teamsTable.NewRow();
-                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                    string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i - 1] : "Round_of_" + Math.Pow(2, i));
                     dRow["Team_Number"] = i;
                     dRow["Team_Name"] = "Team " + i;
                     teamsTable.Rows.Add(dRow);
@@ -202,7 +205,7 @@ namespace IndianBridgeScorer
             for (int i = 1; i <= numberOfRounds; i++)
             {
                 DataRow dRow = table.NewRow();
-                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Convert.ToInt32(Math.Pow(2, i)));
+                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i - 1] : "Round_of_" + Convert.ToInt32(Math.Pow(2, i)));
                 dRow["Round_Number"] = i;
                 dRow["Round_Name"] = sessionName;
                 dRow["Number_Of_Sessions"] = 3;
@@ -226,7 +229,7 @@ namespace IndianBridgeScorer
             for (int i = 1; i <= numberOfTeams; i++)
             {
                 DataRow dRow = table.NewRow();
-                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i-1] : "Round_of_" + Math.Pow(2, i));
+                string sessionName = (Constants.KnockoutSessionNames.Length >= i ? Constants.KnockoutSessionNames[i - 1] : "Round_of_" + Math.Pow(2, i));
                 dRow["Team_Number"] = i;
                 dRow["Team_Name"] = "Team " + i;
                 table.Rows.Add(dRow);
@@ -271,20 +274,20 @@ namespace IndianBridgeScorer
             m_oldNumberOfSessions[roundNumber] = numberOfSessions;
             for (int i = 1; i <= numberOfSessions; ++i)
             {
-                fields.Add(new DatabaseField("Session_"+i+"_Score", "NUMBER"));
+                fields.Add(new DatabaseField("Session_" + i + "_Score", "NUMBER"));
             }
             List<string> primaryKeys = new List<string>();
             primaryKeys.Add("Match_Number");
             primaryKeys.Add("Team_Number");
-            DataTable scoresTable = AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.KnockoutScores+"_"+roundNumber, fields, primaryKeys);
-            int numberOfMatches = Convert.ToInt32(Math.Pow(2,roundNumber-1));
+            DataTable scoresTable = AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber, fields, primaryKeys);
+            int numberOfMatches = Convert.ToInt32(Math.Pow(2, roundNumber - 1));
             for (int i = 1; i <= numberOfMatches; ++i)
             {
                 DataRow dScoresRow = scoresTable.NewRow();
                 dScoresRow["Match_Number"] = i;
                 int teamNumber = i;
                 dScoresRow["Team_Number"] = i;
-                dScoresRow["Team_Name"] = LocalUtilities.getTeamName(m_databaseFileName, Constants.TableName.KnockoutTeams,i);
+                dScoresRow["Team_Name"] = LocalUtilities.getTeamName(m_databaseFileName, Constants.TableName.KnockoutTeams, i);
                 scoresTable.Rows.Add(dScoresRow);
                 dScoresRow = scoresTable.NewRow();
                 dScoresRow["Match_Number"] = i;
@@ -364,7 +367,8 @@ namespace IndianBridgeScorer
         public double FontSize
         {
             get { return fontSize; }
-            set { 
+            set
+            {
                 fontSize = value;
                 NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
             }
@@ -374,7 +378,8 @@ namespace IndianBridgeScorer
         public string ResultsWebsite
         {
             get { return resultsWebsite; }
-            set { 
+            set
+            {
                 resultsWebsite = value;
                 NiniUtilities.setStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
             }
@@ -426,7 +431,8 @@ namespace IndianBridgeScorer
         public ScoringTypeValues ScoringType
         {
             get { return scoringType; }
-            set { 
+            set
+            {
                 scoringType = value;
                 NiniUtilities.setStringValue(m_niniFileName, Constants.ScoringTypeFieldName, scoringType.ToString(), m_autoSave);
             }
@@ -436,7 +442,8 @@ namespace IndianBridgeScorer
         public TiebreakerMethodValues TiebreakerMethod
         {
             get { return tiebreakerMethod; }
-            set { 
+            set
+            {
                 tiebreakerMethod = value;
                 NiniUtilities.setStringValue(m_niniFileName, Constants.TiebreakerMethodFieldName, tiebreakerMethod.ToString(), m_autoSave);
             }
@@ -498,7 +505,8 @@ namespace IndianBridgeScorer
         public int DrawForRound
         {
             get { return drawForRound; }
-            set { 
+            set
+            {
                 drawForRound = value;
                 NiniUtilities.setIntValue(m_niniFileName, Constants.DrawForRoundFieldName, drawForRound, m_autoSave);
             }
@@ -508,7 +516,8 @@ namespace IndianBridgeScorer
         public double FontSize
         {
             get { return fontSize; }
-            set { 
+            set
+            {
                 fontSize = value;
                 NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
             }
@@ -518,7 +527,8 @@ namespace IndianBridgeScorer
         public double PaddingSize
         {
             get { return paddingSize; }
-            set { 
+            set
+            {
                 paddingSize = value;
                 NiniUtilities.setDoubleValue(m_niniFileName, Constants.PaddingSizeFieldName, paddingSize, m_autoSave);
             }
@@ -528,7 +538,8 @@ namespace IndianBridgeScorer
         public bool VPsInSeparateColumn
         {
             get { return vpsInSeparateColumn; }
-            set { 
+            set
+            {
                 vpsInSeparateColumn = value;
                 NiniUtilities.setBooleanValue(m_niniFileName, Constants.VPSInSeparateColumnFieldName, vpsInSeparateColumn, m_autoSave);
             }
@@ -538,7 +549,8 @@ namespace IndianBridgeScorer
         public bool UseBorder
         {
             get { return useBorder; }
-            set { 
+            set
+            {
                 useBorder = value;
                 NiniUtilities.setBooleanValue(m_niniFileName, Constants.UseBorderFieldName, useBorder, m_autoSave);
             }
@@ -600,7 +612,8 @@ namespace IndianBridgeScorer
         public int DrawsCompleted
         {
             get { return drawsCompleted; }
-            set { 
+            set
+            {
                 if (value > drawsCompleted) drawsCompleted = value;
                 NiniUtilities.setIntValue(m_niniFileName, Constants.DrawsCompletedFieldName, drawsCompleted, m_autoSave);
             }
@@ -610,7 +623,8 @@ namespace IndianBridgeScorer
         public int RoundsCompleted
         {
             get { return roundsCompleted; }
-            set { 
+            set
+            {
                 if (value > roundsCompleted) roundsCompleted = value;
                 NiniUtilities.setIntValue(m_niniFileName, Constants.RoundsCompletedFieldName, roundsCompleted, m_autoSave);
             }
@@ -620,9 +634,148 @@ namespace IndianBridgeScorer
         public int RoundsScored
         {
             get { return roundsScored; }
-            set { 
+            set
+            {
                 if (value > roundsScored) roundsScored = value;
                 NiniUtilities.setIntValue(m_niniFileName, Constants.RoundsScoredFieldName, roundsScored, m_autoSave);
+            }
+        }
+    }
+
+    public class PDEventInfo
+    {
+        private string m_niniFileName = "";
+        private string m_eventName = "";
+        private int numberOfTeams = 0;
+        private int numberOfRounds = 0;
+        private int numberOfBoardsPerRound = 0;
+
+        private bool m_autoSave = false;
+
+        [BrowsableAttribute(false)]
+        public int previousNumberOfTeams = 0;
+        [BrowsableAttribute(false)]
+        public int previousNumberOfRounds = 0;
+        [BrowsableAttribute(false)]
+        public int previousNumberOfBoardsPerRound = 0;
+        [BrowsableAttribute(false)]
+        public int totalNumberOfBoards = 0;
+
+        public PDEventInfo(string eventName, string niniFileName, bool autoSave = false)
+        {
+            m_eventName = eventName;
+            m_autoSave = autoSave;
+            m_niniFileName = niniFileName;
+            if (!File.Exists(m_niniFileName))
+            {
+                create();
+            }
+            load();
+        }
+
+        public bool isValid()
+        {
+            return numberOfTeams >= 2 && NumberOfRounds >= 2 && numberOfBoardsPerRound > 0;
+        }
+
+        public bool hasChanged()
+        {
+            return (previousNumberOfTeams != numberOfTeams) ||
+                (previousNumberOfRounds != numberOfRounds) ||
+                (previousNumberOfBoardsPerRound != numberOfBoardsPerRound);
+        }
+
+        public bool wasNonZero()
+        {
+            return previousNumberOfTeams != 0 || previousNumberOfRounds != 0 || previousNumberOfBoardsPerRound != 0;
+        }
+
+        public void create()
+        {
+            List<NiniField> fields = new List<NiniField>();
+            fields.Add(new NiniField(Constants.NumberOfTeamsFieldName, "Integer", "0", ""));
+            fields.Add(new NiniField(Constants.NumberOfRoundsFieldName, "Integer", "0", ""));
+            fields.Add(new NiniField(Constants.NumberOfBoardsFieldName, "Integer", "0", ""));
+            NiniUtilities.createNiniFile(m_niniFileName, fields);
+        }
+
+        public void save()
+        {
+            NiniUtilities.saveNiniConfig(m_niniFileName);
+            previousNumberOfRounds = numberOfRounds;
+            previousNumberOfTeams = numberOfTeams;
+            previousNumberOfBoardsPerRound = numberOfBoardsPerRound;
+        }
+
+        public void load()
+        {
+            NiniUtilities.loadNiniConfig(m_niniFileName);
+            numberOfTeams = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName);
+            numberOfRounds = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName);
+            numberOfBoardsPerRound = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName);
+            previousNumberOfRounds = numberOfRounds;
+            previousNumberOfTeams = numberOfTeams;
+            previousNumberOfBoardsPerRound = numberOfBoardsPerRound;
+            totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+        }
+
+        [CategoryAttribute("PD Event Setup Parameters"), DescriptionAttribute("Number of Teams in the Event")]
+        public int NumberOfTeams
+        {
+            get { return numberOfTeams; }
+            set
+            {
+                if (value < 2)
+                {
+                    Utilities.showErrorMessage("Number of Teams (" + value + ") has to be atleast 2!");
+                }
+                else if (value % 2 == 0)
+                {
+                    Utilities.showErrorMessage("Even Number of teams cannot be handled at this point.");
+                }
+                else
+                {
+                    numberOfTeams = value;
+                    totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
+                }
+            }
+        }
+
+        [CategoryAttribute("PD Event Setup Parameters"), DescriptionAttribute("Number of Rounds in the Event")]
+        public int NumberOfRounds
+        {
+            get { return numberOfRounds; }
+            set
+            {
+                if (value < 2 || value > numberOfTeams)
+                {
+                    Utilities.showErrorMessage("Number of Rounds (" + value + ") has to be atleast 2 and less than equal to number of teams (" + numberOfTeams + ")!");
+                }
+                else
+                {
+                    numberOfRounds = value;
+                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
+                }
+            }
+        }
+
+        [CategoryAttribute("PD Event Setup Parameters"), DescriptionAttribute("Number of Boards to be played in each Round")]
+        public int NumberOfBoardsPerRound
+        {
+            get { return numberOfBoardsPerRound; }
+            set
+            {
+                if (value < 1)
+                {
+                    Utilities.showErrorMessage("Number of BoardsPerRound (" + value + ") has to be atleast 1!");
+                }
+                else
+                {
+                    numberOfBoardsPerRound = value;
+                    totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
+                }
             }
         }
     }
@@ -654,6 +807,11 @@ namespace IndianBridgeScorer
             load();
         }
 
+        public bool isValid()
+        {
+            return numberOfTeams >= 2 && NumberOfRounds >= 2 && numberOfQualifiers >= 0;
+        }
+
         public void create()
         {
             List<NiniField> fields = new List<NiniField>();
@@ -661,7 +819,6 @@ namespace IndianBridgeScorer
             fields.Add(new NiniField(Constants.NumberOfRoundsFieldName, "Integer", "0", ""));
             fields.Add(new NiniField(Constants.NumberOfBoardsFieldName, "Integer", "0", ""));
             fields.Add(new NiniField(Constants.NumberOfQualifiersFieldName, "Integer", "0", ""));
-            NiniUtilities.createNiniFile(m_niniFileName, fields);
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
