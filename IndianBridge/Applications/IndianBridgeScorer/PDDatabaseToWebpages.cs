@@ -40,10 +40,10 @@ namespace IndianBridgeScorer
             m_numberOfTeams = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfTeamsFieldName);
             m_numberOfRounds = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfRoundsFieldName);
             m_numberOfBoardsPerRound = NiniUtilities.getIntValue(mainNiniFileName, Constants.NumberOfBoardsFieldName);
-            m_totalNumberOfBoards = m_numberOfTeams * m_numberOfBoardsPerRound;
+            m_totalNumberOfBoards = m_numberOfTeams + (m_numberOfTeams%2==0?1:0) * m_numberOfBoardsPerRound;
         }
 
-        public void createWebpagesInBackground(object sender,DoWorkEventArgs e)
+        public void createWebpagesInBackground(object sender, DoWorkEventArgs e)
         {
             m_runningInBackground = true;
             m_worker = sender as BackgroundWorker;
@@ -102,24 +102,48 @@ namespace IndianBridgeScorer
             sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + boardNumber, "Round_Number ASC");
             int i = 0;
+            bool bye = false;
             foreach (DataRow dRow in foundRows)
             {
-                ArrayList tableRow = new ArrayList();
-                if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"], true, true));
-                else tableRow.Add("-");
-                if (dRow["EW_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"], true, true));
-                else tableRow.Add("-");
-                if (dRow["Round_Number"] != DBNull.Value) tableRow.Add(getRoundNumberLink((int)dRow["Round_Number"]));
-                else tableRow.Add("-");
-                if (dRow["NS_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_Score"]);
-                else tableRow.Add("-");
-                if (dRow["EW_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_Score"]);
-                else tableRow.Add("-");
-                if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_MPs"]);
-                else tableRow.Add("-");
-                if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_MPs"]);
-                else tableRow.Add("-");
-                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
+                if (dRow["NS_Team_Number"] == DBNull.Value || (int)dRow["NS_Team_Number"] <= m_numberOfTeams)
+                {
+                    bye = false;
+                    ArrayList tableRow = new ArrayList();
+                    if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"], true, true));
+                    else tableRow.Add("-");
+                    if (dRow["EW_Team_Number"] != DBNull.Value)
+                    {
+                        if ((int)dRow["EW_Team_Number"] > m_numberOfTeams)
+                        {
+                            bye = true;
+                            tableRow.Add("BYE");
+                        }
+                        else tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"], true, true));
+                    }
+                    else tableRow.Add("-");
+
+                    if (dRow["Round_Number"] != DBNull.Value) tableRow.Add(getRoundNumberLink((int)dRow["Round_Number"]));
+                    else tableRow.Add("-");
+                    if (bye)
+                    {
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                    }
+                    else
+                    {
+                        if (dRow["NS_Score"] != DBNull.Value) tableRow.Add("" + (double)dRow["NS_Score"]);
+                        else tableRow.Add("-");
+                        if (dRow["EW_Score"] != DBNull.Value) tableRow.Add("" + (double)dRow["EW_Score"]);
+                        else tableRow.Add("-");
+                        if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add("" + (double)dRow["NS_MPs"]);
+                        else tableRow.Add("-");
+                        if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add("" + (double)dRow["EW_MPs"]);
+                        else tableRow.Add("-");
+                    }
+                    sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
+                }
                 i++;
             }
             sw.WriteLine("</tbody></table>");
@@ -129,8 +153,9 @@ namespace IndianBridgeScorer
         }
 
 
-        private void printMessage(String message) { 
-            Trace.WriteLine(message);   
+        private void printMessage(String message)
+        {
+            Trace.WriteLine(message);
         }
 
         private void reportProgress(string title)
@@ -139,7 +164,7 @@ namespace IndianBridgeScorer
             if (m_runningInBackground)
             {
                 double percentage = ((double)numberOfPagesCreatedSoFar / (double)totalNumberOfPagesToBeCreated) * 100;
-                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString+ "Created " + title+ " Page");
+                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString + "Created " + title + " Page");
             }
         }
 
@@ -172,7 +197,7 @@ namespace IndianBridgeScorer
             parameters.fileName = Path.Combine(rootFolder, "index.html");
             parameters.filterCriteria = "";
             parameters.headerTemplate = headerTemplate;
-            parameters.tableName = Constants.TableName.EventNames;          
+            parameters.tableName = Constants.TableName.EventNames;
             createPage_(parameters);
             m_prefix = "./";
             parameters.fileName = Path.Combine(m_webpagesRootDirectory, "index.html");
@@ -200,7 +225,8 @@ namespace IndianBridgeScorer
             reportProgress("Created Names Page");
         }
 
-        private void createTeamPages() {
+        private void createTeamPages()
+        {
             printMessage("Creating Team Pages");
             String rootFolder = Path.Combine(m_webpagesRootDirectory, "teams");
             if (!Directory.Exists(rootFolder)) Directory.CreateDirectory(rootFolder);
@@ -220,51 +246,11 @@ namespace IndianBridgeScorer
             return (string)dRows[0]["Member_Names"];
         }
 
-        private string createMatchTable(DataRow[] dRows, int numberOfSessions)
-        {
-            string html = "";
-            html+=(Utilities.makeTablePreamble_() + "<thead><tr>");
-            ArrayList tableHeader = new ArrayList();
-            ArrayList tableRow = new ArrayList();
-            tableHeader.Add("Team");
-            tableHeader.Add("Carryover");
-            for (int i = 1; i <= numberOfSessions; ++i)
-            {
-                tableHeader.Add("Session " + i);
-            }
-            tableHeader.Add("Total");
-            html += (Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
-            for (int j = 0; j < 2; ++j)
-            {
-                int otherRow = 1 - j;
-                tableRow.Clear();
-                int teamNumber = (int)dRows[j]["Team_Number"];
-                double total = (double)dRows[j]["Total_IMPs"];
-                double otherTotal = (double)dRows[otherRow]["Total_IMPs"];
-                if (total > otherTotal) tableRow.Add("<b>" + getTeamLink(teamNumber, true, true) + "</b>");
-                else tableRow.Add(getTeamLink(teamNumber, true, true));
-                tableRow.Add(""+getDoubleValue(dRows[j], "Carryover"));
-                for (int k = 1; k <= numberOfSessions; ++k)
-                {
-                    string columnName = "Session_" + k + "_Score";
-                    double sessionScore = getDoubleValue(dRows[j],columnName);
-                    double otherSessionScore = getDoubleValue(dRows[otherRow], columnName);
-                    if (sessionScore > otherSessionScore) tableRow.Add("<b>" + sessionScore + "</b>");
-                    else tableRow.Add("" + sessionScore);
-                }
-                if (total > otherTotal) tableRow.Add("<b>" + total + "</b>");
-                else tableRow.Add(""+total);
-                html += ("<tr>" + Utilities.makeTableCell_(tableRow, (total>otherTotal)?0:1) + "</tr>");
-            }
-            html+=("</tbody></table>");
-            return html;
-        }
-
         private void createTeamPage(int teamNumber)
         {
             printMessage("Creating Team Page for Team Number : " + teamNumber);
             m_prefix = "../";
-            StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "teams","team" + teamNumber + "score.html"));
+            StreamWriter sw = new StreamWriter(Path.Combine(m_webpagesRootDirectory, "teams", "team" + teamNumber + "score.html"));
             sw.WriteLine("<html><head></head><body>");
             DataRow dRow = getTable(Constants.TableName.EventNames).Rows.Find(teamNumber);
             string headerTemplate = "<h2>Scores for " + teamNumber + " : {Team_Name} ({Member_Names})</h2>";
@@ -286,37 +272,47 @@ namespace IndianBridgeScorer
                 ArrayList tableRow = new ArrayList();
                 tableRow.Add(getBoardNumberLink(i));
                 DataRow[] nsRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + i + " AND NS_Team_Number = " + teamNumber);
-                DataRow[] ewRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + i + " AND EW_Team_Number = " + teamNumber);
-                if (nsRows.Length > 0 && nsRows[0]["EW_Team_Number"] != DBNull.Value)
+                if (nsRows.Length > 0 && (nsRows[0]["EW_Team_Number"] != DBNull.Value && (int)nsRows[0]["EW_Team_Number"] > m_numberOfTeams))
                 {
-                    tableRow.Add(getTeamLink(nsRows[0]["EW_Team_Number"], true, true));
+                    tableRow.Add("BYE");
+                    tableRow.Add("BYE");
+                    tableRow.Add("BYE");
+                    tableRow.Add("BYE");
                 }
-                else if (ewRows.Length > 0 && ewRows[0]["NS_Team_Number"] != DBNull.Value)
+                else
                 {
-                    tableRow.Add(getTeamLink(ewRows[0]["NS_Team_Number"], true, true));
+                    DataRow[] ewRows = getTable(Constants.TableName.EventScores).Select("Board_Number = " + i + " AND EW_Team_Number = " + teamNumber);
+                    if (nsRows.Length > 0 && nsRows[0]["EW_Team_Number"] != DBNull.Value)
+                    {
+                        tableRow.Add(getTeamLink(nsRows[0]["EW_Team_Number"], true, true));
+                    }
+                    else if (ewRows.Length > 0 && ewRows[0]["NS_Team_Number"] != DBNull.Value)
+                    {
+                        tableRow.Add(getTeamLink(ewRows[0]["NS_Team_Number"], true, true));
+                    }
+                    else tableRow.Add("-");
+                    if (nsRows.Length > 0 && nsRows[0]["NS_Score"] != DBNull.Value)
+                    {
+                        tableRow.Add("" + nsRows[0]["NS_Score"]);
+                    }
+                    else tableRow.Add("-");
+                    if (ewRows.Length > 0 && ewRows[0]["NS_Score"] != DBNull.Value)
+                    {
+                        tableRow.Add("" + ewRows[0]["EW_Score"]);
+                    }
+                    else tableRow.Add("-");
+                    if (nsRows.Length > 0 && nsRows[0]["NS_MPs"] != DBNull.Value)
+                    {
+                        tableRow.Add("" + nsRows[0]["NS_MPs"]);
+                    }
+                    else tableRow.Add("-");
                 }
-                else tableRow.Add("-");
-                if (nsRows.Length > 0 && nsRows[0]["NS_Score"] != DBNull.Value)
-                {
-                    tableRow.Add("" + nsRows[0]["NS_Score"]);
-                }
-                else tableRow.Add("-");
-                if (ewRows.Length > 0 && ewRows[0]["NS_Score"] != DBNull.Value)
-                {
-                    tableRow.Add("" + ewRows[0]["EW_Score"]);
-                }
-                else tableRow.Add("-");
-                if (nsRows.Length > 0 && nsRows[0]["NS_MPs"] != DBNull.Value)
-                {
-                    tableRow.Add("" + nsRows[0]["NS_MPs"]);
-                }
-                else tableRow.Add("-");
                 sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
             }
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
-            reportProgress("Created Team "+teamNumber+" Score Page");
+            reportProgress("Created Team " + teamNumber + " Score Page");
         }
 
         private void createRoundPages()
@@ -351,30 +347,53 @@ namespace IndianBridgeScorer
             sw.WriteLine(Utilities.makeTableHeader_(tableHeader) + "</tr></thead><tbody>");
             DataRow[] foundRows = getTable(Constants.TableName.EventScores).Select("Round_Number = " + roundNumber, "NS_Team_Number ASC");
             int i = 0;
+            bool bye = false;
             foreach (DataRow dRow in foundRows)
             {
-                ArrayList tableRow = new ArrayList();
-                if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"],true,true));
-                else tableRow.Add("-");
-                if (dRow["EW_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"],true,true));
-                else tableRow.Add("-");
-                if (dRow["Board_Number"] != DBNull.Value) tableRow.Add(getBoardNumberLink((int)dRow["Board_Number"]));
-                else tableRow.Add("-");
-                if (dRow["NS_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_Score"]);
-                else tableRow.Add("-");
-                if (dRow["EW_Score"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_Score"]);
-                else tableRow.Add("-");
-                if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["NS_MPs"]);
-                else tableRow.Add("-");
-                if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add(""+(double)dRow["EW_MPs"]);
-                else tableRow.Add("-");
-                sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
-                i++;
+                if (dRow["NS_Team_Number"] == DBNull.Value || (int)dRow["NS_Team_Number"] <= m_numberOfTeams)
+                {
+                    bye = false;
+                    ArrayList tableRow = new ArrayList();
+                    if (dRow["NS_Team_Number"] != DBNull.Value) tableRow.Add(getTeamLink((int)dRow["NS_Team_Number"], true, true));
+                    else tableRow.Add("-");
+                    if (dRow["EW_Team_Number"] != DBNull.Value)
+                    {
+                        if ((int)dRow["EW_Team_Number"] > m_numberOfTeams)
+                        {
+                            bye = true;
+                            tableRow.Add("BYE");
+                        }
+                        else tableRow.Add(getTeamLink((int)dRow["EW_Team_Number"], true, true));
+                    }
+                    else tableRow.Add("-");
+                    if (dRow["Board_Number"] != DBNull.Value) tableRow.Add(getBoardNumberLink((int)dRow["Board_Number"]));
+                    else tableRow.Add("-");
+                    if (bye)
+                    {
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                        tableRow.Add("BYE");
+                    }
+                    else
+                    {
+                        if (dRow["NS_Score"] != DBNull.Value) tableRow.Add("" + (double)dRow["NS_Score"]);
+                        else tableRow.Add("-");
+                        if (dRow["EW_Score"] != DBNull.Value) tableRow.Add("" + (double)dRow["EW_Score"]);
+                        else tableRow.Add("-");
+                        if (dRow["NS_MPs"] != DBNull.Value) tableRow.Add("" + (double)dRow["NS_MPs"]);
+                        else tableRow.Add("-");
+                        if (dRow["EW_MPs"] != DBNull.Value) tableRow.Add("" + (double)dRow["EW_MPs"]);
+                        else tableRow.Add("-");
+                    }
+                    sw.WriteLine("<tr>" + Utilities.makeTableCell_(tableRow, i) + "</tr>");
+                    i++;
+                }
             }
             sw.WriteLine("</tbody></table>");
             sw.WriteLine("</body></html>");
             sw.Close();
-            reportProgress("Created Round "+roundNumber+" Score Page");
+            reportProgress("Created Round " + roundNumber + " Score Page");
         }
         private void createPage_(Utilities.HTMLTableParameters parameters)
         {
@@ -440,7 +459,7 @@ namespace IndianBridgeScorer
         {
             DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.EventNames);
             DataRow dRow = table.Rows.Find(teamNumber);
-            return ""+dRow["Member_Names"];
+            return "" + dRow["Member_Names"];
         }
 
 
