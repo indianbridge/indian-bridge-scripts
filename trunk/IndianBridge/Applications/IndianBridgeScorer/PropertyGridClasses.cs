@@ -660,6 +660,10 @@ namespace IndianBridgeScorer
         public int previousNumberOfBoardsPerRound = 0;
         [BrowsableAttribute(false)]
         public int totalNumberOfBoards = 0;
+        [BrowsableAttribute(false)]
+        public bool hasPhantomTable = false;
+        [BrowsableAttribute(false)]
+        public int numberOfTables = 0;
 
         public PDEventInfo(string eventName, string niniFileName, bool autoSave = false)
         {
@@ -711,12 +715,14 @@ namespace IndianBridgeScorer
         {
             NiniUtilities.loadNiniConfig(m_niniFileName);
             numberOfTeams = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName);
+            hasPhantomTable = (numberOfTeams % 2 == 0);
+            numberOfTables = numberOfTeams + (hasPhantomTable ? 1 : 0);
             numberOfRounds = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName);
             numberOfBoardsPerRound = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName);
             previousNumberOfRounds = numberOfRounds;
             previousNumberOfTeams = numberOfTeams;
             previousNumberOfBoardsPerRound = numberOfBoardsPerRound;
-            totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+            totalNumberOfBoards = numberOfTables * numberOfBoardsPerRound;
         }
 
         [CategoryAttribute("PD Event Setup Parameters"), DescriptionAttribute("Number of Teams in the Event")]
@@ -725,18 +731,21 @@ namespace IndianBridgeScorer
             get { return numberOfTeams; }
             set
             {
+                if (value % 2 == 0)
+                {
+                    hasPhantomTable = true;
+                    Utilities.showWarningessage("A phantom table will be automatically added to make odd number of tables.");
+                }
+                else hasPhantomTable = false;
                 if (value < 2)
                 {
                     Utilities.showErrorMessage("Number of Teams (" + value + ") has to be atleast 2!");
                 }
-                else if (value % 2 == 0)
-                {
-                    Utilities.showErrorMessage("Even Number of teams cannot be handled at this point.");
-                }
                 else
                 {
                     numberOfTeams = value;
-                    totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+                    numberOfTables = numberOfTeams + (hasPhantomTable ? 1 : 0);
+                    totalNumberOfBoards = numberOfTables * numberOfBoardsPerRound;
                     NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
                 }
             }
@@ -748,9 +757,9 @@ namespace IndianBridgeScorer
             get { return numberOfRounds; }
             set
             {
-                if (value < 2 || value > numberOfTeams)
+                if (value < 2 || value >= numberOfTables)
                 {
-                    Utilities.showErrorMessage("Number of Rounds (" + value + ") has to be atleast 2 and less than equal to number of teams (" + numberOfTeams + ")!");
+                    Utilities.showErrorMessage("Number of Rounds (" + value + ") has to be atleast 2 and less than equal to number of tables (" + numberOfTables + ")!");
                 }
                 else
                 {
@@ -773,7 +782,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfBoardsPerRound = value;
-                    totalNumberOfBoards = numberOfTeams * numberOfBoardsPerRound;
+                    totalNumberOfBoards = numberOfTables * numberOfBoardsPerRound;
                     NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
                 }
             }
