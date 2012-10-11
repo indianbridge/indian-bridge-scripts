@@ -81,44 +81,7 @@ namespace IndianBridgeScorer
 
         private void createDatabases()
         {
-            AccessDatabaseUtilities.createDatabase(m_databaseFileName);
-            createTeamsTable();
-            createScoresTable();
-        }
-
-        private void createScoresTable()
-        {
-            List<DatabaseField> fields = new List<DatabaseField>();
-            fields.Add(new DatabaseField("Table_Number", "INTEGER"));
-            fields.Add(new DatabaseField("Round_Number", "INTEGER"));
-            fields.Add(new DatabaseField("Match_Number", "INTEGER"));
-            fields.Add(new DatabaseField("Board_Number", "INTEGER"));
-            fields.Add(new DatabaseField("NS_Team_Number", "INTEGER"));
-            fields.Add(new DatabaseField("EW_Team_Number", "INTEGER"));
-            fields.Add(new DatabaseField("NS_Score", "NUMBER"));
-            fields.Add(new DatabaseField("EW_Score", "NUMBER"));
-            fields.Add(new DatabaseField("NS_MPs", "NUMBER"));
-            fields.Add(new DatabaseField("EW_MPs", "NUMBER"));
-            ArrayList primaryKeys = new ArrayList();
-            primaryKeys.Add("Table_Number");
-            primaryKeys.Add("Round_Number");
-            primaryKeys.Add("Match_Number");
-            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventScores, fields, primaryKeys);
-        }
-
-        private void createTeamsTable()
-        {
-            List<DatabaseField> fields = new List<DatabaseField>();
-            fields.Add(new DatabaseField("Team_Number", "INTEGER"));
-            fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
-            fields.Add(new DatabaseField("Member_Names", "TEXT", 255));
-            fields.Add(new DatabaseField("Total_Score", "NUMBER"));
-            fields.Add(new DatabaseField("Boards_Played", "NUMBER"));
-            fields.Add(new DatabaseField("Percentage_Score", "NUMBER"));
-            fields.Add(new DatabaseField("Rank", "INTEGER"));
-            List<string> primaryKeys = new List<string>();
-            primaryKeys.Add("Team_Number");
-            AccessDatabaseUtilities.createTable(m_databaseFileName, Constants.TableName.EventNames, fields, primaryKeys);
+            AccessDatabaseUtilities.PDEvent.createDatabase(m_databaseFileName, Constants.TableName.EventNames, Constants.TableName.EventScores);
         }
 
 
@@ -420,7 +383,7 @@ namespace IndianBridgeScorer
                     teamToSkip = (shouldSkip ? -1 : 0) + roundsSkipped * -2;
                     boardToSkip = (shouldSkip ? -1 : 0) + roundsSkipped * -1;
                 }
-                increaseBoardNumber(ref firstBoardAtTable1, boardToSkip);
+                increaseBoardNumber(ref firstBoardAtTable1, boardToSkip*m_pdEventInfo.NumberOfBoardsPerRound);
                 increaseTeamNumber(ref ewNumberAtTable1, teamToSkip);
                 int boardNumber = firstBoardAtTable1;
                 int ewNumber = ewNumberAtTable1;

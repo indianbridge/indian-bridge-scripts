@@ -17,7 +17,6 @@ namespace IndianBridge
 {
     public partial class TestForm : Form
     {
-        CustomBackgroundWorker m_cbw = null;
         public TestForm()
         {
             InitializeComponent();
