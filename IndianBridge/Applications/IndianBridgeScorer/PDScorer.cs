@@ -180,7 +180,7 @@ namespace IndianBridgeScorer
         private void populateScoresTable()
         {
             DataTable table = getTable(Constants.TableName.EventScores);
-            table.Clear();
+            foreach (DataRow dRow in table.Rows) dRow.Delete();
             saveTable(Constants.TableName.EventScores);
             for (int i = 1; i <= m_pdEventInfo.numberOfTables; ++i)
             {
