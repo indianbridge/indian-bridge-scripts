@@ -29,6 +29,51 @@ namespace IndianBridge.Common
         public static Dictionary<string, OleDbCommandBuilder> m_commandBuilders = new Dictionary<string, OleDbCommandBuilder>();
         public static DataSet m_ds = new DataSet();
 
+        public static class PDEvent
+        {
+            public static void createDatabase(string databaseFileName, string teamsTableName, string scoresTableName)
+            {
+                AccessDatabaseUtilities.createDatabase(databaseFileName);
+                createTeamsTable(databaseFileName,teamsTableName);
+                createScoresTable(databaseFileName,scoresTableName);
+            }
+
+            private static void createTeamsTable(string databaseFileName, string teamsTableName)
+            {
+                List<DatabaseField> fields = new List<DatabaseField>();
+                fields.Add(new DatabaseField("Team_Number", "INTEGER"));
+                fields.Add(new DatabaseField("Team_Name", "TEXT", 255));
+                fields.Add(new DatabaseField("Member_Names", "TEXT", 255));
+                fields.Add(new DatabaseField("Total_Score", "NUMBER"));
+                fields.Add(new DatabaseField("Boards_Played", "NUMBER"));
+                fields.Add(new DatabaseField("Percentage_Score", "NUMBER"));
+                fields.Add(new DatabaseField("Rank", "INTEGER"));
+                List<string> primaryKeys = new List<string>();
+                primaryKeys.Add("Team_Number");
+                AccessDatabaseUtilities.createTable(databaseFileName, teamsTableName, fields, primaryKeys);
+            }
+
+            private static void createScoresTable(string databaseFileName, string scoresTableName)
+            {
+                List<DatabaseField> fields = new List<DatabaseField>();
+                fields.Add(new DatabaseField("Table_Number", "INTEGER"));
+                fields.Add(new DatabaseField("Round_Number", "INTEGER"));
+                fields.Add(new DatabaseField("Match_Number", "INTEGER"));
+                fields.Add(new DatabaseField("Board_Number", "INTEGER"));
+                fields.Add(new DatabaseField("NS_Team_Number", "INTEGER"));
+                fields.Add(new DatabaseField("EW_Team_Number", "INTEGER"));
+                fields.Add(new DatabaseField("NS_Score", "NUMBER"));
+                fields.Add(new DatabaseField("EW_Score", "NUMBER"));
+                fields.Add(new DatabaseField("NS_MPs", "NUMBER"));
+                fields.Add(new DatabaseField("EW_MPs", "NUMBER"));
+                ArrayList primaryKeys = new ArrayList();
+                primaryKeys.Add("Table_Number");
+                primaryKeys.Add("Round_Number");
+                primaryKeys.Add("Match_Number");
+                AccessDatabaseUtilities.createTable(databaseFileName, scoresTableName, fields, primaryKeys);
+            }
+        }
+
         public static string makeKey_(string databaseFileName, string tableName)
         {
             return Utilities.makeIdentifier_(databaseFileName) + "_" + tableName;

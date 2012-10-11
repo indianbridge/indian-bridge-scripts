@@ -328,8 +328,6 @@ namespace IndianBridge.GoogleAPIs
         
         private void OnDone(object sender, AsyncOperationCompletedEventArgs e) {
             DocumentEntry entry = e.Entry as DocumentEntry;
-            //Console.WriteLine("Error = " + e.Error.Message);
-            //IndianBridge.Common.Utilities.showWarningessage("Uploaded " + entry.Title.Text);
         }
         
         private void OnProgress(object sender, AsyncOperationProgressEventArgs e) {
