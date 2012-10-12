@@ -228,6 +228,8 @@ namespace IndianBridgeScorer
         {
             DataView dView = new DataView(getTable(Constants.TableName.EventScores));
             List<string> filters = new List<string>();
+            filters.Add("NS_Team_Number <= " + m_pdEventInfo.NumberOfTeams);
+            filters.Add("EW_Team_Number <= " + m_pdEventInfo.NumberOfTeams);
             string roundText = showingScoresForRoundCombobox.Text;
             if (roundText != "All" && !string.IsNullOrWhiteSpace(roundText)) filters.Add("Round_Number = " + roundText);
             string boardText = showingScoresForBoardCombobox.Text;
