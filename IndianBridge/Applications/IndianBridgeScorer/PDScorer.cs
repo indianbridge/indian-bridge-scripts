@@ -331,8 +331,8 @@ namespace IndianBridgeScorer
                 int boardToSkip = -1;
                 if (shouldSkip && skipAfterRound + 1 == i)
                 {
-                    teamToSkip = (shouldSkip ? -1 : 0) + roundsSkipped * -2;
-                    boardToSkip = (shouldSkip ? -1 : 0) + roundsSkipped * -1;
+                    teamToSkip = (roundsSkipped+1) * -2;
+                    boardToSkip = (roundsSkipped+1) * -1;
                 }
                 increaseBoardNumber(ref firstBoardAtTable1, boardToSkip*m_pdEventInfo.NumberOfBoardsPerRound);
                 increaseTeamNumber(ref ewNumberAtTable1, teamToSkip);
