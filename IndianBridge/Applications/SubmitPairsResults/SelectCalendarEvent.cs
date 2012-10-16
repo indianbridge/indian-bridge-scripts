@@ -49,7 +49,9 @@ namespace SubmitPairsResults
         {
             try
             {
-                SortableBindingList<IndianCalendarEvent> test = calendarAPI.getEvents(calendarGetEvents_startDate.Value, calendarGetEvents_endDate.Value, calendarGetEvents_SearchTextbox.Text);
+                DateTime startDate = calendarGetEvents_startDate.Value;
+                DateTime endDate = calendarGetEvents_endDate.Value;
+                SortableBindingList<IndianCalendarEvent> test = calendarAPI.getEvents(startDate, endDate.AddHours(24), calendarGetEvents_SearchTextbox.Text);
                 SpreadSheetAPI ssa = new SpreadSheetAPI("Pair Results City And Event Names", "indianbridge.dummy@gmail.com", "kibitzer");
                 DataTable table = ssa.getValuesFromSheet("Sheet1");
                 e.Result = Tuple.Create<SortableBindingList<IndianCalendarEvent>, DataTable>(test, table);
