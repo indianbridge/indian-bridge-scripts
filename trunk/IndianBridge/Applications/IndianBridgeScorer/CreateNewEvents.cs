@@ -357,11 +357,13 @@ namespace IndianBridgeScorer
                         int originalTeamNumber = AccessDatabaseUtilities.getIntValue(dRow, "Team_Number");
                         string teamName = AccessDatabaseUtilities.getStringValue(dRow, "Team_Name");
                         string memberNames = AccessDatabaseUtilities.getStringValue(dRow, "Member_Names");
+                        double totalScore = AccessDatabaseUtilities.getDoubleValue(dRow, "Total_Score");
                         int teamNumber = count;
                         DataRow newRow = table.NewRow();
-                        newRow["Team_Number"] = teamNumber;
+                        newRow["Team_Number"] = keepOriginalTeamNumbersCheckbox.Checked?originalTeamNumber:teamNumber;
                         newRow["Team_Name"] = teamName;
                         newRow["Member_Names"] = memberNames;
+                        newRow["Carryover"] = carryoverTotalCheckbox.Checked ? totalScore : 0;
                         newRow["Original_Team_Number"] = originalTeamNumber;
                         newRow["Original_Event_Name"] = eventName;
                         newRow["Total_Score"] = 0;
@@ -369,7 +371,7 @@ namespace IndianBridgeScorer
                         newRow["Rank"] = 1;
                         table.Rows.Add(newRow);
                         newRow = computedScoresTable.NewRow();
-                        newRow["Team_Number"] = teamNumber;
+                        newRow["Team_Number"] = keepOriginalTeamNumbersCheckbox.Checked ? originalTeamNumber : teamNumber;
                         computedScoresTable.Rows.Add(newRow);
                         count++;
                     }

@@ -24,8 +24,11 @@ namespace IndianBridgeScorer
         {
             // Populate the existing tourney list
             string[] tourneys = Directory.GetDirectories(Constants.getTourneysFolder());
+            var sortedTourneys = from s in tourneys
+                       orderby s descending
+                       select s;
             tourneyListCombobox.Items.Clear();
-            foreach (string tourney in tourneys)
+            foreach (string tourney in sortedTourneys)
             {
                 // Add to list if tourney info file exists
                 if (tourneyExists(tourney)) tourneyListCombobox.Items.Add(Path.GetFileName(tourney));

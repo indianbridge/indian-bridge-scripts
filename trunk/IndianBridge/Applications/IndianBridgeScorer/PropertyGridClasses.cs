@@ -49,7 +49,7 @@ namespace IndianBridgeScorer
                     return;
                 }
                 numberOfTeams = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
                 if (!calledFromNumberOfRounds)
                 {
                     NumberOfRounds = Convert.ToInt32(rounds);
@@ -70,7 +70,7 @@ namespace IndianBridgeScorer
             {
                 calledFromNumberOfRounds = true;
                 numberOfRounds = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
                 if (!calledFromNumberOfTeams)
                 {
                     NumberOfTeams = Convert.ToInt32(Math.Pow(2, value));
@@ -370,7 +370,7 @@ namespace IndianBridgeScorer
             set
             {
                 fontSize = value;
-                NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
             }
         }
 
@@ -381,7 +381,7 @@ namespace IndianBridgeScorer
             set
             {
                 resultsWebsite = value;
-                NiniUtilities.setStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
             }
         }
 
@@ -393,6 +393,7 @@ namespace IndianBridgeScorer
         private string m_eventName = "";
         private ScoringTypeValues scoringType = ScoringTypeValues.IMP;
         private TiebreakerMethodValues tiebreakerMethod = TiebreakerMethodValues.TeamNumber;
+        private int byeScore = 18;
         private bool m_autoSave = false;
 
         public SwissTeamScoringParameters(string eventName, string niniFileName, bool autoSave = false)
@@ -412,6 +413,7 @@ namespace IndianBridgeScorer
             List<NiniField> fields = new List<NiniField>();
             fields.Add(new NiniField(Constants.ScoringTypeFieldName, "List", "IMP", "IMP,VP"));
             fields.Add(new NiniField(Constants.TiebreakerMethodFieldName, "List", "Quotient", "Quotient,Team_Number"));
+            fields.Add(new NiniField(Constants.ByeScoreFieldName, "Number", "18", ""));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
@@ -425,6 +427,7 @@ namespace IndianBridgeScorer
             NiniUtilities.loadNiniConfig(m_niniFileName);
             scoringType = (ScoringTypeValues)Enum.Parse(typeof(ScoringTypeValues), NiniUtilities.getStringValue(m_niniFileName, Constants.ScoringTypeFieldName), true);
             tiebreakerMethod = (TiebreakerMethodValues)Enum.Parse(typeof(TiebreakerMethodValues), NiniUtilities.getStringValue(m_niniFileName, Constants.TiebreakerMethodFieldName), true);
+            byeScore = NiniUtilities.getIntValue(m_niniFileName, Constants.ByeScoreFieldName, 18);
         }
 
         [CategoryAttribute("Scoring Parameters")]
@@ -434,7 +437,7 @@ namespace IndianBridgeScorer
             set
             {
                 scoringType = value;
-                NiniUtilities.setStringValue(m_niniFileName, Constants.ScoringTypeFieldName, scoringType.ToString(), m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.ScoringTypeFieldName, scoringType.ToString(), m_autoSave);
             }
         }
 
@@ -445,7 +448,16 @@ namespace IndianBridgeScorer
             set
             {
                 tiebreakerMethod = value;
-                NiniUtilities.setStringValue(m_niniFileName, Constants.TiebreakerMethodFieldName, tiebreakerMethod.ToString(), m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.TiebreakerMethodFieldName, tiebreakerMethod.ToString(), m_autoSave);
+            }
+        }
+        [CategoryAttribute("Scoring Parameters")]
+        public int ByeScore
+        {
+            get { return byeScore; }
+            set
+            {
+                byeScore = value;
             }
         }
     }
@@ -508,7 +520,7 @@ namespace IndianBridgeScorer
             set
             {
                 drawForRound = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.DrawForRoundFieldName, drawForRound, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.DrawForRoundFieldName, drawForRound, m_autoSave);
             }
         }
 
@@ -519,7 +531,7 @@ namespace IndianBridgeScorer
             set
             {
                 fontSize = value;
-                NiniUtilities.setDoubleValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.FontSizeFieldName, fontSize, m_autoSave);
             }
         }
 
@@ -530,7 +542,7 @@ namespace IndianBridgeScorer
             set
             {
                 paddingSize = value;
-                NiniUtilities.setDoubleValue(m_niniFileName, Constants.PaddingSizeFieldName, paddingSize, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.PaddingSizeFieldName, paddingSize, m_autoSave);
             }
         }
 
@@ -541,7 +553,7 @@ namespace IndianBridgeScorer
             set
             {
                 vpsInSeparateColumn = value;
-                NiniUtilities.setBooleanValue(m_niniFileName, Constants.VPSInSeparateColumnFieldName, vpsInSeparateColumn, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.VPSInSeparateColumnFieldName, vpsInSeparateColumn, m_autoSave);
             }
         }
 
@@ -552,7 +564,7 @@ namespace IndianBridgeScorer
             set
             {
                 useBorder = value;
-                NiniUtilities.setBooleanValue(m_niniFileName, Constants.UseBorderFieldName, useBorder, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.UseBorderFieldName, useBorder, m_autoSave);
             }
         }
     }
@@ -601,11 +613,11 @@ namespace IndianBridgeScorer
             roundsScored = NiniUtilities.getIntValue(m_niniFileName, Constants.RoundsScoredFieldName);
         }
 
-        public void reset()
+        public void reset(int newNumberOfRounds)
         {
-            drawsCompleted = 0;
-            roundsCompleted = 0;
-            roundsScored = 0;
+            if (drawsCompleted > newNumberOfRounds) drawsCompleted = newNumberOfRounds;
+            if (roundsCompleted > newNumberOfRounds) roundsCompleted = newNumberOfRounds;
+            if (roundsScored > newNumberOfRounds) roundsScored = newNumberOfRounds;
         }
 
         [CategoryAttribute("Swiss Team Event Computed Parameters")]
@@ -615,7 +627,7 @@ namespace IndianBridgeScorer
             set
             {
                 if (value > drawsCompleted) drawsCompleted = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.DrawsCompletedFieldName, drawsCompleted, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.DrawsCompletedFieldName, drawsCompleted, m_autoSave);
             }
         }
 
@@ -626,7 +638,7 @@ namespace IndianBridgeScorer
             set
             {
                 if (value > roundsCompleted) roundsCompleted = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.RoundsCompletedFieldName, roundsCompleted, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.RoundsCompletedFieldName, roundsCompleted, m_autoSave);
             }
         }
 
@@ -637,7 +649,7 @@ namespace IndianBridgeScorer
             set
             {
                 if (value > roundsScored) roundsScored = value;
-                NiniUtilities.setIntValue(m_niniFileName, Constants.RoundsScoredFieldName, roundsScored, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.RoundsScoredFieldName, roundsScored, m_autoSave);
             }
         }
     }
@@ -746,7 +758,7 @@ namespace IndianBridgeScorer
                     numberOfTeams = value;
                     numberOfTables = numberOfTeams + (hasPhantomTable ? 1 : 0);
                     totalNumberOfBoards = numberOfTables * numberOfBoardsPerRound;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
                 }
             }
         }
@@ -764,7 +776,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfRounds = value;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
                 }
             }
         }
@@ -783,7 +795,7 @@ namespace IndianBridgeScorer
                 {
                     numberOfBoardsPerRound = value;
                     totalNumberOfBoards = numberOfTables * numberOfBoardsPerRound;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
                 }
             }
         }
@@ -862,7 +874,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfTeams = value;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfTeamsFieldName, numberOfTeams, m_autoSave);
                 }
             }
         }
@@ -880,7 +892,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfRounds = value;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfRoundsFieldName, numberOfRounds, m_autoSave);
                 }
             }
         }
@@ -898,7 +910,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfBoardsPerRound = value;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfBoardsFieldName, numberOfBoardsPerRound, m_autoSave);
                 }
             }
         }
@@ -916,7 +928,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     numberOfQualifiers = value;
-                    NiniUtilities.setIntValue(m_niniFileName, Constants.NumberOfQualifiersFieldName, numberOfQualifiers, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.NumberOfQualifiersFieldName, numberOfQualifiers, m_autoSave);
                 }
             }
         }
@@ -974,7 +986,7 @@ namespace IndianBridgeScorer
                 else
                 {
                     tourneyName = value;
-                    NiniUtilities.setStringValue(m_niniFileName, Constants.TourneyNameFieldName, tourneyName, m_autoSave);
+                    NiniUtilities.setValue(m_niniFileName, Constants.TourneyNameFieldName, tourneyName, m_autoSave);
                 }
             }
         }
@@ -986,7 +998,7 @@ namespace IndianBridgeScorer
             set
             {
                 resultsWebsite = value;
-                NiniUtilities.setStringValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
+                NiniUtilities.setValue(m_niniFileName, Constants.ResultsWebsiteFieldName, resultsWebsite, m_autoSave);
             }
         }
     }

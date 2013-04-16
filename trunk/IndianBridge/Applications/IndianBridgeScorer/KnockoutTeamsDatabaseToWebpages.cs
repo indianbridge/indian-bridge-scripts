@@ -242,8 +242,10 @@ namespace IndianBridgeScorer
             else
             {
                 int originalTeamNumber = AccessDatabaseUtilities.getIntValue(dRow, "Original_Team_Number");
-                string webpagesRootDirectory = Path.Combine("..", "..",  Constants.WebpagesFolderName,Utilities.makeIdentifier_(originalEventName));
-                string link = Path.Combine(webpagesRootDirectory, "teams", "team" + originalTeamNumber + "score.html");
+                //string webpagesRootDirectory = Path.Combine("..", "..", Constants.WebpagesFolderName, Utilities.makeIdentifier_(originalEventName));
+                //string link = Path.Combine(webpagesRootDirectory, "teams", "team" + originalTeamNumber + "score.html");
+                string webpagesRootDirectory = "../"+Utilities.makeIdentifier_(originalEventName);
+                string link = webpagesRootDirectory+ "/teams/team" + originalTeamNumber + "score.html";
                 result = "<a href='" + link + "' title='" + dRow["Member_Names"] + "'>" + (showNumber ? dRow["Team_Number"] + " " : "") + (showName ? dRow["Team_Name"] : "") + "</a>";
             }
             return result;

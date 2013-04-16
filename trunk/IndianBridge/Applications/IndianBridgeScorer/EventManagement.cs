@@ -19,6 +19,7 @@ namespace IndianBridgeScorer
         private string m_tourneyEventsFileName = "";
         private string m_tourneyName;
         TourneyInfo m_tourneyInfo = null;
+        private DataTable m_eventsTable;
 
         private Dictionary<string, Form> m_scorers = new Dictionary<string, Form>();
        
@@ -36,7 +37,7 @@ namespace IndianBridgeScorer
             this.Text = "Tourney Name : " + m_tourneyName;
             m_tourneyInfo = new TourneyInfo(Constants.getCurrentTourneyInformationFileName(),false);
             this.tourneyInfoPropertyGrid.SelectedObject = m_tourneyInfo;
-            AccessDatabaseUtilities.loadDatabaseToTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            m_eventsTable = AccessDatabaseUtilities.loadDatabaseToTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             loadEvents();
         }
 
@@ -44,7 +45,7 @@ namespace IndianBridgeScorer
         {
             eventsDataGridView.DataSource = null;
             eventsDataGridView.Columns.Clear();
-            eventsDataGridView.DataSource = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            eventsDataGridView.DataSource = m_eventsTable;
             var buttonCol = new DataGridViewButtonColumn();
             buttonCol.Name = "Show Event";
             buttonCol.HeaderText = "Show Event";
@@ -53,6 +54,14 @@ namespace IndianBridgeScorer
             eventsDataGridView.Columns.Add(buttonCol);
             buttonCol.FlatStyle = FlatStyle.Popup;
             buttonCol.DefaultCellStyle.ForeColor = Color.Green;
+            buttonCol = new DataGridViewButtonColumn();
+            buttonCol.Name = "Copy Event";
+            buttonCol.HeaderText = "Copy Event";
+            buttonCol.Text = "Copy Event";
+            buttonCol.UseColumnTextForButtonValue = true;
+            buttonCol.FlatStyle = FlatStyle.Popup;
+            buttonCol.DefaultCellStyle.ForeColor = Color.Blue;
+            eventsDataGridView.Columns.Add(buttonCol);
             buttonCol = new DataGridViewButtonColumn();
             buttonCol.Name = "Delete Event";
             buttonCol.HeaderText = "Delete Event";
@@ -77,11 +86,10 @@ namespace IndianBridgeScorer
 
         public void createEvent(string eventName)
         {
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
-            DataRow dRow = table.Rows.Find(eventName);
+            //DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            DataRow dRow = m_eventsTable.Rows.Find(eventName);
             string eventType = (string)dRow["Event_Type"];
             if (eventType == Constants.EventType.TeamsSwissLeague) {
-           
                     TeamsScorer ts = new TeamsScorer(eventName);
                     m_scorers[eventName] = ts;
             }
@@ -102,12 +110,59 @@ namespace IndianBridgeScorer
             }
         }
 
+        public void copyEvent(string eventName)
+        {
+            DataRow dRow = m_eventsTable.Rows.Find(eventName);
+            Debug.Assert(dRow != null, "Cannot find event with name : " + eventName + " in events table.");
+            string eventType = (string)dRow["Event_Type"];
+            string newEventName = addEvent(eventType, "What is the name of the copy of event : " + eventName);
+            if (!string.IsNullOrEmpty(newEventName))
+            {
+                DirectoryCopy(Constants.getEventDatabasesFolder(eventName), Constants.getEventDatabasesFolder(newEventName), true);
+                DirectoryCopy(Constants.getEventWebpagesFolder(eventName), Constants.getEventWebpagesFolder(newEventName), true);
+            }
+        }
+
+        private void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
+        }
+
         public void deleteEvent(string eventName)
         {
             DialogResult result = MessageBox.Show("Are you sure?" + Environment.NewLine + "All information for this event will be deleted", "Confirm Delete", MessageBoxButtons.YesNo);
             if (result == DialogResult.No) return;
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
-            DataRow dRow = table.Rows.Find(eventName);
+            //DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            DataRow dRow = m_eventsTable.Rows.Find(eventName);
             dRow.Delete();
             AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
             if (m_scorers.ContainsKey(eventName) && m_scorers[eventName] != null && !m_scorers[eventName].IsDisposed) m_scorers[eventName].Close();
@@ -117,26 +172,27 @@ namespace IndianBridgeScorer
             Directory.Delete(Constants.getEventWebpagesFolder(eventName),true);
         }
 
-        private void addEvent(string eventType)
+        private string addEvent(string eventType, string message = "What is the name of the event?")
         {
             string eventName = Microsoft.VisualBasic.Interaction.InputBox("What is the name of the event?", "Event Name");
             if (string.IsNullOrWhiteSpace(eventName))
             {
                 MessageBox.Show("Event Name cannot be empty!", "Empty Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return "";
             }
-            DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
-            DataRow dRow = table.Rows.Find(eventName);
+            //DataTable table = AccessDatabaseUtilities.getDataTable(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            DataRow dRow = m_eventsTable.Rows.Find(eventName);
             if (dRow != null)
             {
                 MessageBox.Show("Another event with same name (" + eventName + ") already exists!" + Environment.NewLine + "Either delete the other event first or provide a different event name!", "Duplicate Event Name!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return "";
             }
-            dRow = table.NewRow();
+            dRow = m_eventsTable.NewRow();
             dRow["Event_Name"] = eventName;
             dRow["Event_Type"] = eventType;
-            table.Rows.Add(dRow);
+            m_eventsTable.Rows.Add(dRow);
             AccessDatabaseUtilities.saveTableToDatabase(m_tourneyEventsFileName, Constants.TableName.TourneyEvents);
+            return eventName;
         }
 
         private void eventsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -145,6 +201,11 @@ namespace IndianBridgeScorer
             {
                 string eventName = (string)eventsDataGridView.Rows[e.RowIndex].Cells["Event_Name"].Value;
                 showEvent(eventName);
+            }
+            if (e.RowIndex >= 0 && e.ColumnIndex == eventsDataGridView.Columns["Copy Event"].Index)
+            {
+                string eventName = (string)eventsDataGridView.Rows[e.RowIndex].Cells["Event_Name"].Value;
+                copyEvent(eventName);
             }
             if (e.RowIndex >= 0 && e.ColumnIndex == eventsDataGridView.Columns["Delete Event"].Index)
             {

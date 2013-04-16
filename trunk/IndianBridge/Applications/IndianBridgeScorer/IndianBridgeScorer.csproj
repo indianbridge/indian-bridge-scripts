@@ -11,7 +11,8 @@
     <RootNamespace>IndianBridgeScorer</RootNamespace>
     <AssemblyName>IndianBridgeScorer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="SwissDrawCreation.cs" />
     <Compile Include="PDDatabaseToWebpages.cs" />
     <Compile Include="PDScorer.cs">
       <SubType>Form</SubType>
@@ -83,6 +85,7 @@
     </Compile>
     <Compile Include="LocalUtilities.cs" />
     <Compile Include="PropertyGridClasses.cs" />
+    <Compile Include="SwissScoringAndRanking.cs" />
     <Compile Include="SwissTeamsDatabaseToWebpages.cs" />
     <Compile Include="EventManagement.cs">
       <SubType>Form</SubType>
@@ -122,6 +125,12 @@
     <Compile Include="UploadTourney.Designer.cs">
       <DependentUpon>UploadTourney.cs</DependentUpon>
     </Compile>
+    <Compile Include="WithdrawTeams.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WithdrawTeams.Designer.cs">
+      <DependentUpon>WithdrawTeams.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="PDScorer.resx">
       <DependentUpon>PDScorer.cs</DependentUpon>
     </EmbeddedResource>
@@ -151,6 +160,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="SetTourneyInfo.resx">
       <DependentUpon>SetTourneyInfo.cs</DependentUpon>
@@ -164,6 +174,10 @@
     <EmbeddedResource Include="UploadTourney.resx">
       <DependentUpon>UploadTourney.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="WithdrawTeams.resx">
+      <DependentUpon>WithdrawTeams.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -186,6 +200,10 @@
     <ProjectReference Include="..\..\ResultsManager\ResultsManager.csproj">
       <Project>{B464537E-F74F-40DF-AD24-83ECBA82E312}</Project>
       <Name>ResultsManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WordpressAPIs\WordpressAPIs.csproj">
+      <Project>{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}</Project>
+      <Name>WordpressAPIs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
