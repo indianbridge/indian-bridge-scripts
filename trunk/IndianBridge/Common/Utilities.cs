@@ -252,8 +252,43 @@ namespace IndianBridge.Common
             }
         }
 
-        public static void getGoogleSiteComponents(string address, out string siteName, out string pagePath)
+        public static bool getWordpressSiteComponents(string address, out string siteName, out string pagePath)
         {
+            string[] tokens = address.Split('/');
+            string root = tokens[2];
+            siteName = tokens[0] + "/" + tokens[1] + "/" + tokens[2] + "/";
+            int startToken = 3;
+            if (containsPattern_(root, "localhost") || containsPattern_(root, "127.0.0.1"))
+            {
+                siteName += (tokens[3] + "/");
+                startToken = 4;
+            }
+            pagePath = "";
+            for (int i = startToken; i < tokens.Length; ++i)
+            {
+                pagePath += "/" + tokens[i];
+            }
+            return true;
+        }
+
+        public static string combinePath(string path1, string path2)
+        {
+            if (string.IsNullOrWhiteSpace(path2)) return path1.Replace('\\', '/');
+            char[] trims = new char[] { '\\', '/' };
+            string result = "";
+            result = path1.TrimEnd(trims) + "/" + path2.TrimStart(trims);
+            result = result.Replace('\\', '/');
+            return result;
+        }
+
+        public static bool getGoogleSiteComponents(string address, out string siteName, out string pagePath)
+        {
+            if (!containsPattern_(address, "sites.google.com"))
+            {
+                siteName = "";
+                pagePath = "";
+                return false;
+            }
             string[] tokens = address.Split('/');
             siteName = tokens[4];
             pagePath = "";
@@ -261,6 +296,7 @@ namespace IndianBridge.Common
             {
                 pagePath += "/" + tokens[i];
             }
+            return true;
         }
 
         public static String makeIdentifier_(string variableName, string separator = "-")

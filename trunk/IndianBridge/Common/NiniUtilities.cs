@@ -161,41 +161,58 @@ namespace IndianBridge.Common
 
         public static int getIntValue(string fileName, string parameterName)
         {
-            return m_niniFiles[fileName].Configs[parameterName].GetInt("Value");
+            return getIntValue(fileName, parameterName, 0);
         }
 
         public static double getDoubleValue(string fileName, string parameterName)
         {
-            return m_niniFiles[fileName].Configs[parameterName].GetDouble("Value");
+            return getDoubleValue(fileName, parameterName, 0.0);
         }
 
         public static bool getBooleanValue(string fileName, string parameterName)
         {
-            return m_niniFiles[fileName].Configs[parameterName].GetBoolean("Value");
+            return getBooleanValue(fileName, parameterName, false);
         }
 
         public static string getStringValue(string fileName, string parameterName)
         {
-            return m_niniFiles[fileName].Configs[parameterName].GetString("Value");
+            return getStringValue(fileName, parameterName, "");
+        }
+
+        private static void checkParameter<T>(string fileName, string parameterName, T defaultValue)
+        {
+            IniConfigSource source = m_niniFiles[fileName];
+            if (source.Configs[parameterName] == null)
+            {
+                IConfig config = source.AddConfig(parameterName);
+                config.Set("Type", "Integer");
+                config.Set("Value", defaultValue);
+                config.Set("Source", "");
+                source.Save();
+            }
         }
 
         public static int getIntValue(string fileName, string parameterName, int defaultValue)
         {
-            return m_niniFiles[fileName].Configs[parameterName].GetInt("Value",defaultValue);
+            checkParameter(fileName, parameterName, defaultValue);
+            return m_niniFiles[fileName].Configs[parameterName].GetInt("Value", defaultValue);
         }
 
         public static double getDoubleValue(string fileName, string parameterName, double defaultValue)
         {
+            checkParameter(fileName, parameterName, defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetDouble("Value", defaultValue);
         }
 
         public static bool getBooleanValue(string fileName, string parameterName, bool defaultValue)
         {
+            checkParameter(fileName, parameterName, defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetBoolean("Value", defaultValue);
         }
 
         public static string getStringValue(string fileName, string parameterName, string defaultValue)
         {
+            checkParameter(fileName, parameterName, defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetString("Value", defaultValue);
         }
 
@@ -203,26 +220,7 @@ namespace IndianBridge.Common
         {
             return m_niniFiles[fileName].Configs[parameterName].GetString("Source");
         }
-
-        public static void setIntValue(string fileName, string parameterName, int parameterValue, bool save = false)
-        {
-            m_niniFiles[fileName].Configs[parameterName].Set("Value",parameterValue);
-            if (save) m_niniFiles[fileName].Save();
-        }
-
-        public static void setDoubleValue(string fileName, string parameterName, double parameterValue, bool save = false)
-        {
-            m_niniFiles[fileName].Configs[parameterName].Set("Value", parameterValue);
-            if (save) m_niniFiles[fileName].Save();
-        }
-
-        public static void setBooleanValue(string fileName, string parameterName, bool parameterValue, bool save = false)
-        {
-            m_niniFiles[fileName].Configs[parameterName].Set("Value", parameterValue);
-            if (save) m_niniFiles[fileName].Save();
-        }
-
-        public static void setStringValue(string fileName, string parameterName, string parameterValue, bool save = false)
+        public static void setValue<T>(string fileName, string parameterName, T parameterValue, bool save = false)
         {
             m_niniFiles[fileName].Configs[parameterName].Set("Value", parameterValue);
             if (save) m_niniFiles[fileName].Save();

@@ -82,13 +82,13 @@ namespace IndianBridge.Common
         public static int getIntValue(DataRow dRow, string columnName)
         {
             Object value = dRow[columnName];
-            return (value == DBNull.Value ? 0 : (int)value);
+            return (value == DBNull.Value ? 0 : Convert.ToInt16(value));
         }
 
         public static double getDoubleValue(DataRow dRow, string columnName)
         {
             Object value = dRow[columnName];
-            return (value == DBNull.Value ? 0 : (double)value);
+            return (value == DBNull.Value ? 0 : Convert.ToDouble(value));
         }
 
         public static string getStringValue(DataRow dRow, string columnName)
@@ -120,6 +120,16 @@ namespace IndianBridge.Common
             ADOX.CatalogClass cat = new ADOX.CatalogClass();
             cat.Create(strAccessConn);
             cat = null;
+        }
+
+        public static bool hasColumn(string databaseFileName, string tableName, string fieldName) {
+            string strAccessConn = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + databaseFileName + ";";
+            OleDbConnection connection = new OleDbConnection(strAccessConn);
+            connection.Open();
+            bool result = hasColumn(connection, tableName, fieldName);
+            connection.Close();
+            connection = null;
+            return result;
         }
 
 
@@ -270,6 +280,20 @@ namespace IndianBridge.Common
             connection.Close();
             connection = null;
             loadDatabaseToTable(databaseFileName, tableName);
+        }
+
+        public static bool hasColumn(OleDbConnection connection, string tableName, string fieldName)
+        {
+            var primaryKeyStrings = new List<string>();
+            DataTable mySchema = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns,
+                                        new Object[] { null, null, tableName });
+            int columnOrdinalForName = mySchema.Columns["COLUMN_NAME"].Ordinal;
+            foreach (DataRow r in mySchema.Rows)
+            {
+                string columnName = r.ItemArray[columnOrdinalForName].ToString();
+                if (columnName.Equals(fieldName, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
         }
 
         public static List<string> getPrimaryKeys(OleDbConnection connection, String tableName)
