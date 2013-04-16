@@ -77,11 +77,6 @@ namespace IndianBridgeScorer
             knockoutRoundsCombobox.SelectedIndex = 0;
         }
 
-        private void knockoutSessionsDataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            m_knockoutSessions.updateSessions();
-        }
-
         private void knockoutRoundsCombobox_SelectedIndexChanged(object sender, EventArgs e)
         {
             DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_"+(knockoutRoundsCombobox.SelectedIndex+1));
@@ -151,7 +146,14 @@ namespace IndianBridgeScorer
         private void setUpMatches(int roundNumber)
         {
             DataTable table = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
-            DataTable previousTable = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + (roundNumber+1));
+            // Overwrite existing team numbers to avoid unique value errors
+            int count = -1;
+            foreach (DataRow dRow in table.Rows)
+            {
+                dRow["Team_Number"] = count--;
+            }
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + roundNumber);
+            DataTable previousTable = AccessDatabaseUtilities.getDataTable(m_databaseFileName, Constants.TableName.KnockoutScores + "_" + (roundNumber + 1));
             int matchNumber = 1;
             foreach (DataRow dRow in table.Rows)
             {
@@ -257,5 +259,34 @@ namespace IndianBridgeScorer
             checkRoundCompletion(roundNumber, numberOfSessions);
         }
 
+        private void saveNamesButton_Click(object sender, EventArgs e)
+        {
+            AccessDatabaseUtilities.saveTableToDatabase(m_databaseFileName, Constants.TableName.KnockoutTeams);
+            Utilities.showBalloonNotification("Save Completed", Constants.TableName.KnockoutTeams + " saved to Database successfully");
+        }
+
+        private void reloadNamesButton_Click(object sender, EventArgs e)
+        {
+            if (Utilities.confirmReload(Constants.TableName.KnockoutTeams))
+            {
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName,Constants.TableName.KnockoutTeams);
+                Utilities.showBalloonNotification("Reload Completed", Constants.TableName.KnockoutTeams + " reloaded from database successfully");
+            }
+        }
+
+        private void saveNumberOfSessionsButton_Click(object sender, EventArgs e)
+        {
+            m_knockoutSessions.updateSessions();
+            Utilities.showBalloonNotification("Save Completed", Constants.TableName.KnockoutSessions + " saved to Database successfully");
+        }
+
+        private void reloadNumberOfSessionsButton_Click(object sender, EventArgs e)
+        {
+            if (Utilities.confirmReload(Constants.TableName.KnockoutSessions))
+            {
+                AccessDatabaseUtilities.loadDatabaseToTable(m_databaseFileName, Constants.TableName.KnockoutSessions);
+                Utilities.showBalloonNotification("Reload Completed", Constants.TableName.KnockoutSessions + " reloaded from database successfully");
+            } 
+        }
     }
 }

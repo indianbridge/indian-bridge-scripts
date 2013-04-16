@@ -40,6 +40,10 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.createEventsButton = new System.Windows.Forms.Button();
             this.cancelCreateEventsButton = new System.Windows.Forms.Button();
+            this.keepOriginalTeamNumbersCheckbox = new System.Windows.Forms.CheckBox();
+            this.keepTeamNumberLabel = new System.Windows.Forms.Label();
+            this.carryoverFormulaLabel = new System.Windows.Forms.Label();
+            this.carryoverTotalCheckbox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -77,6 +81,10 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.carryoverTotalCheckbox);
+            this.splitContainer2.Panel2.Controls.Add(this.carryoverFormulaLabel);
+            this.splitContainer2.Panel2.Controls.Add(this.keepTeamNumberLabel);
+            this.splitContainer2.Panel2.Controls.Add(this.keepOriginalTeamNumbersCheckbox);
             this.splitContainer2.Panel2.Controls.Add(this.label1);
             this.splitContainer2.Panel2.Controls.Add(this.label3);
             this.splitContainer2.Panel2.Controls.Add(this.numberOfNewEventsTextbox);
@@ -200,6 +208,44 @@
             this.cancelCreateEventsButton.UseVisualStyleBackColor = false;
             this.cancelCreateEventsButton.Click += new System.EventHandler(this.cancelCreateEventsButton_Click);
             // 
+            // keepOriginalTeamNumbersCheckbox
+            // 
+            this.keepOriginalTeamNumbersCheckbox.AutoSize = true;
+            this.keepOriginalTeamNumbersCheckbox.Location = new System.Drawing.Point(632, 19);
+            this.keepOriginalTeamNumbersCheckbox.Name = "keepOriginalTeamNumbersCheckbox";
+            this.keepOriginalTeamNumbersCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.keepOriginalTeamNumbersCheckbox.TabIndex = 7;
+            this.keepOriginalTeamNumbersCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // keepTeamNumberLabel
+            // 
+            this.keepTeamNumberLabel.AutoSize = true;
+            this.keepTeamNumberLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.keepTeamNumberLabel.Location = new System.Drawing.Point(375, 16);
+            this.keepTeamNumberLabel.Name = "keepTeamNumberLabel";
+            this.keepTeamNumberLabel.Size = new System.Drawing.Size(251, 20);
+            this.keepTeamNumberLabel.TabIndex = 8;
+            this.keepTeamNumberLabel.Text = "Keep Original Team Numbers?";
+            // 
+            // carryoverFormulaLabel
+            // 
+            this.carryoverFormulaLabel.AutoSize = true;
+            this.carryoverFormulaLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.carryoverFormulaLabel.Location = new System.Drawing.Point(486, 51);
+            this.carryoverFormulaLabel.Name = "carryoverFormulaLabel";
+            this.carryoverFormulaLabel.Size = new System.Drawing.Size(140, 20);
+            this.carryoverFormulaLabel.TabIndex = 10;
+            this.carryoverFormulaLabel.Text = "Carryover Total?";
+            // 
+            // carryoverTotalCheckbox
+            // 
+            this.carryoverTotalCheckbox.AutoSize = true;
+            this.carryoverTotalCheckbox.Location = new System.Drawing.Point(632, 56);
+            this.carryoverTotalCheckbox.Name = "carryoverTotalCheckbox";
+            this.carryoverTotalCheckbox.Size = new System.Drawing.Size(15, 14);
+            this.carryoverTotalCheckbox.TabIndex = 11;
+            this.carryoverTotalCheckbox.UseVisualStyleBackColor = true;
+            // 
             // CreateNewEvents
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -236,5 +282,9 @@
         private System.Windows.Forms.TextBox totalQualifiersTextbox;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.FlowLayoutPanel eventsListPanel;
+        private System.Windows.Forms.Label keepTeamNumberLabel;
+        private System.Windows.Forms.CheckBox keepOriginalTeamNumbersCheckbox;
+        private System.Windows.Forms.Label carryoverFormulaLabel;
+        private System.Windows.Forms.CheckBox carryoverTotalCheckbox;
     }
 }

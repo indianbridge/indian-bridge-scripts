@@ -110,6 +110,7 @@ namespace IndianBridgeScorer
         public static string UseBorderFieldName = "Use_Border";
         public static string ScoringTypeFieldName = "Scoring_Type";
         public static string TiebreakerMethodFieldName = "Tiebreaker_Method";
+        public static string ByeScoreFieldName = "Bye_Score";
         
         // Helpers
         public static string getFolder(string folder)

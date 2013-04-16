@@ -42,6 +42,9 @@
             this.eventSetupTab = new System.Windows.Forms.TabPage();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.eventSetupPropertyGrid = new System.Windows.Forms.PropertyGrid();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.saveNumberOfSessionsButton = new System.Windows.Forms.Button();
+            this.reloadNumberOfSessionsButton = new System.Windows.Forms.Button();
             this.knockoutSessionsDataGridView = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.namesTab = new System.Windows.Forms.TabPage();
@@ -82,6 +85,7 @@
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.knockoutSessionsDataGridView)).BeginInit();
             this.namesTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.knockoutNamesDataGridView)).BeginInit();
@@ -147,10 +151,11 @@
             // 
             // splitContainer5.Panel2
             // 
+            this.splitContainer5.Panel2.Controls.Add(this.tableLayoutPanel3);
             this.splitContainer5.Panel2.Controls.Add(this.knockoutSessionsDataGridView);
             this.splitContainer5.Panel2.Controls.Add(this.label2);
             this.splitContainer5.Size = new System.Drawing.Size(980, 497);
-            this.splitContainer5.SplitterDistance = 326;
+            this.splitContainer5.SplitterDistance = 294;
             this.splitContainer5.TabIndex = 11;
             // 
             // eventSetupPropertyGrid
@@ -160,10 +165,55 @@
             this.eventSetupPropertyGrid.Location = new System.Drawing.Point(0, 0);
             this.eventSetupPropertyGrid.Name = "eventSetupPropertyGrid";
             this.eventSetupPropertyGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.eventSetupPropertyGrid.Size = new System.Drawing.Size(326, 497);
+            this.eventSetupPropertyGrid.Size = new System.Drawing.Size(294, 497);
             this.eventSetupPropertyGrid.TabIndex = 10;
             this.eventSetupPropertyGrid.ToolbarVisible = false;
             this.eventSetupPropertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.eventSetupPropertyGrid_PropertyValueChanged);
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.InsetDouble;
+            this.tableLayoutPanel3.ColumnCount = 2;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Controls.Add(this.saveNumberOfSessionsButton, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.reloadNumberOfSessionsButton, 1, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 447);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 1;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(682, 50);
+            this.tableLayoutPanel3.TabIndex = 12;
+            // 
+            // saveNumberOfSessionsButton
+            // 
+            this.saveNumberOfSessionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
+            this.saveNumberOfSessionsButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.saveNumberOfSessionsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.saveNumberOfSessionsButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.saveNumberOfSessionsButton.Location = new System.Drawing.Point(6, 6);
+            this.saveNumberOfSessionsButton.Name = "saveNumberOfSessionsButton";
+            this.saveNumberOfSessionsButton.Size = new System.Drawing.Size(330, 38);
+            this.saveNumberOfSessionsButton.TabIndex = 7;
+            this.saveNumberOfSessionsButton.Text = "Save Number of Sessions to Database";
+            this.saveNumberOfSessionsButton.UseVisualStyleBackColor = false;
+            this.saveNumberOfSessionsButton.Click += new System.EventHandler(this.saveNumberOfSessionsButton_Click);
+            // 
+            // reloadNumberOfSessionsButton
+            // 
+            this.reloadNumberOfSessionsButton.BackColor = System.Drawing.Color.Red;
+            this.reloadNumberOfSessionsButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.reloadNumberOfSessionsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.reloadNumberOfSessionsButton.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.reloadNumberOfSessionsButton.Location = new System.Drawing.Point(345, 6);
+            this.reloadNumberOfSessionsButton.Name = "reloadNumberOfSessionsButton";
+            this.reloadNumberOfSessionsButton.Size = new System.Drawing.Size(331, 38);
+            this.reloadNumberOfSessionsButton.TabIndex = 8;
+            this.reloadNumberOfSessionsButton.Text = "Reload Number of Sessions from Database";
+            this.reloadNumberOfSessionsButton.UseVisualStyleBackColor = false;
+            this.reloadNumberOfSessionsButton.Click += new System.EventHandler(this.reloadNumberOfSessionsButton_Click);
             // 
             // knockoutSessionsDataGridView
             // 
@@ -197,9 +247,8 @@
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.knockoutSessionsDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.knockoutSessionsDataGridView.Size = new System.Drawing.Size(650, 477);
+            this.knockoutSessionsDataGridView.Size = new System.Drawing.Size(682, 477);
             this.knockoutSessionsDataGridView.TabIndex = 0;
-            this.knockoutSessionsDataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.knockoutSessionsDataGridView_CellValueChanged);
             // 
             // label2
             // 
@@ -289,6 +338,7 @@
             this.saveNamesButton.TabIndex = 7;
             this.saveNamesButton.Text = "Save Names to Database";
             this.saveNamesButton.UseVisualStyleBackColor = false;
+            this.saveNamesButton.Click += new System.EventHandler(this.saveNamesButton_Click);
             // 
             // reloadNamesButton
             // 
@@ -302,6 +352,7 @@
             this.reloadNamesButton.TabIndex = 8;
             this.reloadNamesButton.Text = "Reload Names from Database";
             this.reloadNamesButton.UseVisualStyleBackColor = false;
+            this.reloadNamesButton.Click += new System.EventHandler(this.reloadNamesButton_Click);
             // 
             // scoresTab
             // 
@@ -659,6 +710,7 @@
             this.splitContainer5.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.knockoutSessionsDataGridView)).EndInit();
             this.namesTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.knockoutNamesDataGridView)).EndInit();
@@ -735,5 +787,8 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button saveKnockoutScoresButton;
         private System.Windows.Forms.Button reloadKnockoutScoresButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Button saveNumberOfSessionsButton;
+        private System.Windows.Forms.Button reloadNumberOfSessionsButton;
     }
 }
