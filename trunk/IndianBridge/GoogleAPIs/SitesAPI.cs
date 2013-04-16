@@ -32,7 +32,7 @@ namespace IndianBridge.GoogleAPIs
         public void convertCase(bool convert) { m_convertCase = convert; }
 
         public static Boolean checkCredentials(String url, String username, String password)
-        {    
+        {
             SitesService service = new SitesService(APP_NAME);
             service.setUserCredentials(username, password);
             try
@@ -159,12 +159,12 @@ namespace IndianBridge.GoogleAPIs
                 foreach (String file in files)
                 {
                     String extension = Path.GetExtension(file).ToLower();
-                    if ((extension.Equals(".htm", StringComparison.OrdinalIgnoreCase) || extension.Equals(".html", StringComparison.OrdinalIgnoreCase)) 
+                    if ((extension.Equals(".htm", StringComparison.OrdinalIgnoreCase) || extension.Equals(".html", StringComparison.OrdinalIgnoreCase))
                         && Path.GetFileNameWithoutExtension(file).ToLower().Equals("index", StringComparison.OrdinalIgnoreCase))
                     {
                         string html = File.ReadAllText(file);
                         DateTime lastUpdateTime = File.GetLastWriteTime(file);
-                        updateWebpage(siteRoot, Path.GetFileName(path), html, "", lastUpdateTime);
+                        updateWebpage(siteRoot, Path.GetFileName(path), html, "", lastUpdateTime, true);
                         if (cancel()) return;
                     }
                 }
@@ -180,7 +180,7 @@ namespace IndianBridge.GoogleAPIs
                     String extension = Path.GetExtension(path).ToLower();
                     if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower() != "index")
                     {
-                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)), File.GetLastWriteTime(path));
+                        updateWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), makeIdentifier(Path.GetFileNameWithoutExtension(path)), File.GetLastWriteTime(path), false);
                         if (cancel()) return;
                     }
                     return;
@@ -213,7 +213,7 @@ namespace IndianBridge.GoogleAPIs
                             }
                             else html = getSubPageListing();
                         }
-                        updateWebpage(siteRoot, dirName, html, pageName, lastUpdateTime,indexHtmlPath);
+                        updateWebpage(siteRoot, dirName, html, pageName, lastUpdateTime, true, indexHtmlPath);
                         if (cancel()) return;
                         uploadPath(dir, siteRoot + "/" + pageName);
                         if (cancel()) return;
@@ -241,17 +241,17 @@ namespace IndianBridge.GoogleAPIs
             return new XmlExtension(pageNameNode);
         }
 
-        public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified, string indexHtmlPath="")
+        public AtomEntry updateWebpage(String path, String title, String html, String pageName, DateTime lastModified, bool isIndexPage, string indexHtmlPath = "")
         {
             if (cancel()) return null;
-            String url = "https://sites.google.com/feeds/content/site/" + m_siteName + "?path=" + path + (pageName==""?"":"/") + pageName;
+            String url = "https://sites.google.com/feeds/content/site/" + m_siteName + "?path=" + path + (pageName == "" ? "" : "/") + pageName;
             printMessage(url);
             try
             {
                 AtomEntry entry = m_service.Get(url);
                 if (entry == null)
                 {
-                    return createWebPage(url, path, title, html, pageName, lastModified);
+                    return createWebPage(url, path, title, html, pageName, lastModified, isIndexPage);
                 }
                 if (html != "")
                 {
@@ -266,9 +266,9 @@ namespace IndianBridge.GoogleAPIs
                     {
                         AtomContent newContent = new AtomContent();
                         newContent.Type = "html";
-                        newContent.Content = m_replaceLinks ? replaceLinks(html,url,indexHtmlPath) : html;
+                        newContent.Content = m_replaceLinks ? replaceLinks(html, url, isIndexPage, indexHtmlPath) : html;
                         entry.Content = newContent;
-                        entry.Title.Text = m_convertCase?IndianBridge.Common.Utilities.ConvertCaseString(title):title;
+                        entry.Title.Text = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
                         m_service.Update(entry);
                         if (!m_lastRunTimes.ContainsKey(url)) printMessage("UPDATED. No entry was found for last run time.");
                         else
@@ -291,7 +291,7 @@ namespace IndianBridge.GoogleAPIs
             }
             catch (Exception)
             {
-                return createWebPage(url, path, title, html, pageName, lastModified,indexHtmlPath);
+                return createWebPage(url, path, title, html, pageName, lastModified, isIndexPage, indexHtmlPath);
             }
         }
 
@@ -312,7 +312,7 @@ namespace IndianBridge.GoogleAPIs
             if (m_runningInBackground)
             {
                 double percentage = ((double)numberOfPagesAlreadyUploaded / (double)totalPagesToUpload) * 100;
-                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString+"Published " + title);
+                m_worker.ReportProgress(Convert.ToInt32(percentage), m_prefixString + "Published " + title);
             }
         }
 
@@ -321,11 +321,11 @@ namespace IndianBridge.GoogleAPIs
             return m_runningInBackground && m_worker.CancellationPending;
         }
 
-        public AtomEntry createWebPage(String originalUrl, String path, String title, String html, String pageName, DateTime lastModified, string indexHtmlPath="")
+        public AtomEntry createWebPage(String originalUrl, String path, String title, String html, String pageName, DateTime lastModified, bool isIndexPage, string indexHtmlPath = "")
         {
             if (cancel()) return null;
             String parentUrl = originalUrl.Substring(0, originalUrl.LastIndexOf("/"));
-            pageName = originalUrl.Substring(originalUrl.LastIndexOf("/")+1);
+            pageName = originalUrl.Substring(originalUrl.LastIndexOf("/") + 1);
             AtomEntry parent = m_service.Get(parentUrl);
             SiteEntry entry = new SiteEntry();
             AtomCategory category = new AtomCategory(SitesService.WEBPAGE_TERM, SitesService.KIND_SCHEME);
@@ -336,7 +336,7 @@ namespace IndianBridge.GoogleAPIs
             entry.Links.Add(link);
             entry.Title.Text = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
             entry.Content.Type = "html";
-            entry.Content.Content = m_replaceLinks ? replaceLinks(html,originalUrl,indexHtmlPath) : html;
+            entry.Content.Content = m_replaceLinks ? replaceLinks(html, originalUrl, isIndexPage, indexHtmlPath) : html;
             entry.ExtensionElements.Add(makePageNameExtension(pageName));
             AtomEntry newEntry = null;
             String url = "https://sites.google.com/feeds/content/site/" + m_siteName;
@@ -353,7 +353,7 @@ namespace IndianBridge.GoogleAPIs
             int index1 = parentPage.LastIndexOf('/');
             int index2 = parentPage.LastIndexOf('\\');
             int index = index1 > index2 ? index1 : index2;
-            return parentPage.Substring(0, index) ;
+            return parentPage.Substring(0, index);
         }
         private string getPage(string path)
         {
@@ -361,9 +361,9 @@ namespace IndianBridge.GoogleAPIs
         }
 
 
-        private string replaceLinks(string html, string pathUrl, string indexHtmlPath="")
+        private string replaceLinks(string html, string pathUrl, bool isIndexPage, string indexHtmlPath = "")
         {
-            string url = Regex.Replace(pathUrl, @"\?Path=","",RegexOptions.IgnoreCase);
+            string url = Regex.Replace(pathUrl, @"\?Path=", "", RegexOptions.IgnoreCase);
             url = Regex.Replace(url, @"feeds/content/", "", RegexOptions.IgnoreCase);
             Regex re = new Regex(@"<a\s+href[^<]*</a>", RegexOptions.IgnoreCase);
             Regex re2 = new Regex("http", RegexOptions.IgnoreCase);
@@ -374,17 +374,37 @@ namespace IndianBridge.GoogleAPIs
                 if (re2.IsMatch(result)) return result;
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(indexHtmlPath))
+                    string replaceDotUrl = "";
+                    string replaceDotDotUrl = "";
+                    string replaceDoubleDotDotUrl = "";
+                    if (isIndexPage)
                     {
+                        replaceDotUrl = getPage(url);
+                        replaceDotDotUrl = getParentPage(url);
+                        replaceDoubleDotDotUrl = getParentPage(getParentPage(url));
+                    }
+                    else
+                    {
+                        replaceDotUrl = getPage(url);
+                        replaceDotDotUrl = getParentPage(getParentPage(url));
+                        replaceDoubleDotDotUrl = getParentPage(getParentPage(getParentPage(url)));
+                    }
+                    result = Regex.Replace(result, @"(\.\./\.\./)|(\.\.\\\.\.\\)", replaceDoubleDotDotUrl + "/", RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", replaceDotDotUrl + "/", RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"(\./)|(\.\\)", replaceDotUrl + "/", RegexOptions.IgnoreCase);
+                    /*if (string.IsNullOrWhiteSpace(indexHtmlPath))
+                    {
+                        result = Regex.Replace(result, @"(\.\./\.\./)|(\.\.\\\.\.\\)", getParentPage(getParentPage(getParentPage(url))) + "/", RegexOptions.IgnoreCase);
                         result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(getParentPage(url)) + "/", RegexOptions.IgnoreCase);
                         result = Regex.Replace(result, @"(\./)|(\.\\)", getPage(url) + "/", RegexOptions.IgnoreCase);
                     }
                     else
                     {
+                        result = Regex.Replace(result, @"(\.\./\.\./)|(\.\.\\\.\.\\)", getParentPage(getParentPage(url)) + "/", RegexOptions.IgnoreCase);
                         result = Regex.Replace(result, @"(\.\./)|(\.\.\\)", getParentPage(url) + "/", RegexOptions.IgnoreCase);
-                        result = Regex.Replace(result, @"(\./)|(\.\\)", getPage(url) + "/"+ indexHtmlPath+"/", RegexOptions.IgnoreCase);
-                    }
-                    
+                        result = Regex.Replace(result, @"(\./)|(\.\\)", getPage(url) + "/" + indexHtmlPath + "/", RegexOptions.IgnoreCase);
+                    }*/
+
                     result = Regex.Replace(result, @"(index\.html)|(index\.htm)", "", RegexOptions.IgnoreCase);
                     result = Regex.Replace(result, @"(\.html)|(\.htm)", "", RegexOptions.IgnoreCase);
                     result = result.TrimEnd('/').TrimEnd('\\');
