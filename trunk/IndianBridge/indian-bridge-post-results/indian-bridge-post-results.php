@@ -70,41 +70,43 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 			
 			// required parameters
 			if ( empty( $args['pagePath'] ) ) return new IXR_Error( 500, __( "Missing parameter 'pagePath'" ) );
-			if ( empty( $args['pageName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'pageName'" ) );
+			//if ( empty( $args['pageName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'pageName'" ) );
 			if ( empty( $args['pageTitle'] ) ) return new IXR_Error( 500, __( "Missing parameter 'pageTitle'" ) );
 			if ( empty( $args['pageContent'] ) ) return new IXR_Error( 500, __( "Missing parameter 'pageContent'" ) );
 			
 			$pagePath = $args['pagePath'];
-			$pageName = $args['pageName'];
+			//$pageName = $args['pageName'];
 			$pageTitle = $args['pageTitle'];
 			$pageContent = $args['pageContent'];
 			
-			// Check if pagePath exists
-			$parentPageID = url_to_postid($pagePath);
-			if (empty($parentPageID)) {
-				return new IXR_Error( 500, __( "Cannot find page at ".$pagePath) );
-			}
-			// Check is page already exists
-			$fullPagePath = rtrim($pagePath,"/\\").'/'.ltrim($pageName,"/\\");
-			//$page = get_page_by_path($fullPagePath);
-			$pageID = url_to_postid($fullPagePath);
-			
+			// Check if page already exists
+			$pageID = url_to_postid($pagePath);
 			if (empty($pageID)) {
-				// Create new page
-				$my_post = array(
-					'post_title' => $pageTitle,
-					'post_name' => $pageName,
-					'post_content' => $pageContent,
-					'post_status' => 'publish',
-					'post_author' => $user->ID,
-					'post_type' => 'page',
-					'post_parent' => $parentPageID
-				);			
-				$pageID = wp_insert_post($my_post);			
+				// Does not exist. Try to create it.
+				$parentPagePath = dirname($pagePath);
+				$pageName = basename($pagePath);
+				
+				// Check if parent exists
+				$parentPageID = url_to_postid($parentPagePath);
+				if (empty($parentPageID)) {
+					return new IXR_Error( 500, __( "Cannot find page at ".$parentPagePath) );
+				}
+				else {
+					// Create new page
+					$my_post = array(
+						'post_title' => $pageTitle,
+						'post_name' => $pageName,
+						'post_content' => $pageContent,
+						'post_status' => 'publish',
+						'post_author' => $user->ID,
+						'post_type' => 'page',
+						'post_parent' => $parentPageID
+					);			
+					$pageID = wp_insert_post($my_post);					
+				}
 			}
 			else {
-				//$pageID = $page->ID;
-				// Page already exists. Update it.
+				// Already exists. Update it
 				$my_post = array(
 					'ID' => $pageID,
 					'post_title' => $pageTitle,
