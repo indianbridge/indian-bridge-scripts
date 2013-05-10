@@ -1,0 +1,355 @@
+/*-- CUSTOM TYPE POSTS -----------------------------------------------*/
+
+#after_product {
+	padding:25px;
+	margin:0;
+	text-align:center;
+	clear:both;
+	position:relative;
+	background:#EEE;
+	border-bottom:1px solid #CCC;
+	}
+
+#after_catalog {
+	padding:25px;
+	margin:0;
+	text-align:center;
+	background:url(../images/line8.png) top center repeat-x;
+	clear:both;
+	position:relative;
+	}
+
+.pr-img {		margin:10px;}
+.pr-img-last {	margin:10px 0 10px 10px;}
+
+.product-image > div {
+	width:0;
+	height:0;
+	position:absolute;
+	background:url(../images/zoom.png) top left no-repeat;
+	border-radius:50px;
+	}
+
+
+/* -- S i d e b a r -----------------------------------------------*/
+
+
+.pr-bar {
+	width:283px;
+	text-align:center;
+	border:1px solid #CCC;
+	background:#FFF;
+	}
+
+.t2-holder .pr-bar {
+	border:1px solid #CCC;
+	}
+
+.pr-bar h3 {
+	border-radius:3px 3px 0 0;
+	background:#030303 url(../images/grd-white9.png) top left repeat-x;
+	background-size:100% 100%;
+	color:#FFF;
+	font-weight:bold;
+	font-size:13px;
+	padding:8px 10px;
+	margin:-1px -1px 0 -1px;
+	}
+
+.pr-bar h3 a {
+	color:#FFF;
+	}
+
+.pr-bar p {
+	padding:0 10px 1em;
+	}
+
+.t2-price-holder a.bbutton2 {
+	background-color:orange;
+	}
+
+#before-button,
+#after-button,
+#after-purchase {
+	padding:0 10px;
+	}
+
+
+/* -- R a t i n g -----------------------------------------------*/
+
+
+.rating {
+	border:1px solid #DDD;
+	margin:0 0 7px 0;
+	padding:10px 7px;
+	min-width:34.6%;
+	border-radius:3px;
+	display:inline-block;
+	}
+
+#rstars {
+	display:inline;
+	margin:0 0 0 3px;
+	background:url(../images/stars.png) 0 0 no-repeat;
+	}
+
+#rstars.star-1 {	background-position:0 -40px;}
+#rstars.star-2 {	background-position:0 -80px;}
+#rstars.star-3 {	background-position:0 -120px;}
+#rstars.star-4 {	background-position:0 -160px;}
+#rstars.star-5 {	background-position:0 -200px;}
+
+#rstars div {
+	width:20px;
+	height:20px;
+	display:inline-block;
+	cursor:pointer;
+	}
+
+#rating-total {
+	width:100px;
+	background:url(../images/stars.png) left top no-repeat;
+	display:inline-block;
+	}
+
+
+/* -- P r o d u c t s  a r c h i v e -----------------------------------------------*/
+
+.prdcts li {
+	border:1px solid #CCC;
+	background:#FFF;
+	margin:0 22px 25px 0;
+	float:left;
+	width:209px;
+	position:relative;
+	border-radius:3px;
+	}
+
+.prdcts li.last {
+	margin:0 0 25px 0;	
+	clear:right;
+	}
+
+.prdcts h3 {
+	border-radius:3px 3px 0 0;
+	background:#030303 url(../images/grd-white9.png) top left repeat-x;
+	background-size:100% 100%;
+	color:#FFF;
+	font-weight:bold;
+	font-size:13px;
+	padding:8px 10px;
+	margin:-1px -1px 0 -1px;
+	}
+
+.prdcts h3 a {
+	color:#FFF;
+	}
+
+.prdcts-excerpt {
+	font-size:11px;
+	padding:10px 10px 3px;
+	}
+
+.prdcts-excerpt p {
+	padding:0 0 1.3em;
+	}
+
+.lbl {
+	color:#FFF;
+	background:orange;
+	padding:4px 7px;
+	font-weight:bold;
+	}
+
+.t2-prod .lbl {
+	background:olive;
+	}
+
+
+/* -- t 1  a r c h i v e  t e m p l a t e -----------------------------------------------*/
+
+.t1-lbl {
+	border-radius:0 0 0 3px;
+	margin:0;
+	right:-1px;
+	z-index:1;
+	}
+
+.t1-thumb {
+	width:211px;
+	height:211px;
+	margin:0 0 0 -1px;
+	display:block;
+	position:relative;
+	}
+
+.t1-thumb > div {
+	width:0;
+	height:0;
+	position:absolute;
+	background:url(../images/zoom.png) top left no-repeat;
+	border-radius:50px;
+	}
+
+.t1-button-holder {
+	width:211px;
+	margin:0 0 -1px -1px;
+	}
+
+.t1-button-holder a {
+	display:inline-block;
+	text-align:center;
+	text-decoration:none;
+	color:#777;
+	}
+
+.t1-button-holder a span {
+	text-transform:uppercase;
+	font-weight:bold;
+	font-size:11px;
+	border:1px solid #CCC;
+	border-bottom:1px solid #BBB;
+	background:#f5f5f5 url(../images/grd-white.png) top left repeat-x;
+	background-size:100% 100%;
+	display:block;
+	padding:5px 0;
+	}
+
+.t1-button-holder a:hover span {
+	background-color:#1569FF;
+	border-color:#1569FF;
+	color:#FFF;
+	text-shadow:-1px -1px 0 rgba(0,0,0,0.2);
+	}
+
+.t1-button-holder .t1-livedemo {
+	width:105px;
+	}
+
+.t1-button-holder .t1-livedemo span {
+	border-radius:0 0 0 3px;
+	border-right:none;
+	}
+
+.t1-button-holder .t1-details {
+	width:106px;
+	}
+
+.t1-button-holder .t1-details span {
+	border-radius:0 0 3px;
+	}
+
+.t1-button-holder .w100i span { /* in case Details buttoon is single */
+	border-radius:0 0 3px 3px;
+	}
+
+
+/* -- t 2  a r c h i v e  t e m p l a t e -----------------------------------------------*/
+
+.t2-lbl {
+	margin:0 -1px;
+	}
+
+.t2-holder {
+	margin:0 -25px;
+	padding:25px;
+	background:#EEE;
+	}
+
+.t2-price-holder {
+	background:#F1F0E1;
+	padding:20px 0;
+	margin:0 0 1em;
+	}
+
+.t2-price-holder .a {
+	font-size:24px;
+	color:#333;
+	}
+
+.t2-price-holder .b {
+	font-size:16px;
+	}
+
+.t2-button-holder {
+	width:285px;
+	}
+
+.t2-button-holder .t1-livedemo {
+	width:142px;
+	}
+
+.t2-button-holder .t1-details {
+	width:143px;
+	}
+
+
+/* -- C a t a l o g  t a b s -----------------------------------------------*/
+
+.ctabs {
+	background:url(../images/pslider-navbar-1.png) center bottom repeat-x;
+	border-radius:3px 3px 0 0;
+	height:53px;
+	overflow:hidden;
+	}
+
+.ctabs li {
+	width:auto;
+	display:inline-block;
+	float:left;
+	}
+
+.ctabs a {
+	border-top:3px solid transparent;
+	display:inline-block;
+	font-size:11px;
+	font-weight:bold;
+	line-height:12px;
+	padding:19px 26px 19px 25px;
+	text-transform:uppercase;
+	background:url(../images/line.png) right top repeat-y;
+	text-decoration:none;
+	color:#555;
+	}
+
+.ctabs a:hover {
+	border-top:3px solid #030303;
+	color:#030303;
+	background-color:#FFF;
+	}
+
+.ctabs a.current {
+	border-top:3px solid #1569FF;
+	color:#1569FF;
+	background-color:#FFF;
+	}
+
+.ctabs a span {
+	width:10px;
+	height:10px;
+	background:#444 url(../images/arrdown-white-outline.png) center center no-repeat;
+	display:inline-block;
+	margin:0 5px -1px 0;
+	}
+
+.ctabs a.current span,
+.ctabs a.current:hover span {
+	background-color:#1569FF;
+	}
+
+.ctabs a:hover span {
+	background-color:#030303;
+	}
+
+
+/* -- R e l a t e d -----------------------------------------------*/
+
+.related-pr-box {
+	background:#F6F6F6 url(../images/pslider-shadow.png) left top repeat-x;
+	border-radius:0;
+	}
+
+
+
+
+

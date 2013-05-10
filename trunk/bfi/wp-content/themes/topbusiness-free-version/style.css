@@ -1,0 +1,28 @@
+/*
+Theme Name: TopBusiness - FREE version
+Theme URI: http://pandathemes.com
+Description: &bull;&nbsp; Get <a href="http://pandathemes.com/wordpress-themes/topbusiness/">FULL version</a> of theme&nbsp; &bull;&nbsp;&nbsp;Get&nbsp;<a href="http://support.pandathemes.com">SUPPORT</a>&nbsp;from&nbsp;forum&nbsp; &bull;&nbsp;&nbsp;Follow&nbsp;PandaThemes&nbsp;on&nbsp;<a href="http://twitter.com/pandathemes">Twitter</a>
+Author: PandaThemes
+Author URI: http://pandathemes.com
+Version: 1.3.3.free
+Tags: buddypress, responsive, custom-background, custom-header, custom-menu, editor-style, featured-images, fixed-width, light, right-sidebar, rtl-language-support, threaded-comments, translation-ready, two-columns, white
+*/
+
+/*-- IMPORT ----------------------------------------------- */
+@import "styles/reset.css";
+@import "styles/default.css";
+@import "styles/menu.css";
+@import "styles/pandaSlider.css";
+@import "styles/custom_type_posts.css";
+@import "styles/widgets.css";
+@import "styles/prettyPhoto.css";
+@import "styles/shortcodes.css";
+@import "styles/custom_style.css";
+
+/*
+	DO NOT MODIFY SOURCE FILES YOU HAVE NOT THE SKILLS.
+
+	PLEASE USE THE THEME STYLE EDITOR AT 'Admin panel > Theme settings > Style' AS THE SHORT CUT FOR A CUSTOM STYLE.
+
+	IN CASE YOU NEED TO MAKE A DEEP CUSTOMIZATION PLEASE USE THE CHILD THEMES -OR- 'Admin panel > Theme settings > Style > Custom CSS'.
+*/

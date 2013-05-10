@@ -1,0 +1,130 @@
+body {
+background-color:#dce9ef;
+background-image:none;
+}
+
+#site-wrapper {
+background-image:url(../../images/patterns/gradient-black-60.png);
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,#topmess a:hover,#selectElement {
+color:#fff !important;
+}
+
+ul.top-menu > li.current-menu-item > a,ul.top-menu > li.current-menu-ancestor > a {
+color:#dae7ed;
+background-color:#050f14;
+}
+
+#menuwrapper,#searchform input#searchsubmit,.feedemail-form .feedemail-button,.pr-bar h3,.kul,.prdcts h3,.wp-pagenavi span.current,div.item-list-tabs,#selectElement option {
+background-color:#309bc9;
+}
+
+.wp-pagenavi span.current {
+border-color:#309bc9;
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,ul.top-menu li.basic ul li a:hover,ul.top-menu li.basic ul li.current-cat > a:hover,ul.top-menu li.basic ul li.current_page_item > a:hover {
+background-color:#050f14 !important;
+}
+
+ul.top-menu > li {
+background:url(../../images/line-white-20.png) top right repeat-y;
+}
+
+ul.top-menu {
+background-image:url(../../images/line-white-20.png);
+}
+
+#subfooter {
+background-image:url(../../images/shadow.png);
+height:39px;
+}
+
+#footerarea,#footerarea li,#footerarea p,#footerarea td,#footerarea th,#footerarea span,#footerarea div,#footerarea #wp-calendar tbody a {
+color:#adadad;
+}
+
+#footerarea a {
+color:#4aa6cb;
+}
+
+#wp-calendar a,#footerarea .tag-cloud a:hover {
+background:#4aa6cb;
+}
+
+/* P a n d a   s l i d e r   t a b s */
+.ps-1 .pnavbar span:hover {
+color:#050f14;
+border-top:3px solid #050f14;
+}
+
+.tag-cloud a:hover {
+background:#050f14;
+}
+
+/* t 1   b u t t o n s */
+.t1-button-holder a:hover span {
+background-color:#2687ad;
+border-color:#2687ad;
+}
+
+#subnav li.current a {
+background:#2687ad;
+}
+
+a:hover {
+color:#050f14;
+}
+
+/* C u s t o m   p o s t s   c a t e g o r y  t a b s */
+.ctabs a:hover {
+border-top:3px solid #050f14;
+color:#050f14;
+}
+
+body #copyrights * {
+color:#000 !important;
+}
+
+.sidebar-wrapper {
+background:#F0F9FD;
+}
+
+.padder div.pagination {
+background:#DCE9EF;
+}
+
+ul.top-menu > li > a,#topmess,#topmess a,#topmess strong,#footer h1,#footer h2,#footer h3,#footer h4,#footer h,#footer h5,#footer h6,#footer .dropcap {
+color:#fff;
+}
+
+#footerarea,.widget ul.menu > li > a:hover,.ps-1 .pnavbar span:hover strong,.ps-1 .pnavbar span.pscurrent:hover strong,.ctabs a:hover span,.ctabs a.current:hover span {
+background-color:#050f14;
+}
+
+a,#header h1.logo a strong,h2 a,h3 a,h4 a,h5 a,h6 a,li.kcurrent,.kul li:hover,li.current,#item-nav a:hover,#item-nav .selected a,#item-nav .current a {
+color:#2687ad;
+}
+
+.tgl-1 .ta {
+color:#2687ad;
+}
+
+.tgl-1.tclicked .ta {
+background-color:#2687ad;
+}
+
+.demo-W,.ps-1 .pnavbar span.pscurrent strong,.ctabs a.current span,a.bbutton2,#wp-calendar a,#searchform input#searchsubmit:hover,.feedemail-form .feedemail-button:hover,/* C u s t o m m e n u w i d g e t */
+.widget ul.menu > li > a:hover {
+background-color:#2687ad;
+}
+
+.ps-1 .pnavbar span.pscurrent,.ctabs a.current {
+border-top:3px solid #2687ad;
+color:#2687ad;
+}
+
+#before_product {
+background-color:#F0F9FD;
+}

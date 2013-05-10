@@ -1,0 +1,160 @@
+#ads125 {
+	display:inline-block;
+	}
+
+/* MENU
+----------------------------------------------- */
+.top-menu .sub-menu {
+	border-right:1px solid #DDD;
+	border-bottom:1px solid #DDD;
+	}
+
+#menuwrapper {
+	height:42px;
+	}
+
+ul.top-menu > li > a {
+	height:16px;
+	}
+
+/*-- SEARCH DEFAULT + Subscribe widget -----------------------------------------------*/
+
+#searchform div,
+.feedemail-form div {
+	border:1px solid #DDD;
+	}
+
+.feedemail-form .feedemail-button {
+	right:0;
+	position:absolute;
+	}
+
+.feedemail-form > div {
+	height:24px;
+	}
+
+.feedemail-input {
+	margin:6px 0 0 25px;
+	}
+
+/*-- HEADER FIXING ----------------------------------------------- */
+
+.hmisc {
+	width:200px;
+	}
+
+.hmisc div {
+	background:none;
+	}
+
+#icons a img {
+	background:#f5f5f5;
+	}
+
+#header{
+	z-index:6;
+	}
+
+#icons {
+	display:inline-block !important;
+	}
+
+/*-- COLUMNS ----------------------------------------------- */
+
+.one_half { width:49.9%; }
+
+
+/*-- COMMENTS -----------------------------------------------*/
+
+.cmt-header {
+	height:50px;
+	}
+
+.children .cmt-header {
+	height:25px;
+	}
+
+.cmt-time {
+	position:relative;
+	margin:0 0 0 10px;
+	}
+
+/*-- CUSTOM TYPE POSTS -----------------------------------------------*/
+
+#rstars {
+	display:inline-block;
+	}
+
+#rstars div {
+	float:left;
+	}
+
+/*-- BIG BUTTON ----------------------------------------------- */
+
+a.bbutton {
+	cursor:pointer;
+	background:#FFF;
+	}
+
+a.bbutton .a div {
+	width:150px;
+	text-align:left;
+	}
+
+/*-- FOOTER -----------------------------------------------*/
+
+#footerbox {
+	width:936px;
+	}
+
+/*-- IMAGE SHORTCODE -----------------------------------------------------*/
+
+span.img-none,
+span.img-fl,
+span.img-fr,
+span.img-ma {
+	border:1px solid #DDD;
+	}
+
+/*-- PRICING BOX SHORTCODE ----------------------------------------------- */
+
+.pbox {
+	border:1px solid #DDD;
+	}
+
+/*-- QUOTES SHORTCODE ----------------------------------------------- */
+
+.quote .qc {
+	width:35px;
+	}
+
+.quote .qd * {
+	display:inline-block;
+	position:relative;
+	}
+
+/*-- PANDA SLIDER -----------------------------------------------*/
+
+.pslider {
+	overflow:hidden;
+	}
+
+.ps-1 .pnavbar em,
+.ps-1 .pnavbar span {
+	float:left;
+	}
+
+.ps-1 .pnavbar {
+	overflow:visible;
+	}
+
+/*-- TITLES ----------------------------------------------- */
+
+h4 > span {
+	position:absolute;
+	}
+
+/*-- FIELDSET ----------------------------------------------- */
+fieldset legend {
+	display:inline-block;
+	}
