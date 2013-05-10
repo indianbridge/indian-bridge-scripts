@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndianBridgeScorer", "Appli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplication", "Applications\TestApplication\TestApplication.csproj", "{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateBFIPage", "GenerateBFIPage\GenerateBFIPage.csproj", "{FF8AE74D-BB6A-4641-A558-9597BB7132EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CD_ROM|Any CPU = CD_ROM|Any CPU
@@ -236,6 +238,31 @@ Global
 		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|Mixed Platforms.Build.0 = Release|x86
 		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|x86.ActiveCfg = Release|x86
 		{A8FBE5DF-8DBE-4A43-A674-8072AEF233B8}.SingleImage|x86.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.CD_ROM|Any CPU.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.CD_ROM|Mixed Platforms.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.CD_ROM|Mixed Platforms.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.CD_ROM|x86.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.CD_ROM|x86.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Debug|x86.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Debug|x86.Build.0 = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.DVD-5|Any CPU.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.DVD-5|Mixed Platforms.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.DVD-5|Mixed Platforms.Build.0 = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.DVD-5|x86.ActiveCfg = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.DVD-5|x86.Build.0 = Debug|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Release|Any CPU.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Release|Mixed Platforms.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Release|x86.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.Release|x86.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.SingleImage|Any CPU.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.SingleImage|Mixed Platforms.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.SingleImage|Mixed Platforms.Build.0 = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.SingleImage|x86.ActiveCfg = Release|x86
+		{FF8AE74D-BB6A-4641-A558-9597BB7132EA}.SingleImage|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
