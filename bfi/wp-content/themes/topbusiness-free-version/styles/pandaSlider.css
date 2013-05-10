@@ -1,0 +1,292 @@
+/*-- PANDA SLIDER -----------------------------------------------*/
+
+.pslider {
+	position:relative;
+	overflow:hidden;
+	max-width:100%;
+	}
+
+.pslides {
+	height:0;
+	overflow:hidden;
+	position:relative;
+	max-width:100%;
+	}
+
+.pslides > div {
+	display:block;
+	position:absolute;
+	z-index:1;
+	overflow:hidden;
+	max-width:100%;
+	height:auto;
+	left:-9999px;
+	}
+
+.pnavbar {
+	position:relative;
+	z-index:3;
+	}
+
+.ploading {
+	background:url(../images/loading.gif) center no-repeat;
+	height:50px;
+	}
+
+.pslider .block {
+	display:block !important;
+	left:0;
+	}
+
+.pslider img,
+.slide-img {
+	display:table !important;
+	height:auto;
+	}
+
+
+
+/* -- Style #1 -- for Custom Types Posts  -----------------------------------------------*/
+
+.ps-1 .pnavbar {
+	height:53px;
+	background:url(../images/pslider-navbar-1.png) bottom center repeat-x;
+	border-radius:3px 3px 0 0;
+	overflow:hidden;
+	}
+
+.ps-1 .pnav {
+	height:53px;
+	display:table;
+	position:relative;
+	text-align:left;
+	}
+
+.ps-1 .pnav > div {
+	#position:absolute;
+	#top:50%;
+	display:table-cell;
+	vertical-align:middle;
+	left:0; /* for IE7 */
+	width:100%; /* for IE7 */
+	}
+
+.ps-1 .pnav > div > div {
+	#position:relative;
+	#top:-50%;
+	}
+
+.ps-1 .pnavbar span {
+	font-weight:bold;
+	padding:19px 25px;
+	vertical-align:middle;
+	border-top:3px solid transparent;
+	font-size:11px;
+	text-transform:uppercase;
+	line-height:12px;
+	display: inline-block;
+	}
+
+.ps-1 .pnavbar span:hover {
+	cursor:pointer;
+	color:#030303;
+	border-top:3px solid #030303;
+	background:#FFF;
+	}
+
+.ps-1 .pnavbar span.pscurrent {
+	cursor:pointer;
+	color:#1569ff;
+	background:#FFF;
+	border-top:3px solid #1569ff;
+	}
+
+.ps-1 .pnavbar span strong {
+	width:10px;
+	height:10px;
+	display:inline-block;
+	margin:0 5px -1px 0;
+	background:#444 url(../images/arrdown-white-outline.png) center center no-repeat;
+	}
+
+.ps-1 .pnavbar span.pscurrent strong,
+.ps-1 .pnavbar span.pscurrent:hover strong {
+	background-color:#1569ff;
+	}
+
+.ps-1 .pnavbar span:hover strong {
+	background-color:#030303;
+	}
+
+.ps-1 .pnavbar em {
+	width:1px;
+	height:53px;
+	display:inline-block;
+	vertical-align:middle;
+	background:url(../images/line.png) top center repeat-y;
+	}
+
+#sub-slider {
+	background: url(../images/pslider-shadow.png) center center repeat-x;
+	height:5px;
+	margin:0 0 -5px;
+	position:relative;
+	}
+
+
+/* -- Style #2 -- for [slider] shortcode -----------------------------------------------*/
+
+.ps-2 {
+	box-shadow:0 1px 2px rgba(0,0,0,0.3);
+	border-bottom-right-radius:4px;
+	border-bottom-left-radius:4px;
+	}
+
+.ps-2 .pnavbar {
+	height:50px;
+	margin:-5px 0 0 0;
+	padding:4px 0 1px;
+	background:url(../images/pslider-navbar-2.png) top center repeat-x;
+	}
+
+.ps-2 .pnav {
+	height:50px;
+	display:table;
+	position:relative;
+	text-align:center;
+	width:100%;
+	}
+
+.ps-2 .pnav > div {
+	#position:absolute;
+	#top:50%;
+	display:table-cell;
+	vertical-align:middle;
+	left:0; /* for IE7 */
+	width:100%; /* for IE7 */
+	}
+
+.ps-2 .pnav > div > div {
+	#position:relative;
+	#top:-50%;
+	}
+
+.ps-2 .pnavbar span {
+	font-weight:bold;
+	padding:0.5em 1em;
+	vertical-align:middle;
+	background:#FFF url(../images/grd-black2.png) top center repeat-x;
+	background-size:100% 100%;
+	border:1px solid #D5D5D5;
+	border-bottom:1px solid #AAA;
+	border-radius:3px;
+	}
+
+.ps-2 .pnavbar span:hover {
+	cursor:pointer;
+	border:1px solid #AAA;
+	box-shadow:0 1px 2px rgba(0,0,0,0.2);
+	}
+
+.ps-2 .pnavbar span.pscurrent {
+	cursor:pointer;
+	color:#333;
+	background:#E5E5E5;
+	border: 1px solid #AAA;
+	box-shadow:0 1px 2px rgba(0,0,0,0.25) inset;
+	}
+
+.ps-2 .pnavbar em {
+	width:9px;
+	height:50px;
+	display:inline-block;
+	vertical-align:middle;
+	}
+
+
+
+/* -- Style #3 -- for [slider] shortcode -----------------------------------------------*/
+
+.ps-3 {
+	}
+
+.ps-3 .pnavbar {
+	height:50px;
+	margin:-5px 0 0 0;
+	padding:4px 0 1px;
+	background:url(../images/pslider-navbar-2.png) top center repeat-x;
+	}
+
+.ps-3 .pnav {
+	height:50px;
+	display:table;
+	position:relative;
+	text-align:center;
+	width:100%;
+	}
+
+.ps-3 .pnav > div {
+	#position:absolute;
+	#top:50%;
+	display:table-cell;
+	vertical-align:middle;
+	left:0; /* for IE7 */
+	width:100%; /* for IE7 */
+	}
+
+.ps-3 .pnav > div > div {
+	#position:relative;
+	#top:-50%;
+	}
+
+.ps-3 .pnavbar span {
+	font-weight:bold;
+	padding:0.5em 1em;
+	vertical-align:middle;
+	background:#FFF url(../images/grd-black2.png) top center repeat-x;
+	background-size:100% 100%;
+	border:1px solid #D5D5D5;
+	border-bottom:1px solid #AAA;
+	border-radius:3px;
+	}
+
+.ps-3 .pnavbar span:hover {
+	cursor:pointer;
+	border:1px solid #AAA;
+	box-shadow:0 1px 2px rgba(0,0,0,0.2);
+	}
+
+.ps-3 .pnavbar span.pscurrent {
+	cursor:pointer;
+	color:#333;
+	background:#E5E5E5;
+	border: 1px solid #AAA;
+	box-shadow:0 1px 2px rgba(0,0,0,0.25) inset;
+	}
+
+.ps-3 .pnavbar em {
+	width:9px;
+	height:50px;
+	display:inline-block;
+	vertical-align:middle;
+	}
+
+.feat-link {
+	text-decoration:none;
+	color:white;
+	background:orange;
+	border-radius:2px;
+	padding:0.3em 0.7em;
+	margin:0 5px 4px 0;
+	}
+
+
+
+
+
+
+
+
+
+
+
