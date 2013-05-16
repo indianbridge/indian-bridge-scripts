@@ -49,6 +49,7 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 			<script type="text/javascript">
 				function callSwitchTabs(catID) {
 					wp_ajax_filter_categories.switchTabs(catID,'<?php echo $tabIDPrefix; ?>','<?php echo $contentIDPrefix; ?>');
+					return false;
 				}
 				function callLoadPosts(catID) {
 					wp_ajax_filter_categories.loadPostsByCategory(catID,'<?php echo $contentIDPrefix; ?>','<?php echo $loadingImageURL ?>','<?php echo $ajaxURL ?>',<?php echo $shortcode_atts; ?>);
@@ -57,30 +58,35 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 					wp_ajax_filter_categories.loadPostsByCategory(catID,'<?php echo $ajaxurl; ?>',<?php echo $shortcode_atts; ?>);
 				}
 			</script>
-			<div class="tabber-widget-default">
-				<ul class="tabber-widget-tabs">
-					<li><a id="<?php echo $tabIDPrefix; ?>" onclick="callSwitchTabs('');" href="#">All Categories</a></li>			
-					<?php foreach ( $categories as $catID ) { ?>
-						<li><a id="<?php echo $tabIDPrefix.$catID; ?>" onclick="callSwitchTabs('<?php echo $catID; ?>');" href="#"><?php echo get_cat_name($catID) ; ?></a></li>
-					<?php } ?>
-				</ul>
-				<div class="tabber-widget-content">
-					<div class="tabber-widget">
-						<div id="<?php echo $contentIDPrefix; ?>" style="display:none;"></div>
-						<?php foreach ( $categories as $catID ) { ?>
-							<div id="<?php echo $contentIDPrefix.$catID; ?>" style="display:none;"></div>
-						<?php } ?>						
-					</div>
-				</div>
-			</div>
+			<?php
+			ob_start();
+			echo '<div class="tabber-widget-default">';
+				echo '<ul class="tabber-widget-tabs">';
+					echo '<li><a id="'.$tabIDPrefix.'" onclick="callSwitchTabs(\'\');" href="javascript:void(0)">All Categories</a></li>';			
+					foreach ( $categories as $catID ) {
+						echo '<li><a id="'.$tabIDPrefix.$catID.'" onclick="callSwitchTabs(\''.$catID.'\');" href="javascript:void(0)">'.get_cat_name($catID).'</a></li>';
+					}
+				echo '</ul>';
+				echo '<div class="tabber-widget-content">';
+					echo '<div class="tabber-widget">';
+						echo '<div id="'.$contentIDPrefix.'" style="display:none;"></div>';
+						foreach ( $categories as $catID ) { 
+							echo '<div id="'.$contentIDPrefix.$catID.'" style="display:none;"></div>';
+						} 
+					echo '</div>';
+				echo '</div>';
+			echo '</div>';
+			?>
 			<script type="text/javascript">
 				callSwitchTabs('');
 				callLoadPosts('');
 				<?php foreach ( $categories as $catID ) { ?>
 					callLoadPosts('<?php echo $catID; ?>');
 				<?php } ?>
-			</script> 			
-			<?php			
+			</script> 		
+			<?php	
+				$out = ob_get_clean();
+				return $out;
 		}	
 
 				
