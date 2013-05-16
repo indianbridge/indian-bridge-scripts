@@ -43,8 +43,8 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 			$ajaxURL = admin_url ('admin-ajax.php');
 			$loadingImageURL = admin_url ( 'images/loading.gif' );
 			$shortcode_atts = json_encode($atts);
-			$tabIDPrefix = basename(get_permalink()).'-tab';
-			$contentIDPrefix = basename(get_permalink()).'-content';
+			$tabIDPrefix = 'wp_ajax_filter_categories-tab';
+			$contentIDPrefix = 'wp_ajax_filter_categories-content';
 			?>
 			<script type="text/javascript">
 				function callSwitchTabs(catID) {
