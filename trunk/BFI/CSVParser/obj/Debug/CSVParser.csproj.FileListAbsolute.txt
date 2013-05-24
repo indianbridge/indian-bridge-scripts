@@ -1,0 +1,9 @@
+F:\Bridge\BFI\CSVParser\bin\Debug\CSVParser.exe.config
+F:\Bridge\BFI\CSVParser\bin\Debug\CSVParser.exe
+F:\Bridge\BFI\CSVParser\bin\Debug\CSVParser.pdb
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.csprojResolveAssemblyReference.cache
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.Form1.resources
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.Properties.Resources.resources
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.csproj.GenerateResource.Cache
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.exe
+F:\Bridge\BFI\CSVParser\obj\Debug\CSVParser.pdb
