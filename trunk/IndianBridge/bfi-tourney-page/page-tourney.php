@@ -1,0 +1,116 @@
+<?php
+/*
+Template Name: Tourney
+*/
+
+	get_header();
+
+	if (have_posts()) : while (have_posts()) : the_post(); 
+
+	// GET CUSTOM SIDEBAR
+	//$sidebar = get_post_meta($post->ID, 'sidebar_value', true);
+	$sidebar='No sidebar';
+
+	?>
+
+	<div id="content">
+
+		<div class="contentbox <?php
+			if ($sidebar == 'No sidebar') :
+
+				echo'wfull';
+
+			elseif ($sidebar == 'Buddy Sidebar') :
+
+				echo'w720';
+
+			else :
+
+				echo'w620';
+
+			endif; ?>">
+
+			<h2><?php the_title(); edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' ) ?></h2>
+
+			<?php
+
+				// BREADCRUMBS
+				echo '<div class="mt-10 pb15">';
+				if ( !is_front_page() && function_exists( 'breadcrumb_trail' ) ) {
+					breadcrumb_trail(	array(
+						'before'		=> __('Browse:','pandathemes'),
+						'show_home'		=> __('Home','pandathemes'),
+						'front_page'	=> true,
+						'separator'		=> '>'
+					));
+				}
+				echo '</div>';
+				
+				// Get Ancestors and locate root
+				$ancestors = $post->ancestors;
+				$root = $post->ID;
+				foreach($ancestors as $ancestor) {
+					$page_template = get_post_meta( $ancestor, '_wp_page_template', true );
+					if ($page_template != 'page-tourney.php') break;
+					$root = $ancestor;
+				}
+				
+				// Set images from featured image of root
+				if (has_post_thumbnail( $root ) ):
+					$image = wp_get_attachment_image_src( get_post_thumbnail_id( $root ), 'single-post-thumbnail' );
+					echo '<img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/>';
+				endif;			
+				echo '<div class="clear h20"><!-- --></div>';
+				
+				$mypages = get_pages( array( 'child_of' => $root, 'parent' => $root, 'sort_column' => 'menu_order', 'sort_order' => 'asc' ) );
+				echo '<div class="tabber-widget-default">';
+					// Set the top menu
+					echo '<ul class="tabber-widget-tabs">';	
+						$counter = 1;
+						foreach( $mypages as $page ) {
+							if (in_array($page->ID, $ancestors) or $page->ID == $post->ID) {
+								echo '<li><a class="selected" href="'.get_page_link($page->ID).'">'.$page->post_title.'</a></li>';
+							}
+							else {
+								echo '<li><a href="'.get_page_link($page->ID).'">'.$page->post_title.'</a></li>';
+							}
+						}
+					echo '</ul>';
+								
+
+					// Set the content
+					echo '<div class="tabber-widget-content">';
+						echo '<div class="tabber-widget">';
+							// CONTENT
+							the_content();
+						echo '</div>';
+					echo '</div>';
+				echo '</div>';	
+
+				echo '<div class="clear h20"><!-- --></div>';
+
+				// PAGINATION
+				wp_link_pages(array('before' => '<p><strong>Pages:</strong> ', 'after' => '</p>', 'next_or_number' => 'number'));
+				
+				// COMMENTS ETC.
+				if ( $theme_options['pages_metas'] == 'enable' ) : comments_template(); endif;
+				
+	endwhile;
+
+		else : echo '<div class="contentbox w620"><h2>404</h2><p>'.__('Sorry, no posts matched your criteria.','pandathemes').'</p>';
+
+	endif; ?>
+
+	</div> <!-- end_of_contentbox -->
+
+		<?php
+			// SIDEBAR
+			if ($sidebar == 'Buddy Sidebar') :
+				include(TEMPLATEPATH.'/inc/sidebar_buddy.php');
+			else :
+				include(TEMPLATEPATH.'/inc/sidebar.php');
+			endif;
+
+	get_footer();
+
+?>
