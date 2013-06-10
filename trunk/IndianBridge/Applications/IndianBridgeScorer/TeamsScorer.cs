@@ -996,5 +996,7 @@ namespace IndianBridgeScorer
         {
             publishResultsToWordpress();
         }
+
+
     }
 }

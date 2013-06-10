@@ -1,0 +1,138 @@
+body {
+background-color:#2c98c7;
+background-image:url(../../images/patterns/vertical_lines.png);
+background-position:top center;
+background-repeat:repeat;
+background-attachment:scroll;
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,#topmess a:hover, #selectElement {
+color:#fff !important;
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,ul.top-menu li.basic ul li a:hover,ul.top-menu li.basic ul li.current-cat > a:hover,ul.top-menu li.basic ul li.current_page_item > a:hover, #selectElement option {
+background-color:#2c98c7 !important;
+}
+
+/* P a n d a   s l i d e r   t a b s */
+.ps-1 .pnavbar span:hover {
+color:#2c98c7;
+border-top:3px solid #2c98c7;
+}
+
+.tag-cloud a:hover {
+background:#2c98c7;
+}
+
+/* t 1   b u t t o n s */
+.t1-button-holder a:hover span {
+background-color:#8eaf00;
+border-color:#8eaf00;
+}
+
+#subnav li.current a {
+background:#8eaf00;
+}
+
+a:hover {
+color:#2c98c7;
+}
+
+/* C u s t o m   p o s t s   c a t e g o r y  t a b s */
+.ctabs a:hover {
+border-top:3px solid #2c98c7;
+color:#2c98c7;
+}
+
+a,#header h1.logo a strong,h2 a,h3 a,h4 a,h5 a,h6 a,li.kcurrent,.kul li:hover,li.current,#item-nav a:hover,#item-nav .selected a,#item-nav .current a {
+color:#8eaf00;
+}
+
+
+.tgl-1 .ta {
+color:#8eaf00;
+}
+
+.tgl-1.tclicked .ta {
+background-color:#8eaf00;
+}
+
+.demo-W,.ps-1 .pnavbar span.pscurrent strong,.ctabs a.current span,a.bbutton2,#wp-calendar a,#searchform input#searchsubmit:hover,.feedemail-form .feedemail-button:hover,/* C u s t o m m e n u w i d g e t */
+.widget ul.menu > li > a:hover {
+background-color:#8eaf00;
+}
+
+.ps-1 .pnavbar span.pscurrent,.ctabs a.current {
+border-top:3px solid #8eaf00;
+color:#8eaf00;
+}
+
+.widget ul.menu > li > a:hover,.ps-1 .pnavbar span:hover strong,.ps-1 .pnavbar span.pscurrent:hover strong,.ctabs a:hover span,.ctabs a.current:hover span {
+background-color:#2c98c7;
+}
+/* Style Tabs */
+
+.tabber-widget-default {
+}
+.tabber-widget-default ul.tabber-widget-tabs {
+}
+.tabber-widget-default a {
+}
+.tabber-widget-default ul.tabber-widget-tabs li {
+
+}
+.tabber-widget-default ul.tabber-widget-tabs li:before {
+}
+.tabber-widget-default ul.tabber-widget-tabs a {
+}
+.tabber-widget-default ul.tabber-widget-tabs a:hover ,.tabber-widget-default ul.tabber-widget-tabs a.selected,
+.tabber-widget-default ul.tabber-widget-tabs a.selected:hover {
+color: #8eaf00;
+}
+
+.tabber-widget-default .tabber-widget-content {
+}
+
+/* Style Content */
+
+.tabber-widget-default .tabber-widget-content {
+}
+.tabber-widget-default .tabber-widget-content .tabber-widget-title {
+}
+
+
+
+/* BFI Table Styling */
+table.bfi {
+	border-collapse:collapse;
+	border: 1px solid black;
+}
+table.bfi > thead > tr > th, table.bfi th
+{
+	border: 1px solid black;
+	font-weight:bold;
+	padding:5px 10px;	
+}
+
+table.bfi > tbody > tr > td , table.bfi td{
+	padding:5px;
+	border: 1px solid #333;
+}
+table.bfi > thead > tr{
+	background-color:#EEE;
+	font-size:16px;
+	line-height:1.3em !important;
+	padding:0.6em 0 0.6em 0;
+	margin:0 0 0 -0.07em;
+	font-style:normal;
+	font-weight:normal;
+	font-family:Arial,'Lucida Sans',Verdana,sans-serif;
+}
+table.bfi > tbody > tr.even {
+	background: #030303 url(../../images/grd-white5.png) left top repeat-x;
+	background-color: #030303;
+	color: #fff;
+}
+table.bfi > tbody > tr.odd {
+	color: #8eaf00;
+}

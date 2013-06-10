@@ -15,6 +15,7 @@ namespace IndianBridge.WordpressAPIs
         //public string pageName;
         public string pageTitle;
         public string pageContent;
+        public string pageTemplate;
     }
 
     public interface IgetCatList
@@ -239,7 +240,8 @@ namespace IndianBridge.WordpressAPIs
                         //pageInfo.pageName = pageName;
                         pageInfo.pageTitle = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
                         pageInfo.pageContent = m_replaceLinks ? replaceLinks(html, url, isIndexPage, indexHtmlPath) : html;
-                        string result = m_categories.postResults(1, "indianbridge", "kibitzer", pageInfo);
+                        pageInfo.pageTemplate = "page-tourney.php";
+                        string result = m_categories.postResults(1, m_userName, m_password, pageInfo);
                         if (!m_lastRunTimes.ContainsKey(url)) printMessage("UPDATED. No entry was found for last run time.");
                         else
                         {
