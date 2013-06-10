@@ -78,6 +78,7 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 			//$pageName = $args['pageName'];
 			$pageTitle = $args['pageTitle'];
 			$pageContent = $args['pageContent'];
+			$pageTemplate = $args['pageTemplate'];
 			
 			// Check if page already exists
 			$pageID = url_to_postid($pagePath);
@@ -102,7 +103,10 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 						'post_type' => 'page',
 						'post_parent' => $parentPageID
 					);			
-					$pageID = wp_insert_post($my_post);					
+					$pageID = wp_insert_post($my_post);	
+					if($pageID && !empty($pageTemplate)) {
+						update_post_meta($pageID, '_wp_page_template',  $pageTemplate);
+					}
 				}
 			}
 			else {

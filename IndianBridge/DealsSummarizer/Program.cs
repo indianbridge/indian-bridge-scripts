@@ -69,7 +69,7 @@ namespace DealsSummarizer
                         //bool making2H = false;
                         bool making4HNS = false;
                         bool makingGameEW = false;
-                        bool failing3HNS = false;
+                        //bool failing3HNS = false;
                         if (Convert.ToInt32(ntricks[1]) >= 10)
                         {
                             handsMaking4HNS++;
@@ -78,7 +78,7 @@ namespace DealsSummarizer
                         else if (Convert.ToInt32(ntricks[1]) < 9)
                         {
                             handsFailing3H++;
-                            failing3HNS = true;
+                            //failing3HNS = true;
                         }
                         if (making4HNS && 
                             ((Convert.ToInt32(etricks[0]) >= 7 || Convert.ToInt32(etricks[1]) >= 7 || Convert.ToInt32(etricks[2]) >= 8 || Convert.ToInt32(etricks[3]) >= 8 || Convert.ToInt32(etricks[4]) >= 6) ||

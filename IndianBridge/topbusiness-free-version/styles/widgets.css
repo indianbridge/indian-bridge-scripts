@@ -1,0 +1,215 @@
+/*-- WIDGET SUBSCRIBE -----------------------------------------------*/
+
+/*see Search default*/
+
+.feederss-label {
+	text-decoration:none;
+	}
+
+h5.rss-title {
+	padding:0.6em 0 0.6em 21px;
+	background:url(../images/icons/rss_16.png) left 50% no-repeat;
+	color:#ff9500;
+	display:inline-block;
+	}
+
+/*-- WIDGET RECENT POSTS -----------------------------------------------*/
+
+.widget-recent .a {
+	background:url(../images/line.png) left bottom repeat-x;
+	padding:10px 0 11px 0;
+	}
+
+.widget-recent .a-first-child {
+	padding:0 0 11px 0;
+	}
+
+.widget-recent .a:last-child {
+	background:none;
+	}
+
+.widget-recent img {
+	border-radius:3px;
+	}
+
+
+/*-- WIDGET CALENDAR -----------------------------------------------*/
+
+#wp-calendar th,
+#wp-calendar td {
+	text-align:center;
+	}
+
+#wp-calendar a {
+	display:block;
+	margin:-4px;
+	padding:4px;
+	background:#1569ff;
+	color:#FFF;
+	text-decoration:none;
+	border-radius:2px;
+	}
+
+#wp-calendar #prev a,
+#wp-calendar #next a {
+	font-size:10px;
+	line-height:1.4em;
+	font-weight:bold;
+	display:inline-block !important;
+	text-decoration:none;
+	color:#555 !important;
+	padding:0.2em 0.6em;
+	background-color:#FFF;
+	background-position:center center;
+	background-image:url(../images/grd-black2.png) !important;
+	background-repeat:repeat-x;
+	background-size:100% 100%;
+	border-radius:3px;
+	border:1px solid #D5D5D5;
+	border-bottom:1px solid #AAA;
+	text-transform:uppercase;
+	}
+
+#wp-calendar #prev a:hover,
+#wp-calendar #next a:hover {
+	border:1px solid #AAA;
+	box-shadow:0 1px 2px rgba(0,0,0,0.2);
+	cursor:pointer;
+	}
+
+#wp-calendar tfoot {
+	background-image:url(../images/line10.png) !important;	
+	}
+
+#wp-calendar tfoot #prev {
+	padding:10px 0 10px 10px;
+	text-align:left;
+	}
+
+#wp-calendar tfoot #next {
+	padding:10px 10px 10px 0;
+	text-align:right;
+	}
+
+#wp-calendar caption {
+	padding:0 0 10px 0;
+	letter-spacing:0.3em;
+	font-style:italic;
+	font-family:georgia,times;
+	font-size:14px;
+	text-align:center;
+	}
+
+/*-- WIDGET TAGS -----------------------------------------------*/
+
+.tag-cloud a {
+	text-decoration:none;
+	background:#FFF;
+	padding:3px 7px;
+	display:inline-block;
+	margin:0 3px 3px 0;
+	border-radius:2px;
+	}
+
+.tag-cloud a:hover {
+	background:#1569ff;
+	color:#FFF;
+	}
+
+/*-- WIDGET TABS -----------------------------------------------*/
+
+.tabs-widget-tags a {
+	background:#F6F6F6;
+	}
+
+/*-- WIDGET CATEGORIES -----------------------------------------------*/
+
+.tabs-widget-cats .children {
+	margin:0 0 0 10px;
+	}
+
+/*-- WIDGET PAGES -----------------------------------------------*/
+
+.tabs-widget-pages .children {
+	margin:0 0 0 10px;
+	}
+
+/*-- WIDGET TWITTER -----------------------------------------------*/
+
+ul#twitter_update_list {
+	list-style-type:none;
+	margin:0 0 -0.5em;
+	}
+
+ul#twitter_update_list li {
+	padding:0 0 1em 23px;
+	background:url(../images/icons/twitter_16.png) left 1px no-repeat;
+	}
+
+.followme-box {
+	text-align:right;
+	padding:10px 0 0 0;
+	}
+
+/*-- WIDGET FLICKR -----------------------------------------------*/
+
+#flickr {
+	padding:0;
+	position:relative;
+	}
+
+#flickr .flickr_badge_image {
+	float:left;
+	margin:0 1px 1px 0;
+	padding:12px;
+	width:75px;
+	height:75px;
+	background:url(../images/bg-white-80.png) top left repeat;
+	border-radius:3px;
+	}
+
+#flickr .flickr_badge_image a {
+	display:block;
+	}
+
+#flickr .flickr_badge_image img {
+	border-radius:3px;
+	}
+
+#flickr .flickr_badge_image a:hover img {
+	}
+
+/*-- WIDGETS ADS -----------------------------------------------*/
+
+.ads300 {
+	width:300px;
+	}
+
+.ads125 {
+	display:inline-block;
+	}
+
+.ads125 > div {
+	float:left;
+	display:inline-block;
+	margin:0 1px 1px 0;
+	padding:12px;
+	position:relative;
+	background:url(../images/bg-white-80.png) top left repeat;
+	overflow:hidden;
+	width:125px;
+	height:125px;
+	border-radius:3px;
+	}
+
+/*-- WIDGET CONTACT INFO -----------------------------------------------*/
+.widget-contact-info p.ci-p {
+	padding:0 0 1em 20px;
+	background-repeat:no-repeat;
+	background-position:left 1px;
+	}
+
+#ci-phone {	background-image:url(../images/icons/16/led-icons/mobile_phone.png); }
+#ci-email {	background-image:url(../images/icons/16/led-icons/email.png); }
+#ci-address {	background-image:url(../images/icons/16/led-icons/house.png); background-position:left 0px; }
+#ci-name {	background-image:url(../images/icons/16/led-icons/user.png); }
