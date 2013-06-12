@@ -58,7 +58,7 @@ Template Name: Tourney
 				// Set images from featured image of root
 				if (has_post_thumbnail( $root ) ):
 					$image = wp_get_attachment_image_src( get_post_thumbnail_id( $root ), 'single-post-thumbnail' );
-					echo '<img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/>';
+					echo '<a href="'.get_permalink($root).'"><img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/></a>';
 				endif;			
 				echo '<div class="clear h20"><!-- --></div>';
 				
@@ -66,7 +66,12 @@ Template Name: Tourney
 				echo '<div class="tabber-widget-default">';
 					// Set the top menu
 					echo '<ul class="tabber-widget-tabs">';	
-						$counter = 1;
+						if ($root == $post->ID) {
+							echo '<li><a class="selected" href="'.get_permalink($root).'">HOME</a></li>';
+						}
+						else {
+							echo '<li><a href="'.get_permalink($root).'">HOME</a></li>';
+						}
 						foreach( $mypages as $page ) {
 							if (in_array($page->ID, $ancestors) or $page->ID == $post->ID) {
 								echo '<li><a class="selected" href="'.get_page_link($page->ID).'">'.$page->post_title.'</a></li>';
