@@ -1,0 +1,10 @@
+.shortcode-placeholder {
+	background:url("../img/shortcode.gif") no-repeat scroll 50% 50% #EEE;
+	border:1px dotted #888;
+	margin:4px;
+	width:20px;
+	height:20px;
+	display:inline-block;
+	cursor:default;
+	vertical-align:bottom;
+	}
