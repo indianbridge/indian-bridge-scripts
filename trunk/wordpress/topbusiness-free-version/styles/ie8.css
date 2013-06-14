@@ -1,0 +1,66 @@
+/* MENU
+----------------------------------------------- */
+.top-menu .sub-menu {
+	border-right:1px solid #DDD;
+	border-bottom:1px solid #DDD;
+	}
+
+/*-- HEADER FIXING ----------------------------------------------- */
+
+#icons a img {
+	background:#f5f5f5;
+	}
+
+#icons {
+	display:inline-block !important;
+	}
+
+/*-- BIG BUTTON ----------------------------------------------- */
+
+a.bbutton {
+	background:#FFF;
+	}
+
+/*-- SEARCH DEFAULT + Subscribe widget -----------------------------------------------*/
+
+#searchform div,
+.feedemail-form div {
+	border:1px solid #DDD;
+	}
+
+.feedemail-input {
+	margin:4px 0 0 25px;
+	}
+
+/*-- IMAGE SHORTCODE -----------------------------------------------------*/
+
+span.img-none,
+span.img-fl,
+span.img-fr,
+span.img-ma {
+	border:1px solid #DDD;
+	}
+
+/*-- PRICING BOX SHORTCODE ----------------------------------------------- */
+
+.pbox {
+	border:1px solid #DDD;
+	}
+
+/*-- PANDA SLIDER -----------------------------------------------*/
+
+.pslider img, .slide-img {
+	display:block !important;
+	}
+
+/*-- PRETTYPHOTO -----------------------------------------------*/
+
+.pp_gallery ul a img {
+	width:50px !important;
+	height:33px !important;
+	}
+
+.pp_gallery ul a {
+	width:50px !important;
+	background:#000;
+	}

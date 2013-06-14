@@ -1,0 +1,191 @@
+body {
+background-color:#6fbec5;
+background-image:url(../../images/patterns/vertical_lines_4.png);
+background-position:top center;
+background-repeat:repeat;
+background-attachment:fixed;
+}
+
+ul.top-menu > li > a,#topmess,#topmess a,#topmess strong, #selectElement {
+color:#fbf6fc;
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,#topmess a:hover {
+color:#f6fcf8 !important;
+}
+
+ul.top-menu > li.current-menu-item > a,ul.top-menu > li.current-menu-ancestor > a {
+color:#fff;
+background-color:#82738a;
+}
+
+#menuwrapper,#searchform input#searchsubmit,.feedemail-form .feedemail-button,.pr-bar h3,.kul,.prdcts h3,.wp-pagenavi span.current,div.item-list-tabs, #selectElement option {
+background-color:#35283c;
+}
+
+.wp-pagenavi span.current {
+border-color:#35283c;
+}
+
+ul.top-menu > li > a:hover,ul.top-menu > li.hover-has-ul > a,ul.top-menu > li.hover-has-ul > a:hover,ul.top-menu li.basic ul li a:hover,ul.top-menu li.basic ul li.current-cat > a:hover,ul.top-menu li.basic ul li.current_page_item > a:hover {
+background-color:#82738a !important;
+}
+
+#footerarea {
+background-color:#a3d6c0;
+}
+
+#subfooter {
+background-image:url(../../images/shadow.png);
+height:39px;
+}
+
+#footer h1,#footer h2,#footer h3,#footer h4,#footer h,#footer h5,#footer h6,#footer .dropcap {
+color:#35283c;
+}
+
+#footerarea,#footerarea li,#footerarea p,#footerarea td,#footerarea th,#footerarea span,#footerarea div,#footerarea #wp-calendar tbody a {
+color:#39574a;
+}
+
+#footerarea a {
+color:#fff;
+}
+
+#wp-calendar a,#footerarea .tag-cloud a:hover {
+background:#fff;
+}
+
+/* P a n d a   s l i d e r   t a b s */
+.ps-1 .pnavbar span:hover {
+color:#6fbec5;
+border-top:3px solid #6fbec5;
+}
+
+.tag-cloud a:hover {
+background:#6fbec5;
+}
+
+/* t 1   b u t t o n s */
+.t1-button-holder a:hover span {
+background-color:#fe5141;
+border-color:#fe5141;
+}
+
+#subnav li.current a {
+background:#fe5141;
+}
+
+a:hover {
+color:#6fbec5;
+}
+
+/* C u s t o m   p o s t s   c a t e g o r y  t a b s */
+.ctabs a:hover {
+border-top:3px solid #6fbec5;
+color:#6fbec5;
+}
+
+#before_product {
+background-color:#C9EDF0;
+}
+
+body #copyrights * {
+color:#35283C !important;
+}
+
+h1,h1 a,h2,h2 a,h3,h3 a,.it1 h3 a,.it2 h3 a,.it3 h3 a,h4,h4 a,h5,h5 a,h6,h6 a {
+color:#1f1722;
+}
+
+a,#header h1.logo a strong,h2 a,h3 a,h4 a,h5 a,h6 a,li.kcurrent,.kul li:hover,li.current,#item-nav a:hover,#item-nav .selected a,#item-nav .current a {
+color:#fe5141;
+}
+
+.tgl-1 .ta {
+color:#fe5141;
+}
+
+.tgl-1.tclicked .ta {
+background-color:#fe5141;
+}
+
+.demo-W,.ps-1 .pnavbar span.pscurrent strong,.ctabs a.current span,a.bbutton2,#wp-calendar a,#searchform input#searchsubmit:hover,.feedemail-form .feedemail-button:hover,/* C u s t o m m e n u w i d g e t */
+.widget ul.menu > li > a:hover {
+background-color:#fe5141;
+}
+
+.ps-1 .pnavbar span.pscurrent,.ctabs a.current {
+border-top:3px solid #fe5141;
+color:#fe5141;
+}
+
+.widget ul.menu > li > a:hover,.ps-1 .pnavbar span:hover strong,.ps-1 .pnavbar span.pscurrent:hover strong,.ctabs a:hover span,.ctabs a.current:hover span {
+background-color:#6fbec5;
+}
+
+/* Style Tabs */
+
+.tabber-widget-default {
+}
+.tabber-widget-default ul.tabber-widget-tabs {
+background-color: #35283c;
+}
+.tabber-widget-default a {
+}
+.tabber-widget-default ul.tabber-widget-tabs li {
+
+}
+.tabber-widget-default ul.tabber-widget-tabs li:before {
+}
+.tabber-widget-default ul.tabber-widget-tabs a {
+}
+.tabber-widget-default ul.tabber-widget-tabs a:hover ,.tabber-widget-default ul.tabber-widget-tabs a.selected,
+.tabber-widget-default ul.tabber-widget-tabs a.selected:hover {
+color: #fe5141;
+}
+
+.tabber-widget-default .tabber-widget-content {
+}
+
+/* Style Content */
+
+.tabber-widget-default .tabber-widget-content {
+}
+.tabber-widget-default .tabber-widget-content .tabber-widget-title {
+}
+
+/* BFI Table Styling */
+table.bfi {
+	border-collapse:collapse;
+	border: 1px solid black;
+}
+table.bfi > thead > tr > th, table.bfi th
+{
+	border: 1px solid black;
+	font-weight:bold;
+	padding:5px 10px;	
+}
+
+table.bfi > tbody > tr > td , table.bfi td{
+	padding:5px;
+	border: 1px solid #82738a;
+}
+table.bfi > thead > tr{
+	background-color:#EEE;
+	font-size:16px;
+	line-height:1.3em !important;
+	padding:0.6em 0 0.6em 0;
+	margin:0 0 0 -0.07em;
+	font-style:normal;
+	font-weight:normal;
+	font-family:Arial,'Lucida Sans',Verdana,sans-serif;
+}
+table.bfi > tbody > tr.even {
+	background: #030303 url(../../images/grd-white5.png) left top repeat-x;
+	background-color: #35283c;
+	color: #fff;
+}
+table.bfi > tbody > tr.odd {
+	color: #fe5141;
+}

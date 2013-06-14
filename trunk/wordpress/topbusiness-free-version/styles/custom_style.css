@@ -1,0 +1,21 @@
+
+/*
+	THIS FILE HAS BEEN CREATED AUTOMATICALLY.
+	DO NOT MODIFY THIS FILE. ALL CUSTOM CHANGES WILL BE LOST.
+*/
+
+body.login { background-color:#1569a2; }body.login { background-image:url(http://localhost/bfi/wp-content/themes/topbusiness-free-version/images/grd-white-80.png); }body, body.login { background-position:top center; } body, body.login { background-repeat:repeat-x; } body, body.login { background-attachment:scroll; } body.login h1 a { background:transparent url(http://localhost/bfi/wp-content/uploads/files/images/BFI_Header.png) center center no-repeat; }body.login form { box-shadow:0 10px 30px rgba(0, 0, 0, 0.3); }
+				.login #nav a,
+				.login #nav a:hover,
+				.login #backtoblog a,
+				.login #backtoblog a:hover {
+					text-shadow:0 0 6px rgba(0, 0, 0, 0.8);
+					color:#FFF !important;
+					}
+				
+					/* titles */
+						h1, h2, h3, h4, h5, h6,
+					/* pricing box header */
+						.pbox .pa *,
+					/* misc titles */
+						.font-replace, .dropcap, .dropcap2 div div { font-family:; } h1 { font-size:px; } h2 { font-size:px; } h3 { font-size:px; } h4 { font-size:px; } h5 { font-size:px; } h6 { font-size:px; } 
