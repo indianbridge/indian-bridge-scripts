@@ -1,8 +1,8 @@
 var f = jQuery.noConflict();
 
 jQuery(document).ready(function() {
-	f('table.bfi').each(function() {
-		f('tr:odd',  this).addClass('odd').removeClass('even');
-		f('tr:even', this).addClass('even').removeClass('odd');
+	f('table.stripeme').each(function() {
+		f('tbody tr:odd',  this).addClass('odd').removeClass('even').addClass('alt');
+		f('tbody tr:even', this).addClass('even').removeClass('odd');
 	});
 });
