@@ -15,8 +15,10 @@
 	#headwrapper { width:768px; }
 
 	#header { width:743px; }
+	
+	#hlifestream { display:none; }
 
-	#hcustom { display:none; }
+	/*#hcustom { display:none; }*/
 
 	ul.top-menu > li > a { font-weight:normal; font-size:11px; padding:13px 8px 13px 9px !important; }
 
@@ -239,7 +241,7 @@
 
 	.hmisc { height:auto; padding:0 0 20px 0; }
 
-	#hcustom, #hsearch { display:none; }
+	/*#hcustom, #hsearch { display:none; }*/
 
 	#icons { max-width:100%; }
 
