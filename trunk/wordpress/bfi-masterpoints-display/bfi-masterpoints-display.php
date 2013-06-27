@@ -19,22 +19,38 @@ Version: 1.0
 		class BFI_Masterpoint_Display {
 			private $bfi_masterpoint_db;
 			private $fieldNames;
+			private $dataGridName;
 			public function __construct() {
-				$use_dataTables = false;
-			// register the javascript
-				if ($use_dataTables) {
+				$this->dataGridName = "jqGrid";
+				$dataGridName = $this->dataGridName;
+				//$dataGridName = "dataTables";
+				//$dataGridName = "flexiGrid";
+				$jsFilePath = 'js/jquery.'.$dataGridName.'.min.js';
+				$cssFilePath = 'css/jquery.'.$dataGridName.'.css';
+				$jsIdentifier = 'jquery_'.$dataGridName.'_js';
+				$cssIdentifier = 'jquery_'.$dataGridName.'_css';
+				//$use_dataTables = false;
+				// register the javascript
+				wp_register_script( $jsIdentifier, plugins_url($jsFilePath, __FILE__ ), array( 'jquery' ) );	
+				wp_enqueue_script($jsIdentifier);	
+				/*if ($use_dataTables) {
 					wp_register_script( 'jquery_dataTables', plugins_url( 'js/jquery.dataTables.min.js', __FILE__ ), array( 'jquery' ) );	
 					wp_enqueue_script('jquery_dataTables');							
 				}
 				else {
 					wp_register_script( 'jquery_flexigrid', plugins_url( 'js/flexigrid.js', __FILE__ ), array( 'jquery' ) );	
 					wp_enqueue_script('jquery_flexigrid');
-				}
+				}*/
+
+				// Register bfi master point javascript
 
 				wp_register_script( 'bfi_masterpoints_display', plugins_url( 'bfi-masterpoints-display.js', __FILE__ ), array( 'jquery' ) );	
-				wp_enqueue_script('bfi_masterpoints_display');				
-			// register the css
-				if ($use_dataTables) {
+				wp_enqueue_script('bfi_masterpoints_display');
+				// register the css
+				wp_register_style($cssIdentifier, plugins_url($cssFilePath, __FILE__ ) );	
+				wp_enqueue_style($cssIdentifier);				
+
+				/*if ($use_dataTables) {
 					wp_register_style( 'jquery_dataTables_css', plugins_url( 'css/jquery.dataTables.css', __FILE__ ) );	
 					wp_enqueue_style('jquery_dataTables_css');
 					//wp_register_style( 'jquery_dataTables_themeroller_css', plugins_url( 'css/jquery.dataTables_themeroller.css', __FILE__ ) );	
@@ -46,8 +62,9 @@ Version: 1.0
 				else {
 					wp_register_style( 'jquery_flexigrid_css', plugins_url( 'css/jquery.flexigrid.css', __FILE__ ) );	
 					wp_enqueue_style('jquery_flexigrid_css');			
-				}	
-			// Add the shortcode
+				}*/
+
+				// Add the shortcode
 				add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));
 				add_action( 'show_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
 				add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
@@ -142,7 +159,7 @@ Version: 1.0
 		}
 
 		function remove_subscribers() {
-			$args = array( 'role' => 'Subscriber' );
+			$args = array( 'role' => 'subscriber' );
 			$subscribers = get_users( $args );
 			if( !empty($subscribers) ) {
 				$i = 0;
@@ -163,13 +180,14 @@ Version: 1.0
 		function bfi_masterpoint_display ($atts, $content = null ) {
 			ob_start();
 			?>
-			<div class="datagrid">
-				<table id="masterpoints-table" class="flexme">
-					
+			<div class="datagrid1">
+				<table id="bfi_masterpoints_table"></table>
+				<div id="bfi_masterpoints_pager"></div>
 				</table>
 			</div>
 			<script type="text/javascript">
-			bfi_masterpointTable_flexigrid();
+				bfi_masterpoint_renderTable(<?php echo "'".$this->dataGridName."'"; ?>);
+				//bfi_masterpointTable_flexigrid();
 			</script>
 			<?php
 			$out = ob_get_clean();

@@ -1,5 +1,20 @@
-function bfi_masterpointTable_dataTables() {
-    jQuery('#masterpoints-table').dataTable( {
+function bfi_masterpoint_renderTable(dataGridName) {
+	if (dataGridName == "dataTables") {
+		bfi_masterpoint_renderTable_dataTables();
+	}
+	else if (dataGridName == "flexiGrid") {
+		bfi_masterpoint_renderTable_flexiGrid();
+	}
+	else if (dataGridName == "jqGrid") {
+		bfi_masterpoint_renderTable_jqGrid();
+	}
+}
+
+function bfi_masterpoint_renderTable_jqGrid() {
+}
+
+function bfi_masterpoint_renderTable_dataTables() {
+    jQuery('#bfi_masterpoints_table').dataTable( {
         "bProcessing": true,
         "bJQueryUI": true,
         "bServerSide": true,
@@ -7,15 +22,8 @@ function bfi_masterpointTable_dataTables() {
     } );        
 }
 
-function bfi_masterpointTable_flexigrid() {
-    /*jQuery("#masterpoints-table th").each(function() {
-        jQuery(this).attr("width", jQuery(this).width());
-    });*/
-    /*jQuery('#masterpoints-table').attr('width','95%');
-    jQuery('#masterpoints-table thead tr th').each(function() {
-        jQuery(this).attr('width',jQuery(this).width()-10);
-    });*/
-    jQuery("#masterpoints-table").flexigrid({
+function bfi_masterpoint_renderTable_flexiGrid() {
+    jQuery("#bfi_masterpoints_table").flexigrid({
         url: 'http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.flexigrid.php',
         dataType: 'json',
         colModel : [
