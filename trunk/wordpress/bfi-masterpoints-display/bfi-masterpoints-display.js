@@ -1,44 +1,76 @@
-function renderTable(server_processing_file,member_id) {
-    jQuery('#demo').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"><thead><tr><th>Evetnt Date</th><th>Masterpoints</th></tr></thead><tbody></tbody></table>' );
-	jQuery('#example').dataTable( {
-		"bProcessing": true,
-		"bServerSide": true,
-		"sAjaxSource": server_processing_file,
-		"fnServerData": function ( sSource, aoData, fnCallback ) {
-			aoData.push( { "name":"member_id","value": member_id } );
-			jQuery.getJSON( sSource, aoData, function (json) { 
-				fnCallback(json)
-			} );
-		}
-	} );	
- /*jQuery('#example').dataTable( {
+function bfi_masterpointTable_dataTables() {
+    jQuery('#masterpoints-table').dataTable( {
         "bProcessing": true,
+        "bJQueryUI": true,
         "bServerSide": true,
-        "sAjaxSource": server_processing_file,
+        "sAjaxSource": "http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.datatables.php"
+    } );        
+}
 
-    } );*/	
-    /*jQuery('#example').dataTable( {
-        "aaData": [
-            Reduced data set
-            [ "Trident", "Internet Explorer 4.0", "Win 95+", 4, "X" ],
-            [ "Trident", "Internet Explorer 5.0", "Win 95+", 5, "C" ],
-            [ "Trident", "Internet Explorer 5.5", "Win 95+", 5.5, "A" ],
-            [ "Trident", "Internet Explorer 6.0", "Win 98+", 6, "A" ],
-            [ "Trident", "Internet Explorer 7.0", "Win XP SP2+", 7, "A" ],
-            [ "Gecko", "Firefox 1.5", "Win 98+ / OSX.2+", 1.8, "A" ],
-            [ "Gecko", "Firefox 2", "Win 98+ / OSX.2+", 1.8, "A" ],
-            [ "Gecko", "Firefox 3", "Win 2k+ / OSX.3+", 1.9, "A" ],
-            [ "Webkit", "Safari 1.2", "OSX.3", 125.5, "A" ],
-            [ "Webkit", "Safari 1.3", "OSX.3", 312.8, "A" ],
-            [ "Webkit", "Safari 2.0", "OSX.4+", 419.3, "A" ],
-            [ "Webkit", "Safari 3.0", "OSX.4+", 522.1, "A" ]
+function bfi_masterpointTable_flexigrid() {
+    /*jQuery("#masterpoints-table th").each(function() {
+        jQuery(this).attr("width", jQuery(this).width());
+    });*/
+    /*jQuery('#masterpoints-table').attr('width','95%');
+    jQuery('#masterpoints-table thead tr th').each(function() {
+        jQuery(this).attr('width',jQuery(this).width()-10);
+    });*/
+    jQuery("#masterpoints-table").flexigrid({
+        url: 'http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.flexigrid.php',
+        dataType: 'json',
+        colModel : [
+        {display: 'Tourney Code', name : 'tournament_code', width:'auto',  sortable : true, align: 'left'},
+        {display: 'Event_Code', name : 'event_code',  width:'auto', sortable : true, align: 'left'},
+        {display: 'Member', name : 'member_id',   width:'auto', sortable : true, align: 'left'},
+        {display: 'Event Date', name : 'event_date',  width:'auto', sortable : true, align: 'left'},
+        {display: 'Local', name : 'localpoints_earned',  width:'auto', sortable : true, align: 'left'},
+        {display: 'Fed', name : 'fedpoints_earned', width:'auto', sortable : true, align: 'left'}
         ],
-        "aoColumns": [
-            { "sTitle": "Engine" },
-            { "sTitle": "Browser" },
-            { "sTitle": "Platform" },
-            { "sTitle": "Version", "sClass": "center" },
-            { "sTitle": "Grade", "sClass": "center" }
-        ]
-    } ); */  
+        params : [{name:'member_id', value: 'WB007531'}],
+        searchitems : [
+        {display: 'Tourney Code', name : 'tourney_code'},
+        {display: 'Event Code', name : 'event_code'},
+        {display: 'Member ID', name : 'member_id', isdefault: true}
+        ],
+        sortname: "event_date",
+        sortorder: "desc",
+        usepager: true,
+        title: "Masterpoints",
+        useRp: true,
+        rp: 20,
+        showTableToggleBtn: false,
+        resizable: true,
+        height: 500,
+        onSuccess: function() {format();},
+        singleSelect: true
+    });    
+}
+
+function format() {
+    var gridContainer = jQuery('.flexigrid');
+    var headers = gridContainer.find('div.hDiv table tr:first th:not(:hidden)');
+    var drags = gridContainer.find('div.cDrag div');
+    var offset = 0;
+    var firstDataRow = gridContainer.find('tr:first td:not(:hidden)');
+    var columnWidths = new Array( firstDataRow.length );
+    gridContainer.find( 'tr' ).each( function() {
+        gridContainer.find('td:not(:hidden)').each( function(i) {
+            var colWidth = jQuery(this).outerWidth();
+            if (!columnWidths[i] || columnWidths[i] < colWidth) {
+                columnWidths[i] = colWidth;
+            }
+        });
+    });
+    for (var i = 0; i < columnWidths.length; ++i) {
+        var bodyWidth = columnWidths[i];
+
+        var header = headers.eq(i);
+        var headerWidth = header.outerWidth();
+
+        var realWidth = bodyWidth > headerWidth ? bodyWidth : headerWidth;
+        firstDataRow.eq(i).css('width',realWidth);
+        header.css('width',realWidth);            
+        drags.eq(i).css('left',  offset + realWidth );
+        offset += realWidth;
+    }
 }

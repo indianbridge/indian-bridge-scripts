@@ -95,7 +95,8 @@
 		$sWhere .= ')';
 	}
 	else {
-		$sWhere = 'WHERE member_id = \'TM000277\'';	
+		/*$sWhere = 'WHERE member_id = \'TM000277\'';	*/
+		$sWhere = '';
 	}
 	
 	/* Individual column filtering */
@@ -177,4 +178,5 @@
 	}
 	
 	echo json_encode( $output );
+
 ?>
