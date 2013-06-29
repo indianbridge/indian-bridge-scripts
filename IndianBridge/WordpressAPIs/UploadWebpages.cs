@@ -102,6 +102,7 @@ namespace IndianBridge.WordpressAPIs
             m_e = e;
             uploadDirectoryInternal(directory, siteRoot);
             if (cancel()) m_e.Cancel = true;
+            
         }
 
         public void uploadDirectory(String directory, String siteRoot)
@@ -264,7 +265,7 @@ namespace IndianBridge.WordpressAPIs
             catch (Exception ex)
             {
                 printMessage("Exception : "+ex.Message);
-                return false;
+                throw ex;
             }
         }
 
