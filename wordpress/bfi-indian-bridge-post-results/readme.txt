@@ -1,16 +1,16 @@
-=== Indian Bridge Post Results ===
+=== BFI Post Results ===
 Contributors: Sriram Narasimhan
 Donate link: none
-Tags: indian bridge, post results
+Tags: bfi, indian bridge, post results
 Requires at least: 3.1
 Tested up to: 3.5
 Stable tag: 1.0
 
-A plugin to accept post requests to post results of indian bridge events
+A plugin to accept post requests to post html pages (was built for results of indian bridge events) to any wordpress site
 
 == Description ==
 
-Pretty easy setup.. just install and activate it on the site of your choice.
+Pretty easy setup. just install and activate it on the site of your choice.
 
 You can now use indianbridge.postResults XMLRPC call to post results.
 
@@ -25,7 +25,7 @@ OR you can just install it with WordPress by going to Plugins >> Add New >> and 
 
 == Official Support ==
 
-Indian Bridge Post Results - none
+BFI Post Results - none
 
 == About the Plugin Author ==
 
