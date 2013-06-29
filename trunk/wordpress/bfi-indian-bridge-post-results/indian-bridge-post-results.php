@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Indian Bridge Post Results
+Plugin Name: BFI Post Results
 Plugin URI: http://bfi.net.in
 Description: A plugin to accept post requests to post results of indian bridge events
 Author: Sriram Narasimhan
@@ -13,10 +13,10 @@ Version: 1.0
 */
 
 
-if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
+if ( ! class_exists( 'BFI_Post_Results' ) ) {
 	
 
-	class Indian_Bridge_Post_Results {
+	class BFI_Post_Results {
 		
 		public function __construct() {
 			add_filter( 'xmlrpc_methods', array( &$this, 'add_xml_rpc_methods' ) );
@@ -32,7 +32,7 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 		 *         function callback
 		 */
 		public function add_xml_rpc_methods( $methods ) {
-			$methods['indianbridge.postResults'] = array( &$this, 'indian_bridge_post_results' );
+			$methods['indianbridge.postResults'] = array( &$this, 'bfi_post_results' );
 			return $methods;
 		}
 		
@@ -46,7 +46,7 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 		 * 
 		 * @return mixed IXR_Error, or string
 		 */
-		public function indian_bridge_post_results( $params ) {
+		public function bfi_post_results( $params ) {
 			
 			global $wp_xmlrpc_server;
 			$wp_xmlrpc_server->escape( $args );
@@ -125,5 +125,5 @@ if ( ! class_exists( 'Indian_Bridge_Post_Results' ) ) {
 	}
 
 	// finally instantiate our plugin class and add it to the set of globals
-	$GLOBALS['indian_bridge_post_results'] = new Indian_Bridge_Post_Results();
+	$GLOBALS['bfi_post_results'] = new BFI_Post_Results();
 }
