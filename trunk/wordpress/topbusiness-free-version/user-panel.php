@@ -5,7 +5,6 @@ Theme My Login will always look in your theme's directory first, before using th
 */
 ?>
 <div class="login" id="theme-my-login<?php $template->the_instance(); ?>">
-
 	<?php if ( $template->options['show_gravatar'] ) : ?>
 	<div class="one_half"><?php $template->the_user_avatar(); ?></div>
 	<?php endif; ?>
@@ -33,12 +32,13 @@ Theme My Login will always look in your theme's directory first, before using th
 		}
 	</script> 		
 	<?php
-	$mydb= new wpdb('indianbridge','kibitzer','masterpoints','localhost');
+	$mydb= new wpdb('bfinem7l_sriram','kibitzer','masterpoints','localhost');
 	$current_user = wp_get_current_user();
-	//$member_id = 'WB000777';
 	$member_id = $current_user->user_login;
+	$masterpointURL = home_url("/masterpoints");
 	?>
 	<h5>Masterpoints</h5>
+	<h6><a href="<?php echo $masterpointURL; ?>">Click for Detailed Masterpoint Page</a></h6>
 	<div class="tabber-widget-default">
 		<ul class="tabber-widget-tabs">
 			<li><a id="masterpoint_tab_1" onclick="user_panel_switchTabs(1);" href="javascript:void(0)">Summary</a></li>		
@@ -74,44 +74,21 @@ Theme My Login will always look in your theme's directory first, before using th
 
 <?php
 function getMasterpointSummary($mydb,$member_id) {	
-		$query = "SELECT * FROM member WHERE member_id=%s";
-		$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
-		$numItems = count($rows);
-		if ($numItems < 1) {
-			echo '<h6>Not a member of BFI</h6>';
-		}
-		else {
-			$row=$rows[0];
-			$query = "SELECT description FROM rank_master WHERE rank_code=%s";
-			$rows = $mydb->get_results( $mydb->prepare($query,$row->rank_code));
-			if (count($rows) > 0) {
-				echo '<span class="ico ranking-icon">Rank: '.$rows[0]->description.'</span>';
-			}
-			else {
-				echo '<span class="ico ranking-icon">Rank: Unknown</span>';
-			}
-			echo '<br/>';
-			$query = "SELECT description FROM zone_master WHERE zone_code=%s";
-			$rows = $mydb->get_results( $mydb->prepare($query,$row->zone_code));
-			if (count($rows) > 0) {
-				echo '<span class="ico map-icon">Zone: '.$rows[0]->description.'</span>';
-			}
-			else {
-				echo '<span class="ico map-icon">Zone: Unknown</span>';
-			}		
-			echo '<br/>';	
-			$sumField = 'localpoints_earned';
-			$tableName = 'tournament_masterpoint';
-			$query = "SELECT SUM(".$sumField.") FROM ".$tableName." WHERE member_id = %s";
-			$localTotal = $mydb->get_var( $mydb->prepare($query,$member_id) );
-			
-			$sumField = 'fedpoints_earned';
-			$query = "SELECT SUM(".$sumField.") FROM ".$tableName." WHERE member_id = %s";
-			$fedTotal = $mydb->get_var( $mydb->prepare($query,$member_id) );
-			echo '<span><a href="#">Total Points: '.($localTotal+$fedTotal).'</a></span><br/>';
-			echo '<span><a href="#">Fed Points: '.$fedTotal.'</a></span><br/>';
-			echo '<span><a href="#">Local Points: '.$localTotal.'</a></span><br/>';
-		}	
+	$query = "SELECT member.member_id AS member_number, rank_master.description AS rank, zone_master.description AS zone, (member.total_current_lp+member.total_current_fp) AS total_points, member.total_current_fp AS fed_points, member.total_current_lp AS local_points FROM member ";
+	$query .= "JOIN zone_master ON member.zone_code=zone_master.zone_code JOIN rank_master ON member.rank_code=rank_master.rank_code WHERE member_id=%s LIMIT 1";
+	$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
+	$numItems = count($rows);
+	if ($numItems < 1) {
+		echo '<h6>Not a member of BFI</h6>';
+	}
+	else {
+		$row=$rows[0];
+		echo '<span class="ico ranking-icon">Rank: '.$rows[0]->rank.'</span><br/>';
+		echo '<span class="ico map-icon">Zone: '.$rows[0]->zone.'</span><br/>';	
+		echo '<span class="ico trophy-icon">Total Points: '.$rows[0]->total_points.'</span><br/>';
+		echo '<span class="ico trophy-silver-icon">Fed Points: '.$rows[0]->fed_points.'</span><br/>';
+		echo '<span class="ico trophy-bronze-icon">Local Points: '.$rows[0]->local_points.'</span><br/>';		
+	}	
 }
 
 function showTable($rows,$fields) {
@@ -143,7 +120,6 @@ function getRecentMasterpointList($mydb,$member_id) {
 }
 
 function getMasterpointLeaders($mydb,$member_id) {
-	//$query = "SELECT *,(fedpoints_earned+localpoints_earned) AS totalpoints_earned FROM member WHERE member_id=%s ORDER BY totalpoints_earned DESC LIMIT 0,10";
 	$query = "SELECT CONCAT(first_name,' ',last_name) AS full_name,(total_current_fp+total_current_lp) AS total FROM member ORDER BY total DESC LIMIT 0,10";
 	$rows = $mydb->get_results( $mydb->prepare($query,$member_id));	
 	$fields = array('full_name' => 'Name','total' => 'Total');

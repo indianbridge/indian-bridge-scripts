@@ -405,6 +405,12 @@ div#logo > div > div,
 
 .map-icon {	background-image:url(../images/icons/16/led-icons/map.png);	}
 
+.trophy-icon {	background-image:url(../images/icons/16/led-icons/trophy.png);	}
+
+.trophy-silver-icon {	background-image:url(../images/icons/16/led-icons/trophy_silver.png);	}
+
+.trophy-bronze-icon {	background-image:url(../images/icons/16/led-icons/trophy_bronze.png);	}
+
 body .tag {	background-image:url(../images/icons/16/tag.png); /* Do not remove body */ }
 
 .com {	background-image:url(../images/icons/16/comm.png);	}
