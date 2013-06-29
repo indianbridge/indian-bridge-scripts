@@ -19,50 +19,27 @@ Version: 1.0
 		class BFI_Masterpoint_Display {
 			private $bfi_masterpoint_db;
 			private $fieldNames;
-			private $dataGridName;
 			public function __construct() {
-				$this->dataGridName = "jqGrid";
-				$dataGridName = $this->dataGridName;
-				//$dataGridName = "dataTables";
-				//$dataGridName = "flexiGrid";
+				$dataGridName = "datatables";
+
 				$jsFilePath = 'js/jquery.'.$dataGridName.'.min.js';
 				$cssFilePath = 'css/jquery.'.$dataGridName.'.css';
 				$jsIdentifier = 'jquery_'.$dataGridName.'_js';
 				$cssIdentifier = 'jquery_'.$dataGridName.'_css';
-				//$use_dataTables = false;
+
 				// register the javascript
 				wp_register_script( $jsIdentifier, plugins_url($jsFilePath, __FILE__ ), array( 'jquery' ) );	
 				wp_enqueue_script($jsIdentifier);	
-				/*if ($use_dataTables) {
-					wp_register_script( 'jquery_dataTables', plugins_url( 'js/jquery.dataTables.min.js', __FILE__ ), array( 'jquery' ) );	
-					wp_enqueue_script('jquery_dataTables');							
-				}
-				else {
-					wp_register_script( 'jquery_flexigrid', plugins_url( 'js/flexigrid.js', __FILE__ ), array( 'jquery' ) );	
-					wp_enqueue_script('jquery_flexigrid');
-				}*/
 
 				// Register bfi master point javascript
-
 				wp_register_script( 'bfi_masterpoints_display', plugins_url( 'bfi-masterpoints-display.js', __FILE__ ), array( 'jquery' ) );	
 				wp_enqueue_script('bfi_masterpoints_display');
-				// register the css
-				wp_register_style($cssIdentifier, plugins_url($cssFilePath, __FILE__ ) );	
-				wp_enqueue_style($cssIdentifier);				
 
-				/*if ($use_dataTables) {
-					wp_register_style( 'jquery_dataTables_css', plugins_url( 'css/jquery.dataTables.css', __FILE__ ) );	
-					wp_enqueue_style('jquery_dataTables_css');
-					//wp_register_style( 'jquery_dataTables_themeroller_css', plugins_url( 'css/jquery.dataTables_themeroller.css', __FILE__ ) );	
-					//wp_enqueue_style('jquery_dataTables_themeroller_css');
-					wp_register_style( 'jquery_dataTables_redmond_css', plugins_url( 'css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__ ) );	
-					wp_enqueue_style('jquery_dataTables_redmond_css');
-					
-				}
-				else {
-					wp_register_style( 'jquery_flexigrid_css', plugins_url( 'css/jquery.flexigrid.css', __FILE__ ) );	
-					wp_enqueue_style('jquery_flexigrid_css');			
-				}*/
+				// register the css
+				wp_register_style($cssIdentifier, plugins_url( 'css/jquery.datatables_themeroller.css', __FILE__ ) );	
+				wp_enqueue_style($cssIdentifier);							
+				wp_register_style( 'jquery_dataTables_redmond_css', plugins_url( 'css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__ ) );	
+				wp_enqueue_style('jquery_dataTables_redmond_css');
 
 				// Add the shortcode
 				add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));
@@ -70,11 +47,18 @@ Version: 1.0
 				add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
 				add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
-				add_action('admin_menu', array($this, 'bfi_database_import_menu'));				
-				$this->bfi_masterpoint_db = new wpdb('indianbridge', 'kibitzer', 'masterpoints', 'localhost');
+				add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
+				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);				
+				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'masterpoints', 'localhost');
 				$this->fieldNames = array('address_1', 'address_2', 'address_3', 'city', 'state', 'country','residence_phone','mobile_no','sex','dob');
-				//$this->bfi_masterpoint_db->show_errors();
 			}
+
+			function remove_contactmethods( $contactmethods ) {
+				unset($contactmethods['aim']);
+				unset($contactmethods['jabber']);
+				unset($contactmethods['yim']);
+				return $contactmethods;
+			}			
 
 			function bfi_database_import_menu() {
 				add_users_page( 'Import Members from Masterpoint Table', 'Import BFI Members', 'manage_masterpoints', 'bfi-database-import',array($this, 'bfi_database_import'));
@@ -93,43 +77,17 @@ Version: 1.0
 
 
     			// See if the user has posted us some information
-    			// If they did, this hidden field will be set to 'Y'
-				if( isset($_POST[ $hidden_field_name ]) && $_POST[ $hidden_field_name ] == 'Y' ) {
-					if ($this->bfi_masterpoint_db) {
-						$added = 0;
-						$notAdded = 0;
-						$query = "SELECT * FROM member LIMIT 0,10";
-						$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query));
-						foreach($rows as $row) {
-							$userdata = array();
-							$userdata['user_login'] = $row->member_id;
-							$query = "SELECT password FROM valid WHERE username=%s";
-							$passwordRow = $this->bfi_masterpoint_db->get_row($this->bfi_masterpoint_db->prepare($query,$member_id));
-							if ($passwordRow != null) $userdata['user_pass'] = $passwordRow->password;
-							else $userdata['user_pass'] = 'bridge';
-							$userdata['user_email'] = $row->email;
-							$userdata['first_name'] = $row->first_name;
-							$userdata['last_name'] = $row->last_name;
-							$userdata['display_name'] = $row->first_name.' '.$row->last_name;
-							$userdata['role'] = 'subscriber';
-							$user_id = wp_insert_user( $userdata );
-							if ( is_wp_error( $user_id ) ) {
-								$notAdded += 1;
-							}
-							else {
-								$added += 1;
-							}
-						}
-						?>
-						<div class="updated"><p><strong>Added : <?php echo $added; ?>, Not Added: <?php echo $notAdded; ?></strong></p></div>
-						<?php
+    			// If they did, this hidden field will be set to 'I' or 'D'
+				if( isset($_POST[ $hidden_field_name ]) && ($_POST[ $hidden_field_name ] == 'I' || $_POST[ $hidden_field_name ] == 'D')) {
+					if ($_POST[ $hidden_field_name ] == 'I') {
+						$updatedHTML = $this->import_subscribers();
 					}
-        			else {
+					else if ($_POST[ $hidden_field_name ] == 'D') {
+						$updatedHTML = $this->remove_subscribers();
+					}
 					?>
-					<div class="updated"><p><strong><?php _e('Database is not available for import', 'menu-test' ); ?></strong></p></div>
+					<div class="updated">Finished : <?php echo $updatedHTML; ?></div>
 					<?php
-					}
-
 				}
 
     			// Now display the settings editing screen
@@ -138,27 +96,69 @@ Version: 1.0
 
    				 // header
 
-				echo "<h2>" . __( 'Import BFI Members from Database', 'menu-test' ) . "</h2>";
+				echo "<h2>" . __( 'Manage BFI Members from Database', 'menu-test' ) . "</h2>";
 
     			// settings form
 
 				?>
 
 				<form name="form1" method="post" action="">
-					<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="Y">
+					<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="I">
 
 					<p class="submit">
 						<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Import BFI Members') ?>" />
 					</p>
 
 				</form>
-			</div>
+				<form name="form2" method="post" action="">
+					<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="D">
+
+					<p class="submit">
+						<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Remove Subscribers') ?>" />
+					</p>
+
+				</form>				
+				</div>
 
 			<?php
 
 		}
 
+		function import_subscribers() {
+			$html = "Import Subscribers : ";
+			if ($this->bfi_masterpoint_db) {
+				$added = 0;
+				$notAdded = 0;
+				$query = "SELECT member.member_id AS member_id, valid.password as password, member.email AS email, member.first_name AS first_name, member.last_name AS last_name FROM member ";
+				$query .= " JOIN valid ON valid.username= member.member_id ORDER BY (total_current_fp+total_current_lp) DESC LIMIT 10";
+				$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query));
+				foreach($rows as $row) {
+					$userdata = array();
+					$userdata['user_login'] = $row->member_id;
+					$userdata['user_pass'] = $row->password;
+					$userdata['user_email'] = $row->email;
+					$userdata['first_name'] = $row->first_name;
+					$userdata['last_name'] = $row->last_name;
+					$userdata['display_name'] = $row->first_name.' '.$row->last_name;
+					$userdata['role'] = 'subscriber';
+					$user_id = wp_insert_user( $userdata );
+					if ( is_wp_error( $user_id ) ) {
+						$notAdded += 1;
+					}
+					else {
+						$added += 1;
+					}
+				}
+				$html .= '<p><strong>Added : '.$added.', Not Added: '.$notAdded.'</strong></p>';	
+			}
+			else {
+				$html .= '<p><strong>Database is not available for import</strong></p>';	
+			}		
+			return $html;
+		}
+
 		function remove_subscribers() {
+			$html = "Remove Subscribers : ";
 			$args = array( 'role' => 'subscriber' );
 			$subscribers = get_users( $args );
 			if( !empty($subscribers) ) {
@@ -168,30 +168,106 @@ Version: 1.0
 						$i++;
 					}
 				}
-				echo $i.' Subscribers deleted';
+				$html .= ''.$i.' Subscribers deleted';
 			} else {
-				echo 'No Subscribers deleted';
+				$html .= 'No Subscribers deleted';
 			}
+			return $html;
 		}		
+
+		function getMemberSummary($current_user) {
+			$html = "";
+			$html .= '<div class="fl" style="padding-right:10px;" title="Member Photo"><em>'.get_avatar( $current_user->ID,'110' ).'</em></div>';
+			$html .= '<div>Name : '.$current_user->display_name.'</div>';
+			return $html;
+		}
+
+		function getBFIMembershipInfo($member_id) {
+			$query = "SELECT member.member_id AS member_number, rank_master.description AS rank, zone_master.description AS zone, (member.total_current_lp+member.total_current_fp) AS total_points, member.total_current_fp AS fed_points, member.total_current_lp AS local_points FROM member ";
+			$query .= "JOIN zone_master ON member.zone_code=zone_master.zone_code JOIN rank_master ON member.rank_code=rank_master.rank_code WHERE member_id=%s LIMIT 1";
+			$mydb = $this->bfi_masterpoint_db;
+			$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
+			if (count($rows) > 0) return $rows[0];
+			else return null;
+		}
+
+		function showLoggedInShortCodeContent() {
+			$current_user = wp_get_current_user();
+			if ( 0 == $current_user->ID ) {
+				return $this->showNotLoggedInShortcodeContent();
+			}
+			$member_id = $current_user->user_login;		
+			$membership_info = $this->getBFIMembershipInfo($member_id);
+			if ($membership_info != null) { return $this->showMemberShortcodeContent($current_user,$membership_info); }
+			else { return $this->showNonMemberShortcodeContent($current_user); }		
+		}
+
+		function showMemberShortcodeContent($current_user,$membership_info) {
+			ob_start();
+			echo $this->getMemberSummary($current_user);
+			echo '<div class="fl" style="padding-right:10px;" title="BFI Member Info">';
+			echo '<span class="ico aut">Member Number: '.$membership_info->member_number.'</span><br/>';
+			echo '<span class="ico ranking-icon">Rank: '.$membership_info->rank.'</span><br/>';
+			echo '<span class="ico map-icon">Zone: '.$membership_info->zone.'</span>';
+			echo '</div>';
+			echo '<div class="fl" style="padding-right:10px;" title="BFI Member Points">';
+			echo '<span class="ico trophy-icon">Total Points: '.$membership_info->total_points.'</span><br/>';
+			echo '<span class="ico trophy-silver-icon">Fed Points: '.$membership_info->fed_points.'</span><br/>';
+			echo '<span class="ico trophy-bronze-icon">Local Points: '.$membership_info->local_points.'</span>';	
+			echo '</div>';	
+			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard");
+			$selectedTab = 'mymasterpoint';
+			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			$out = ob_get_clean();
+			return $out;			
+		}		
+
+		function showNonMemberShortcodeContent($current_user) {
+			ob_start();
+			echo $this->getMemberSummary($current_user);
+			echo '<h1>You have to be a member of BFI to see your Masterpoint Summary and Details</h1>';
+			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
+			$selectedTab = 'leaderboard';
+			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			$out = ob_get_clean();
+			return $out;			
+		}
+
+		function showNotLoggedInShortcodeContent() {
+			ob_start();
+			echo '<h1>You have to be a member of BFI and be logged in to see your Masterpoint Summary and Details</h1>';
+			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
+			$selectedTab = 'leaderboard';
+			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			$out = ob_get_clean();
+			return $out;
+		}
+
+		function getMasterpointTabs($tabs,$selectedTab) {
+			$html = "";
+			$html .= '<div class="tabber-widget-default">';
+			$html .= '<ul class="tabber-widget-tabs">';
+			$tabIDPrefix = 'masterpoint_page_tab_';
+			foreach($tabs as $tab=>$tabName) {
+				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
+			}
+			$html .= '</ul>';
+			$html .= '<div class="tabber-widget-content">';
+			$html .= '<div class="tabber-widget">';
+			$html .= '<div id="bfi_masterpoints_table_container">';
+			$html .= '</div></div></div></div>';
+			$html .= '<script type="text/javascript">';
+			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\');';
+			$html .= '</script>';
+			return $html;
+		}
 
 		/**
 		 * Replace shortcode with posts
 		 */
 		function bfi_masterpoint_display ($atts, $content = null ) {
-			ob_start();
-			?>
-			<div class="datagrid1">
-				<table id="bfi_masterpoints_table"></table>
-				<div id="bfi_masterpoints_pager"></div>
-				</table>
-			</div>
-			<script type="text/javascript">
-				bfi_masterpoint_renderTable(<?php echo "'".$this->dataGridName."'"; ?>);
-				//bfi_masterpointTable_flexigrid();
-			</script>
-			<?php
-			$out = ob_get_clean();
-			return $out;		 
+			if ( is_user_logged_in() ) { return $this->showLoggedInShortCodeContent(); }
+			else { return $this->showNotLoggedInShortcodeContent(); }
 		}
 
 		function bfi_add_custom_user_profile_fields( $user ) {

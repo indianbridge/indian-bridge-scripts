@@ -1,27 +1,24 @@
 <?php
-	/*
-	 * Script:    DataTables server-side script for PHP and MySQL
-	 * Copyright: 2010 - Allan Jardine
-	 * License:   GPL v2 or BSD (3-point)
-	 */
-	
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 * Easy set variables
-	 */
-	
-	/* Array of database columns which should be read and sent back to DataTables. Use a space where
-	 * you want to insert a non-database field (for example a counter or static image)
-	 */
-	$aColumns = array( 'event_date', 'fedpoints_earned' );
-	
-	/* Indexed column (used for fast and accurate table cardinality) */
-	$sIndexColumn = "tournament_code";
-	
-	/* DB table to use */
-	$sTable = "tournament_masterpoint";
+
+$paramName = 'BFI_Table_Type';
+if ( isset( $_GET[$paramName] ) && $_GET[$paramName] != '' ) {
+	$tableType = $_GET[$paramName];
+}
+else {
+	$tableType = 'leaderboard';
+}
+
+if ($tableType == 'leaderboard') {
+	doLeaderboard();
+}
+else if ($tableType == 'mymasterpoint') {
+	doMyMasterpoint();
+}
+
+function connectToDB() {
 	
 	/* Database connection information */
-	$gaSql['user']       = "indianbridge";
+	$gaSql['user']       = "bfinem7l_sriram";
 	$gaSql['password']   = "kibitzer";
 	$gaSql['db']         = "masterpoints";
 	$gaSql['server']     = "localhost";
@@ -36,34 +33,35 @@
 	 * MySQL connection
 	 */
 	$gaSql['link'] =  mysql_pconnect( $gaSql['server'], $gaSql['user'], $gaSql['password']  ) or
-		die( 'Could not open connection to server' );
+	die( 'Could not open connection to server' );
 	
 	mysql_select_db( $gaSql['db'], $gaSql['link'] ) or 
-		die( 'Could not select database '. $gaSql['db'] );
-	
-	
-	/* 
-	 * Paging
-	 */
+	die( 'Could not select database '. $gaSql['db'] );	
+
+	return $gaSql['link'];
+}
+
+function getLimit() {
 	$sLimit = "";
 	if ( isset( $_GET['iDisplayStart'] ) && $_GET['iDisplayLength'] != '-1' )
 	{
 		$sLimit = "LIMIT ".mysql_real_escape_string( $_GET['iDisplayStart'] ).", ".
 			mysql_real_escape_string( $_GET['iDisplayLength'] );
-	}
-	
-	
-	/*
-	 * Ordering
-	 */
+	}	
+	return $sLimit;
+}
+
+function getOrder($aColumns) {
+	$sOrder = "";
 	if ( isset( $_GET['iSortCol_0'] ) )
 	{
+		$aValues = array_values($aColumns);
 		$sOrder = "ORDER BY  ";
 		for ( $i=0 ; $i<intval( $_GET['iSortingCols'] ) ; $i++ )
 		{
 			if ( $_GET[ 'bSortable_'.intval($_GET['iSortCol_'.$i]) ] == "true" )
 			{
-				$sOrder .= $aColumns[ intval( $_GET['iSortCol_'.$i] ) ]."
+				$sOrder .= $aValues[ intval( $_GET['iSortCol_'.$i] ) ]."
 				 	".mysql_real_escape_string( $_GET['sSortDir_'.$i] ) .", ";
 			}
 		}
@@ -73,68 +71,35 @@
 		{
 			$sOrder = "";
 		}
-	}
-	
-	
-	/* 
-	 * Filtering
-	 * NOTE this does not match the built-in DataTables filtering which does it
-	 * word by word on any field. It's possible to do here, but concerned about efficiency
-	 * on very large tables, and MySQL's regex functionality is very limited
-	 */
+	}	
+	return $sOrder;
+}
+
+function doSearch($aColumns) {
 	$sWhere = "";
 	if ( $_GET['sSearch'] != "" )
 	{
-		$sWhere = "WHERE (";
-		//$sWhere = "WHERE (member_id = ".$_GET['member_id']." AND ";
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
-		{
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+		$sWhere = "(";	
+		foreach ($aColumns as $key => $value) {
+			$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
 		$sWhere .= ')';
 	}
 	else {
-		/*$sWhere = 'WHERE member_id = \'TM000277\'';	*/
-		$sWhere = '';
-	}
-	
-	/* Individual column filtering */
-	for ( $i=0 ; $i<count($aColumns) ; $i++ )
-	{
-		if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-		{
-			if ( $sWhere == "" )
-			{
-				$sWhere = "WHERE ";
-			}
-			else
-			{
-				$sWhere .= " AND ";
-			}
-			$sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-		}
-	}
-	
-	
-	/*
-	 * SQL queries
-	 * Get data to display
-	 */
-	$sQuery = "
-		SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
-		FROM   $sTable
-		$sWhere
-		$sOrder
-		$sLimit
-	";
-	$rResult = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
+		$sWhere = "";
+	}	
+	return $sWhere;
+}
+
+function getResults($sqlLink, $sQuery_old, $sIndexColumn, $sTable, $aColumns) {
+	$rResult = mysql_query( $sQuery_old, $sqlLink ) or die(mysql_error());
 	
 	/* Data set length after filtering */
 	$sQuery = "
 		SELECT FOUND_ROWS()
 	";
-	$rResultFilterTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
+	$rResultFilterTotal = mysql_query( $sQuery, $sqlLink) or die(mysql_error());
 	$aResultFilterTotal = mysql_fetch_array($rResultFilterTotal);
 	$iFilteredTotal = $aResultFilterTotal[0];
 	
@@ -143,7 +108,7 @@
 		SELECT COUNT(".$sIndexColumn.")
 		FROM   $sTable
 	";
-	$rResultTotal = mysql_query( $sQuery, $gaSql['link'] ) or die(mysql_error());
+	$rResultTotal = mysql_query( $sQuery,$sqlLink) or die(mysql_error());
 	$aResultTotal = mysql_fetch_array($rResultTotal);
 	$iTotal = $aResultTotal[0];
 	
@@ -161,22 +126,106 @@
 	while ( $aRow = mysql_fetch_array( $rResult ) )
 	{
 		$row = array();
-		for ( $i=0 ; $i<count($aColumns) ; $i++ )
-		{
-			if ( $aColumns[$i] == "version" )
+		foreach ($aColumns as $key => $value) {
+			if ( $value == "version" )
 			{
-				/* Special output formatting for 'version' column */
-				$row[] = ($aRow[ $aColumns[$i] ]=="0") ? '-' : $aRow[ $aColumns[$i] ];
+				// Special output formatting for 'version' column 
+				$row[] = ($aRow[ $value ]=="0") ? '-' : $aRow[ $value ];
 			}
-			else if ( $aColumns[$i] != ' ' )
+			else if ( $value != ' ' )
 			{
-				/* General output */
-				$row[] = $aRow[ $aColumns[$i] ];
-			}
+				// General output 
+				$row[] = $aRow[ $value ];
+			}			
 		}
 		$output['aaData'][] = $row;
 	}
-	
+	return $output;
+	//echo json_encode( $output );	
+}
+
+function doLeaderboard() {
+	$sqlLink = connectToDB();
+	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name','(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp');
+	//$aColumns = array( 'member_id'=>'member_id',"last_name"=>'full_name','(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp');
+	// Indexed column (used for fast and accurate table cardinality) 
+	$sIndexColumn = "member_id";
+	$sTable = "member";
+	$sqlLink = connectToDB();
+	$sLimit = getLimit();
+	//$sOrder = "";
+	$sOrder = getOrder($aColumns);
+	$sWhereSearch = doSearch($aColumns);
+	$sWhere = "";
+	if($sWhereSearch != "") {
+		$sWhere .= " WHERE ".$sWhereSearch;
+	}
+	$sJoin = "";
+	$sQuery = "
+		SELECT SQL_CALC_FOUND_ROWS ";
+	foreach ($aColumns as $key => $value) {
+	  $sQuery .= "$key as $value,";
+	}
+	$sQuery = rtrim($sQuery,',');		
+	$sQuery .= " FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
+	$output = getResults($sqlLink, $sQuery, $sIndexColumn, $sTable, $aColumns);
 	echo json_encode( $output );
+}
+
+
+
+function doMyMasterpoint() {
+
+	$aColumns = array( 'tournament_masterpoint.event_date'=>'event_date','tournament_master.description'=>'tournament_name','tournament_level_master.description'=>'tournament_type','event_master.description'=>'event_code','tournament_masterpoint.localpoints_earned'=>'localpoints_earned','tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(tournament_masterpoint.localpoints_earned+tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
+	// Indexed column (used for fast and accurate table cardinality)
+	$sIndexColumn = "*";
+	$sTable = "tournament_masterpoint";
+
+	//Connect
+	$sqlLink = connectToDB();
+
+	//Paging
+	$sLimit = getLimit();
+
+	//Ordering
+	$sOrder = getOrder($aColumns);
+	
+	//Filtering
+	$sWhereSearch = doSearch($aColumns);
+	$sWhere = "WHERE (member_id = 'WB000777'";
+	if($sWhereSearch != "") {
+		$sWhere .= " AND ".$sWhereSearch;
+	}
+	$sWhere .= ")";
+	
+	//Join
+	$sJoin = "";
+	$sJoin .= "JOIN tournament_master ON tournament_masterpoint.tournament_code = tournament_master.tournament_code ";
+	$sJoin .= "JOIN event_master ON event_master.event_code = tournament_masterpoint.event_code ";
+	$sJoin .= "JOIN tournament_level_master ON tournament_level_master.tournament_level_code = tournament_master.tournament_level_code";
+	
+	//Query
+	$sQuery = "
+		SELECT SQL_CALC_FOUND_ROWS ";
+	foreach ($aColumns as $key => $value) {
+	  $sQuery .= "$key as $value,";
+	}
+	$sQuery = rtrim($sQuery,',');		
+	$sQuery .= " FROM   $sTable
+		$sJoin
+		$sWhere
+		$sOrder
+		$sLimit
+	";
+
+	//Results
+	$output = getResults($sqlLink, $sQuery, $sIndexColumn, $sTable, $aColumns);
+	echo json_encode( $output );
+}
 
 ?>
