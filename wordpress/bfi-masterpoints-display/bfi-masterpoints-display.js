@@ -1,11 +1,11 @@
     var previous_masterpoint_page_tab = null;
-    function switchMasterpointPageTab(newTab, tabIDPrefix) {
+    function switchMasterpointPageTab(newTab, tabIDPrefix,server_side_url) {
         var selectedClass = 'selected';
         if (previous_masterpoint_page_tab != null)
             jQuery("#"+tabIDPrefix+previous_masterpoint_page_tab).removeClass(selectedClass);
         jQuery("#"+tabIDPrefix+newTab).addClass(selectedClass);
         previous_masterpoint_page_tab = newTab;
-        bfi_masterpoint_renderTable_dataTables(newTab);
+        bfi_masterpoint_renderTable_dataTables(newTab,server_side_url);
     } 
 
 function bfi_masterpoint_renderTable(dataGridName,tableType) {
@@ -20,12 +20,13 @@ function bfi_masterpoint_renderTable(dataGridName,tableType) {
 	}
 }
 
-function bfi_masterpoint_renderTable_jqGrid() {
+function bfi_masterpoint_renderTable_jqGrid(server_side_url) {
     var html = '<table id="bfi_masterpoints_table"><table>';
     html += ' <div id="bfi_masterpoints_pager"></div>';
     jQuery('#bfi_masterpoints_table_container').html(html);                 
     jQuery("#bfi_masterpoints_table").jqGrid({
-        url:'http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.jqgrid.php?q=2',
+        //url:'http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.jqgrid.php?q=2',
+		url:server_side_url+'?q=2',
         datatype: "json",
         colNames:['event_date','localpoints_earned', 'fedpoints_earned'],
         colModel:[
@@ -44,7 +45,7 @@ function bfi_masterpoint_renderTable_jqGrid() {
     jQuery("#bfi_masterpoints_table").jqGrid('navGrid','#bfi_masterpoints_pager',{edit:false,add:false,del:false});    
 }
 
-function bfi_masterpoint_renderTable_dataTables(tableType) {
+function bfi_masterpoint_renderTable_dataTables(tableType,server_side_url) {
     var html = '<table id="bfi_masterpoints_table"><thead><tr>';
     if (tableType == "leaderboard") {
         var columns=new Array("ID","NAME","Total","Fed", "Local");
@@ -81,16 +82,16 @@ function bfi_masterpoint_renderTable_dataTables(tableType) {
         "fnServerParams": function ( aoData ) {
               aoData.push( { "name": "BFI_Table_Type", "value": tableType } );
         },
-        "sAjaxSource": "http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.datatables.php"
+        "sAjaxSource": server_side_url
     } );        
 }
 
-function bfi_masterpoint_renderTable_flexiGrid() {
+function bfi_masterpoint_renderTable_flexiGrid(server_side_url) {
     var html = '<table id="bfi_masterpoints_table"><table>';
     jQuery('#bfi_masterpoints_table_container').html(html);                 
 
     jQuery("#bfi_masterpoints_table").flexigrid({
-        url: 'http://localhost/bfi/wp-content/plugins/bfi-masterpoints-display/jquery.flexigrid.php',
+        url: server_side_url,
         dataType: 'json',
         colModel : [
         {display: 'Tourney Code', name : 'tournament_code', width:'auto',  sortable : true, align: 'left'},
