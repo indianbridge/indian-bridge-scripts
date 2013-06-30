@@ -123,11 +123,12 @@ namespace CSVParser
 
 		private void PublishResultsToHTML(DataTable results, IEnumerable<string> columnNames, string fileName = @"C:\results.html")
 		{
-			var htmlHeader = String.Format("<html><h2>{0}</h2><table border='1'>\n", txtTitle.Text);
-			var htmlString = htmlHeader  + GetHTMLTableHeader(columnNames);
+			string tableContainerClass = "datagrid";
+			var htmlHeader = String.Format("<html><head><title></title>{0}</head><h2>{1}</h2><div class=\"{2}\"><table class=\"stripeme\"><thead>\n", txtTitle.Text,txtTitle.Text,tableContainerClass);
+			var htmlString = htmlHeader  + GetHTMLTableHeader(columnNames)+"</thead><tbody>";
 			htmlString = results.Rows.Cast<DataRow>().Aggregate(htmlString, (current, row) => 
 				current + GetHTMLRowResult(row.ItemArray));
-			htmlString += "\n</table></html>";
+			htmlString += "\n</tbody></table><div></html>";
 			WriteFile(fileName, htmlString);
 		}
 
