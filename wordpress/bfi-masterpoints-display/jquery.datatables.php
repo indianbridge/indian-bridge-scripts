@@ -1,4 +1,11 @@
 <?php
+$paramName = 'member_id';
+if ( isset( $_GET[$paramName] ) && $_GET[$paramName] != '' ) {
+$member_id = $_GET[$paramName];
+}
+else {
+$member_id = '';
+}
 
 $paramName = 'BFI_Table_Type';
 if ( isset( $_GET[$paramName] ) && $_GET[$paramName] != '' ) {
@@ -8,11 +15,11 @@ else {
 	$tableType = 'leaderboard';
 }
 
-if ($tableType == 'leaderboard') {
+if ($tableType == 'leaderboard' || $member_id == '') {
 	doLeaderboard();
 }
 else if ($tableType == 'mymasterpoint') {
-	doMyMasterpoint();
+	doMyMasterpoint($member_id);
 }
 
 function connectToDB() {
@@ -147,7 +154,7 @@ function getResults($sqlLink, $sQuery_old, $sIndexColumn, $sTable, $aColumns) {
 function doLeaderboard() {
 	$sqlLink = connectToDB();
 	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name','(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp');
-	//$aColumns = array( 'member_id'=>'member_id',"last_name"=>'full_name','(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp');
+
 	// Indexed column (used for fast and accurate table cardinality) 
 	$sIndexColumn = "member_id";
 	$sTable = "member";
@@ -179,7 +186,7 @@ function doLeaderboard() {
 
 
 
-function doMyMasterpoint() {
+function doMyMasterpoint($member_id) {
 
 	$aColumns = array( 'tournament_masterpoint.event_date'=>'event_date','tournament_master.description'=>'tournament_name','tournament_level_master.description'=>'tournament_type','event_master.description'=>'event_code','tournament_masterpoint.localpoints_earned'=>'localpoints_earned','tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(tournament_masterpoint.localpoints_earned+tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
 	// Indexed column (used for fast and accurate table cardinality)
@@ -197,7 +204,7 @@ function doMyMasterpoint() {
 	
 	//Filtering
 	$sWhereSearch = doSearch($aColumns);
-	$sWhere = "WHERE (member_id = 'WB000777'";
+	$sWhere = "WHERE (member_id = '".$member_id."'";
 	if($sWhereSearch != "") {
 		$sWhere .= " AND ".$sWhereSearch;
 	}
