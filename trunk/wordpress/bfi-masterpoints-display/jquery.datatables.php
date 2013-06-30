@@ -20,7 +20,7 @@ function connectToDB() {
 	/* Database connection information */
 	$gaSql['user']       = "bfinem7l_sriram";
 	$gaSql['password']   = "kibitzer";
-	$gaSql['db']         = "masterpoints";
+	$gaSql['db']         = "bfinem7l_masterpoints";
 	$gaSql['server']     = "localhost";
 	
 	

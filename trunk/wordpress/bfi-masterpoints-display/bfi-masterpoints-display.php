@@ -49,7 +49,7 @@ Version: 1.0
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
 				add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
 				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);				
-				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'masterpoints', 'localhost');
+				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'bfinem7l_masterpoints', 'localhost');
 				$this->fieldNames = array('address_1', 'address_2', 'address_3', 'city', 'state', 'country','residence_phone','mobile_no','sex','dob');
 			}
 

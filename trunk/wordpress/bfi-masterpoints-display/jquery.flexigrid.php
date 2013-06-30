@@ -1,7 +1,7 @@
 <?php
 // Connect to MySQL database
 mysql_connect('localhost', 'indianbridge', 'kibitzer');
-mysql_select_db('masterpoints');
+mysql_select_db('bfinem7l_masterpoints');
 $page = 1; // The current page
 $sortname = 'event_date'; // Sort column
 $sortorder = 'desc'; // Sort order
