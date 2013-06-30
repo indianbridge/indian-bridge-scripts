@@ -249,7 +249,7 @@ Version: 1.0
 			$html .= '<ul class="tabber-widget-tabs">';
 			$tabIDPrefix = 'masterpoint_page_tab_';
 			foreach($tabs as $tab=>$tabName) {
-				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
+				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
 			}
 			$html .= '</ul>';
 			$html .= '<div class="tabber-widget-content">';
