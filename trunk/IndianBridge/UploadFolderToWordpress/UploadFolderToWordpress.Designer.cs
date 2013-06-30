@@ -46,6 +46,8 @@
             this.publishResultsStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.publishResultsProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.cancelPublishResultsButton = new System.Windows.Forms.ToolStripButton();
+            this.selectFileOrFolderDialog = new System.Windows.Forms.OpenFileDialog();
+            this.selectFileToUploadButton = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,7 +66,7 @@
             // 
             // wordpressPathTextbox
             // 
-            this.wordpressPathTextbox.Location = new System.Drawing.Point(83, 253);
+            this.wordpressPathTextbox.Location = new System.Drawing.Point(83, 247);
             this.wordpressPathTextbox.Name = "wordpressPathTextbox";
             this.wordpressPathTextbox.Size = new System.Drawing.Size(336, 20);
             this.wordpressPathTextbox.TabIndex = 24;
@@ -80,7 +82,7 @@
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(12, 253);
+            this.label3.Location = new System.Drawing.Point(12, 247);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(62, 27);
             this.label3.TabIndex = 23;
@@ -98,7 +100,7 @@
             this.uploadButton.BackColor = System.Drawing.Color.Green;
             this.uploadButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uploadButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.uploadButton.Location = new System.Drawing.Point(15, 283);
+            this.uploadButton.Location = new System.Drawing.Point(15, 277);
             this.uploadButton.Name = "uploadButton";
             this.uploadButton.Size = new System.Drawing.Size(404, 68);
             this.uploadButton.TabIndex = 22;
@@ -116,7 +118,7 @@
             // 
             // wordpressURLTextbox
             // 
-            this.wordpressURLTextbox.Location = new System.Drawing.Point(83, 216);
+            this.wordpressURLTextbox.Location = new System.Drawing.Point(83, 210);
             this.wordpressURLTextbox.Name = "wordpressURLTextbox";
             this.wordpressURLTextbox.Size = new System.Drawing.Size(336, 20);
             this.wordpressURLTextbox.TabIndex = 21;
@@ -126,7 +128,7 @@
             // 
             this.selectFolderButton.Location = new System.Drawing.Point(15, 162);
             this.selectFolderButton.Name = "selectFolderButton";
-            this.selectFolderButton.Size = new System.Drawing.Size(404, 37);
+            this.selectFolderButton.Size = new System.Drawing.Size(173, 37);
             this.selectFolderButton.TabIndex = 17;
             this.selectFolderButton.Text = "Select Folder To Upload";
             this.selectFolderButton.UseVisualStyleBackColor = true;
@@ -134,7 +136,7 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(12, 216);
+            this.label2.Location = new System.Drawing.Point(12, 210);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 27);
             this.label2.TabIndex = 20;
@@ -144,9 +146,9 @@
             // 
             this.label1.Location = new System.Drawing.Point(12, 67);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 30);
+            this.label1.Size = new System.Drawing.Size(65, 58);
             this.label1.TabIndex = 18;
-            this.label1.Text = "Selected Folder : ";
+            this.label1.Text = "Selected File or Folder : ";
             // 
             // selectedFolderTextbox
             // 
@@ -163,9 +165,9 @@
             this.publishResultsStatus,
             this.publishResultsProgressBar,
             this.cancelPublishResultsButton});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 359);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 354);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(425, 23);
+            this.statusStrip1.Size = new System.Drawing.Size(430, 23);
             this.statusStrip1.TabIndex = 25;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -188,11 +190,22 @@
             this.cancelPublishResultsButton.Size = new System.Drawing.Size(88, 21);
             this.cancelPublishResultsButton.Text = "Cancel Upload";
             // 
+            // selectFileToUploadButton
+            // 
+            this.selectFileToUploadButton.Location = new System.Drawing.Point(242, 162);
+            this.selectFileToUploadButton.Name = "selectFileToUploadButton";
+            this.selectFileToUploadButton.Size = new System.Drawing.Size(173, 37);
+            this.selectFileToUploadButton.TabIndex = 26;
+            this.selectFileToUploadButton.Text = "Select File To Upload";
+            this.selectFileToUploadButton.UseVisualStyleBackColor = true;
+            this.selectFileToUploadButton.Click += new System.EventHandler(this.selectFileToUploadButton_Click);
+            // 
             // UploadFolderToWordpress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(425, 382);
+            this.ClientSize = new System.Drawing.Size(430, 377);
+            this.Controls.Add(this.selectFileToUploadButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.username);
             this.Controls.Add(this.wordpressPathTextbox);
@@ -234,6 +247,8 @@
         private System.Windows.Forms.ToolStripStatusLabel publishResultsStatus;
         private System.Windows.Forms.ToolStripProgressBar publishResultsProgressBar;
         private System.Windows.Forms.ToolStripButton cancelPublishResultsButton;
+        private System.Windows.Forms.OpenFileDialog selectFileOrFolderDialog;
+        private System.Windows.Forms.Button selectFileToUploadButton;
     }
 }
 

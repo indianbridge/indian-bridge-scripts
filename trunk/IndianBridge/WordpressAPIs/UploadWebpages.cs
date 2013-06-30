@@ -34,6 +34,12 @@ namespace IndianBridge.WordpressAPIs
         Hashtable m_lastRunTimes = new Hashtable();
         private string m_hashTableFileName = "";
         private bool m_replaceLinks = false;
+
+        public bool ReplaceLinks
+        {
+            get { return m_replaceLinks; }
+            set { m_replaceLinks = value; }
+        }
         private bool m_convertCase = false;
         private BackgroundWorker m_worker;
         private DoWorkEventArgs m_e;
@@ -41,20 +47,36 @@ namespace IndianBridge.WordpressAPIs
         private int totalPagesToUpload = 0;
         private int numberOfPagesAlreadyUploaded = 0;
         private string m_prefixString = "";
+        private bool m_useTourneyTemplate = true;
+
+        public bool UseTourneyTemplate
+        {
+            get { return m_useTourneyTemplate; }
+            set { m_useTourneyTemplate = value; }
+        }
+        private bool m_forceUpload = false;
+
+        public bool ForceUpload
+        {
+            get { return m_forceUpload; }
+            set { m_forceUpload = value; }
+        }
 
         public XmlRpcClientProtocol m_clientProtocol;
         public IgetCatList m_categories;
 
         public void convertCase(bool convert) { m_convertCase = convert; }
 
-        public UploadWebpages(string sitename, string username, string password, bool replaceLinks = false)
+        public UploadWebpages(string sitename, string username, string password, bool replaceLinks = false, bool forceUpload = false, bool useTourneyTemplate = true)
         {
             // Initialize member variables
             this.m_siteName = sitename;
             this.m_userName = username;
             this.m_password = password;
             this.m_replaceLinks = replaceLinks;
-            this.m_xmlrpcURL = Path.Combine(m_siteName, "xmlrpc.php");
+            this.m_useTourneyTemplate = useTourneyTemplate;
+            this.m_forceUpload = forceUpload;
+            this.m_xmlrpcURL = m_siteName.TrimEnd(new[] { '/', '\\' }) + "/xmlrpc.php";
 
             m_categories = (IgetCatList)XmlRpcProxyGen.Create(typeof(IgetCatList));
             m_clientProtocol = (XmlRpcClientProtocol)m_categories;
@@ -96,7 +118,7 @@ namespace IndianBridge.WordpressAPIs
         {
             Tuple<string, string> values = (Tuple<string, string>)e.Argument;
             string directory = values.Item1;
-            string siteRoot = values.Item2;
+            string siteRoot = values.Item2.TrimEnd(new[] { '/', '\\' });
             m_runningInBackground = true;
             m_worker = sender as BackgroundWorker;
             m_e = e;
@@ -110,14 +132,18 @@ namespace IndianBridge.WordpressAPIs
             m_runningInBackground = false;
             m_worker = null;
             m_e = null;
-            uploadDirectoryInternal(directory, siteRoot);
+            uploadDirectoryInternal(directory, siteRoot.TrimEnd(new[] { '/', '\\' }));
             if (cancel()) m_e.Cancel = true;
         }
 
         public void uploadDirectoryInternal(String directory, String siteRoot)
         {
+            if (File.Exists(directory)) {
+                uploadSingleFile(directory, siteRoot);
+                return;
+            }
             if (!Directory.Exists(directory))
-                throw new System.ArgumentException("Only a directory structure can be uploaded");
+                throw new System.ArgumentException("Only a file or directory structure can be uploaded");
             DirectoryInfo dir = new DirectoryInfo(directory);
             totalPagesToUpload = dir.GetDirectories("*", SearchOption.AllDirectories).Length + dir.GetFiles("*", SearchOption.AllDirectories).Length;
             printMessage("Uploading " + directory + " to " + siteRoot);
@@ -154,6 +180,65 @@ namespace IndianBridge.WordpressAPIs
                         if (cancel()) return;
                     }
                 }
+            }
+        }
+
+        public void uploadSingleFile(String path, String siteRoot)
+        {
+            String extension = Path.GetExtension(path).ToLower();
+            if ((extension == ".htm" || extension == ".html") && Path.GetFileNameWithoutExtension(path).ToLower() != "index")
+            {
+                updateSingleWebpage(siteRoot, Path.GetFileNameWithoutExtension(path), File.ReadAllText(path), File.GetLastWriteTime(path), false);
+            }
+            else
+            {
+                throw new Exception(path + " does not have .htm or .html extension or it is index page which cannot be uploaded.");
+            }
+            return;
+        }
+
+        public bool updateSingleWebpage(string url, string title, string html, DateTime lastModified, bool isIndexPage = false, string indexHtmlPath = "")
+        {
+            printMessage(url);
+            try
+            {
+                if (html != "")
+                {
+                    double diff = 0;
+                    if (m_lastRunTimes.ContainsKey(url) && !m_forceUpload)
+                    {
+                        DateTime lastRunTime = DateTime.Parse((String)m_lastRunTimes[url]);
+                        TimeSpan dt = lastModified - lastRunTime;
+                        diff = Math.Abs(dt.TotalSeconds);
+                    }
+                    if (m_forceUpload || !m_lastRunTimes.ContainsKey(url) || diff > 1)
+                    {
+                        PageInfo pageInfo = default(PageInfo);
+                        pageInfo.pagePath = url;
+                        pageInfo.pageTitle = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
+                        pageInfo.pageContent = m_replaceLinks ? replaceLinks(html, url, isIndexPage, indexHtmlPath) : html;
+                        pageInfo.pageTemplate = m_useTourneyTemplate ? "page-tourney.php" : "";
+                        string result = m_categories.postResults(1, m_userName, m_password, pageInfo);
+                        if (!m_lastRunTimes.ContainsKey(url)) printMessage("UPDATED. No entry was found for last run time.");
+                        else
+                        {
+                            DateTime lastRunTime = DateTime.Parse((String)m_lastRunTimes[url]);
+                            printMessage("UPDATED. (Last Modified Time " + lastModified.ToString() + " is later than last update time " + lastRunTime.ToString() + ")");
+                        }
+                        m_lastRunTimes[url] = lastModified;
+                    }
+                    else
+                    {
+                        DateTime lastRunTime = DateTime.Parse((String)m_lastRunTimes[url]);
+                        printMessage("NOT UPDATED. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                printMessage("Exception : " + ex.Message);
+                throw ex;
             }
         }
 
@@ -219,29 +304,26 @@ namespace IndianBridge.WordpressAPIs
         public bool updateWebpage(string path, string title, string html, string pageName, DateTime lastModified, bool isIndexPage, string indexHtmlPath = "")
         {
             if (cancel()) return false;
-            //String url = Utilities.combinePath(m_siteName, path);
             string url = Utilities.combinePath(path, pageName);
-            //if (pageName != "") url = Path.Combine(url, pageName);
             printMessage(url);
             try
             {
                 if (html != "")
                 {
                     double diff = 0;
-                    if (m_lastRunTimes.ContainsKey(url))
+                    if (m_lastRunTimes.ContainsKey(url) && !m_forceUpload)
                     {
                         DateTime lastRunTime = DateTime.Parse((String)m_lastRunTimes[url]);
                         TimeSpan dt = lastModified - lastRunTime;
                         diff = Math.Abs(dt.TotalSeconds);
                     }
-                    if (!m_lastRunTimes.ContainsKey(url) || diff > 1)
+                    if (m_forceUpload || !m_lastRunTimes.ContainsKey(url) || diff > 1)
                     {
                         PageInfo pageInfo = default(PageInfo);
                         pageInfo.pagePath = url;
-                        //pageInfo.pageName = pageName;
                         pageInfo.pageTitle = m_convertCase ? IndianBridge.Common.Utilities.ConvertCaseString(title) : title;
                         pageInfo.pageContent = m_replaceLinks ? replaceLinks(html, url, isIndexPage, indexHtmlPath) : html;
-                        pageInfo.pageTemplate = "page-tourney.php";
+                        pageInfo.pageTemplate = m_useTourneyTemplate?"page-tourney.php":"";
                         string result = m_categories.postResults(1, m_userName, m_password, pageInfo);
                         if (!m_lastRunTimes.ContainsKey(url)) printMessage("UPDATED. No entry was found for last run time.");
                         else

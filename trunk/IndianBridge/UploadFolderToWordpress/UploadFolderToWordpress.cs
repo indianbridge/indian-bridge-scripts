@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using IndianBridge.Common;
 using IndianBridge.WordpressAPIs;
+using System.IO;
 
 namespace UploadFolderToWordpress
 {
@@ -49,10 +50,34 @@ namespace UploadFolderToWordpress
             string username = usernameTextbox.Text;
             string password = passwordTextbox.Text;
             UploadWebpages uw = new UploadWebpages(siteName, username, password, true);
-            m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, publishResultsCompleted, publishResultsStatus, publishResultsProgressBar, cancelPublishResultsButton,null);
-            Tuple<string, string> values = new Tuple<string, string>(selectedFolderTextbox.Text, pagePath);
-            m_publishResultsRunning = true;
-            m_publishResultsCBW.run(values);
+            uw.UseTourneyTemplate = true;
+            uw.ForceUpload = true;
+            String fileName = selectedFolderTextbox.Text;
+            if (Directory.Exists(fileName))
+            {
+                m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, publishResultsCompleted, publishResultsStatus, publishResultsProgressBar, cancelPublishResultsButton, null);
+                Tuple<string, string> values = new Tuple<string, string>(selectedFolderTextbox.Text, pagePath);
+                m_publishResultsRunning = true;
+                m_publishResultsCBW.run(values);
+            }
+            else if (File.Exists(fileName))
+            {
+                try
+                {
+                    uw.uploadSingleFile(fileName, pagePath);
+                    MessageBox.Show(fileName + " uploaded to " + siteName + pagePath + " successfully.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Following Error occurred while uploading file" + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show(fileName + " is not a valid file or folder!");
+            }
+
+
         }
 
         private void uploadButton_Click(object sender, EventArgs e)
@@ -65,6 +90,14 @@ namespace UploadFolderToWordpress
             if (selectFolderDialog.ShowDialog() == DialogResult.OK)
             {
                 selectedFolderTextbox.Text = selectFolderDialog.SelectedPath;
+            }
+        }
+
+        private void selectFileToUploadButton_Click(object sender, EventArgs e)
+        {
+            if (selectFileOrFolderDialog.ShowDialog() == DialogResult.OK)
+            {
+                selectedFolderTextbox.Text = selectFileOrFolderDialog.FileName;
             }
         }
 
