@@ -32,7 +32,7 @@ Theme My Login will always look in your theme's directory first, before using th
 		}
 	</script> 		
 	<?php
-	$mydb= new wpdb('bfinem7l_sriram','kibitzer','masterpoints','localhost');
+	$mydb= new wpdb('bfinem7l_sriram','kibitzer','bfinem7l_masterpoints','localhost');
 	$current_user = wp_get_current_user();
 	$member_id = $current_user->user_login;
 	$masterpointURL = home_url("/masterpoints");
