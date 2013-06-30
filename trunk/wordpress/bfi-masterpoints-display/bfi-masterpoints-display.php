@@ -257,7 +257,7 @@ Version: 1.0
 			$html .= '<div id="bfi_masterpoints_table_container">';
 			$html .= '</div></div></div></div>';
 			$html .= '<script type="text/javascript">';
-			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\');';
+			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\');';
 			$html .= '</script>';
 			return $html;
 		}
