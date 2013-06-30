@@ -217,7 +217,7 @@ Version: 1.0
 			echo '</div>';	
 			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard");
 			$selectedTab = 'mymasterpoint';
-			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			echo $this->getMasterpointTabs($tabs,$selectedTab,$current_user->user_login);
 			$out = ob_get_clean();
 			return $out;			
 		}		
@@ -228,7 +228,7 @@ Version: 1.0
 			echo '<h1>You have to be a member of BFI to see your Masterpoint Summary and Details</h1>';
 			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
 			$selectedTab = 'leaderboard';
-			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			echo $this->getMasterpointTabs($tabs,$selectedTab,'');
 			$out = ob_get_clean();
 			return $out;			
 		}
@@ -238,18 +238,18 @@ Version: 1.0
 			echo '<h1>You have to be a member of BFI and be logged in to see your Masterpoint Summary and Details</h1>';
 			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
 			$selectedTab = 'leaderboard';
-			echo $this->getMasterpointTabs($tabs,$selectedTab);
+			echo $this->getMasterpointTabs($tabs,$selectedTab,'');
 			$out = ob_get_clean();
 			return $out;
 		}
 
-		function getMasterpointTabs($tabs,$selectedTab) {
+		function getMasterpointTabs($tabs,$selectedTab,$member_id) {
 			$html = "";
 			$html .= '<div class="tabber-widget-default">';
 			$html .= '<ul class="tabber-widget-tabs">';
 			$tabIDPrefix = 'masterpoint_page_tab_';
 			foreach($tabs as $tab=>$tabName) {
-				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
+				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
 			}
 			$html .= '</ul>';
 			$html .= '<div class="tabber-widget-content">';
@@ -257,7 +257,7 @@ Version: 1.0
 			$html .= '<div id="bfi_masterpoints_table_container">';
 			$html .= '</div></div></div></div>';
 			$html .= '<script type="text/javascript">';
-			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\');';
+			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');';
 			$html .= '</script>';
 			return $html;
 		}
@@ -274,7 +274,6 @@ Version: 1.0
 			if ($this->bfi_masterpoint_db) {
 				$query = "SELECT * FROM member WHERE member_id=%s";
 				$member_id = $user->user_login;
-				//$member_id = 'WB000777';
 				$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query,$member_id));
 				if (count($rows) > 0) {
 					$row = $rows[0]
