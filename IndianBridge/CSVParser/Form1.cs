@@ -234,12 +234,13 @@ namespace CSVParser
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			string siteName = "http://bfi.net.in/bfitest";
+			string siteName = "http://bfitest.bfi.net.in/";
 			string pagePath = "/tourneys/winter-national/y2012/results/team-event";
 			string username = "vdevadass";
 			string password = "bitspilani";
-			UploadWebpages uw = new UploadWebpages(siteName, username, password, true);
-			var m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, publishResultsCompleted, null, null, null, null);
+			UploadWebpages uw = new UploadWebpages(siteName, username, password, true, true);
+			var m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, 
+				publishResultsCompleted, null, null, null, null);
 			oldFontSize = Utilities.fontSize;
 			Utilities.fontSize = 5;
 			var values = new Tuple<string, string>(folderBrowserDialog1.SelectedPath, pagePath);
