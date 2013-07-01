@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndianBridgeScorer", "Applications\IndianBridgeScorer\IndianBridgeScorer.csproj", "{B9942FFF-D1F9-4F81-9C16-D1623B9E3F28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultsManager", "ResultsManager\ResultsManager.csproj", "{B464537E-F74F-40DF-AD24-83ECBA82E312}"
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{1C337ECB-18C4-4F1E-8557-C29696777EC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordpressAPIs", "WordpressAPIs\WordpressAPIs.csproj", "{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVParser", "CSVParser\CSVParser.csproj", "{B68844B9-0195-463D-A8F8-83D9F8F42857}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,16 @@ Global
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Release|x86.ActiveCfg = Release|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B68844B9-0195-463D-A8F8-83D9F8F42857}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
