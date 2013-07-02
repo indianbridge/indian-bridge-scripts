@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Wordpress BFI Masterpoint Display
+Plugin Name: BFI Masterpoint Display
 Plugin URI: http://bfi.net.in
 Description: A plugin to show posts filtered by categories using ajax
 Author: Sriram Narasimhan
