@@ -49,15 +49,30 @@ Version: 1.0
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
 				add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
 				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);			
-				register_activation_hook( __FILE__, array( $this, 'copy_template_files' ) );	
+				register_activation_hook( __FILE__, array( $this, 'activate' ) );	
+				register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
 				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'bfinem7l_masterpoints', 'localhost');
-				$this->fieldNames = array('address_1', 'address_2', 'address_3', 'city', 'state', 'country','residence_phone','mobile_no','sex','dob');
-				//$this->copy_template_files();
 			}
 
-			function copy_template_files() {
+			function deactivate() {
+				global $wp_roles;				
+				$wp_roles->remove_cap( 'administrator', 'manage_masterpoints' );
+				$wp_roles->remove_cap( 'editor', 'manage_masterpoints' );
+				$this->deleteFile('user-panel.php');
+				$this->deleteFile('profile-form.php');
+			}
+
+			function activate() {
+				global $wp_roles;				
+				$wp_roles->add_cap( 'administrator', 'manage_masterpoints' );
+				$wp_roles->add_cap( 'editor', 'manage_masterpoints' );
 				$this->copyFile('user-panel.php');
 				$this->copyFile('profile-form.php');
+			}
+
+			function deleteFile($fileName) {
+				$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
+				unlink($destination);
 			}
 
 			function copyFile($fileName) {
