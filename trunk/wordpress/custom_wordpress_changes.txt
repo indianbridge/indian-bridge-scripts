@@ -1,0 +1,33 @@
+Simple Local Avatar
+	In simple-local-avatars.php unique_filename_callback function
+		use this instead ($name = $base_name = sanitize_file_name( $user->user_login . '_avatar_' . time() );)
+	In simple-local-avatars.php edit_user_profile
+		remove lines 274 - 289 (display rating)
+	In simple-local-avatars.php missing argument problem
+		on line 64 change $id_or_email to $id_or_email = ''
+		
+		
+All in one calendar
+	in app/model/class-ai1ec-event.php
+		use following for excerpt in 
+			/**
+			 * Get excerpt of post content for display in popup view
+			 */
+			public function get_post_excerpt() {
+				if (
+					! isset( $this->post->post_excerpt ) ||
+					empty( $this->post->post_excerpt )
+				) {
+					$text = strip_shortcodes( $this->post->post_content );
+					$text = apply_filters('the_content', $text);
+					$text = str_replace(']]>', ']]&gt;', $text);
+					$excerpt_length = apply_filters('excerpt_length', 25);
+					$excerpt_more = apply_filters('excerpt_more', ' ' . '[...]');
+					$this->post->post_excerpt = wp_trim_words( $text, $excerpt_length, $excerpt_more );		
+
+				}
+				return $this->post->post_excerpt;
+			}		
+		
+	in app/controller/class-ai1ec-app-controller.php
+		comment out line 218 to not show timezone in profile
