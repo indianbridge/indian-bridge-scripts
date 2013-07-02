@@ -19,7 +19,7 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 	class BFI_Post_Results {
 		
 		public function __construct() {
-			add_filter( 'xmlrpc_methods', array( &$this, 'add_xml_rpc_methods' ) );
+			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
 		}
 		
 		
@@ -32,7 +32,7 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 		 *         function callback
 		 */
 		public function add_xml_rpc_methods( $methods ) {
-			$methods['indianbridge.postResults'] = array( &$this, 'bfi_post_results' );
+			$methods['indianbridge.postResults'] = array( $this, 'bfi_post_results' );
 			return $methods;
 		}
 		
