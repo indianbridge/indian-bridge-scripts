@@ -1,4 +1,4 @@
-=== Wordpress BFI Masterpoint Display ===
+=== BFI Masterpoint Display ===
 Contributors: Sriram Narasimhan
 Donate link: none
 Tags: indian bridge, filter categories, ajax
@@ -25,7 +25,7 @@ OR you can just install it with WordPress by going to Plugins >> Add New >> and 
 
 == Official Support ==
 
-Wordpress BFI Masterpoint Display - none
+BFI Masterpoint Display - none
 
 == About the Plugin Author ==
 
