@@ -2,7 +2,7 @@
 /*
 Plugin Name: BFI Masterpoint Display
 Plugin URI: http://bfi.net.in
-Description: A plugin to show posts filtered by categories using ajax
+Description: A plugin to manage all masterpoint capabilities for BFI site
 Author: Sriram Narasimhan
 Author URI: ...
 Version: 1.0
@@ -14,7 +14,6 @@ Version: 1.0
 
 
 	if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
-
 
 		class BFI_Masterpoint_Display {
 			private $bfi_masterpoint_db;
