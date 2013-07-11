@@ -44,7 +44,9 @@ $template_url = get_bloginfo('template_url');
 		wp_register_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js', false, null); 				wp_enqueue_script('jquery', false, null);
 
 		// another
-		wp_register_script('k1', get_bloginfo('template_directory').'/js/jquery.menu.js', false, null);								wp_enqueue_script('k1', false, null);
+		//wp_register_script('k1', get_bloginfo('template_directory').'/js/jquery.menu.js', false, null);								//wp_enqueue_script('k1', false, null);
+		wp_register_script('k1', get_bloginfo('template_directory').'/js/jquery.menu.now.js', false, null);
+		wp_enqueue_script('k1', false, null);
 		wp_register_script('k2', get_bloginfo('template_directory').'/js/jquery.panda.js', false, null);							wp_enqueue_script('k2', false, null);
 		wp_register_script('k3', get_bloginfo('template_directory').'/js/jquery.animate-colors-min.js', false, null);				wp_enqueue_script('k3', false, null);
 		wp_register_script('k4', get_bloginfo('template_directory').'/js/jquery.prettyPhoto.js', false, null, true, true);			wp_enqueue_script('k4', false, null, true, true);
@@ -154,7 +156,6 @@ $template_url = get_bloginfo('template_url');
 		echo '</form>';
 
 	}
-
 
 
 // ********************************************
