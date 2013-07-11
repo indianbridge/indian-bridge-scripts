@@ -30,9 +30,29 @@ Template Name: Tourney
 
 			endif; ?>">
 
-			<h2><?php the_title(); edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' ) ?></h2>
 
 			<?php
+				// Get Ancestors and locate root
+				$ancestors = $post->ancestors;
+				$root = $post->ID;
+				foreach($ancestors as $ancestor) {
+					$page_template = get_post_meta( $ancestor, '_wp_page_template', true );
+					if ($page_template != 'page-tourney.php') break;
+					$root = $ancestor;
+				}
+							
+				// Set images from featured image of root
+				if (has_post_thumbnail( $root ) ):
+					$image = wp_get_attachment_image_src( get_post_thumbnail_id( $root ), 'single-post-thumbnail' );
+					//echo '<a href="'.get_permalink($root).'"><img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/></a>';
+					$path = $image[0];
+					$w='240';
+					$h='240';
+					$a = $theme_options['thumbs_crop_top']=='enable' ? '&a=t' : '';
+					$out = '<a rel="prettyPhoto" href="' . $path . '" title="Test"><img id="single-feat-img" class="fr ml10 br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=3&amp;q=90'. $a . '" width="' . $w . '" alt="altTest" /></a>';
+					echo $out;
+					//echo '<img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/>';
+				endif;			
 
 				// BREADCRUMBS
 				echo '<div class="mt-10 pb15">';
@@ -46,21 +66,20 @@ Template Name: Tourney
 				}
 				echo '</div>';
 				
-				// Get Ancestors and locate root
-				$ancestors = $post->ancestors;
-				$root = $post->ID;
-				foreach($ancestors as $ancestor) {
-					$page_template = get_post_meta( $ancestor, '_wp_page_template', true );
-					if ($page_template != 'page-tourney.php') break;
-					$root = $ancestor;
-				}
-				
-				// Set images from featured image of root
-				if (has_post_thumbnail( $root ) ):
-					$image = wp_get_attachment_image_src( get_post_thumbnail_id( $root ), 'single-post-thumbnail' );
-					echo '<a href="'.get_permalink($root).'"><img style="display: block;margin-left: auto;margin-right: auto;" src="'.$image[0].'"/></a>';
-				endif;			
+
+			
 				echo '<div class="clear h20"><!-- --></div>';
+
+				?>
+				<h2><?php 
+				if ($root == $post->ID) {
+					echo 'Home';
+				}
+				else {
+					the_title();
+				}
+				edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' ) ?></h2>
+				<?php
 				
 				$mypages = get_pages( array( 'child_of' => $root, 'parent' => $root, 'sort_column' => 'menu_order', 'sort_order' => 'asc' ) );
 				echo '<div class="tabber-widget-default">';

@@ -206,6 +206,7 @@
 						));
 
 					?>
+					<script>header_menu_showMenu();</script>
 
 					<div class="clear"><!-- --></div>
 			
