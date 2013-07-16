@@ -124,7 +124,7 @@ namespace SubmitPairsResults
                 string pageName = Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy_MM_dd"));
                 m_eventInformation.databaseFileName = Path.Combine(Globals.m_rootDirectory, "Databases", cityName, pageName) + ".mdb";
                 m_eventInformation.webpagesDirectory = Path.Combine(Globals.m_rootDirectory, "Webpages", cityName, pageName);
-                m_googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy-MM-dd"));
+                m_googleSiteRootPageName = "/results/" + Utilities.makeIdentifier_(cityName) + "/" + Utilities.makeIdentifier_("Other Events") + Utilities.makeIdentifier_(eventTitle + "  " + eventDate.ToString("yyyy-MM-dd"));
             }
             else
             {

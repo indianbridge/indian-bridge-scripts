@@ -40,7 +40,7 @@ namespace IndianBridge.WordpressAPIs
             get { return m_replaceLinks; }
             set { m_replaceLinks = value; }
         }
-        private bool m_convertCase = false;
+        private bool m_convertCase = true;
         private BackgroundWorker m_worker;
         private DoWorkEventArgs m_e;
         private bool m_runningInBackground = false;
@@ -304,7 +304,8 @@ namespace IndianBridge.WordpressAPIs
         public bool updateWebpage(string path, string title, string html, string pageName, DateTime lastModified, bool isIndexPage, string indexHtmlPath = "")
         {
             if (cancel()) return false;
-            string url = Utilities.combinePath(path, pageName);
+            int value;
+            string url = int.TryParse(pageName, out value)?Utilities.combinePath(path, "y"+pageName):Utilities.combinePath(path, pageName);
             printMessage(url);
             try
             {
