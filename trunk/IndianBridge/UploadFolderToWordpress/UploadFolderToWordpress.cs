@@ -50,7 +50,7 @@ namespace UploadFolderToWordpress
             string username = usernameTextbox.Text;
             string password = passwordTextbox.Text;
             UploadWebpages uw = new UploadWebpages(siteName, username, password, true);
-            uw.UseTourneyTemplate = true;
+            uw.UseTourneyTemplate = useTourneyTemplateCheckbox.Checked;
             uw.ForceUpload = true;
             String fileName = selectedFolderTextbox.Text;
             if (Directory.Exists(fileName))

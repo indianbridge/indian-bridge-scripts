@@ -48,6 +48,7 @@
             this.cancelPublishResultsButton = new System.Windows.Forms.ToolStripButton();
             this.selectFileOrFolderDialog = new System.Windows.Forms.OpenFileDialog();
             this.selectFileToUploadButton = new System.Windows.Forms.Button();
+            this.useTourneyTemplateCheckbox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,7 +67,7 @@
             // 
             // wordpressPathTextbox
             // 
-            this.wordpressPathTextbox.Location = new System.Drawing.Point(83, 247);
+            this.wordpressPathTextbox.Location = new System.Drawing.Point(83, 270);
             this.wordpressPathTextbox.Name = "wordpressPathTextbox";
             this.wordpressPathTextbox.Size = new System.Drawing.Size(336, 20);
             this.wordpressPathTextbox.TabIndex = 24;
@@ -82,7 +83,7 @@
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(12, 247);
+            this.label3.Location = new System.Drawing.Point(12, 270);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(62, 27);
             this.label3.TabIndex = 23;
@@ -100,7 +101,7 @@
             this.uploadButton.BackColor = System.Drawing.Color.Green;
             this.uploadButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uploadButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.uploadButton.Location = new System.Drawing.Point(15, 277);
+            this.uploadButton.Location = new System.Drawing.Point(15, 300);
             this.uploadButton.Name = "uploadButton";
             this.uploadButton.Size = new System.Drawing.Size(404, 68);
             this.uploadButton.TabIndex = 22;
@@ -118,7 +119,7 @@
             // 
             // wordpressURLTextbox
             // 
-            this.wordpressURLTextbox.Location = new System.Drawing.Point(83, 210);
+            this.wordpressURLTextbox.Location = new System.Drawing.Point(83, 233);
             this.wordpressURLTextbox.Name = "wordpressURLTextbox";
             this.wordpressURLTextbox.Size = new System.Drawing.Size(336, 20);
             this.wordpressURLTextbox.TabIndex = 21;
@@ -136,7 +137,7 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(12, 210);
+            this.label2.Location = new System.Drawing.Point(12, 233);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(62, 27);
             this.label2.TabIndex = 20;
@@ -165,7 +166,7 @@
             this.publishResultsStatus,
             this.publishResultsProgressBar,
             this.cancelPublishResultsButton});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 354);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 374);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(430, 23);
             this.statusStrip1.TabIndex = 25;
@@ -200,11 +201,24 @@
             this.selectFileToUploadButton.UseVisualStyleBackColor = true;
             this.selectFileToUploadButton.Click += new System.EventHandler(this.selectFileToUploadButton_Click);
             // 
+            // useTourneyTemplateCheckbox
+            // 
+            this.useTourneyTemplateCheckbox.AutoSize = true;
+            this.useTourneyTemplateCheckbox.Checked = true;
+            this.useTourneyTemplateCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.useTourneyTemplateCheckbox.Location = new System.Drawing.Point(15, 209);
+            this.useTourneyTemplateCheckbox.Name = "useTourneyTemplateCheckbox";
+            this.useTourneyTemplateCheckbox.Size = new System.Drawing.Size(134, 17);
+            this.useTourneyTemplateCheckbox.TabIndex = 27;
+            this.useTourneyTemplateCheckbox.Text = "Use Tourney Template";
+            this.useTourneyTemplateCheckbox.UseVisualStyleBackColor = true;
+            // 
             // UploadFolderToWordpress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(430, 377);
+            this.ClientSize = new System.Drawing.Size(430, 397);
+            this.Controls.Add(this.useTourneyTemplateCheckbox);
             this.Controls.Add(this.selectFileToUploadButton);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.username);
@@ -249,6 +263,7 @@
         private System.Windows.Forms.ToolStripButton cancelPublishResultsButton;
         private System.Windows.Forms.OpenFileDialog selectFileOrFolderDialog;
         private System.Windows.Forms.Button selectFileToUploadButton;
+        private System.Windows.Forms.CheckBox useTourneyTemplateCheckbox;
     }
 }
 
