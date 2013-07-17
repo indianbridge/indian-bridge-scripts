@@ -47,11 +47,54 @@ Version: 1.0
 				add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
 				add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
-				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);			
+				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);	
+				add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
 				register_activation_hook( __FILE__, array( $this, 'activate' ) );	
 				register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
 				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'bfinem7l_masterpoints', 'localhost');
 			}
+			
+			public function add_xml_rpc_methods( $methods ) {
+				$methods['bfi.postMasterpoints'] = array( $this, 'bfi_post_masterpoints' );
+				return $methods;
+			}	
+			
+			public function bfi_post_masterpoints( $params ) {
+				
+				global $wp_xmlrpc_server;
+				$wp_xmlrpc_server->escape( $args );
+				
+				$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+				$username = $params[1];
+				$password = $params[2];
+				$args     = $params[3];
+				
+				// verify credentials
+				if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+					return $wp_xmlrpc_server->error;
+				}
+				
+				if ( ! current_user_can( 'manage_masterpoints' ) )
+					return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot run this software.' ) );
+				
+				do_action( 'xmlrpc_call', 'bfi.postMasterpoints' ); // patterned on the core XML-RPC actions
+				
+				// required parameters
+				if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+				
+				$content = $args['content'];
+				// Update post 37
+				$my_post = array();
+				$my_post['ID'] = 1563;
+				$my_post['post_content'] = $content;
+
+				// Update the post into the database
+				wp_update_post( $my_post );				
+
+				return strval($my_post['ID']);
+			}
+			
+					
 
 			function deactivate() {
 				global $wp_roles;				
