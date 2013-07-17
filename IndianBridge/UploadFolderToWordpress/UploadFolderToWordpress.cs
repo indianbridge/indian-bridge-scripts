@@ -101,5 +101,22 @@ namespace UploadFolderToWordpress
             }
         }
 
+        private void postMasterpointsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string siteName = wordpressURLTextbox.Text;
+                string username = usernameTextbox.Text;
+                string password = passwordTextbox.Text;
+                UploadWebpages uw = new UploadWebpages(siteName, username, password, true);
+                uw.postMasterpoints(csvContentTextbox.Text);
+                MessageBox.Show("Posted Masterpoints successfully");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Following Error occurred while posting masterpoints" + Environment.NewLine + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }
