@@ -18,10 +18,17 @@ namespace IndianBridge.WordpressAPIs
         public string pageTemplate;
     }
 
+    public struct CSVContent
+    {
+        public string content;
+    }
+
     public interface IgetCatList
     {
         [CookComputing.XmlRpc.XmlRpcMethod("indianbridge.postResults")]
         string postResults(int blogId, string username, string password, PageInfo content);
+        [CookComputing.XmlRpc.XmlRpcMethod("bfi.postMasterpoints")]
+        string postMasterpoints(int blogId, string username, string password, CSVContent content);
     }
 
     public class UploadWebpages
@@ -66,6 +73,13 @@ namespace IndianBridge.WordpressAPIs
         public IgetCatList m_categories;
 
         public void convertCase(bool convert) { m_convertCase = convert; }
+
+        public void postMasterpoints(string csvContent)
+        {
+            CSVContent content = default(CSVContent);
+            content.content = csvContent;
+            string result = m_categories.postMasterpoints(1, m_userName, m_password, content);
+        }
 
         public UploadWebpages(string sitename, string username, string password, bool replaceLinks = false, bool forceUpload = false, bool useTourneyTemplate = true)
         {
