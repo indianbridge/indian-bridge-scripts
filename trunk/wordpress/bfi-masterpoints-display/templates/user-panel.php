@@ -11,7 +11,7 @@ Theme My Login will always look in your theme's directory first, before using th
 
 	<div class="one_half">
 		<?php 
-		echo '<span class="ico profile-icon"><a href="http://localhost/bfi/wp-admin/profile.php">' . self::get_title( 'profile' ) . '</a></span><br/>';
+		echo '<span class="ico profile-icon"><a href="'.admin_url("profile.php").'">' . self::get_title( 'profile' ) . '</a></span><br/>';
 		echo '<span class="ico logout-icon"><a href="' . wp_logout_url() . '">' . self::get_title( 'logout' ) . '</a></span>';
 		?>
 	</div>
