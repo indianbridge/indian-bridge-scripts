@@ -45,6 +45,7 @@ Version: 1.0
 				add_action( 'show_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
 				add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
 				add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
+				add_action('admin_menu', array($this, 'bfi_database_import_menu'));   
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
 				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);	
 				add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
@@ -129,7 +130,173 @@ Version: 1.0
 				unset($contactmethods['jabber']);
 				unset($contactmethods['yim']);
 				return $contactmethods;
-			}			
+			}		
+			
+                        function bfi_database_import_menu() {
+                                add_users_page( 'Import Members from Masterpoint Table', 'Import BFI Members', 'manage_masterpoints', 'bfi-database-import',array($this, 'bfi_database_import'));
+                        }
+
+                        function bfi_database_import() {
+
+                        //must check that the user has the required capability 
+                                if (!current_user_can('manage_masterpoints'))
+                                {
+                                        wp_die( __('You do not have sufficient permissions to access this page.') );
+                                }
+
+                        // variables for the field and option names 
+                                $hidden_field_name = 'mt_submit_hidden';
+
+                                ?>
+                                <div id="update-status" class="updated"></div>
+                                <?php
+                        // See if the user has posted us some information
+                        // If they did, this hidden field will be set to 'I' or 'D'
+                                if( isset($_POST[ $hidden_field_name ]) && ($_POST[ $hidden_field_name ] == 'I' || $_POST[ $hidden_field_name ] == 'D')) {
+                                        $numberOfMembers = 0;
+                                        if (isset($_POST[ 'number_of_members'])) {
+                                                $numberOfMembers = intval($_POST[ 'number_of_members']);
+                                        }
+                                        if ($numberOfMembers==0) {
+                                                $numberOfMembers = 500;
+                                        }
+                                        if ($_POST[ $hidden_field_name ] == 'I') {
+                                                $updatedHTML = $this->import_subscribers($numberOfMembers);
+                                        }
+                                        else if ($_POST[ $hidden_field_name ] == 'D') {
+                                                $updatedHTML = $this->remove_subscribers($numberOfMembers);
+                                        }
+                                        ?>
+                                        <div class="updated">Finished : <?php echo $updatedHTML; ?></div>
+                                        <?php
+                                }
+
+                        // Now display the settings editing screen
+
+                                echo '<div class="wrap">';
+
+                                 // header
+
+                                echo "<h2>" . __( 'Manage BFI Members from Database', 'menu-test' ) . "</h2>";
+
+                        // settings form
+
+                                ?>
+
+                                <form name="form1" method="post" action="">
+                                        <input type="hidden" name="<?php echo $hidden_field_name; ?>" value="I">
+                                        <span>Number of Members to import : </span><input name="number_of_members" value="500">
+                                        <p class="submit">
+                                                <input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Import BFI Members') ?>" />
+                                        </p>
+
+                                </form>
+                                <form name="form2" method="post" action="">
+                                        <input type="hidden" name="<?php echo $hidden_field_name; ?>" value="D">
+                                        <span>Number of Members to delete : </span><input name="number_of_members" value="500">
+                                        <p class="submit">
+                                                <input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Remove Subscribers') ?>" />
+                                        </p>
+
+                                </form>                         
+                                </div>
+
+                        <?php
+
+                }
+
+                function import_subscribers($numberOfMembers) {
+                        $html = "<div>Import Subscribers : </div>";
+                        if ($this->bfi_masterpoint_db) {
+                                global $wpdb;
+                                //echo '<script>jQuery("#update-status").html("Importing "'.$numberOfMembers.' members);</script>';
+                                // Calculate where to start
+                                $count_last_imported = $wpdb->get_var( "SELECT COUNT(*) FROM sriram_member_count" );
+                                if ($count_last_imported == 0) {
+                                        $last_imported = 0;
+                                }
+                                else {
+                                        $last_imported = $wpdb->get_var( "SELECT last_imported FROM sriram_member_count LIMIT 0,1" );
+                                }
+                                $added = 0;
+                                $notAdded = 0;
+								$alreadyExists = 0;
+                                $query = "SELECT member.member_id AS member_id, valid.password as password, member.email AS email, member.first_name AS first_name, member.last_name AS last_name FROM member ";
+                                //$query .= " JOIN valid ON valid.username= member.member_id ORDER BY (total_current_fp+total_current_lp) DESC LIMIT 10";
+                                $query .= " JOIN valid ON valid.username= member.member_id LIMIT ".$last_imported.",".$numberOfMembers;
+                                //$query .= " JOIN valid ON valid.username= member.member_id";
+                                $rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query));
+                                $count = 0;
+                                $html .= '<p>Count = '.count($rows).'</p>';
+                                foreach($rows as $row) {
+                                        if (username_exists($row->member_id)) {
+											$alreadyExists++;
+                                        }
+                                        else {
+                                                //$html .= '<p>Member '.$row->member_id.' not found! Trying to Add.</p>';
+                                                $userdata = array();
+                                                $userdata['user_login'] = $row->member_id;
+                                                $userdata['user_pass'] = $row->password;
+                                                $userdata['user_email'] = $row->email;
+                                                $userdata['first_name'] = $row->first_name;
+                                                $userdata['last_name'] = $row->last_name;
+                                                $userdata['display_name'] = $row->first_name.' '.$row->last_name;
+                                                $userdata['role'] = 'subscriber';
+                                                $user_id = wp_insert_user( $userdata ); 
+                                                if ( is_wp_error( $user_id ) ) {
+                                                        $html .= '<p>Not Added because : '.$user_id->get_error_message().'</p>';
+														$notAdded++;
+                                                }
+                                                else {
+                                                        //$html .= '<p>Added</p>';
+													$added++;
+                                                }
+                                        }
+                                        /*$userdata = array();
+                                        $userdata['user_login'] = $row->member_id;
+                                        $userdata['user_pass'] = $row->password;
+                                        $userdata['user_email'] = $row->email;
+                                        $userdata['first_name'] = $row->first_name;
+                                        $userdata['last_name'] = $row->last_name;
+                                        $userdata['display_name'] = $row->first_name.' '.$row->last_name;
+                                        $userdata['role'] = 'subscriber';
+                                        $user_id = wp_insert_user( $userdata );
+                                        if ( is_wp_error( $user_id ) ) {
+                                                $notAdded += 1;
+                                        }
+                                        else {
+                                                $added += 1;
+                                        }
+                                        $count = $count+1;*/
+                                        //echo '<script>jQuery("#update-status").html("Count : "'.$count.', Added : '.$added.', Not Added : '.$notAdded.'</script>';
+                                }
+                                $last_imported = $last_imported+$numberOfMembers;
+                                $wpdb->query( $wpdb->prepare( "UPDATE sriram_member_count SET last_imported=%d",$last_imported));
+                                $html .= '<p><strong>Already Exisits : '.$alreadyExist.', Added : '.$added.', Not Added: '.$notAdded.'</strong></p>';      
+                        }
+                        else {
+                                $html .= '<p><strong>Database is not available for import</strong></p>';        
+                        }               
+                        return $html;
+                }
+
+                function remove_subscribers($numberOfMembers) {
+                        $html = "Remove Subscribers : ";
+                        $args = array( 'role' => 'subscriber' );
+                        $subscribers = get_users( $args );
+                        if( !empty($subscribers) ) {
+                                $i = 0;
+                                foreach( $subscribers as $subscriber ) {
+                                        if( wp_delete_user( $subscriber->ID ) ) {
+                                                $i++;
+                                        }
+                                }
+                                $html .= ''.$i.' Subscribers deleted';
+                        } else {
+                                $html .= 'No Subscribers deleted';
+                        }
+                        return $html;
+                }               			
 
 
 
