@@ -46,7 +46,7 @@ Version: 1.0
 				add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
 				add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
 				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
-				add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
+				//add_action('admin_menu', array($this, 'bfi_database_import_menu'));	
 				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);	
 				add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
 				register_activation_hook( __FILE__, array( $this, 'activate' ) );	
@@ -61,7 +61,7 @@ Version: 1.0
 			
 			public function bfi_post_masterpoints( $params ) {
 				
-				global $wp_xmlrpc_server;
+				/*global $wp_xmlrpc_server;
 				$wp_xmlrpc_server->escape( $args );
 				
 				$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
@@ -85,13 +85,14 @@ Version: 1.0
 				$content = $args['content'];
 				// Update post 37
 				$my_post = array();
-				$my_post['ID'] = 1563;
+				$my_post['ID'] = 1536;
 				$my_post['post_content'] = $content;
 
 				// Update the post into the database
 				wp_update_post( $my_post );				
 
-				return strval($my_post['ID']);
+				return strval($my_post['ID']);*/
+				return '';
 			}
 			
 					
@@ -131,7 +132,7 @@ Version: 1.0
 			}			
 
 			function bfi_database_import_menu() {
-				add_users_page( 'Import Members from Masterpoint Table', 'Import BFI Members', 'manage_masterpoints', 'bfi-database-import',array($this, 'bfi_database_import'));
+				//add_users_page( 'Import Members from Masterpoint Table', 'Import BFI Members', 'manage_masterpoints', 'bfi-database-import',array($this, 'bfi_database_import'));
 			}
 
 			function bfi_database_import() {
@@ -145,15 +146,24 @@ Version: 1.0
     			// variables for the field and option names 
 				$hidden_field_name = 'mt_submit_hidden';
 
-
+				?>
+				<div id="update-status" class="updated"></div>
+				<?php
     			// See if the user has posted us some information
     			// If they did, this hidden field will be set to 'I' or 'D'
 				if( isset($_POST[ $hidden_field_name ]) && ($_POST[ $hidden_field_name ] == 'I' || $_POST[ $hidden_field_name ] == 'D')) {
+					$numberOfMembers = 0;
+					if (isset($_POST[ 'number_of_members'])) {
+						$numberOfMembers = intval($_POST[ 'number_of_member']);
+					}
+					if ($numberOfMembers==0) {
+						$numberOfMembers = 500;
+					}
 					if ($_POST[ $hidden_field_name ] == 'I') {
-						$updatedHTML = $this->import_subscribers();
+						$updatedHTML = $this->import_subscribers($numberOfMembers);
 					}
 					else if ($_POST[ $hidden_field_name ] == 'D') {
-						$updatedHTML = $this->remove_subscribers();
+						$updatedHTML = $this->remove_subscribers($numberOfMembers);
 					}
 					?>
 					<div class="updated">Finished : <?php echo $updatedHTML; ?></div>
@@ -174,7 +184,7 @@ Version: 1.0
 
 				<form name="form1" method="post" action="">
 					<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="I">
-
+					<span>Number of Members to import : </span><input name="number_of_members" value="500">
 					<p class="submit">
 						<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Import BFI Members') ?>" />
 					</p>
@@ -182,7 +192,7 @@ Version: 1.0
 				</form>
 				<form name="form2" method="post" action="">
 					<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="D">
-
+					<span>Number of Members to delete : </span><input name="number_of_members" value="500">
 					<p class="submit">
 						<input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Remove Subscribers') ?>" />
 					</p>
@@ -194,16 +204,50 @@ Version: 1.0
 
 		}
 
-		function import_subscribers() {
-			$html = "Import Subscribers : ";
+		function import_subscribers($numberOfMembers) {
+			$html = "<div>Import Subscribers : </div>";
 			if ($this->bfi_masterpoint_db) {
+				global $wpdb;
+				//echo '<script>jQuery("#update-status").html("Importing "'.$numberOfMembers.' members);</script>';
+				// Calculate where to start
+				/*$count_last_imported = $wpdb->get_var( "SELECT COUNT(*) FROM sriram_member_count" );
+				if ($count_last_imported == 0) {
+					$last_imported = 0;
+				}
+				else {
+					$last_imported = $wpdb->get_var( "SELECT last_imported FROM sriram_member_count LIMIT 0,1" );
+				}*/
 				$added = 0;
 				$notAdded = 0;
 				$query = "SELECT member.member_id AS member_id, valid.password as password, member.email AS email, member.first_name AS first_name, member.last_name AS last_name FROM member ";
-				$query .= " JOIN valid ON valid.username= member.member_id ORDER BY (total_current_fp+total_current_lp) DESC LIMIT 10";
+				//$query .= " JOIN valid ON valid.username= member.member_id ORDER BY (total_current_fp+total_current_lp) DESC LIMIT 10";
+				//$query .= " JOIN valid ON valid.username= member.member_id LIMIT ".$last_imported.",".$numberOfMembers;
+				$query .= " JOIN valid ON valid.username= member.member_id";
 				$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query));
+				$count = 0;
+				$html .= '<p>Count = '.count($rows).'</p>';
 				foreach($rows as $row) {
-					$userdata = array();
+					if (username_exists($row->member_id)) {
+					}
+					else {
+						$html .= '<p>Member '.$row->member_id.' not found! Trying to Add.</p>';
+						/*$userdata = array();
+						$userdata['user_login'] = $row->member_id;
+						$userdata['user_pass'] = $row->password;
+						$userdata['user_email'] = $row->email;
+						$userdata['first_name'] = $row->first_name;
+						$userdata['last_name'] = $row->last_name;
+						$userdata['display_name'] = $row->first_name.' '.$row->last_name;
+						$userdata['role'] = 'subscriber';
+						$user_id = wp_insert_user( $userdata );	
+						if ( is_wp_error( $user_id ) ) {
+							$html .= '<p>Not Added because : '.$user_id->get_error_message().'</p>';
+						}
+						else {
+							$html .= '<p>Added</p>';
+						}*/
+					}
+					/*$userdata = array();
 					$userdata['user_login'] = $row->member_id;
 					$userdata['user_pass'] = $row->password;
 					$userdata['user_email'] = $row->email;
@@ -218,8 +262,12 @@ Version: 1.0
 					else {
 						$added += 1;
 					}
+					$count = $count+1;*/
+					//echo '<script>jQuery("#update-status").html("Count : "'.$count.', Added : '.$added.', Not Added : '.$notAdded.'</script>';
 				}
-				$html .= '<p><strong>Added : '.$added.', Not Added: '.$notAdded.'</strong></p>';	
+				/*$last_imported = $last_imported+$numberOfMembers;
+				$wpdb->query( $wpdb->prepare( "UPDATE sriram_member_count SET last_imported=%d",$last_imported));
+				$html .= '<p><strong>Added : '.$added.', Not Added: '.$notAdded.'</strong></p>';*/	
 			}
 			else {
 				$html .= '<p><strong>Database is not available for import</strong></p>';	
@@ -227,7 +275,7 @@ Version: 1.0
 			return $html;
 		}
 
-		function remove_subscribers() {
+		function remove_subscribers($numberOfMembers) {
 			$html = "Remove Subscribers : ";
 			$args = array( 'role' => 'subscriber' );
 			$subscribers = get_users( $args );
