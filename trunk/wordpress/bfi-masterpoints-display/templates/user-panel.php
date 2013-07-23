@@ -96,7 +96,7 @@ function showTable($rows,$fields) {
 		echo '<h6>No Entries Found!</h6>';
 		return;
 	}	
-	echo '<div class="datagrid">';
+	echo '<div class="table-blue">';
 	echo '<table class="stripeme"><thead><tr>';
 	foreach($fields as $fieldKey => $fieldValue) {
 		echo '<th>'.$fieldValue.'</th>';
