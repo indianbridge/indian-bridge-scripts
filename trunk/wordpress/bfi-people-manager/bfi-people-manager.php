@@ -27,7 +27,7 @@ if (!class_exists('BFI_People_Manager')) {
 		private $stateFields;
 		private $committeeFields;
 		private $directorFields;
-		private $potentialFields;		
+		private $potentialFields;
 		private $stateCustomFields;
 		private $committeeCustomFields;
 		private $directorCustomFields;
@@ -47,7 +47,7 @@ if (!class_exists('BFI_People_Manager')) {
 			$this->stateFields = array(
 					'title' => 1,
 					'image' => 6
-					);
+			);
 			$this->stateCustomFields = array(
 					array(
 							'label'=> 'President',
@@ -79,13 +79,13 @@ if (!class_exists('BFI_People_Manager')) {
 					)
 
 			);
-				
+
 			$prefix = $this->committeeTypeName.'_';
 			$this->committeeFields = array (
 					'title' => 0,
 					'content' => 7,
 					'image' => 6
-					);
+			);
 			$this->committeeCustomFields = array(
 					array(
 							'label'=> 'Designation',
@@ -115,7 +115,7 @@ if (!class_exists('BFI_People_Manager')) {
 							'type'	=> 'text',
 							'index' => 3
 					)
-						
+
 			);
 
 			$prefix = $this->directorTypeName.'_';
@@ -155,7 +155,8 @@ if (!class_exists('BFI_People_Manager')) {
 							'label'=> 'Dues Paid?',
 							'desc'  => 'Has this person paid his director renewal fees?.',
 							'id'    => $prefix.'dues_paid',
-							'type'  => 'checkbox'
+							'type'  => 'checkbox',
+							'index' => 6
 					)
 
 			);
@@ -194,14 +195,14 @@ if (!class_exists('BFI_People_Manager')) {
 							'type'	=> 'text'
 					)
 			);
-				
+
 			if (is_admin()) {
 				$jsFilePath = 'jquery.imageLoader.js';
 				$jsIdentifier = 'jquery_imageLoader_js';
 				wp_register_script( $jsIdentifier, plugins_url($jsFilePath, __FILE__ ), array( 'jquery' ) );
 				wp_enqueue_script($jsIdentifier);
 			}
-				
+
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
 
@@ -210,7 +211,10 @@ if (!class_exists('BFI_People_Manager')) {
 			add_action('admin_menu', array($this, 'add_import_export'));
 			add_action( 'add_meta_boxes', array($this,'add_custom_meta_box') );
 			add_action('save_post', array($this,'save_custom_meta'));
-			add_shortcode('bfi_state_associations_display', array($this, 'bfi_state_associations_display'));
+			foreach($this->typeNames as $registerTypeName=>$typeName) {
+				$shortcodeName = $registerTypeName.'_display';
+				add_shortcode($shortcodeName, array($this, $shortcodeName));
+			}
 		}
 
 
@@ -220,7 +224,7 @@ if (!class_exists('BFI_People_Manager')) {
 			foreach($this->typeNames as $registerTypeName=>$typeName) {
 				$this->deleteFile('archive-'.$registerTypeName.'.php');
 				$this->deleteFile('single-'.$registerTypeName.'.php');
-			}			
+			}
 		}
 
 		function activate() {
@@ -240,11 +244,10 @@ if (!class_exists('BFI_People_Manager')) {
 		function copyFile($fileName) {
 			$source = rtrim(plugin_dir_path(__FILE__),'/').DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$fileName;
 			$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
-			copy($source,$destination);;
+			copy($source,$destination);
 		}
 
-		function bfi_state_associations_display ($atts, $content = null ) {
-			$registerTypeName = $this->stateTypeName;
+		function generic_shortcode_template($registerTypeName,$customFields) {
 			$args=array(
 					'post_type' => $registerTypeName,
 					'post_status' => 'publish',
@@ -254,86 +257,120 @@ if (!class_exists('BFI_People_Manager')) {
 					'orderby' => 'title'
 			);
 			$query = new WP_Query( $args );
+			$rootDir = get_template_directory_uri();
+			$imagePath = '/images/icons/16/led-icons/';
 			// The Loop
 			if ( $query->have_posts() ) {
-				?>
-<div id="archive">
-	<?php 
-	while ( $query->have_posts() ) {
-		$query->the_post();
-		$post_id = get_the_ID();
-		?>
-	<div class="item">
-		<?php 
-		// Dimentions
-		//$w = '300';
-		//$h = $theme_options['square_thumbs']=='enable' ? $w : 'auto';
-		$w='120';
-		$h='120';
-		$a = $theme_options['thumbs_crop_top']=='enable' ? '&a=t' : '';
-			
-		// Check featured image from URL
-		$feat_img = get_post_meta($post_id, 'feat_img_value', true);
-			
-		if ($feat_img) :
-			
-		$src = $feat_img;
-		$path = $src;
-			
-		else :
-			
-		// Get image source
-		$src = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'Full Size');
-		$src = ($src) ? $src[0] : get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg';
-		$path = $src;
-			
-		endif;
-		// Display image
-		if ($src) :
-		$out = '<a href="'.get_permalink().'"><img id="single-feat-img" class="t1 fl br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=3&amp;q=90'. $a . '" width="' . $w . '" alt="' . get_the_title() . '" /></a>';
-		endif;
-		echo $out;
-		?>
-		<div class="t1-right fr">
-			<h3>
-				<a href="<?php the_permalink(); ?>"><?php the_title(); edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' ) ?>
-				</a>
-			</h3>
+				echo '<div id="archive">';
+				while ( $query->have_posts() ) {
+					$query->the_post();
+					$post_id = get_the_ID();
+					echo '<div class="item">';
+					$w='120';
+					$h='120';
+					$a = $theme_options['thumbs_crop_top']=='enable' ? '&a=t' : '';
 
-			<?php
-				
-			$prefix = 'bfi_state_';
-			$president = get_post_meta($post_id,$prefix.'president',true);
-			$secretary = get_post_meta($post_id,$prefix.'secretary',true);
-			$phone = get_post_meta($post_id,$prefix.'phone',true);
-			$email = get_post_meta($post_id,$prefix.'email',true);
-			$rootDir = get_template_directory_uri();
-			$out = '<div class="icon16" style="background-image:url('.$rootDir.'/images/icons/16/led-icons/user_business.png) !important;">President : '.$president.' </div><br/>';
-			$out .= '<div class="icon16" style="background-image:url('.$rootDir.'/images/icons/16/led-icons/user.png) !important;">Secretary : '.$secretary.' </div><br/>';
-			$out .= ' <div class="icon16" style="background-image:url('.$rootDir.'/images/icons/16/led-icons/email.png) !important;">Email : <a href="'.$email.'">'.$email.' </a></div><br/>';
-			$out .= '<div class="icon16" style="background-image:url('.$rootDir.'/images/icons/16/led-icons/mobile_phone.png) !important;">Phone : '.$phone.' </div><br/>';
-			echo $out;
-			?>
-			<div class="clear"></div>
-			<div class="h30"></div>
-		</div>
-		<div class="clear"></div>
+					// Check featured image from URL
+					$feat_img = get_post_meta($post_id, 'feat_img_value', true);
 
-		<?php 
-		echo '<p>'.get_the_excerpt().'<span class="btwrap"><a class="button" href="'.get_permalink().'"><span>'.__('Read More','pandathemes').'</span></a></span></p>';
-		?>
-		<div class="clear"></div>
-	</div>
-	<?php 			
-	}
-	?>
-</div>
-<?php 
+					if ($feat_img) :
+
+					$src = $feat_img;
+					$path = $src;
+
+					else :
+
+					// Get image source
+					$src = wp_get_attachment_image_src(get_post_thumbnail_id($post_id), 'Full Size');
+					$src = ($src) ? $src[0] : get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg';
+					$path = $src;
+
+					endif;
+					// Display image
+					if ($src) :
+					$out = '<a href="'.get_permalink().'"><img id="single-feat-img" class="t1 fl br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=3&amp;q=90'. $a . '" width="' . $w . '" alt="' . get_the_title() . '" /></a>';
+					endif;
+					echo $out;
+					echo '<div class="t1-right fr">';
+					echo '<h3><a href="'.get_permalink().'">';
+					the_title();
+					edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' );
+					echo '</a></h3>';
+					foreach($customFields as $field=>$image) {
+						$value = get_post_meta($post_id,$registerTypeName.'_'.$field,true);
+						$imageURL = $rootDir.$imagePath.$image;
+						if ($field == 'email') {
+							$value = '<a href=mailto:'.$value.'>'.$value.'</a>';
+						}
+						if ($value == 'true') {
+							$value = '<img src="'.$rootDir.$imagePath.'accept.png'.'"/>';
+						}
+						else if ($value == 'false') {
+							$value = '<img src="'.$rootDir.$imagePath.'cross.png'.'"/>';
+						}
+						$out = '<div class="icon16" style="background-image:url('.$imageURL.') !important;">'.ucfirst($field).' : '.$value.' </div><br/>';
+						echo $out;
+					}
+					echo '<div class="clear"></div><div class="h30"></div></div><div class="clear"></div>';
+					echo '<p>'.get_the_excerpt().'<span class="btwrap"><a class="button" href="'.get_permalink().'"><span>'.__('Read More','pandathemes').'</span></a></span></p>';
+					echo '<div class="clear"></div></div>';
+				}
+				echo '</div>';
 			} else {
 				echo '<h1>No State Association information found</h1>';
 			}
+				
 			/* Restore original Post Data */
 			wp_reset_postdata();
+		}
+
+		function bfi_associations_display($atts, $content = null) {
+			$registerTypeName = 'bfi_associations';
+			$customFields = array (
+					'president' => 'user_business.png',
+					'secretary' => 'user.png',
+					'email' => 'email.png',
+					'phone' => 'mobile_phone.png'
+			);
+
+			$this->generic_shortcode_template($registerTypeName,$customFields);
+		}
+
+		function bfi_committee_display($atts, $content = null) {
+			$registerTypeName = 'bfi_committee';
+			$customFields = array (
+					'designation' => 'user.png',
+					'address' => 'house.png',
+					'email' => 'email.png',
+					'phone' => 'mobile_phone.png'
+			);
+
+			$this->generic_shortcode_template($registerTypeName,$customFields);
+		}
+
+		function bfi_director_display($atts, $content = null) {
+			$registerTypeName = 'bfi_director';
+			$customFields = array (
+					'region' => 'map.png',
+					'level' => 'star_2.png',
+					'email' => 'email.png',
+					'phone' => 'mobile_phone.png',
+					'dues_paid' => 'money.png'
+			);
+
+			$this->generic_shortcode_template($registerTypeName,$customFields);
+		}
+
+		function bfi_potential_display($atts, $content = null) {
+			$registerTypeName = 'bfi_potential';
+			$customFields = array (
+					'region' => 'map.png',
+					'level' => 'star_2.png',
+					'email' => 'email.png',
+					'phone' => 'mobile_phone.png'
+			);
+
+			$this->generic_shortcode_template($registerTypeName,$customFields);
 		}
 
 		// Add the Meta Box
@@ -345,42 +382,9 @@ if (!class_exists('BFI_People_Manager')) {
 						array($this,'show_'.$registerTypeName.'_custom_meta_box'), // $callback
 						$registerTypeName, // $page
 						'normal', // $context
-						'high'); // $priority				
+						'high'); // $priority
 			}
-			/*$registerTypeName = $this->stateTypeName;
-			add_meta_box(
-					'state_association_custom_meta_box', // $id
-					'State Association Information', // $title
-					array($this,'show_state_association_custom_meta_box'), // $callback
-					$registerTypeName, // $page
-					'normal', // $context
-					'high'); // $priority
-			$registerTypeName = $this->committeeTypeName;
-			add_meta_box(
-					'committee_custom_meta_box', // $id
-					'ExecutiveCommittee Member Information', // $title
-					array($this,'show_committee_member_custom_meta_box'), // $callback
-					$registerTypeName, // $page
-					'normal', // $context
-					'high'); // $priority
-			$registerTypeName = $this->directorTypeName;
-			add_meta_box(
-					'director_custom_meta_box', // $id
-					'Director Information', // $title
-					array($this,'show_director_custom_meta_box'), // $callback
-					$registerTypeName, // $page
-					'normal', // $context
-					'high'); // $priority
-				
-			$registerTypeName = $this->potentialTypeName;
-			add_meta_box(
-					'potential_custom_meta_box', // $id
-					'Potential Director Information', // $title
-					array($this,'show_potential_custom_meta_box'), // $callback
-					$registerTypeName, // $page
-					'normal', // $context
-					'high'); // $priority*/
-				
+
 		}
 
 		function save_custom_meta_specific($post_id,$custom_meta_fields) {
@@ -388,6 +392,7 @@ if (!class_exists('BFI_People_Manager')) {
 			foreach ($custom_meta_fields as $field) {
 				$old = get_post_meta($post_id, $field['id'], true);
 				$new = $_POST[$field['id']];
+				if ($field['type'] == 'checkbox' && !$new) $new = 'false';
 				if ($new && $new != $old) {
 					update_post_meta($post_id, $field['id'], $new);
 				} elseif ('' == $new && $old) {
@@ -450,7 +455,8 @@ if (!class_exists('BFI_People_Manager')) {
 						break;
 						// checkbox
 					case 'checkbox':
-						echo '<input type="checkbox" name="'.$field['id'].'" id="'.$field['id'].'" ',$meta ? ' checked="checked"' : '','/>
+						if ($meta == "false") $meta = null;
+						echo '<input type="checkbox" value="true" name="'.$field['id'].'" id="'.$field['id'].'" ',$meta ? ' checked="checked"' : '','/>
 						<label for="'.$field['id'].'">'.$field['desc'].'</label>';
 						break;
 					case 'select':
@@ -533,33 +539,25 @@ if (!class_exists('BFI_People_Manager')) {
 
 		function add_import_export() {
 			foreach($this->typeNames as $registerTypeName=>$typeName) {
-				//$callbackName = 'import_export_callback_'.$registerTypeName;
 				$view_hook_name = add_submenu_page( 'edit.php?post_type='.$registerTypeName,'Import and Export '.$typeName, 'Import & Export '.$typeName, 'edit_posts', 'import-export-'.$registerTypeName,array($this, 'import_export_callback'));
 				$this->views[$view_hook_name.'_register'] = $registerTypeName;
 				$this->views[$view_hook_name.'_type'] = $typeName;
-				//function() {$this->import_export_forms($registerTypeName,$typeName);}
-				//array($this, 'import_export_'.$registerTypeName)
 			}
-			/*$registerTypeName = $this->stateTypeName;
-			add_submenu_page( 'edit.php?post_type='.$registerTypeName,'Import and Export State Associations', 'Import & Export State Associations', 'edit_posts', 'import-export-state-associations',array($this, 'import_export_state_associations'));
-			$registerTypeName = $this->committeeTypeName;
-			$registerTypeName = $this->directorTypeName;
-			$registerTypeName = $this->potentialTypeName;*/
 		}
-		
+
 		function import_export_callback() {
 			$registerTypeName = $this->views[current_filter().'_register'];
 			$typeName = $this->views[current_filter().'_type'];
 			$this->import_export_forms($registerTypeName,$typeName);
 		}
-		
-		
+
+
 		function import_export_forms($registerTypeName,$typeName) {
 			//must check that the user has the required capability
 			if (!current_user_can('edit_posts'))   {
 				wp_die( __('You do not have sufficient permissions to access this page.') );
 			}
-			
+				
 			// variables for the field and option names
 			echo '<div id="update-status" class="updated"></div>';
 			$dataField = 'state_associations_csv';
@@ -568,7 +566,7 @@ if (!class_exists('BFI_People_Manager')) {
 			// See if the user has posted us some information
 			// If they did, this hidden field will be set to 'I' or 'D'
 			if( isset($_POST[ $hidden_field_name ]) && ($_POST[ $hidden_field_name ] == 'I' || $_POST[ $hidden_field_name ] == 'D')) {
-			
+					
 				$text = '';
 				if (isset($_POST[$dataField])) {
 					$text = $_POST[$dataField];
@@ -578,7 +576,7 @@ if (!class_exists('BFI_People_Manager')) {
 				}
 				else if ($_POST[ $hidden_field_name ] == 'D') {
 				}
-			
+					
 				echo '<div class="updated">';
 				echo 'Finished : '.$updatedHTML;
 				echo '</div>';
@@ -590,71 +588,9 @@ if (!class_exists('BFI_People_Manager')) {
 			echo '<input type="hidden" name="'.$hidden_field_name.'" value="I">';
 			echo '<span>CSV Text : </span><textarea name="'.$dataField.'" cols="60" rows="10"></textarea>';
 			echo '<p class="submit"><input type="submit" name="Submit" class="button-primary" value="Import '.$typeName.'"/></p>';
-			echo '</form></div>';	
+			echo '</form></div>';
 		}
 
-		/*function import_export_bfi_associations() {
-			//must check that the user has the required capability
-			if (!current_user_can('edit_posts'))   {
-				wp_die( __('You do not have sufficient permissions to access this page.') );
-			}
-
-			// variables for the field and option names
-			$hidden_field_name = 'mt_submit_hidden';
-
-			?>
-<div id="update-status" class="updated"></div>
-<?php
-$dataField = 'state_associations_csv';
-// See if the user has posted us some information
-// If they did, this hidden field will be set to 'I' or 'D'
-if( isset($_POST[ $hidden_field_name ]) && ($_POST[ $hidden_field_name ] == 'I' || $_POST[ $hidden_field_name ] == 'D')) {
-
-	$text = '';
-	if (isset($_POST[$dataField])) {
-		$text = $_POST[$dataField];
-	}
-	if ($_POST[ $hidden_field_name ] == 'I') {
-		$updatedHTML = $this->import_state_associations($text);
-	}
-	else if ($_POST[ $hidden_field_name ] == 'D') {
-	}
-	?>
-<div class="updated">
-	Finished :
-	<?php echo $updatedHTML; ?>
-</div>
-<?php
-}
-
-// Now display the settings editing screen
-
-echo '<div class="wrap">';
-
-// header
-
-echo "<h2>" . __( 'Import State Associations', 'menu-test' ) . "</h2>";
-
-// settings form
-
-?>
-
-<form name="form1" method="post" action="">
-	<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="I">
-	<span>CSV Text : </span>
-	<textarea name="<?php echo $dataField; ?>" cols="60" rows="10"></textarea>
-	<p class="submit">
-		<input type="submit" name="Submit" class="button-primary"
-			value="<?php esc_attr_e('Import State Associations') ?>" />
-	</p>
-
-</form>
-
-</div>
-
-<?php
-		}*/
-		
 		function import_bfi_associations($registerTypeName,$text) {
 			return $this->import_data($registerTypeName,$text,$this->stateFields,$this->stateCustomFields);
 		}
@@ -667,7 +603,26 @@ echo "<h2>" . __( 'Import State Associations', 'menu-test' ) . "</h2>";
 		function import_bfi_potential($registerTypeName,$text) {
 			return $this->import_data($registerTypeName,$text,$this->potentialFields,$this->potentialCustomFields);
 		}
-				
+		
+		function checkIfPostExists($registerTypeName,$title) {
+			global $wpdb;
+			
+			$query = $wpdb->prepare(
+					'SELECT ID FROM ' . $wpdb->posts . '
+					WHERE post_title = %s
+					AND post_type = %s',
+					$title,$registerTypeName
+			);
+			$wpdb->query( $query );
+			
+			if ( $wpdb->num_rows ) {
+				$post_id = $wpdb->get_var( $query );
+				return $post_id;
+			} else {
+				return null;
+			}			
+		}
+
 		function import_data($registerTypeName,$text,$fieldList,$custom_meta_fields) {
 			$lines = explode(PHP_EOL,$text);
 			$html = '<br/>';
@@ -677,114 +632,70 @@ echo "<h2>" . __( 'Import State Associations', 'menu-test' ) . "</h2>";
 				$title = array_key_exists($fieldName,$fieldList)?$fields[$fieldList[$fieldName]]:'';
 				$fieldName = 'content';
 				$content = array_key_exists($fieldName,$fieldList)?$fields[$fieldList[$fieldName]]:'';
-				//$title = $fields[1];
 				if (!empty($title)) {
+					$post_id = $this->checkIfPostExists($registerTypeName,$title);
 					$my_post = array(
 							'post_title'    => $title,
 							'post_content'  => $content,
 							'post_status'   => 'publish',
 							'post_type'      => $registerTypeName
 					);
-						
-					// Insert the post into the database
-					$post_id = wp_insert_post( $my_post );
 					
-					// check if featured image is present
-					$fieldName = 'image';
-					if (array_key_exists($fieldName,$fieldList)) {
-						//$filename = $fields[6];
-						$filename = $fields[$fieldList[$fieldName]];
-						$wp_filetype = wp_check_filetype($filename, null );
-						$mime_type = $wp_filetype[type];
-						$attachment = array(
-								'post_mime_type' => $wp_filetype['type'],
-								'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-								'post_name' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-								'post_content' => '',
-								'post_parent' => $post_id,
-								'post_excerpt' => $thumb_credit,
-								'post_status' => 'inherit'
-						);
-						$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
-						if($attachment_id != 0) {
-							$attachment_data = wp_generate_attachment_metadata($attachment_id, $filename);
-							wp_update_attachment_metadata($attachment_id, $attach_data);
-							set_post_thumbnail($post_id,$attachment_id);
-							//update_post_meta($post_id, '_thumbnail_id', $attachment_id);
-						}						
+					$prefixText = '';
+					
+					if ($post_id == null) {
+						$prefixText = "Added";
+						// Insert the post into the database
+						$post_id = wp_insert_post( $my_post );
 					}
-					
+					else {
+						$prefixText = "Updated";
+						$my_post['ID'] = $post_id;
+						wp_update_post($my_post);
+					}
+						
+					if (!has_post_thumbnail($post_id)) {
+						// check if featured image is present
+						$fieldName = 'image';
+						if (array_key_exists($fieldName,$fieldList)) {
+							$filename = $fields[$fieldList[$fieldName]];
+							$wp_filetype = wp_check_filetype($filename, null );
+							$mime_type = $wp_filetype[type];
+							$attachment = array(
+									'post_mime_type' => $wp_filetype['type'],
+									'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
+									'post_name' => preg_replace('/\.[^.]+$/', '', basename($filename)),
+									'post_content' => '',
+									'post_parent' => $post_id,
+									'post_excerpt' => $thumb_credit,
+									'post_status' => 'inherit'
+							);
+							$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
+							if($attachment_id != 0) {
+								$attachment_data = wp_generate_attachment_metadata($attachment_id, $filename);
+								wp_update_attachment_metadata($attachment_id, $attach_data);
+								set_post_thumbnail($post_id,$attachment_id);
+							}
+						}
+					}
+						
 					// All meta fields
 					foreach ($custom_meta_fields as $field) {
 						if (array_key_exists('index',$field)) {
 							update_post_meta($post_id,$field['id'],$fields[$field['index']]);
 						}
 					}
-					/*$prefix = 'bfi_state_';
-					update_post_meta($post_id,$prefix.'president',$fields[5]);
-					update_post_meta($post_id,$prefix.'secretary',$fields[2]);
-					update_post_meta($post_id,$prefix.'email',$fields[4]);
-					update_post_meta($post_id,$prefix.'phone',$fields[3]);*/
 
-					$html .= 'Added '.$title.'<br/>';
+					$html .= $prefixText.' '.$title.'<br/>';
 				}
 				else {
-					//var_dump($fields[$fieldList['title']]);
 					$html .= 'Empty title at index '.$fieldList['title'].' in '.$line.'<br/>';
 				}
 			}
 			return $html;
 		}
 
-		/*function import_state_associations($text) {
-			$registerTypeName = $this->stateTypeName;
-			$lines = explode(PHP_EOL,$text);
-			$html = '<br/>';
-			foreach($lines as $line) {
-				$fields = explode("\t",$line);
-				$title = $fields[1];
-				if (!empty($title)) {
-					$my_post = array(
-							'post_title'    => $title,
-							'post_content'  => '',
-							'post_status'   => 'publish',
-							'post_type'      => $registerTypeName
-					);
-						
-					// Insert the post into the database
-					$post_id = wp_insert_post( $my_post );
-					$prefix = 'bfi_state_';
-					update_post_meta($post_id,$prefix.'president',$fields[5]);
-					update_post_meta($post_id,$prefix.'secretary',$fields[2]);
-					update_post_meta($post_id,$prefix.'email',$fields[4]);
-					update_post_meta($post_id,$prefix.'phone',$fields[3]);
-					$filename = $fields[6];
-					$wp_filetype = wp_check_filetype($filename, null );
-					$mime_type = $wp_filetype[type];
-					$attachment = array(
-							'post_mime_type' => $wp_filetype['type'],
-							'post_title' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-							'post_name' => preg_replace('/\.[^.]+$/', '', basename($filename)),
-							'post_content' => '',
-							'post_parent' => $post_id,
-							'post_excerpt' => $thumb_credit,
-							'post_status' => 'inherit'
-					);
-					$attachment_id = wp_insert_attachment($attachment, $filename, $post_id);
-					if($attachment_id != 0) {
-						$attachment_data = wp_generate_attachment_metadata($attachment_id, $filename);
-						wp_update_attachment_metadata($attachment_id, $attach_data);
-						set_post_thumbnail($post_id,$attachment_id);
-						//update_post_meta($post_id, '_thumbnail_id', $attachment_id);
-					}
-					$html .= 'Added '.$title.'<br/>';
-				}
-				//
-				//$html .= $fields[1].'<br/>';
-			}
-			return $html;
-		}*/
-		
+
 		function register_custom_post_types() {
 			foreach($this->typeNames as $registerTypeName=>$typeName) {
 				$pluralTypeName = $typeName.'s';
@@ -812,45 +723,13 @@ echo "<h2>" . __( 'Import State Associations', 'menu-test' ) . "</h2>";
 						'taxonomies' => array( '' ),
 						'has_archive' => true
 				);
-				register_post_type($registerTypeName,$args);				
+				register_post_type($registerTypeName,$args);
 			}
 		}
-
-		/*function register_state_association_custom_post_type() {
-			$registerTypeName = $this->stateTypeName;
-			$typeName = $this->typeNames[$registerTypeName];
-			$pluralTypeName = $typeName.'s';
-			$labels = array(
-					'name'               => _x( $pluralTypeName, 'post type general name' ),
-					'singular_name'      => _x( $typeName, 'post type singular name' ),
-					'add_new'            => _x( 'Add New', $typeName ),
-					'add_new_item'       => __( 'Add New '.$typeName ),
-					'edit_item'          => __( 'Edit '.$typeName ),
-					'new_item'           => __( 'New '.$typeName ),
-					'all_items'          => __( 'All '.$pluralTypeName ),
-					'view_item'          => __( 'View '.$typeName ),
-					'search_items'       => __( 'Search '.$pluralTypeName ),
-					'not_found'          => __( 'No '.$pluralTypeName.' found' ),
-					'not_found_in_trash' => __( 'No '.$pluralTypeName.' found in the Trash' ),
-					'parent_item_colon'  => '',
-					'menu_name'          => $pluralTypeName
-			);
-			$args = array(
-					'labels' => $labels,
-					'description'   => 'Holds our '.$pluralTypeName.' and '.$typeName.' specific data',
-					'public' => true,
-					'menu_position' => 15,
-					'supports' => array( 'title', 'editor', 'thumbnail' ),
-					'taxonomies' => array( '' ),
-					'has_archive' => true
-			);
-			register_post_type($registerTypeName,$args);
-		}*/
 
 
 		function my_updated_messages( $messages) {
 			foreach($this->typeNames as $registerTypeName=>$typeName) {
-				//$typeName = $this->typeNames[$registerTypeName];
 				$pluralTypeName = $typeName.'s';
 				global $post, $post_ID;
 				$messages[$registerTypeName] = array(
@@ -868,13 +747,6 @@ echo "<h2>" . __( 'Import State Associations', 'menu-test' ) . "</h2>";
 				);
 			}
 			return $messages;
-		}
-
-		function writeDebug($text) {
-			return $text;
-			/* global $wpdb;
-			 $tableName = "wp_debug";
-			$wpdb->insert( $tableName,array( 'text' => $text),array( '%s') ); */
 		}
 
 	}

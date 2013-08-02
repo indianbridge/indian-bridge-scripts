@@ -37,7 +37,7 @@ if (have_posts()) {
 
 		echo $out;
 
-		echo '<div class="t1 fl">';
+		echo '<div class="t1-right fr">';
 		echo'<h3>';
 		the_title();
 		edit_post_link( __( 'edit','pandathemes' ), '<span class="f13"> - ', '</span>' );
@@ -49,6 +49,12 @@ if (have_posts()) {
 				if ($field == 'email') {
 					$value = '<a href=mailto:'.$value.'>'.$value.'</a>';
 				}
+				if ($value == 'true') {
+					$value = '<img src="'.$rootDir.$imagePath.'accept.png'.'"/>';
+				}
+				else if ($value == 'false') {
+					$value = '<img src="'.$rootDir.$imagePath.'cross.png'.'"/>';
+				}				
 				$out = '<div class="icon16" style="background-image:url('.$imageURL.') !important;">'.ucfirst($field).' : '.$value.' </div><br/>';
 				echo $out;
 			}

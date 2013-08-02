@@ -55,6 +55,12 @@ if ( $query->have_posts() ) {
 			if ($field == 'email') {
 				$value = '<a href=mailto:'.$value.'>'.$value.'</a>';
 			}
+			if ($value == 'true') {
+				$value = '<img src="'.$rootDir.$imagePath.'accept.png'.'"/>';
+			}
+			else if ($value == 'false') {
+				$value = '<img src="'.$rootDir.$imagePath.'cross.png'.'"/>';
+			}			
 			$out = '<div class="icon16" style="background-image:url('.$imageURL.') !important;">'.ucfirst($field).' : '.$value.' </div><br/>';
 			echo $out;
 		}
