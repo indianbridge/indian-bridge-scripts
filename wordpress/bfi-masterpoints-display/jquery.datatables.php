@@ -27,7 +27,7 @@ function connectToDB() {
 	/* Database connection information */
 	$gaSql['user']       = "bfinem7l_sriram";
 	$gaSql['password']   = "kibitzer";
-	$gaSql['db']         = "bfinem7l_masterpoints";
+	$gaSql['db']         = "bfinem7l_bfitest";
 	$gaSql['server']     = "localhost";
 	
 	
@@ -157,7 +157,7 @@ function doLeaderboard() {
 
 	// Indexed column (used for fast and accurate table cardinality) 
 	$sIndexColumn = "member_id";
-	$sTable = "member";
+	$sTable = "bfi_member";
 	$sqlLink = connectToDB();
 	$sLimit = getLimit();
 	//$sOrder = "";
@@ -188,10 +188,10 @@ function doLeaderboard() {
 
 function doMyMasterpoint($member_id) {
 
-	$aColumns = array( 'tournament_masterpoint.event_date'=>'event_date','tournament_master.description'=>'tournament_name','tournament_level_master.description'=>'tournament_type','event_master.description'=>'event_code','tournament_masterpoint.localpoints_earned'=>'localpoints_earned','tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(tournament_masterpoint.localpoints_earned+tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
+	$aColumns = array( 'bfi_tournament_masterpoint.event_date'=>'event_date','bfi_tournament_master.description'=>'tournament_name','bfi_tournament_level_master.description'=>'tournament_type','bfi_event_master.description'=>'event_code','bfi_tournament_masterpoint.localpoints_earned'=>'localpoints_earned','bfi_tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(bfi_tournament_masterpoint.localpoints_earned+bfi_tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
 	// Indexed column (used for fast and accurate table cardinality)
 	$sIndexColumn = "*";
-	$sTable = "tournament_masterpoint";
+	$sTable = "bfi_tournament_masterpoint";
 
 	//Connect
 	$sqlLink = connectToDB();
@@ -212,9 +212,9 @@ function doMyMasterpoint($member_id) {
 	
 	//Join
 	$sJoin = "";
-	$sJoin .= "JOIN tournament_master ON tournament_masterpoint.tournament_code = tournament_master.tournament_code ";
-	$sJoin .= "JOIN event_master ON event_master.event_code = tournament_masterpoint.event_code ";
-	$sJoin .= "JOIN tournament_level_master ON tournament_level_master.tournament_level_code = tournament_master.tournament_level_code";
+	$sJoin .= "JOIN bfi_tournament_master ON bfi_tournament_masterpoint.tournament_code = bfi_tournament_master.tournament_code ";
+	$sJoin .= "JOIN bfi_event_master ON bfi_event_master.event_code = bfi_tournament_masterpoint.event_code ";
+	$sJoin .= "JOIN bfi_tournament_level_master ON bfi_tournament_level_master.tournament_level_code = bfi_tournament_master.tournament_level_code";
 	
 	//Query
 	$sQuery = "

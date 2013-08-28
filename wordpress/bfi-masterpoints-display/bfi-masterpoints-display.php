@@ -1,136 +1,469 @@
 <?php
 /*
-Plugin Name: BFI Masterpoint Display
+ Plugin Name: BFI Masterpoint Display
 Plugin URI: http://bfi.net.in
 Description: A plugin to manage all masterpoint capabilities for BFI site
 Author: Sriram Narasimhan
 Author URI: ...
 Version: 1.0
 
-	Copyright: © 2013 Sriram Narasimhan (email : indianbridge@gmail.com)
-	License: GNU General Public License v3.0
-	License URI: http://www.gnu.org/licenses/gpl-3.0.html
+Copyright: © 2013 Sriram Narasimhan (email : indianbridge@gmail.com)
+License: GNU General Public License v3.0
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
 
 
-	if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
+if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
-		class BFI_Masterpoint_Display {
-			private $bfi_masterpoint_db;
-			private $fieldNames;
-			public function __construct() {
-				$dataGridName = "datatables";
+	class BFI_Masterpoint_Display {
+		private $bfi_masterpoint_db;
+		private $fieldNames;
+		public function __construct() {
+			$dataGridName = "datatables";
 
-				$jsFilePath = 'js/jquery.'.$dataGridName.'.min.js';
-				$cssFilePath = 'css/jquery.'.$dataGridName.'.css';
-				$jsIdentifier = 'jquery_'.$dataGridName.'_js';
-				$cssIdentifier = 'jquery_'.$dataGridName.'_css';
+			$jsFilePath = 'js/jquery.'.$dataGridName.'.min.js';
+			$cssFilePath = 'css/jquery.'.$dataGridName.'.css';
+			$jsIdentifier = 'jquery_'.$dataGridName.'_js';
+			$cssIdentifier = 'jquery_'.$dataGridName.'_css';
 
-				// register the javascript
-				wp_register_script( $jsIdentifier, plugins_url($jsFilePath, __FILE__ ), array( 'jquery' ) );	
-				wp_enqueue_script($jsIdentifier);	
+			// register the javascript
+			wp_register_script( $jsIdentifier, plugins_url($jsFilePath, __FILE__ ), array( 'jquery' ) );
+			wp_enqueue_script($jsIdentifier);
 
-				// Register bfi master point javascript
-				wp_register_script( 'bfi_masterpoints_display', plugins_url( 'bfi-masterpoints-display.js', __FILE__ ), array( 'jquery' ) );	
-				wp_enqueue_script('bfi_masterpoints_display');
+			// Register bfi master point javascript
+			wp_register_script( 'bfi_masterpoints_display', plugins_url( 'bfi-masterpoints-display.js', __FILE__ ), array( 'jquery' ) );
+			wp_enqueue_script('bfi_masterpoints_display');
 
-				// register the css
-				wp_register_style($cssIdentifier, plugins_url( 'css/jquery.datatables_themeroller.css', __FILE__ ) );	
-				wp_enqueue_style($cssIdentifier);							
-				wp_register_style( 'jquery_dataTables_redmond_css', plugins_url( 'css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__ ) );	
-				wp_enqueue_style('jquery_dataTables_redmond_css');
+			// register the css
+			wp_register_style($cssIdentifier, plugins_url( 'css/jquery.datatables_themeroller.css', __FILE__ ) );
+			wp_enqueue_style($cssIdentifier);
+			wp_register_style( 'jquery_dataTables_redmond_css', plugins_url( 'css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__ ) );
+			wp_enqueue_style('jquery_dataTables_redmond_css');
 
-				// Add the shortcode
-				add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));
-				add_action( 'show_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
-				add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
-				add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
-				add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );	
-				add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);	
-				add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
-				register_activation_hook( __FILE__, array( $this, 'activate' ) );	
-				register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
-				$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'bfinem7l_masterpoints', 'localhost');
-				$this->fieldNames = array('address_1','address_2','address_3','city','country','residence_phone','mobile_no','sex','dob');
+			// Add the shortcode
+			add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));
+			add_action( 'show_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
+			add_action( 'edit_user_profile', array($this, 'bfi_add_custom_user_profile_fields') );
+			add_action( 'personal_options_update', array($this, 'bfi_save_custom_user_profile_fields') );
+			add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );
+			add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);
+			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
+			register_activation_hook( __FILE__, array( $this, 'activate' ) );
+			register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
+			//$this->bfi_masterpoint_db = new wpdb('bfinem7l_sriram', 'kibitzer', 'bfinem7l_masterpoints', 'localhost');
+			global $wpdb;
+			$this->bfi_masterpoint_db = $wpdb;
+			$this->fieldNames = array('address_1','address_2','address_3','city','country','residence_phone','mobile_no','sex','dob');
+		}
+			
+		public function add_xml_rpc_methods( $methods ) {
+			//$methods['bfi.postMasterpoints'] = array( $this, 'bfi_post_masterpoints' );
+			//$methods['bfi.addUsers'] = array($this,'bfi_add_users');
+			//$methods['bfi.addTourney'] = array($this,'bfi_add_tourney');
+
+			$methods['bfi.getTableCount'] = array($this,'bfi_getTableCount');
+			$methods['bfi.getTableData'] = array($this,'bfi_getTableData');
+			$methods['bfi.addTableData'] = array($this,'bfi_addTableData');
+			return $methods;
+		}
+		
+		public function bfi_getTableCount($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+			
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
 			}
 			
-			public function add_xml_rpc_methods( $methods ) {
-				$methods['bfi.postMasterpoints'] = array( $this, 'bfi_post_masterpoints' );
-				return $methods;
-			}	
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
 			
-			public function bfi_post_masterpoints( $params ) {
+			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions
+			if (!$this->bfi_masterpoint_db) {
+				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
+			}
+			$args     = $params[3];
+			// required parameters
+			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>"","where"=>"","orderBy"=>"","limit"=>"");
+			foreach($tableInfo as $indexName=>$value) {
+				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
+			}
+			if ( empty( $tableInfo['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
 				
-				/*global $wp_xmlrpc_server;
-				$wp_xmlrpc_server->escape( $args );
-				
-				$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-				$username = $params[1];
-				$password = $params[2];
-				$args     = $params[3];
-				
-				// verify credentials
-				if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-					return $wp_xmlrpc_server->error;
+			$query = "SELECT COUNT(*) FROM ".$tableInfo['tableName'];
+			if (!empty($tableInfo['where'])) $query .= " WHERE ".$tableInfo['where'];
+			if (!empty($tableInfo['orderBy'])) $query .= " ORDER BY ".$tableInfo['orderBy'];
+			if (!empty($tableInfo['limit'])) $query .= " LIMIT ".$tableInfo['limit'];
+			$return_value = $this->bfi_masterpoint_db->get_var($query);
+			if (!return_value) return 0;
+			return $return_value;	
+		}
+		
+		public function bfi_addTableData($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+			
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
+			}
+			
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
+			
+			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions
+			if (!$this->bfi_masterpoint_db) {
+				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
+			}
+			$args     = $params[3];
+			// required parameters
+			if ( empty( $args['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName" ) );
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content" ) );
+			$tableName = $args['tableName'];
+			$content = $args['content'];
+			$delimiter = ",";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
+			$lines = explode(chr(10),$content);
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($delimiter,$line);
 				}
+				else {
+					$fields = explode($delimiter,$line);
+					if(count($fields) < count($fieldNames)) {
+						$return_string .= 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+						return $return_string;
+					}
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						$result = $this->bfi_masterpoint_db->insert($tableName,$values);
+						if (false === $result) {
+							$return_string .= 'Error trying to insert '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
+						}
+						else {
+							$return_string .= 'Successfully inserted '.$line.PHP_EOL;
+						}
+					}
+				}
+			}
+			return $return_string;
+		}
+		
+		public function bfi_getTableData($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
 				
-				if ( ! current_user_can( 'manage_masterpoints' ) )
-					return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot run this software.' ) );
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
 				
-				do_action( 'xmlrpc_call', 'bfi.postMasterpoints' ); // patterned on the core XML-RPC actions
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
+			}
 				
-				// required parameters
-				if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
 				
-				$content = $args['content'];
-				// Update post 37
-				$my_post = array();
-				$my_post['ID'] = 1536;
-				$my_post['post_content'] = $content;
-
-				// Update the post into the database
-				wp_update_post( $my_post );				
-
-				return strval($my_post['ID']);*/
-				return '';
+			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions	
+			if (!$this->bfi_masterpoint_db) {
+				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
+			}
+			$args     = $params[3];
+			// required parameters
+			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>"","where"=>"","orderBy"=>"","limit"=>"");
+			foreach($tableInfo as $indexName=>$value) {
+				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
+			}
+			if ( empty( $tableInfo['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
+			
+			$query = "SELECT * FROM ".$tableInfo['tableName'];
+			if (!empty($tableInfo['where'])) $query .= " WHERE ".$tableInfo['where'];
+			if (!empty($tableInfo['orderBy'])) $query .= " ORDER BY ".$tableInfo['orderBy'];
+			if (!empty($tableInfo['limit'])) $query .= " LIMIT ".$tableInfo['limit'];
+			$results = $this->bfi_masterpoint_db->get_results($query,ARRAY_A);
+			$return_string = '';
+			foreach($results as $index=>$result) {
+				if ($index == 0) {
+					$return_string .= implode(",",array_keys($result)).PHP_EOL;
+				}
+				$return_string .= implode(",",array_values($result)).PHP_EOL;
+			}
+			return $return_string;
+		}
+		
+		public function bfi_getTournamentTypes($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+			
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];			
+			
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
 			}
 			
-					
-
-			function deactivate() {
-				global $wp_roles;				
-				$wp_roles->remove_cap( 'administrator', 'manage_masterpoints' );
-				$wp_roles->remove_cap( 'editor', 'manage_masterpoints' );
-				$this->deleteFile('user-panel.php');
-				$this->deleteFile('profile-form.php');
-			}
-
-			function activate() {
-				global $wp_roles;				
-				$wp_roles->add_cap( 'administrator', 'manage_masterpoints' );
-				$wp_roles->add_cap( 'editor', 'manage_masterpoints' );
-				$this->copyFile('user-panel.php');
-				$this->copyFile('profile-form.php');
-			}
-
-			function deleteFile($fileName) {
-				$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
-				unlink($destination);
-			}
-
-			function copyFile($fileName) {
-				$source = rtrim(plugin_dir_path(__FILE__),'/').DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$fileName;
-				$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
-				copy($source,$destination);;				
-			}
-
-			function remove_contactmethods( $contactmethods ) {
-				unset($contactmethods['aim']);
-				unset($contactmethods['jabber']);
-				unset($contactmethods['yim']);
-				return $contactmethods;
-			}		
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );			
 			
+			do_action( 'xmlrpc_call', 'bfi.getTournamentTypes' ); // patterned on the core XML-RPC actions
+			if (!$this->bfi_masterpoint_db) {
+				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
+			}
+			$results = $this->bfi_masterpoint_db->get_results('SELECT * FROM bfi_tournament_level_master');
+			if ($results === false) {
+				return new IXR_Error( 403, __("Error when retrieving from database : ".$this->bfi_masterpoint_db->last_error));
+			}
+			$return_string = '';
+			foreach($results as $result) {
+				$return_string .= $result->tournament_level_code.','.$result->description.','.$result->tournament_type.PHP_EOL;
+			}
+			return $return_string;	
+		}
+		
+		public function bfi_addTournamentTypes($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+				
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			
+			if (!$this->bfi_masterpoint_db) {
+				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
+			}				
+			
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
+			}
+				
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot add tournament types information.' ) );
+				
+			do_action( 'xmlrpc_call', 'bfi.addTournamentTypes' ); // patterned on the core XML-RPC actions
+		
+			$args     = $params[3];
+			// required parameters
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			$delimiter = "\t";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
+			$content = $args['content'];
+			$lines = explode(chr(10),$content);
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($delimiter,$line);
+				}
+				else {
+					$fields = explode($delimiter,$line);
+					if(count($fields) < count($fieldNames)) {
+						$return_string .= 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+						return $return_string;
+					}	
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						//$result = $this->bfi_masterpoint_db->insert('bfi_tournament_level_master',array('tournament_level_code'=>$fields[0],'description'=>$fields[1],'tournament_type'=>$fields[2]));
+						$result = $this->bfi_masterpoint_db->insert('bfi_tournament_level_master',$values);
+						if (false === $result) {
+							$return_string .= 'Error trying to insert '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
+						}
+						else {
+							$return_string .= 'Successfully inserted '.$line.PHP_EOL;
+						}	
+					}		
+				}
+			}
+			return $return_string;	
+		}
+
+		public function bfi_add_tourney($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+				
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			$args     = $params[3];
+				
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
+			}
+				
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot add users.' ) );
+				
+			do_action( 'xmlrpc_call', 'bfi.addTourney' ); // patterned on the core XML-RPC actions
+				
+			// required parameters
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			$tourneyName = 	$args['content'];
+
+			// Check if tourney with same name exists
+			$tourneyRow = $wpdb->get_row($wpdb->prepare("SELECT * FROM $wpdb->bfi_tournament_master WHERE description = %s",$tourneyName));
+			if ($tourneyRow != null) {
+				return 'ERROR: A tourney with tournament code '.$tourneyRow->tournament_code.' and tournament name '.$tourneyRow->description.' already exists!';
+			}
+			
+			// Find the existing number of rows
+			$tourneyCount = $wpdb->get_var( "SELECT COUNT(*) FROM $wpdb->bfi_tournament_master" );
+			$flag = true;
+			$tourneyNumber = $tourneyCount+1;
+			while($flag) {
+				$tourneyCode = 'T'.'$tourneyNumber';
+				// Check of tourney exists
+				$exists = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $wpdb->bfi_tournament_master WHERE tournament_code = %s",$tourneyCode));
+				if ($exists == 0) {
+					$flag = false;
+				}
+				else {
+					$tourneyNumber++;
+				}
+			}
+			// Create tourney
+			$wpdb->insert('bfi_tournament_master',array());
+		}
+			
+		public function bfi_add_users($params) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server->escape( $args );
+
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			$args     = $params[3];
+
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+				return $wp_xmlrpc_server->error;
+			}
+
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot add users.' ) );
+
+			do_action( 'xmlrpc_call', 'bfi.addUsers' ); // patterned on the core XML-RPC actions
+
+			// required parameters
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			$delimiter = "\t";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
+			$content = $args['content'];
+			$lines = explode(PHP_EOL,$content);
+			foreach($lines as $line) {
+				$fields = explode($delimiter,$line);
+				// Expected order is member id, name, local, national, total
+				$userdata['user_login'] = $fields[0];
+				$userdata['display_name'] = $fields[1];
+				$nameSplit = explode(' ',$userdata['display_name'],2);
+				$userdata['first_name'] = $nameSplit[0];
+				$userdata['last_name'] = count($nameSplit) > 1?$nameSplit[1]:'';
+				$userdata['user_pass'] = 'bridge';
+				$local = $fields[2];
+				$national = $fields[3];
+				$total = $fields[4];
+
+				// Insert into members table
+				$this->bfi_masterpoint_db->insert();
+
+				// Insert into users table
+			}
+
+			$output = '';
+
+			return $output;
+		}
+
+		public function bfi_post_masterpoints( $params ) {
+
+			/*global $wp_xmlrpc_server;
+			 $wp_xmlrpc_server->escape( $args );
+
+			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
+			$username = $params[1];
+			$password = $params[2];
+			$args     = $params[3];
+
+			// verify credentials
+			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
+			return $wp_xmlrpc_server->error;
+			}
+
+			if ( ! current_user_can( 'manage_masterpoints' ) )
+				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot run this software.' ) );
+
+			do_action( 'xmlrpc_call', 'bfi.postMasterpoints' ); // patterned on the core XML-RPC actions
+
+			// required parameters
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+
+			$content = $args['content'];
+			// Update post 37
+			$my_post = array();
+			$my_post['ID'] = 1536;
+			$my_post['post_content'] = $content;
+
+			// Update the post into the database
+			wp_update_post( $my_post );
+
+			return strval($my_post['ID']);*/
+			return '';
+		}
+
+
+
+		function deactivate() {
+			global $wp_roles;
+			$wp_roles->remove_cap( 'administrator', 'manage_masterpoints' );
+			$wp_roles->remove_cap( 'editor', 'manage_masterpoints' );
+			$this->deleteFile('user-panel.php');
+			$this->deleteFile('profile-form.php');
+		}
+
+		function activate() {
+			global $wp_roles;
+			$wp_roles->add_cap( 'administrator', 'manage_masterpoints' );
+			$wp_roles->add_cap( 'editor', 'manage_masterpoints' );
+			$this->copyFile('user-panel.php');
+			$this->copyFile('profile-form.php');
+		}
+
+		function deleteFile($fileName) {
+			$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
+			unlink($destination);
+		}
+
+		function copyFile($fileName) {
+			$source = rtrim(plugin_dir_path(__FILE__),'/').DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$fileName;
+			$destination = get_template_directory().DIRECTORY_SEPARATOR.$fileName;
+			copy($source,$destination);;
+		}
+
+		function remove_contactmethods( $contactmethods ) {
+			unset($contactmethods['aim']);
+			unset($contactmethods['jabber']);
+			unset($contactmethods['yim']);
+			return $contactmethods;
+		}
+
 
 
 
@@ -142,8 +475,8 @@ Version: 1.0
 		}
 
 		function getBFIMembershipInfo($member_id) {
-			$query = "SELECT member.member_id AS member_number, rank_master.description AS rank, zone_master.description AS zone, (member.total_current_lp+member.total_current_fp) AS total_points, member.total_current_fp AS fed_points, member.total_current_lp AS local_points FROM member ";
-			$query .= "JOIN zone_master ON member.zone_code=zone_master.zone_code JOIN rank_master ON member.rank_code=rank_master.rank_code WHERE member_id=%s LIMIT 1";
+			$query = "SELECT bfi_member.member_id AS member_number, bfi_rank_master.description AS rank, bfi_zone_master.description AS zone, (bfi_member.total_current_lp+bfi_member.total_current_fp) AS total_points, bfi_member.total_current_fp AS fed_points, bfi_member.total_current_lp AS local_points FROM bfi_member ";
+			$query .= "JOIN bfi_zone_master ON bfi_member.zone_code=bfi_zone_master.zone_code JOIN bfi_rank_master ON bfi_member.rank_code=bfi_rank_master.rank_code WHERE member_id=%s LIMIT 1";
 			$mydb = $this->bfi_masterpoint_db;
 			$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
 			if (count($rows) > 0) return $rows[0];
@@ -155,10 +488,13 @@ Version: 1.0
 			if ( 0 == $current_user->ID ) {
 				return $this->showNotLoggedInShortcodeContent();
 			}
-			$member_id = $current_user->user_login;		
+			$member_id = $current_user->user_login;
 			$membership_info = $this->getBFIMembershipInfo($member_id);
-			if ($membership_info != null) { return $this->showMemberShortcodeContent($current_user,$membership_info); }
-			else { return $this->showNonMemberShortcodeContent($current_user); }		
+			if ($membership_info != null) {
+				return $this->showMemberShortcodeContent($current_user,$membership_info);
+			}
+			else { return $this->showNonMemberShortcodeContent($current_user);
+			}
 		}
 
 		function showMemberShortcodeContent($current_user,$membership_info) {
@@ -172,14 +508,14 @@ Version: 1.0
 			echo '<div class="fl" style="padding-right:10px;" title="BFI Member Points">';
 			echo '<span class="ico trophy-icon">Total Points: '.$membership_info->total_points.'</span><br/>';
 			echo '<span class="ico trophy-silver-icon">Fed Points: '.$membership_info->fed_points.'</span><br/>';
-			echo '<span class="ico trophy-bronze-icon">Local Points: '.$membership_info->local_points.'</span>';	
-			echo '</div>';	
+			echo '<span class="ico trophy-bronze-icon">Local Points: '.$membership_info->local_points.'</span>';
+			echo '</div>';
 			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard");
 			$selectedTab = 'mymasterpoint';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,$current_user->user_login);
 			$out = ob_get_clean();
-			return $out;			
-		}		
+			return $out;
+		}
 
 		function showNonMemberShortcodeContent($current_user) {
 			ob_start();
@@ -189,7 +525,7 @@ Version: 1.0
 			$selectedTab = 'leaderboard';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,'');
 			$out = ob_get_clean();
-			return $out;			
+			return $out;
 		}
 
 		function showNotLoggedInShortcodeContent() {
@@ -208,7 +544,7 @@ Version: 1.0
 			$html .= '<ul class="tabber-widget-tabs">';
 			$tabIDPrefix = 'masterpoint_page_tab_';
 			foreach($tabs as $tab=>$tabName) {
-				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';				
+				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';
 			}
 			$html .= '</ul>';
 			$html .= '<div class="tabber-widget-content">';
@@ -225,50 +561,57 @@ Version: 1.0
 		 * Replace shortcode with posts
 		 */
 		function bfi_masterpoint_display ($atts, $content = null ) {
-			if ( is_user_logged_in() ) { return $this->showLoggedInShortCodeContent(); }
-			else { return $this->showNotLoggedInShortcodeContent(); }
+			if ( is_user_logged_in() ) {
+				return $this->showLoggedInShortCodeContent();
+			}
+			else { return $this->showNotLoggedInShortcodeContent();
+			}
 		}
 
 		function bfi_add_custom_user_profile_fields( $user ) {
 			if ($this->bfi_masterpoint_db) {
-				$query = "SELECT * FROM member WHERE member_id=%s";
+				$query = "SELECT * FROM bfi_member WHERE member_id=%s";
 				$member_id = $user->user_login;
 				$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query,$member_id));
 				if (count($rows) > 0) {
 					$row = $rows[0]
-					
-					?>
-					<h3><?php _e('Extra Profile Information', 'your_textdomain');?></h3>
-					<table class="form-table">
-						<?php foreach ($this->fieldNames as $fieldName) 
-						{
-							?>
-							<tr>
-								<th>
-									<label for="<?php echo $fieldName; ?>"><?php _e($fieldName, 'your_textdomain'); ?></label>
-								</th>							
-								<td>
-									<input type="text" name="<?php echo $fieldName; ?>" id="<?php echo $fieldName; ?>" value="<?php echo esc_attr( $row->$fieldName ); ?>" class="regular-text" /><br />
-									<span class="description"><?php _e('Please enter '.$fieldName.'.', 'your_textdomain'); ?></span>
-								</td>
-							</tr>
-							<?php
-						}
-						?>
 
-					</table>
-					<?php 
-				}		
+					?>
+<h3>
+	<?php _e('Extra Profile Information', 'your_textdomain');?>
+</h3>
+<table class="form-table">
+	<?php foreach ($this->fieldNames as $fieldName) 
+	{
+		?>
+	<tr>
+		<th><label for="<?php echo $fieldName; ?>"><?php _e($fieldName, 'your_textdomain'); ?>
+		</label>
+		</th>
+		<td><input type="text" name="<?php echo $fieldName; ?>"
+			id="<?php echo $fieldName; ?>"
+			value="<?php echo esc_attr( $row->$fieldName ); ?>"
+			class="regular-text" /><br /> <span class="description"><?php _e('Please enter '.$fieldName.'.', 'your_textdomain'); ?>
+		</span>
+		</td>
+	</tr>
+	<?php
+	}
+	?>
+
+</table>
+<?php 
+				}
 			}
 		}
-		
+
 		function bfi_save_custom_user_profile_fields( $user_id ) {
 			if ( !current_user_can( 'edit_user', $user_id ) )
 				return FALSE;
 
 			$user_info = get_userdata($user_id);
 			$member_id = $user_info->user_login;
-			$query = "UPDATE member SET ";
+			$query = "UPDATE bfi_member SET ";
 			$updateFields = array();
 			$updateFields[] = "first_name='$user_info->user_firstname'";
 			$updateFields[] = "last_name='$user_info->user_lastname'";
@@ -282,7 +625,7 @@ Version: 1.0
 			/*$query = "UPDATE valid SET password='$user_info->user_pass' WHERE member_id=%s";
 			$rows = $this->bfi_masterpoint_db->query( $this->bfi_masterpoint_db->prepare($query,$member_id));
 			*/
-		}		
+		}
 	}
 
 	// finally instantiate our plugin class and add it to the set of globals
