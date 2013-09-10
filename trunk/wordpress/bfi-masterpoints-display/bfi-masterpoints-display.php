@@ -58,86 +58,320 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 		}
 			
 		public function add_xml_rpc_methods( $methods ) {
-			$methods['bfi.getTableCount'] = array($this,'bfi_getTableCount');
+			//$methods['bfi.getTableCount'] = array($this,'bfi_getTableCount');
 			$methods['bfi.getTableData'] = array($this,'bfi_getTableData');
 			$methods['bfi.addTableData'] = array($this,'bfi_addTableData');
+			$methods['bfi.validateMasterpointCredentials'] = array($this,'bfi_checkManageMasterpointCredentials');
 			$methods['bfi.addUsers'] = array($this,'bfi_addUsers');
+			$methods['bfi.addMasterpoints'] = array($this,'bfi_addMasterpoints');
 			return $methods;
 		}
 		
+		public function createMessage($error,$message,$content) {
+			$return_value = array("error"=>$error,"message"=>$message,"content"=>$content);
+			return json_encode($return_value);			
+		}
 		
-		public function bfi_addUsers($params) {
+		public function createErrorMessage($message, $content='') {
+			return $this->createMessage("true",$message,$content);
+			/*$return_value = array("error"=>"true","message"=>$message,"content"=>$content);
+			return json_encode($return_value);*/
+		}
+		
+		public function createSuccessMessage($message,$content='') {
+			return $this->createMessage("false",$message,$content);
+			/*$return_value = array("error"=>"false","message"=>$message,"content"=>$content);
+			return json_encode($return_value);*/
+		}	
+		
+		public function bfi_checkManageMasterpointCredentials($params) {
 			global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $args );
+			$wp_xmlrpc_server->escape( $params );
 		
 			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
 			$username = $params[1];
 			$password = $params[2];
-			$args     = $params[3];
 		
 			// verify credentials
 			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $wp_xmlrpc_server->error;
+				return $this->createErrorMessage($wp_xmlrpc_server->error->message);
 			}
 		
+			// Check if user is allowed to manage masterpoints
 			if ( ! current_user_can( 'manage_masterpoints' ) )
-				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot add users.' ) );
+				return $this->createErrorMessage("User $username is not authorized to manage masterpoints.");
 		
-			do_action( 'xmlrpc_call', 'bfi.addUsers' ); // patterned on the core XML-RPC actions
-		
-			// required parameters
-			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
-			$delimiter = "\t";
-			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
-			$content = $args['content'];
-			$lines = explode(PHP_EOL,$content);
-			foreach($lines as $line) {
-				$fields = explode($delimiter,$line);
-				// Expected order is member id, name, local, national, total
-				$userdata['user_login'] = $fields[0];
-				$userdata['display_name'] = $fields[1];
-				$nameSplit = explode(' ',$userdata['display_name'],2);
-				$userdata['first_name'] = $nameSplit[0];
-				$userdata['last_name'] = count($nameSplit) > 1?$nameSplit[1]:'';
-				$userdata['user_pass'] = 'bridge';
-				$local = $fields[2];
-				$national = $fields[3];
-				$total = $fields[4];
-		
-				// Insert into members table
-				$this->bfi_masterpoint_db->insert();
-		
-				// Insert into users table
+			// Check if database is valid
+			if (!$this->bfi_masterpoint_db) {
+				return $this->createErrorMessage('Invalid Masterpoint Database!');
 			}
+			
+			return $this->createSuccessMessage("Validated Credentials");
+		}		
 		
-			$output = '';
+		public function bfi_getTableData($params) {
+			// Check credentials first		
+			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			$result = json_decode($return_string,true);
+			if ($result->error) return $return_string;
+			
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
+			
+			// Parse the parameters
+			$args     = $params[3];
+			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>",","where"=>"","orderBy"=>"","limit"=>"");
+			foreach($tableInfo as $indexName=>$value) {
+				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
+			}
+			if ( empty( $tableInfo['tableName'] ) ) {
+				return $this->createErrorMessage("Missing parameter 'tableName'");
+			}
+
+			// Create Query
+			$query = "SELECT * FROM ".$tableInfo['tableName'];
+			if (!empty($tableInfo['where'])) $query .= " WHERE ".$tableInfo['where'];
+			if (!empty($tableInfo['orderBy'])) $query .= " ORDER BY ".$tableInfo['orderBy'];
+			if (!empty($tableInfo['limit'])) $query .= " LIMIT ".$tableInfo['limit'];
+			
+			// Fetch results
+			try {
+				$results = $this->bfi_masterpoint_db->get_results($query,ARRAY_A);
+				if ($results == null) {
+					return $this->createErrorMessage("Invalid Query : $query or no results found!");
+				}
+				$content = '';
+				foreach($results as $index=>$result) {
+					if ($index == 0) {
+						$content .= implode($tableInfo['delimiter'],array_keys($result)).PHP_EOL;
+					}
+					$content .= implode($tableInfo['delimiter'],array_values($result)).PHP_EOL;
+				}
+			}
+			catch (Exception $e) {
+				return $this->createErrorMessage($e->getMessage());
+			}
+			return $this->createSuccessMessage("Retrieved Table Data Successfully",$content);
+		}		
 		
-			return $output;
+		public function bfi_addTableData($params) {
+			
+			// Check credentials first
+			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			$result = json_decode($return_string,true);
+			if ($result->error) return $return_string;
+				
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
+				
+			// Parse the parameters
+			$args     = $params[3];
+			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>",","where"=>"","orderBy"=>"","limit"=>"");
+			foreach($tableInfo as $indexName=>$value) {
+				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
+			}
+			if ( empty( $tableInfo['tableName'] ) ) {
+				return $this->createErrorMessage("Missing parameter 'tableName'");
+			}
+			
+			if ( empty( $tableInfo['content'] ) ) {
+				return $this->createErrorMessage("Missing parameter 'content'");
+			}			
+				
+			/*$tableName = $args['tableName'];
+			$content = $args['content'];
+			$delimiter = ",";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];*/
+			$lines = explode(chr(10),$tableInfo['content']);
+			$error = 'false';
+			$content = '';
+			$message = '';
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($tableInfo['delimiter'],$line);
+				}
+				else {
+					$fields = explode($tableInfo['delimiter'],$line);
+					if(count($fields) < count($fieldNames)) {
+						$message = 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+						$error = 'true';
+					}
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						$result = $this->bfi_masterpoint_db->insert($tableInfo['tableName'],$values);
+						if (false === $result) {
+							$error = 'true';
+							$message = "Some errors were found!";
+							$content .= 'Error trying to insert '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
+						}
+						else {
+							$content .= 'Successfully inserted '.$line.PHP_EOL;
+						}
+					}
+				}
+			}
+			return $this->createMessage($error,$message,$content);
+		}		
+		
+		public function bfi_addMasterpoints($params) {
+			$this->errorFlag = false;
+			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
+			if ($this->errorFlag == true) return return_string;
+			$this->errorFlag = false;
+			$args     = $params[3];
+			// required parameters
+			if ( empty( $args['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			$tableName = $args['tableName'];
+			if($tableName != 'bfi_tournament_masterpoint') return new IXR_Error( 500, __( "TableName (".$tableName.") has to be bfi_tournament_masterpoint to add users!" ) );
+			$content = $args['content'];
+			$delimiter = ",";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
+			$lines = explode(chr(10),$content);
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($delimiter,$line);
+				}
+				else {
+					$fields = explode($delimiter,$line);
+					if(count($fields) < count($fieldNames)) {
+						$return_string .= 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+					}
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						$return_string .= $this->bfi_addMasterpoint($values).PHP_EOL;
+					}
+				}
+			}
+			return $return_string;
+		}
+		
+		public function bfi_addMasterpoint($args) {
+			$this->errorFlag = false;
+			$return_string = '';
+			$fields = array('tournament_code','event_code','member_id');
+			foreach($fields as $field) {
+				if ( empty( $args[$field] ) ) {
+					$this->errorFlag = true;
+					return 'bfi_addMasterpoint - Missing field : '.$field;
+				}
+			}
+			$member_id = $args['member_id'];
+			$tableName = 'bfi_tournament_masterpoint';
+			$result = $this->bfi_masterpoint_db->insert($tableName,$args);
+			if (false === $result) {
+				$this->errorFlag = true;
+				return 'Error trying to insert '.http_build_query($args).' into '.$tableName.' because : '.$this->bfi_masterpoint_db->last_error;
+			}	
+			// REcompute total for this member id	
+			
+			$localpoints_earned = $this->bfi_masterpoint_db->get_var( $this->bfi_masterpoint_db->prepare("SELECT sum(localpoints_earned) FROM $tableName WHERE member_id = %s",$member_id) );
+			$fedpoints_earned = $this->bfi_masterpoint_db->get_var( $this->bfi_masterpoint_db->prepare("SELECT sum(fedpoints_earned) FROM $tableName WHERE member_id = %s",$member_id) );
+			$tableName = 'bfi_member';
+			$results = $this->bfi_masterpoint_db->update(
+					$tableName,
+					array(
+							'total_current_lp' => $localpoints_earned,
+							'total_current_fp' => $fedpoints_earned	
+					),
+					array( 'member_id' => $member_id ),
+					array(
+							'%f',	// value1
+							'%f'	// value2
+					)
+			);
+			if (false === $results) {
+				$this->errorFlag = true;
+				return 'Error trying to update '.$tableName.' for member_id : '.$member_id.' with local points : '.$localpoints_earned.' and fed points : '.$fedpoints_earned.' because : '.$this->bfi_masterpoint_db->last_error;
+			}
+			return 'Successfully inserted into masterpoint table and updated '.$results.' rows in member table for member id : '.$member_id.' with local points : '.$localpoints_earned.' and fed points : '.$fedpoints_earned;
+		}
+		
+		
+		public function bfi_addUsers($params) {
+			$this->errorFlag = false;
+			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
+			if ($this->errorFlag == true) return return_string;
+			$this->errorFlag = false;
+			$args     = $params[3];
+			// required parameters
+			if ( empty( $args['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
+			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
+			$tableName = $args['tableName'];
+			if($tableName != 'bfi_member') return new IXR_Error( 500, __( "TableName (".$tableName.") has to be bfi_member to add users!" ) );
+			$content = $args['content'];
+			$delimiter = ",";
+			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
+			$lines = explode(chr(10),$content);
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($delimiter,$line);
+				}
+				else {
+					$fields = explode($delimiter,$line);
+					if(count($fields) < count($fieldNames)) {
+						$return_string .= 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+					}
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						$result = $this->bfi_masterpoint_db->insert($tableName,$values);
+						if (false === $result) {
+							$return_string .= 'Error trying to insert '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
+						}
+						else {
+							$return_string .= 'Successfully added member '.$line.PHP_EOL;
+							// Add masterpoint data
+							$masterpointdata = array();
+							$masterpointdata['member_id'] = $values['member_id'];
+							$masterpointdata['tournament_code'] = 'OP000';
+							$masterpointdata['event_code'] = 'OP0';
+							$date = new DateTime('now', new DateTimeZone('Asia/Calcutta'));
+							$masterpointdata['event_date'] = $date->format('Y-m-d');
+							$masterpointdata['localpoints_earned'] = empty($values['total_current_lp'])?0:$values['total_current_lp'];						
+							$masterpointdata['fedpoints_earned'] = empty($values['total_current_fp'])?0:$values['total_current_fp'];
+							$return_string .= $this->bfi_addMasterpoint($masterpointdata);						
+							$userdata = array();
+							$userdata['user_login'] = $values['member_id'];
+							$userdata['user_pass'] = 'bridge';
+							if (!empty($values['email'])) $userdata['user_email'] = $values['email'];
+							if (!empty($values['first_name'])) $userdata['first_name'] = $values['first_name'];
+							else $userdata['first_name'] = '';
+							if (!empty($values['last_name'])) $userdata['last_name'] = $values['last_name'];
+							else $userdata['last_name'] = '';
+							$userdata['display_name'] = $userdata['first_name'].' '.$userdata['last_name'];
+							$userdata['role'] = 'subscriber';
+							$user_id = wp_insert_user( $userdata );
+							if ( is_wp_error( $user_id ) ) {
+								$return_string .= 'Cannot create user : '.$userdata['user_login'].' because '.$user_id->get_error_message().PHP_EOL;
+							}
+							else {
+								$return_string .= 'Successfully created user : '.$userdata['user_login'].PHP_EOL;
+							}							
+						}
+					}
+				}
+			}
+			return $return_string;
 		}
 		
 		
 		
 		public function bfi_getTableCount($params) {
-			/*global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $args );
-			
-			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-			$username = $params[1];
-			$password = $params[2];
-			
-			// verify credentials
-			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $wp_xmlrpc_server->error;
-			}
-			
-			if ( ! current_user_can( 'manage_masterpoints' ) )
-				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
-			
-			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions
-			if (!$this->bfi_masterpoint_db) {
-				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
-			}*/
+			$this->errorFlag = false;
 			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 			if ($errorFlag == true) return return_string;			
 			$args     = $params[3];
 			// required parameters
@@ -152,149 +386,17 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			if (!empty($tableInfo['orderBy'])) $query .= " ORDER BY ".$tableInfo['orderBy'];
 			if (!empty($tableInfo['limit'])) $query .= " LIMIT ".$tableInfo['limit'];
 			$return_value = $this->bfi_masterpoint_db->get_var($query);
-			if (!return_value) return 0;
+			if ($return_value == null || false === $return_value) {
+				$this->errorFlag = true;
+				return 'Invalid Query : '.$query;
+			}
 			return $return_value;	
 		}
 		
-		public function bfi_checkManageMasterpointCredentials($params) {
-			global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $params );
-			$errorFlag = true;
-				
-			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-			$username = $params[1];
-			$password = $params[2];
-				
-			// verify credentials
-			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $wp_xmlrpc_server->error;
-			}
-				
-			if ( ! current_user_can( 'manage_masterpoints' ) )
-				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
-				
-			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions
-			if (!$this->bfi_masterpoint_db) {
-				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
-			}
-			$errorFlag = false;
-			return '';	
-		}
+
+
 		
-		public function bfi_addTableData($params) {
-			/*global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $args );
-			
-			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-			$username = $params[1];
-			$password = $params[2];
-			
-			// verify credentials
-			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $wp_xmlrpc_server->error;
-			}
-			
-			if ( ! current_user_can( 'manage_masterpoints' ) )
-				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
-			
-			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions
-			if (!$this->bfi_masterpoint_db) {
-				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
-			}*/
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			if ($errorFlag == true) return return_string;
-			$args     = $params[3];
-			// required parameters
-			if ( empty( $args['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName" ) );
-			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content" ) );
-			$tableName = $args['tableName'];
-			$content = $args['content'];
-			$delimiter = ",";
-			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];
-			$lines = explode(chr(10),$content);
-			foreach($lines as $index=> $line) {
-				if ($index == 0) {
-					$fieldNameLine = $line;
-					$fieldNames = explode($delimiter,$line);
-				}
-				else {
-					$fields = explode($delimiter,$line);
-					if(count($fields) < count($fieldNames)) {
-						$return_string .= 'Error trying to insert '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
-						return $return_string;
-					}
-					else {
-						$values = array();
-						foreach($fieldNames as $fieldIndex=>$fieldName) {
-							$values[$fieldName] = $fields[$fieldIndex];
-						}
-						$result = $this->bfi_masterpoint_db->insert($tableName,$values);
-						if (false === $result) {
-							$return_string .= 'Error trying to insert '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
-						}
-						else {
-							$return_string .= 'Successfully inserted '.$line.PHP_EOL;
-						}
-					}
-				}
-			}
-			return $return_string;
-		}
-		
-		public function bfi_getTableData($params) {
-			/*global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $args );
-				
-			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-			$username = $params[1];
-			$password = $params[2];
-				
-			// verify credentials
-			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $wp_xmlrpc_server->error;
-			}
-				
-			if ( ! current_user_can( 'manage_masterpoints' ) )
-				return new IXR_Error( 403, __( 'User '.$username.' is not allowed to manage masterpoints and so cannot request tournament types information.' ) );
-				
-			do_action( 'xmlrpc_call', 'bfi.getTableData' ); // patterned on the core XML-RPC actions	
-			if (!$this->bfi_masterpoint_db) {
-				return new IXR_Error( 403, __("Invalid Masterpoint Database!"));
-			}*/
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			if ($errorFlag == true) return return_string;		
-			$errorFlag = true;	
-			$args     = $params[3];
-			// required parameters
-			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>"","where"=>"","orderBy"=>"","limit"=>"");
-			foreach($tableInfo as $indexName=>$value) {
-				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
-			}
-			if ( empty( $tableInfo['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
-			
-			$query = "SELECT * FROM ".$tableInfo['tableName'];
-			if (!empty($tableInfo['where'])) $query .= " WHERE ".$tableInfo['where'];
-			if (!empty($tableInfo['orderBy'])) $query .= " ORDER BY ".$tableInfo['orderBy'];
-			if (!empty($tableInfo['limit'])) $query .= " LIMIT ".$tableInfo['limit'];
-			try {
-				$results = $this->bfi_masterpoint_db->get_results($query,ARRAY_A);
-				if ($results == null) {
-					return 'Invalid Query : '.$query.' or no results found!';
-				}
-				$return_string = '';
-				foreach($results as $index=>$result) {
-					if ($index == 0) {
-						$return_string .= implode(",",array_keys($result)).PHP_EOL;
-					}
-					$return_string .= implode(",",array_values($result)).PHP_EOL;
-				}
-			}
-			catch (Exception $e) {
-				return $e->getMessage();
-			}
-			$errorFlag = false;
-			return $return_string;
-		}
+
 		
 		function import_subscribers($numberOfMembers) {
 			$html = "<div>Import Subscribers : </div>";
