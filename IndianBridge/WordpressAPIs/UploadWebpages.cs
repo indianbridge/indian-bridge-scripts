@@ -21,6 +21,7 @@ namespace IndianBridge.WordpressAPIs
     public struct CSVContent
     {
         public string content;
+        public string delimiter;
     }
 
     public interface IgetCatList

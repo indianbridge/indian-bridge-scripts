@@ -96,6 +96,7 @@ namespace GenerateBFIPage
                 shortcodeText += startTag();
                 shortcodeText += getImageLink(row, "Member", "Photo", "wp-content/uploads/files/images/mystery-man-bpfull.jpg");
                 shortcodeText += clear();
+                shortcodeText += getPaid(row);
                 shortcodeText += getField(row, "Tournament Level", "user.png", true);
                 shortcodeText += getField(row, "Region", "map.png", false);
                 shortcodeText += getEmailLink(row, "Email");
@@ -184,13 +185,32 @@ namespace GenerateBFIPage
             return shortcodeText;
         }
 
+        private string getPaid(DataRow row)
+        {
+            string shortcodeText = "";
+            string fieldName = "Paid";
+            if (!row.Table.Columns.Contains(fieldName)) return "";
+            string field = (string)row[fieldName];
+            if (field.ToLower() == "on")
+            {
+                shortcodeText += System.Environment.NewLine + "[icon name=\"accept.png\"]Dues Paid[/icon]" + System.Environment.NewLine;
+            }
+            else
+            {
+                shortcodeText += System.Environment.NewLine + "[icon name=\"cross.png\"]Dues Not Paid[/icon]" + System.Environment.NewLine;
+            }
+            return shortcodeText;
+        }
+
         private string getField(DataRow row, string fieldName, string iconName, bool strong=false,string text="")
         {
             string shortcodeText = "";
             if (!row.Table.Columns.Contains(fieldName)) return "";
             string field = (string)row[fieldName];
             if (!string.IsNullOrWhiteSpace(field))
-                shortcodeText += System.Environment.NewLine + "[icon name=\"" + iconName + "\"]" + (strong ? "<strong>" : "") + (string.IsNullOrWhiteSpace(text)?"":text+" : ") + field + (strong ? "</strong>" : "") + "[/icon]" + System.Environment.NewLine;
+            {
+                shortcodeText += System.Environment.NewLine + "[icon name=\"" + iconName + "\"]" + (strong ? "<strong>" : "") + (string.IsNullOrWhiteSpace(text) ? "" : text + " : ") + field + (strong ? "</strong>" : "") + "[/icon]" + System.Environment.NewLine;
+            }
             return shortcodeText;
         }
 
