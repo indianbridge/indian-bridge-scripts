@@ -11,8 +11,8 @@ Theme My Login will always look in your theme's directory first, before using th
 
 	<div class="one_half">
 		<?php 
-		echo '<span class="ico profile-icon"><a href="'.admin_url("profile.php").'">' . self::get_title( 'profile' ) . '</a></span><br/>';
-		echo '<span class="ico logout-icon"><a href="' . wp_logout_url() . '">' . self::get_title( 'logout' ) . '</a></span>';
+		echo '<span class="ico profile-icon"><a href="'.admin_url("profile.php").'">Profile</a></span><br/>';
+		echo '<span class="ico logout-icon"><a href="' . wp_logout_url() . '">Logout</a></span>';
 		?>
 	</div>
 	<div class="clear"><!-- --></div>
@@ -32,7 +32,10 @@ Theme My Login will always look in your theme's directory first, before using th
 		}
 	</script> 		
 	<?php
-	$mydb= new wpdb('bfinem7l_sriram','kibitzer','bfinem7l_masterpoints','localhost');
+	global $wpdb;
+	$mydb = $wpdb;
+	$table_prefix = 'bfi_';
+	//$mydb= new wpdb('bfinem7l_sriram','kibitzer','bfinem7l_masterpoints','localhost');
 	$current_user = wp_get_current_user();
 	$member_id = $current_user->user_login;
 	$masterpointURL = home_url("/masterpoints");
@@ -49,17 +52,17 @@ Theme My Login will always look in your theme's directory first, before using th
 			<div class="tabber-widget">
 				<div id="masterpoint_content_1" style="display:none;">
 					<?php
-						getMasterpointSummary($mydb,$member_id);
+						getMasterpointSummary($mydb,$member_id,$table_prefix);
 					?>
 				</div>
 				<div id="masterpoint_content_2" style="display:none;">
 				<?php
-					getRecentMasterpointList($mydb,$member_id)
+					getRecentMasterpointList($mydb,$member_id,$table_prefix)
 				?>
 				</div>
 				<div id="masterpoint_content_3" style="display:none;">
 				<?php
-					getMasterpointLeaders($mydb,$member_id)
+					getMasterpointLeaders($mydb,$member_id,$table_prefix)
 				?>
 				</div>
 			</div>
@@ -73,9 +76,12 @@ Theme My Login will always look in your theme's directory first, before using th
 </div>
 
 <?php
-function getMasterpointSummary($mydb,$member_id) {	
-	$query = "SELECT member.member_id AS member_number, rank_master.description AS rank, zone_master.description AS zone, (member.total_current_lp+member.total_current_fp) AS total_points, member.total_current_fp AS fed_points, member.total_current_lp AS local_points FROM member ";
-	$query .= "JOIN zone_master ON member.zone_code=zone_master.zone_code JOIN rank_master ON member.rank_code=rank_master.rank_code WHERE member_id=%s LIMIT 1";
+function getMasterpointSummary($mydb,$member_id,$table_prefix) {
+	$member_tableName = $table_prefix.'member';	
+	$zone_tableName = $table_prefix.'zone_master';	
+	$rank_tableName = $table_prefix.'rank_master';	
+	$query = "SELECT ".$member_tableName.".member_id AS member_number, ".$rank_tableName.".description AS rank, ".$zone_tableName.".description AS zone, (".$member_tableName.".total_current_lp+".$member_tableName.".total_current_fp) AS total_points, ".$member_tableName.".total_current_fp AS fed_points, ".$member_tableName.".total_current_lp AS local_points FROM ".$member_tableName." ";
+	$query .= "JOIN ".$zone_tableName." ON ".$member_tableName.".zone_code=".$zone_tableName.".zone_code JOIN ".$rank_tableName." ON ".$member_tableName.".rank_code=".$rank_tableName.".rank_code WHERE member_id=%s LIMIT 1";
 	$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
 	$numItems = count($rows);
 	if ($numItems < 1) {
@@ -112,15 +118,17 @@ function showTable($rows,$fields) {
 	echo '</tbody></table></div>';		
 }
 
-function getRecentMasterpointList($mydb,$member_id) {
-	$query = "SELECT * FROM tournament_masterpoint WHERE member_id=%s ORDER BY event_date DESC LIMIT 0,10";
+function getRecentMasterpointList($mydb,$member_id,$table_prefix) {
+	$tableName = $table_prefix.'tournament_masterpoint';
+	$query = "SELECT * FROM ".$tableName." WHERE member_id=%s ORDER BY event_date DESC LIMIT 0,10";
 	$rows = $mydb->get_results( $mydb->prepare($query,$member_id));	
 	$fields = array('event_date' => 'Date','fedpoints_earned' => 'Fed','localpoints_earned' => 'Local');
 	showTable($rows,$fields);
 }
 
-function getMasterpointLeaders($mydb,$member_id) {
-	$query = "SELECT CONCAT(first_name,' ',last_name) AS full_name,(total_current_fp+total_current_lp) AS total FROM member ORDER BY total DESC LIMIT 0,10";
+function getMasterpointLeaders($mydb,$member_id,$table_prefix) {
+	$tableName = $table_prefix.'member';
+	$query = "SELECT CONCAT(first_name,' ',last_name) AS full_name,(total_current_fp+total_current_lp) AS total FROM ".$tableName." ORDER BY total DESC LIMIT 0,10";
 	$rows = $mydb->get_results( $mydb->prepare($query,$member_id));	
 	$fields = array('full_name' => 'Name','total' => 'Total');
 	showTable($rows,$fields);	

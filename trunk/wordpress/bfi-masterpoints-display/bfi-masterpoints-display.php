@@ -7,7 +7,7 @@ Author: Sriram Narasimhan
 Author URI: ...
 Version: 1.0
 
-Copyright: � 2013 Sriram Narasimhan (email : indianbridge@gmail.com)
+Copyright: � 2013 Sriram Narasimhan (email : indianbridge@gmail.com)
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
@@ -19,6 +19,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 		private $bfi_masterpoint_db;
 		private $fieldNames;
 		private $errorFlag;
+		private $table_prefix;
 		public function __construct() {
 			$dataGridName = "datatables";
 
@@ -49,18 +50,38 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			add_action( 'edit_user_profile_update', array($this, 'bfi_save_custom_user_profile_fields') );
 			add_filter('user_contactmethods',array($this, 'remove_contactmethods'),10,1);
 			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
+			add_filter( 'admin_bar_menu', array($this,'customize_admin_bar'),25 );
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook(__FILE__, array( $this, 'deactivate' ));
 			global $wpdb;
 			$this->bfi_masterpoint_db = $wpdb;
+			$this->table_prefix = 'bfi_';
 			$this->fieldNames = array('address_1','address_2','address_3','city','country','residence_phone','mobile_no','sex','dob');
 			$this->errorFlag = false;
 		}
+		
+		public function customize_admin_bar( $wp_admin_bar ) {
+			 $my_account=$wp_admin_bar->get_node('my-account');
+			 $newtitle = str_replace( 'Howdy,', 'Namaste', $my_account->title );
+			 $wp_admin_bar->add_node( array(
+			 'id' => 'my-account',
+			 'title' => $newtitle
+			 ) );
+			 $wp_admin_bar->add_menu( array(
+				 'parent' => 'my-account', // new-content is the ID for “Add New” menu so we use it as parent ID.
+				 'id' => 'masterpoints', // You can add any value here as you are adding something very new here.
+				 'title' => __('My Masterpoints'), // The anchor text.
+				 'href' => home_url("/masterpoints") // name of file to which you will link to.
+			 ));	 
+			 $wp_admin_bar->remove_menu('wp-logo');
+	   	}
+
 			
 		public function add_xml_rpc_methods( $methods ) {
 			//$methods['bfi.getTableCount'] = array($this,'bfi_getTableCount');
 			$methods['bfi.getTableData'] = array($this,'bfi_getTableData');
 			$methods['bfi.addTableData'] = array($this,'bfi_addTableData');
+			$methods['bfi.removeTableData'] = array($this,'bfi_removeTableData');
 			$methods['bfi.validateMasterpointCredentials'] = array($this,'bfi_checkManageMasterpointCredentials');
 			$methods['bfi.addUsers'] = array($this,'bfi_addUsers');
 			$methods['bfi.addMasterpoints'] = array($this,'bfi_addMasterpoints');
@@ -74,14 +95,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 		
 		public function createErrorMessage($message, $content='') {
 			return $this->createMessage("true",$message,$content);
-			/*$return_value = array("error"=>"true","message"=>$message,"content"=>$content);
-			return json_encode($return_value);*/
 		}
 		
 		public function createSuccessMessage($message,$content='') {
 			return $this->createMessage("false",$message,$content);
-			/*$return_value = array("error"=>"false","message"=>$message,"content"=>$content);
-			return json_encode($return_value);*/
 		}	
 		
 		public function bfi_checkManageMasterpointCredentials($params) {
@@ -176,10 +193,6 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 				return $this->createErrorMessage("Missing parameter 'content'");
 			}			
 				
-			/*$tableName = $args['tableName'];
-			$content = $args['content'];
-			$delimiter = ",";
-			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];*/
 			$lines = explode(chr(10),$tableInfo['content']);
 			$error = 'false';
 			$content = '';
@@ -214,6 +227,63 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			}
 			return $this->createMessage($error,$message,$content);
 		}		
+		
+		public function bfi_removeTableData($params) {
+			// Check credentials first
+			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
+			$result = json_decode($return_string,true);
+			if ($result->error) return $return_string;
+				
+			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
+				
+			// Parse the parameters
+			$args     = $params[3];
+			$tableInfo = array("tableName"=>"","content"=>"","delimiter"=>",","where"=>"","orderBy"=>"","limit"=>"");
+			foreach($tableInfo as $indexName=>$value) {
+				if (!empty($args[$indexName])) $tableInfo[$indexName] = $args[$indexName];
+			}
+			if ( empty( $tableInfo['tableName'] ) ) {
+				return $this->createErrorMessage("Missing parameter 'tableName'");
+			}
+			
+			if ( empty( $tableInfo['content'] ) ) {
+				return $this->createErrorMessage("Missing parameter 'content'");
+			}			
+				
+				$lines = explode(chr(10),$tableInfo['content']);
+			$error = 'false';
+			$content = '';
+			$message = '';
+			foreach($lines as $index=> $line) {
+				if ($index == 0) {
+					$fieldNameLine = $line;
+					$fieldNames = explode($tableInfo['delimiter'],$line);
+				}
+				else {
+					$fields = explode($tableInfo['delimiter'],$line);
+					if(count($fields) < count($fieldNames)) {
+						$message = 'Error trying to remove '.$line.' : Number of elements ('.strval(count($fields)).') is less than number of fieldNames ('.strval(count($fieldNames)).') specified in first line : '.$fieldNameLine;
+						$error = 'true';
+					}
+					else {
+						$values = array();
+						foreach($fieldNames as $fieldIndex=>$fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}
+						$result = $this->bfi_masterpoint_db->delete($tableInfo['tableName'],$values);
+						if (false === $result) {
+							$error = 'true';
+							$message = "Some errors were found!";
+							$content .= 'Error trying to delete '.$line.' : '.$this->bfi_masterpoint_db->last_error.PHP_EOL;
+						}
+						else {
+							$content .= 'Successfully deleted '.$line.PHP_EOL;
+						}
+					}
+				}				
+			}
+			
+		}
 		
 		public function bfi_addMasterpoints($params) {
 			$this->errorFlag = false;
@@ -394,93 +464,13 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 		}
 		
 
-
-		
-
-		
-		function import_subscribers($numberOfMembers) {
-			$html = "<div>Import Subscribers : </div>";
-			if ($this->bfi_masterpoint_db) {
-				global $wpdb;
-				//echo '<script>jQuery("#update-status").html("Importing "'.$numberOfMembers.' members);</script>';
-				// Calculate where to start
-				$count_last_imported = $wpdb->get_var( "SELECT COUNT(*) FROM sriram_member_count" );
-				if ($count_last_imported == 0) {
-					$last_imported = 0;
-				}
-				else {
-					$last_imported = $wpdb->get_var( "SELECT last_imported FROM sriram_member_count LIMIT 0,1" );
-				}
-				$added = 0;
-				$notAdded = 0;
-				$alreadyExists = 0;
-				$query = "SELECT member.member_id AS member_id, valid.password as password, member.email AS email, member.first_name AS first_name, member.last_name AS last_name FROM member ";
-				//$query .= " JOIN valid ON valid.username= member.member_id ORDER BY (total_current_fp+total_current_lp) DESC LIMIT 10";
-				$query .= " JOIN valid ON valid.username= member.member_id LIMIT ".$last_imported.",".$numberOfMembers;
-				//$query .= " JOIN valid ON valid.username= member.member_id";
-				$rows = $this->bfi_masterpoint_db->get_results( $this->bfi_masterpoint_db->prepare($query));
-				$count = 0;
-				$html .= '<p>Count = '.count($rows).'</p>';
-				foreach($rows as $row) {
-					if (username_exists($row->member_id)) {
-						$alreadyExists++;
-					}
-					else {
-						//$html .= '<p>Member '.$row->member_id.' not found! Trying to Add.</p>';
-						$userdata = array();
-						$userdata['user_login'] = $row->member_id;
-						$userdata['user_pass'] = $row->password;
-						$userdata['user_email'] = $row->email;
-						$userdata['first_name'] = $row->first_name;
-						$userdata['last_name'] = $row->last_name;
-						$userdata['display_name'] = $row->first_name.' '.$row->last_name;
-						$userdata['role'] = 'subscriber';
-						$user_id = wp_insert_user( $userdata );
-						if ( is_wp_error( $user_id ) ) {
-							$html .= '<p>Not Added because : '.$user_id->get_error_message().'</p>';
-							$notAdded++;
-						}
-						else {
-							//$html .= '<p>Added</p>';
-							$added++;
-						}
-					}
-					/*$userdata = array();
-					 $userdata['user_login'] = $row->member_id;
-					$userdata['user_pass'] = $row->password;
-					$userdata['user_email'] = $row->email;
-					$userdata['first_name'] = $row->first_name;
-					$userdata['last_name'] = $row->last_name;
-					$userdata['display_name'] = $row->first_name.' '.$row->last_name;
-					$userdata['role'] = 'subscriber';
-					$user_id = wp_insert_user( $userdata );
-					if ( is_wp_error( $user_id ) ) {
-					$notAdded += 1;
-					}
-					else {
-					$added += 1;
-					}
-					$count = $count+1;*/
-					//echo '<script>jQuery("#update-status").html("Count : "'.$count.', Added : '.$added.', Not Added : '.$notAdded.'</script>';
-				}
-				$last_imported = $last_imported+$numberOfMembers;
-				$wpdb->query( $wpdb->prepare( "UPDATE sriram_member_count SET last_imported=%d",$last_imported));
-				$html .= '<p><strong>Already Exisits : '.$alreadyExist.', Added : '.$added.', Not Added: '.$notAdded.'</strong></p>';
-			}
-			else {
-				$html .= '<p><strong>Database is not available for import</strong></p>';
-			}
-			return $html;
-		}
-		
-		
-
 		function deactivate() {
 			global $wp_roles;
 			$wp_roles->remove_cap( 'administrator', 'manage_masterpoints' );
 			$wp_roles->remove_cap( 'editor', 'manage_masterpoints' );
 			$this->deleteFile('user-panel.php');
 			$this->deleteFile('profile-form.php');
+			$this->deleteFile('login-form.php');
 		}
 
 		function activate() {
@@ -489,6 +479,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			$wp_roles->add_cap( 'editor', 'manage_masterpoints' );
 			$this->copyFile('user-panel.php');
 			$this->copyFile('profile-form.php');
+			$this->copyFile('login-form.php');
 		}
 
 		function deleteFile($fileName) {
@@ -517,8 +508,12 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 		}
 
 		function getBFIMembershipInfo($member_id) {
-			$query = "SELECT bfi_member.member_id AS member_number, bfi_rank_master.description AS rank, bfi_zone_master.description AS zone, (bfi_member.total_current_lp+bfi_member.total_current_fp) AS total_points, bfi_member.total_current_fp AS fed_points, bfi_member.total_current_lp AS local_points FROM bfi_member ";
-			$query .= "JOIN bfi_zone_master ON bfi_member.zone_code=bfi_zone_master.zone_code JOIN bfi_rank_master ON bfi_member.rank_code=bfi_rank_master.rank_code WHERE member_id=%s LIMIT 1";
+			$table_prefix = $this->table_prefix;
+			$member_tableName = $table_prefix.'member';
+			$zone_tableName = $table_prefix.'zone_master';
+			$rank_tableName = $table_prefix.'rank_master';
+			$query = "SELECT ".$member_tableName.".member_id AS member_number, ".$rank_tableName.".description AS rank, ".$zone_tableName.".description AS zone, (".$member_tableName.".total_current_lp+".$member_tableName.".total_current_fp) AS total_points, ".$member_tableName.".total_current_fp AS fed_points, ".$member_tableName.".total_current_lp AS local_points FROM ".$member_tableName." ";
+			$query .= "JOIN ".$zone_tableName." ON ".$member_tableName.".zone_code=".$zone_tableName.".zone_code JOIN ".$rank_tableName." ON ".$member_tableName.".rank_code=".$rank_tableName.".rank_code WHERE member_id=%s LIMIT 1";
 			$mydb = $this->bfi_masterpoint_db;
 			$rows = $mydb->get_results( $mydb->prepare($query,$member_id));
 			if (count($rows) > 0) return $rows[0];
@@ -535,7 +530,8 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			if ($membership_info != null) {
 				return $this->showMemberShortcodeContent($current_user,$membership_info);
 			}
-			else { return $this->showNonMemberShortcodeContent($current_user);
+			else {
+				 return $this->showNonMemberShortcodeContent($current_user);
 			}
 		}
 
@@ -552,7 +548,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			echo '<span class="ico trophy-silver-icon">Fed Points: '.$membership_info->fed_points.'</span><br/>';
 			echo '<span class="ico trophy-bronze-icon">Local Points: '.$membership_info->local_points.'</span>';
 			echo '</div>';
-			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard");
+			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard", "allmasterpoint"=>"All Masterpoints");
 			$selectedTab = 'mymasterpoint';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,$current_user->user_login);
 			$out = ob_get_clean();
@@ -563,7 +559,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			ob_start();
 			echo $this->getMemberSummary($current_user);
 			echo '<h1>You have to be a member of BFI to see your Masterpoint Summary and Details</h1>';
-			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
+			$tabs = array('leaderboard'=>"Masterpoint Leaderboard", "allmasterpoint"=>"All Masterpoints");
 			$selectedTab = 'leaderboard';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,'');
 			$out = ob_get_clean();
@@ -572,9 +568,9 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 		function showNotLoggedInShortcodeContent() {
 			ob_start();
-			echo '<h1>You have to be a member of BFI and be logged in to see your Masterpoint Summary and Details</h1>';
-			$tabs = array('leaderboard'=>"Masterpoint Leaderboard");
-			$selectedTab = 'leaderboard';
+			echo '<h1>You have to be a member of BFI and be logged in to see Masterpoint Summary and Details</h1>';
+			$tabs = array('lookupmemberid'=>'Find Your BFI Member ID','leaderboard'=>"Masterpoint Leaderboard");
+			$selectedTab = 'lookupmemberid';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,'');
 			$out = ob_get_clean();
 			return $out;
@@ -620,56 +616,55 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 					?>
 <h3>
-	<?php _e('Extra Profile Information', 'your_textdomain');?>
+<?php _e('Extra Profile Information', 'your_textdomain'); ?>
 </h3>
 <table class="form-table">
-	<?php foreach ($this->fieldNames as $fieldName) 
+	<?php foreach ($this->fieldNames as $fieldName)
 	{
-		?>
+	?>
 	<tr>
-		<th><label for="<?php echo $fieldName; ?>"><?php _e($fieldName, 'your_textdomain'); ?>
-		</label>
-		</th>
-		<td><input type="text" name="<?php echo $fieldName; ?>"
-			id="<?php echo $fieldName; ?>"
-			value="<?php echo esc_attr( $row->$fieldName ); ?>"
-			class="regular-text" /><br /> <span class="description"><?php _e('Please enter '.$fieldName.'.', 'your_textdomain'); ?>
-		</span>
-		</td>
+		<th><label for="<?php echo $fieldName; ?>"><?php _e($fieldName, 'your_textdomain'); ?></label></th>
+		<td>
+		<input type="text" name="<?php echo $fieldName; ?>"
+		id="<?php echo $fieldName; ?>"
+		value="<?php echo esc_attr($row -> $fieldName); ?>"
+		class="regular-text" />
+		<br />
+		<span class="description"><?php _e('Please enter ' . $fieldName . '.', 'your_textdomain'); ?></span></td>
 	</tr>
 	<?php
 	}
 	?>
 
 </table>
-<?php 
-				}
-			}
-		}
+<?php
+}
+}
+}
 
-		function bfi_save_custom_user_profile_fields( $user_id ) {
-			if ( !current_user_can( 'edit_user', $user_id ) )
-				return FALSE;
+function bfi_save_custom_user_profile_fields( $user_id ) {
+if ( !current_user_can( 'edit_user', $user_id ) )
+return FALSE;
 
-			$user_info = get_userdata($user_id);
-			$member_id = $user_info->user_login;
-			$query = "UPDATE bfi_member SET ";
-			$updateFields = array();
-			$updateFields[] = "first_name='$user_info->user_firstname'";
-			$updateFields[] = "last_name='$user_info->user_lastname'";
-			foreach ($this->fieldNames as $fieldName) {
-				$updateFields[] = "$fieldName='$_POST[$fieldName]'";
-			}
-			$query .= implode(',', $updateFields);
-			$query .= " WHERE member_id=%s";
-			$rows = $this->bfi_masterpoint_db->query( $this->bfi_masterpoint_db->prepare($query,$member_id));
-			// Dont update password since masterpoint valid table uses a blob for pass.
-			/*$query = "UPDATE valid SET password='$user_info->user_pass' WHERE member_id=%s";
-			$rows = $this->bfi_masterpoint_db->query( $this->bfi_masterpoint_db->prepare($query,$member_id));
-			*/
-		}
-	}
+$user_info = get_userdata($user_id);
+$member_id = $user_info->user_login;
+$query = "UPDATE bfi_member SET ";
+$updateFields = array();
+$updateFields[] = "first_name='$user_info->user_firstname'";
+$updateFields[] = "last_name='$user_info->user_lastname'";
+foreach ($this->fieldNames as $fieldName) {
+$updateFields[] = "$fieldName='$_POST[$fieldName]'";
+}
+$query .= implode(',', $updateFields);
+$query .= " WHERE member_id=%s";
+$rows = $this->bfi_masterpoint_db->query( $this->bfi_masterpoint_db->prepare($query,$member_id));
+// Dont update password since masterpoint valid table uses a blob for pass.
+/*$query = "UPDATE valid SET password='$user_info->user_pass' WHERE member_id=%s";
+$rows = $this->bfi_masterpoint_db->query( $this->bfi_masterpoint_db->prepare($query,$member_id));
+*/
+}
+}
 
-	// finally instantiate our plugin class and add it to the set of globals
-	$GLOBALS['bfi_masterpoint_display'] = new BFI_Masterpoint_Display();
+// finally instantiate our plugin class and add it to the set of globals
+$GLOBALS['bfi_masterpoint_display'] = new BFI_Masterpoint_Display();
 }
