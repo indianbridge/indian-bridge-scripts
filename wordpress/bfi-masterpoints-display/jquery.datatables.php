@@ -1,5 +1,5 @@
 <?php
-$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>",","db_user"=>"bfinem7l_sriram","db_password"=>"kibitzer","db_name"=>"bfinem7l_bfitest");
+$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>"bfi_","db_user"=>"bfinem7l_sriram","db_password"=>"kibitzer","db_name"=>"");
 foreach($params as $paramName=>$value) {
 	if (isset( $_GET[$paramName]) && !empty($_GET[$paramName])) { 
 		$params[$paramName] = $_GET[$paramName];
@@ -7,8 +7,8 @@ foreach($params as $paramName=>$value) {
 }
 $member_id = $params['member_id'];
 $tableType = $params['BFI_Table_Type'];
-//$table_prefix = $params['table_prefix'];
-$table_prefix = "bfi_";
+$table_prefix = $params['table_prefix'];
+//$table_prefix = "bfi_";
 
 
 switch ($tableType) {

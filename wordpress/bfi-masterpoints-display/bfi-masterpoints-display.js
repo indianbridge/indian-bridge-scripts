@@ -1,14 +1,14 @@
 var previous_masterpoint_page_tab = null;
-function switchMasterpointPageTab(newTab, tabIDPrefix, server_side_url, member_id) {
+function switchMasterpointPageTab(newTab, tabIDPrefix, server_side_url, member_id,db_name) {
 	var selectedClass = 'selected';
 	if (previous_masterpoint_page_tab != null)
 		jQuery("#" + tabIDPrefix + previous_masterpoint_page_tab).removeClass(selectedClass);
 	jQuery("#" + tabIDPrefix + newTab).addClass(selectedClass);
 	previous_masterpoint_page_tab = newTab;
-	bfi_masterpoint_renderTable_dataTables(newTab, server_side_url, member_id);
+	bfi_masterpoint_renderTable_dataTables(newTab, server_side_url, member_id,db_name);
 }
 
-function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, member_id, table_prefix) {
+function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, member_id, db_name) {
 	var html = '<table id="bfi_masterpoints_table"><thead><tr>';
 	if (tableType == "leaderboard") {
 		var columns = new Array("ID", "NAME", "Total", "Fed", "Local");
@@ -63,8 +63,8 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 				"value" : member_id
 			});
 			aoData.push({
-				"name" : "table_prefix",
-				"value" : table_prefix
+				"name" : "db_name",
+				"value" : db_name
 			});
 		},
 		"sAjaxSource" : server_side_url

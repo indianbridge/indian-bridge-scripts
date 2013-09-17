@@ -582,7 +582,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			$html .= '<ul class="tabber-widget-tabs">';
 			$tabIDPrefix = 'masterpoint_page_tab_';
 			foreach($tabs as $tab=>$tabName) {
-				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';
+				$html .= '<li><a id="'.$tabIDPrefix.$tab.'" onclick="switchMasterpointPageTab(\''.$tab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\',\''.DB_NAME.'\');" href="javascript:void(0)">'.$tabName.'</a></li>';
 			}
 			$html .= '</ul>';
 			$html .= '<div class="tabber-widget-content">';
@@ -590,7 +590,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			$html .= '<div id="bfi_masterpoints_table_container">';
 			$html .= '</div></div></div></div>';
 			$html .= '<script type="text/javascript">';
-			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\');';
+			$html .= 'switchMasterpointPageTab(\''.$selectedTab.'\',\''.$tabIDPrefix.'\',\''.plugins_url( 'jquery.datatables.php', __FILE__ ).'\',\''.$member_id.'\',\''.DB_NAME.'\');';
 			$html .= '</script>';
 			return $html;
 		}
