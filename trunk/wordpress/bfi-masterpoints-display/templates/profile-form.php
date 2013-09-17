@@ -14,17 +14,7 @@ Theme My Login will always look in your theme's directory first, before using th
 			<input type="hidden" name="checkuser_id" value="<?php echo $current_user->ID; ?>" />
 		</p>
 
-		<?php if ( has_action( 'personal_options' ) ) : ?>
 
-		<h3><?php _e( 'Personal Options' ); ?></h3>
-
-		<table class="form-table">
-		<?php do_action( 'personal_options', $profileuser ); ?>
-		</table>
-
-		<?php endif; ?>
-
-		<?php do_action( 'profile_personal_options', $profileuser ); ?>
 
 		<h3><?php _e( 'Name' ); ?></h3>
 

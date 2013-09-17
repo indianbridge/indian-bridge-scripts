@@ -71,7 +71,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 				 'parent' => 'my-account', // new-content is the ID for “Add New” menu so we use it as parent ID.
 				 'id' => 'masterpoints', // You can add any value here as you are adding something very new here.
 				 'title' => __('My Masterpoints'), // The anchor text.
-				 'href' => home_url("/masterpoints") // name of file to which you will link to.
+				 'href' => home_url("/member-services/masterpoints") // name of file to which you will link to.
 			 ));	 
 			 $wp_admin_bar->remove_menu('wp-logo');
 	   	}
