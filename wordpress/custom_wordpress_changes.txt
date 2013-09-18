@@ -31,3 +31,13 @@ All in one calendar
 		
 	in app/controller/class-ai1ec-app-controller.php
 		comment out line 218 to not show timezone in profile
+
+				
+Updraft Plus
+
+	in backup.php
+		Line 658 : change to 				if ( strpos($table, $table_prefix) === 0 || strpos($table,'bfi_') === 0) {
+		
+Mingle Forum
+	in wpf.class.php
+		change line 1931 to : $meta = "<p>".__("Welcome Guest, posting in this forum requires BFI Membership", "mingleforum").$this->login_form();
