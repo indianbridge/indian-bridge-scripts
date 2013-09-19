@@ -48,6 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddNewEvent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewEvent.Designer.cs">
+      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    </Compile>
     <Compile Include="AddNewTournament.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,6 +80,9 @@
     <Compile Include="ValidateMasterpointCredentials.Designer.cs">
       <DependentUpon>ValidateMasterpointCredentials.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AddNewEvent.resx">
+      <DependentUpon>AddNewEvent.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AddNewTournament.resx">
       <DependentUpon>AddNewTournament.cs</DependentUpon>
     </EmbeddedResource>

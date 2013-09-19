@@ -15,55 +15,46 @@ namespace BFIMasterpointManagement
     {
         ManageMasterpoints mm;
         
-        private Dictionary<string, string> m_getTableDataResult;
+        private Dictionary<string, string> m_getTournamentLevelResult;
+        private Dictionary<string, string> m_getTournamentResult;
+        private Dictionary<string, string> m_getEventResult;
         public BFIMasterpointManagement()
         {
             InitializeComponent();
         }
 
-        private void getTournamentTypesButton_Click(object sender, EventArgs e)
-        {
-            /*ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfitest", "nsriram", "cvans7671");
-            TableInfo tableInfo = new TableInfo();
-            tableInfo.tableName = tableNameTextbox.Text;
-            tableInfo.where = whereTextbox.Text;
-            tableInfo.orderBy = orderByTextbox.Text;
-            if (!String.IsNullOrWhiteSpace(limitLengthTextbox.Text) && !String.IsNullOrWhiteSpace(limitStartTextbox.Text))
-                tableInfo.limit = limitStartTextbox.Text + "," + limitLengthTextbox.Text;
-            tournamentTypesTextbox.Text = mm.getTableData(tableInfo);*/
-        }
-
-        private void addTournamentTypesButton_Click(object sender, EventArgs e)
-        {
-            /*ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfitest", "nsriram", "cvans7671");
-            TableInfo tableInfo = new TableInfo();
-            tableInfo.tableName = tableNameTextbox.Text;
-            tableInfo.content = tournamentTypesTextbox.Text;
-            tableInfo.delimiter = ",";
-            string result = mm.addTableData(tableInfo);
-            MessageBox.Show(result, "Add Tournament Type Response");*/
-        }
-
         private void addUsersButton_Click(object sender, EventArgs e)
         {
-            ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfitest", "nsriram", "cvans7671");
-            TableInfo tableInfo = new TableInfo();
-            tableInfo.tableName = "bfi_member";
-            tableInfo.content = tournamentTypesTextbox.Text;
-            tableInfo.delimiter = ",";
-            string result = mm.addUsers(tableInfo);
-            MessageBox.Show(result, "Add Users Response");
+
         }
 
         private void addMasterpointsButton_Click(object sender, EventArgs e)
         {
-            ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfitest", "nsriram", "cvans7671");
-            TableInfo tableInfo = new TableInfo();
-            tableInfo.tableName = "bfi_tournament_masterpoint";
-            tableInfo.content = tournamentTypesTextbox.Text;
-            tableInfo.delimiter = ",";
-            string result = mm.addMasterpoints(tableInfo);
-            MessageBox.Show(result, "Add Masterpoints Response");
+
+        }
+
+        private void loadEvents()
+        {
+            emDataGridView.Enabled = false;
+            emLoadingPicture.Visible = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.WorkerSupportsCancellation = false;
+            bw.WorkerReportsProgress = false;
+            bw.DoWork += new DoWorkEventHandler(getEvents);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getEventsCompleted);
+            bw.RunWorkerAsync();
+        }
+
+        private void loadTournaments()
+        {
+            tmDataGridView.Enabled = false;
+            tmLoadingPicture.Visible = true;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.WorkerSupportsCancellation = false;
+            bw.WorkerReportsProgress = false;
+            bw.DoWork += new DoWorkEventHandler(getTournaments);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getTournamentsCompleted);
+            bw.RunWorkerAsync();
         }
 
         private void loadTournamentLevels()
@@ -74,20 +65,88 @@ namespace BFIMasterpointManagement
             bw.WorkerSupportsCancellation = false;
             bw.WorkerReportsProgress = false;
             bw.DoWork += new DoWorkEventHandler(getTournamentLevels);
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getTournamentLevelsCompleted);
             bw.RunWorkerAsync();
         }
 
-
-        private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void getEventsCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            bool errorStatus = Convert.ToBoolean(m_getTableDataResult["error"]);
+            bool errorStatus = Convert.ToBoolean(m_getEventResult["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Unable to retrive table data because : " + m_getTableDataResult["message"], "Get Table Data Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Unable to retrive event master data because : " + m_getEventResult["message"], "Get Table Data Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            string m_ttmData = m_getTableDataResult["content"];
+            string m_emData = m_getEventResult["content"];
+            string[] lines = m_emData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] columnHeaders = lines[0].Split(',');
+            emDataGridView.Columns.Clear();
+            emDataGridView.Rows.Clear();
+            foreach (string columnHeader in columnHeaders)
+            {
+                emDataGridView.Columns.Add(columnHeader, columnHeader);
+            }
+            for (int i = 1; i < lines.Length; ++i)
+            {
+                emDataGridView.Rows.Add(lines[i].Split(','));
+            }
+            emLoadingPicture.Visible = false;
+            emDataGridView.Enabled = true;
+        }
+
+        private void getEvents(object sender, DoWorkEventArgs e)
+        {
+            TableInfo tableInfo = new TableInfo();
+            tableInfo.tableName = "bfi_event_master";
+            string json_result = mm.getTableData(tableInfo);
+            var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
+            m_getEventResult = serializer.Deserialize<Dictionary<string, string>>(json_result);
+        }
+
+
+        private void getTournamentsCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            bool errorStatus = Convert.ToBoolean(m_getTournamentResult["error"]);
+            if (errorStatus)
+            {
+                MessageBox.Show("Unable to retrive tournament master data because : " + m_getTournamentResult["message"], "Get Table Data Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            string m_tmData = m_getTournamentResult["content"];
+            string[] lines = m_tmData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] columnHeaders = lines[0].Split(',');
+            tmDataGridView.Columns.Clear();
+            tmDataGridView.Rows.Clear();
+            foreach (string columnHeader in columnHeaders)
+            {
+                tmDataGridView.Columns.Add(columnHeader, columnHeader);
+            }
+            for (int i = 1; i < lines.Length; ++i)
+            {
+                tmDataGridView.Rows.Add(lines[i].Split(','));
+            }
+            tmLoadingPicture.Visible = false;
+            tmDataGridView.Enabled = true;
+        }
+
+        private void getTournaments(object sender, DoWorkEventArgs e)
+        {
+            TableInfo tableInfo = new TableInfo();
+            tableInfo.tableName = "bfi_tournament_master";
+            string json_result = mm.getTableData(tableInfo);
+            var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
+            m_getTournamentResult = serializer.Deserialize<Dictionary<string, string>>(json_result);
+        }
+
+        private void getTournamentLevelsCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            bool errorStatus = Convert.ToBoolean(m_getTournamentLevelResult["error"]);
+            if (errorStatus)
+            {
+                MessageBox.Show("Unable to retrive tournament level master data because : " + m_getTournamentLevelResult["message"], "Get Table Data Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            string m_ttmData = m_getTournamentLevelResult["content"];
             string[] lines = m_ttmData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             string[] columnHeaders = lines[0].Split(',');
             ttmDataGridView.Columns.Clear();
@@ -110,7 +169,7 @@ namespace BFIMasterpointManagement
             tableInfo.tableName = "bfi_tournament_level_master";
             string json_result = mm.getTableData(tableInfo);
             var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
-            m_getTableDataResult = serializer.Deserialize<Dictionary<string, string>>(json_result);
+            m_getTournamentLevelResult = serializer.Deserialize<Dictionary<string, string>>(json_result);
         }
 
 
@@ -127,6 +186,8 @@ namespace BFIMasterpointManagement
             toolStripUsername.Text = "Logged in as : " + mm.UserName;
             toolStripLoginButton.Enabled = true;
             loadTournamentLevels();
+            loadTournaments();
+            loadEvents();
         }
 
         private void toolStripLoginButton_ButtonClick(object sender, EventArgs e)
@@ -145,8 +206,7 @@ namespace BFIMasterpointManagement
             atl.StartPosition = FormStartPosition.CenterParent;
             if (atl.ShowDialog(this) != DialogResult.Cancel)
             {
-                //MessageBox.Show("Added Tournament Level Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ttmDataGridView.Rows.Add(atl.newRowCSV.Split(','));
+                loadTournamentLevels();
             }
         }
 
@@ -155,7 +215,72 @@ namespace BFIMasterpointManagement
             int rowIndex = e.RowIndex;
             DataGridView dgv = sender as DataGridView;
             DataGridViewRow row = dgv.Rows[rowIndex];
-            MessageBox.Show("Clicked "+row.Cells["description"].Value.ToString());
+            AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, row.Cells["tournament_level_code"].Value.ToString());
+            ant.StartPosition = FormStartPosition.CenterParent;
+            if (ant.ShowDialog(this) != DialogResult.Cancel)
+            {
+                loadTournaments();
+            }
+        }
+
+        private void addTournamentButton_Click(object sender, EventArgs e)
+        {
+            AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, null);
+            ant.StartPosition = FormStartPosition.CenterParent;
+            if (ant.ShowDialog(this) != DialogResult.Cancel)
+            {
+                loadTournaments();
+            }
+
+        }
+
+        private void addEventButton_Click(object sender, EventArgs e)
+        {
+            AddNewEvent ane = new AddNewEvent(mm);
+            ane.StartPosition = FormStartPosition.CenterParent;
+            if (ane.ShowDialog(this) != DialogResult.Cancel)
+            {
+                loadEvents();
+            }
+        }
+
+        private void uploadUsersButton_Click(object sender, EventArgs e)
+        {
+            TableInfo tableInfo = new TableInfo();
+            tableInfo.content = usersTextbox.Text;
+            tableInfo.delimiter = ",";
+            string json_result = mm.addUsers(tableInfo);
+            var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
+            Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
+            bool errorStatus = Convert.ToBoolean(result["error"]);
+            if (errorStatus)
+            {
+                MessageBox.Show(result["message"]+Environment.NewLine+result["content"], "Error adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Success adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+ 
+        }
+
+        private void uploadMasterpointsButton_Click(object sender, EventArgs e)
+        {
+            TableInfo tableInfo = new TableInfo();
+            tableInfo.content = masterpointsTextbox.Text;
+            tableInfo.delimiter = ",";
+            string json_result = mm.addMasterpoints(tableInfo);
+            var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
+            Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
+            bool errorStatus = Convert.ToBoolean(result["error"]);
+            if (errorStatus)
+            {
+                MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Error adding Masterpoints !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Success adding Masterpoints !", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
     }
 }
