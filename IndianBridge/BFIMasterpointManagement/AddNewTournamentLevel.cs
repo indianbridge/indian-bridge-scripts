@@ -33,9 +33,9 @@ namespace BFIMasterpointManagement
                 MessageBox.Show("Description cannot be empty string!");
                 return;
             }
-            if (string.IsNullOrWhiteSpace(descriptionTextbox.Text))
+            if (string.IsNullOrWhiteSpace(typeTextbox.Text))
             {
-                MessageBox.Show("Description cannot be empty string!");
+                MessageBox.Show("Tournament Type cannot be empty string!");
                 return;
             }
             this.loginPanel.Enabled = false;
@@ -43,25 +43,21 @@ namespace BFIMasterpointManagement
             this.loadingPicture.Visible = true;
             this.loadingPicture.BringToFront();
             this.Refresh();
-            TableInfo tableInfo = new TableInfo();
-            tableInfo.tableName = "bfi_tournament_level_master";
-            string delimiter = ",";
-            string content = "tournament_level_code" + delimiter + "description" + delimiter + "tournament_type"+Environment.NewLine;
-            newRowCSV = levelCodeTextbox.Text + delimiter + descriptionTextbox.Text + delimiter + typeTextbox.Text;
-            content += newRowCSV;
-            tableInfo.content = content;
-            tableInfo.delimiter = delimiter;
-            string json_result = m_mm.addTableData(tableInfo);
+            TournamentLevelInfo tournamentLevelInfo = new TournamentLevelInfo();
+            tournamentLevelInfo.tournament_level_code = levelCodeTextbox.Text;
+            tournamentLevelInfo.description = descriptionTextbox.Text;
+            tournamentLevelInfo.tournament_type = typeTextbox.Text;
+            string json_result = m_mm.addTournamentLevel(tournamentLevelInfo);
             var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
             Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Error when trying to add table data because : " + result["content"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error when trying to add Tournament Level because : " + result["content"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                MessageBox.Show(result["content"], "Add Table Data Success");
+                MessageBox.Show(result["content"], "Add Tournament Level Success");
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }

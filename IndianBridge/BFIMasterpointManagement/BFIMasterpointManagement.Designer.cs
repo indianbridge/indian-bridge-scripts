@@ -30,30 +30,39 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BFIMasterpointManagement));
-            this.tournamentTypesTextbox = new System.Windows.Forms.TextBox();
-            this.addUsersButton = new System.Windows.Forms.Button();
-            this.addMasterpointsButton = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripUsername = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripLoginButton = new System.Windows.Forms.ToolStripSplitButton();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tournamentLevelMaster = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.ttmDataGridView = new System.Windows.Forms.DataGridView();
+            this.ttmLoadingPicture = new System.Windows.Forms.PictureBox();
             this.addTournamentLevelButton = new System.Windows.Forms.Button();
             this.tournamentMaster = new System.Windows.Forms.TabPage();
-            this.eventMaster = new System.Windows.Forms.TabPage();
-            this.addUsers = new System.Windows.Forms.TabPage();
-            this.addMasterpoints = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tmLoadingPicture = new System.Windows.Forms.PictureBox();
             this.tmDataGridView = new System.Windows.Forms.DataGridView();
             this.addTournamentButton = new System.Windows.Forms.Button();
+            this.eventMaster = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.emLoadingPicture = new System.Windows.Forms.PictureBox();
             this.emDataGridView = new System.Windows.Forms.DataGridView();
             this.addEventButton = new System.Windows.Forms.Button();
+            this.addUsers = new System.Windows.Forms.TabPage();
+            this.addMasterpoints = new System.Windows.Forms.TabPage();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.ttmLoadingPicture = new System.Windows.Forms.PictureBox();
-            this.toolStripLoginButton = new System.Windows.Forms.ToolStripSplitButton();
+            this.splitContainer4 = new System.Windows.Forms.SplitContainer();
+            this.uploadUsersButton = new System.Windows.Forms.Button();
+            this.splitContainer5 = new System.Windows.Forms.SplitContainer();
+            this.loadUsersButton = new System.Windows.Forms.Button();
+            this.usersTextbox = new System.Windows.Forms.TextBox();
+            this.splitContainer6 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer7 = new System.Windows.Forms.SplitContainer();
+            this.loadMasterpointsButton = new System.Windows.Forms.Button();
+            this.masterpointsTextbox = new System.Windows.Forms.TextBox();
+            this.uploadMasterpointsButton = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tournamentLevelMaster.SuspendLayout();
@@ -62,51 +71,40 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ttmDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ttmLoadingPicture)).BeginInit();
             this.tournamentMaster.SuspendLayout();
-            this.eventMaster.SuspendLayout();
-            this.addUsers.SuspendLayout();
-            this.addMasterpoints.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tmLoadingPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tmDataGridView)).BeginInit();
+            this.eventMaster.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.emLoadingPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.emDataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ttmLoadingPicture)).BeginInit();
+            this.addUsers.SuspendLayout();
+            this.addMasterpoints.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
+            this.splitContainer4.Panel1.SuspendLayout();
+            this.splitContainer4.Panel2.SuspendLayout();
+            this.splitContainer4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
+            this.splitContainer5.Panel1.SuspendLayout();
+            this.splitContainer5.Panel2.SuspendLayout();
+            this.splitContainer5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
+            this.splitContainer6.Panel1.SuspendLayout();
+            this.splitContainer6.Panel2.SuspendLayout();
+            this.splitContainer6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
+            this.splitContainer7.Panel1.SuspendLayout();
+            this.splitContainer7.Panel2.SuspendLayout();
+            this.splitContainer7.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tournamentTypesTextbox
-            // 
-            this.tournamentTypesTextbox.Location = new System.Drawing.Point(52, 25);
-            this.tournamentTypesTextbox.Multiline = true;
-            this.tournamentTypesTextbox.Name = "tournamentTypesTextbox";
-            this.tournamentTypesTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tournamentTypesTextbox.Size = new System.Drawing.Size(465, 238);
-            this.tournamentTypesTextbox.TabIndex = 1;
-            // 
-            // addUsersButton
-            // 
-            this.addUsersButton.Location = new System.Drawing.Point(56, 89);
-            this.addUsersButton.Name = "addUsersButton";
-            this.addUsersButton.Size = new System.Drawing.Size(203, 49);
-            this.addUsersButton.TabIndex = 5;
-            this.addUsersButton.Text = "Add Users";
-            this.addUsersButton.UseVisualStyleBackColor = true;
-            this.addUsersButton.Click += new System.EventHandler(this.addUsersButton_Click);
-            // 
-            // addMasterpointsButton
-            // 
-            this.addMasterpointsButton.Location = new System.Drawing.Point(128, 363);
-            this.addMasterpointsButton.Name = "addMasterpointsButton";
-            this.addMasterpointsButton.Size = new System.Drawing.Size(203, 49);
-            this.addMasterpointsButton.TabIndex = 6;
-            this.addMasterpointsButton.Text = "Add Masterpoints";
-            this.addMasterpointsButton.UseVisualStyleBackColor = true;
-            this.addMasterpointsButton.Click += new System.EventHandler(this.addMasterpointsButton_Click);
             // 
             // statusStrip1
             // 
@@ -114,7 +112,7 @@
             this.toolStripUsername,
             this.toolStripStatusLabel1,
             this.toolStripLoginButton});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 498);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 633);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(891, 22);
             this.statusStrip1.TabIndex = 7;
@@ -132,6 +130,18 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(10, 17);
             this.toolStripStatusLabel1.Text = "|";
             // 
+            // toolStripLoginButton
+            // 
+            this.toolStripLoginButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripLoginButton.DropDownButtonWidth = 0;
+            this.toolStripLoginButton.Enabled = false;
+            this.toolStripLoginButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripLoginButton.Image")));
+            this.toolStripLoginButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripLoginButton.Name = "toolStripLoginButton";
+            this.toolStripLoginButton.Size = new System.Drawing.Size(133, 20);
+            this.toolStripLoginButton.Text = "Login As Different User";
+            this.toolStripLoginButton.ButtonClick += new System.EventHandler(this.toolStripLoginButton_ButtonClick);
+            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tournamentLevelMaster);
@@ -143,7 +153,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(891, 498);
+            this.tabControl1.Size = new System.Drawing.Size(891, 633);
             this.tabControl1.TabIndex = 8;
             // 
             // tournamentLevelMaster
@@ -177,6 +187,8 @@
             // 
             // ttmDataGridView
             // 
+            this.ttmDataGridView.AllowUserToAddRows = false;
+            this.ttmDataGridView.AllowUserToDeleteRows = false;
             this.ttmDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.ttmDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ttmDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -189,6 +201,17 @@
             this.ttmDataGridView.TabIndex = 0;
             this.toolTip1.SetToolTip(this.ttmDataGridView, "Double Click on any element to create a new tourney at that level");
             this.ttmDataGridView.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.ttmDataGridView_CellMouseDoubleClick);
+            // 
+            // ttmLoadingPicture
+            // 
+            this.ttmLoadingPicture.Image = global::BFIMasterpointManagement.Properties.Resources.loading;
+            this.ttmLoadingPicture.Location = new System.Drawing.Point(411, 214);
+            this.ttmLoadingPicture.Name = "ttmLoadingPicture";
+            this.ttmLoadingPicture.Size = new System.Drawing.Size(67, 51);
+            this.ttmLoadingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.ttmLoadingPicture.TabIndex = 8;
+            this.ttmLoadingPicture.TabStop = false;
+            this.ttmLoadingPicture.Visible = false;
             // 
             // addTournamentLevelButton
             // 
@@ -214,39 +237,6 @@
             this.tournamentMaster.Text = "Tournament Master";
             this.tournamentMaster.UseVisualStyleBackColor = true;
             // 
-            // eventMaster
-            // 
-            this.eventMaster.Controls.Add(this.splitContainer3);
-            this.eventMaster.Location = new System.Drawing.Point(4, 22);
-            this.eventMaster.Name = "eventMaster";
-            this.eventMaster.Size = new System.Drawing.Size(883, 472);
-            this.eventMaster.TabIndex = 4;
-            this.eventMaster.Text = "Event Master";
-            this.eventMaster.UseVisualStyleBackColor = true;
-            // 
-            // addUsers
-            // 
-            this.addUsers.Controls.Add(this.addUsersButton);
-            this.addUsers.Location = new System.Drawing.Point(4, 22);
-            this.addUsers.Name = "addUsers";
-            this.addUsers.Padding = new System.Windows.Forms.Padding(3);
-            this.addUsers.Size = new System.Drawing.Size(883, 472);
-            this.addUsers.TabIndex = 0;
-            this.addUsers.Text = "Add Users";
-            this.addUsers.UseVisualStyleBackColor = true;
-            // 
-            // addMasterpoints
-            // 
-            this.addMasterpoints.Controls.Add(this.addMasterpointsButton);
-            this.addMasterpoints.Controls.Add(this.tournamentTypesTextbox);
-            this.addMasterpoints.Location = new System.Drawing.Point(4, 22);
-            this.addMasterpoints.Name = "addMasterpoints";
-            this.addMasterpoints.Padding = new System.Windows.Forms.Padding(3);
-            this.addMasterpoints.Size = new System.Drawing.Size(883, 472);
-            this.addMasterpoints.TabIndex = 1;
-            this.addMasterpoints.Text = "addMasterpoints";
-            this.addMasterpoints.UseVisualStyleBackColor = true;
-            // 
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -256,6 +246,7 @@
             // 
             // splitContainer2.Panel1
             // 
+            this.splitContainer2.Panel1.Controls.Add(this.tmLoadingPicture);
             this.splitContainer2.Panel1.Controls.Add(this.tmDataGridView);
             // 
             // splitContainer2.Panel2
@@ -264,6 +255,17 @@
             this.splitContainer2.Size = new System.Drawing.Size(883, 472);
             this.splitContainer2.SplitterDistance = 401;
             this.splitContainer2.TabIndex = 10;
+            // 
+            // tmLoadingPicture
+            // 
+            this.tmLoadingPicture.Image = global::BFIMasterpointManagement.Properties.Resources.loading;
+            this.tmLoadingPicture.Location = new System.Drawing.Point(408, 175);
+            this.tmLoadingPicture.Name = "tmLoadingPicture";
+            this.tmLoadingPicture.Size = new System.Drawing.Size(67, 51);
+            this.tmLoadingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.tmLoadingPicture.TabIndex = 9;
+            this.tmLoadingPicture.TabStop = false;
+            this.tmLoadingPicture.Visible = false;
             // 
             // tmDataGridView
             // 
@@ -289,6 +291,17 @@
             this.addTournamentButton.TabIndex = 0;
             this.addTournamentButton.Text = "Add New Tournament";
             this.addTournamentButton.UseVisualStyleBackColor = false;
+            this.addTournamentButton.Click += new System.EventHandler(this.addTournamentButton_Click);
+            // 
+            // eventMaster
+            // 
+            this.eventMaster.Controls.Add(this.splitContainer3);
+            this.eventMaster.Location = new System.Drawing.Point(4, 22);
+            this.eventMaster.Name = "eventMaster";
+            this.eventMaster.Size = new System.Drawing.Size(883, 472);
+            this.eventMaster.TabIndex = 4;
+            this.eventMaster.Text = "Event Master";
+            this.eventMaster.UseVisualStyleBackColor = true;
             // 
             // splitContainer3
             // 
@@ -299,6 +312,7 @@
             // 
             // splitContainer3.Panel1
             // 
+            this.splitContainer3.Panel1.Controls.Add(this.emLoadingPicture);
             this.splitContainer3.Panel1.Controls.Add(this.emDataGridView);
             // 
             // splitContainer3.Panel2
@@ -307,6 +321,17 @@
             this.splitContainer3.Size = new System.Drawing.Size(883, 472);
             this.splitContainer3.SplitterDistance = 401;
             this.splitContainer3.TabIndex = 11;
+            // 
+            // emLoadingPicture
+            // 
+            this.emLoadingPicture.Image = global::BFIMasterpointManagement.Properties.Resources.loading;
+            this.emLoadingPicture.Location = new System.Drawing.Point(408, 175);
+            this.emLoadingPicture.Name = "emLoadingPicture";
+            this.emLoadingPicture.Size = new System.Drawing.Size(67, 51);
+            this.emLoadingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.emLoadingPicture.TabIndex = 10;
+            this.emLoadingPicture.TabStop = false;
+            this.emLoadingPicture.Visible = false;
             // 
             // emDataGridView
             // 
@@ -332,6 +357,29 @@
             this.addEventButton.TabIndex = 0;
             this.addEventButton.Text = "Add New Event";
             this.addEventButton.UseVisualStyleBackColor = false;
+            this.addEventButton.Click += new System.EventHandler(this.addEventButton_Click);
+            // 
+            // addUsers
+            // 
+            this.addUsers.Controls.Add(this.splitContainer4);
+            this.addUsers.Location = new System.Drawing.Point(4, 22);
+            this.addUsers.Name = "addUsers";
+            this.addUsers.Padding = new System.Windows.Forms.Padding(3);
+            this.addUsers.Size = new System.Drawing.Size(883, 472);
+            this.addUsers.TabIndex = 0;
+            this.addUsers.Text = "Upload Users";
+            this.addUsers.UseVisualStyleBackColor = true;
+            // 
+            // addMasterpoints
+            // 
+            this.addMasterpoints.Controls.Add(this.splitContainer6);
+            this.addMasterpoints.Location = new System.Drawing.Point(4, 22);
+            this.addMasterpoints.Name = "addMasterpoints";
+            this.addMasterpoints.Padding = new System.Windows.Forms.Padding(3);
+            this.addMasterpoints.Size = new System.Drawing.Size(883, 607);
+            this.addMasterpoints.TabIndex = 1;
+            this.addMasterpoints.Text = "Upload Masterpoints";
+            this.addMasterpoints.UseVisualStyleBackColor = true;
             // 
             // toolTip1
             // 
@@ -339,34 +387,153 @@
             this.toolTip1.ForeColor = System.Drawing.SystemColors.Window;
             this.toolTip1.IsBalloon = true;
             // 
-            // ttmLoadingPicture
+            // splitContainer4
             // 
-            this.ttmLoadingPicture.Image = global::BFIMasterpointManagement.Properties.Resources.loading;
-            this.ttmLoadingPicture.Location = new System.Drawing.Point(411, 214);
-            this.ttmLoadingPicture.Name = "ttmLoadingPicture";
-            this.ttmLoadingPicture.Size = new System.Drawing.Size(67, 51);
-            this.ttmLoadingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.ttmLoadingPicture.TabIndex = 8;
-            this.ttmLoadingPicture.TabStop = false;
-            this.ttmLoadingPicture.Visible = false;
+            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer4.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer4.Name = "splitContainer4";
+            this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // toolStripLoginButton
+            // splitContainer4.Panel1
             // 
-            this.toolStripLoginButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripLoginButton.DropDownButtonWidth = 0;
-            this.toolStripLoginButton.Enabled = false;
-            this.toolStripLoginButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripLoginButton.Image")));
-            this.toolStripLoginButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripLoginButton.Name = "toolStripLoginButton";
-            this.toolStripLoginButton.Size = new System.Drawing.Size(133, 19);
-            this.toolStripLoginButton.Text = "Login As Different User";
-            this.toolStripLoginButton.ButtonClick += new System.EventHandler(this.toolStripLoginButton_ButtonClick);
+            this.splitContainer4.Panel1.Controls.Add(this.splitContainer5);
+            // 
+            // splitContainer4.Panel2
+            // 
+            this.splitContainer4.Panel2.Controls.Add(this.uploadUsersButton);
+            this.splitContainer4.Size = new System.Drawing.Size(877, 466);
+            this.splitContainer4.SplitterDistance = 376;
+            this.splitContainer4.TabIndex = 0;
+            // 
+            // uploadUsersButton
+            // 
+            this.uploadUsersButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.uploadUsersButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uploadUsersButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.uploadUsersButton.Location = new System.Drawing.Point(0, 0);
+            this.uploadUsersButton.Name = "uploadUsersButton";
+            this.uploadUsersButton.Size = new System.Drawing.Size(877, 86);
+            this.uploadUsersButton.TabIndex = 1;
+            this.uploadUsersButton.Text = "Upload Users";
+            this.uploadUsersButton.UseVisualStyleBackColor = false;
+            this.uploadUsersButton.Click += new System.EventHandler(this.uploadUsersButton_Click);
+            // 
+            // splitContainer5
+            // 
+            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer5.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer5.Name = "splitContainer5";
+            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer5.Panel1
+            // 
+            this.splitContainer5.Panel1.Controls.Add(this.loadUsersButton);
+            // 
+            // splitContainer5.Panel2
+            // 
+            this.splitContainer5.Panel2.Controls.Add(this.usersTextbox);
+            this.splitContainer5.Size = new System.Drawing.Size(877, 376);
+            this.splitContainer5.SplitterDistance = 83;
+            this.splitContainer5.TabIndex = 0;
+            // 
+            // loadUsersButton
+            // 
+            this.loadUsersButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.loadUsersButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loadUsersButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadUsersButton.Location = new System.Drawing.Point(0, 0);
+            this.loadUsersButton.Name = "loadUsersButton";
+            this.loadUsersButton.Size = new System.Drawing.Size(877, 83);
+            this.loadUsersButton.TabIndex = 2;
+            this.loadUsersButton.Text = "Load Users from File";
+            this.loadUsersButton.UseVisualStyleBackColor = false;
+            // 
+            // usersTextbox
+            // 
+            this.usersTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.usersTextbox.Location = new System.Drawing.Point(0, 0);
+            this.usersTextbox.Multiline = true;
+            this.usersTextbox.Name = "usersTextbox";
+            this.usersTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.usersTextbox.Size = new System.Drawing.Size(877, 289);
+            this.usersTextbox.TabIndex = 2;
+            // 
+            // splitContainer6
+            // 
+            this.splitContainer6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer6.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer6.Name = "splitContainer6";
+            this.splitContainer6.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer6.Panel1
+            // 
+            this.splitContainer6.Panel1.Controls.Add(this.splitContainer7);
+            // 
+            // splitContainer6.Panel2
+            // 
+            this.splitContainer6.Panel2.Controls.Add(this.uploadMasterpointsButton);
+            this.splitContainer6.Size = new System.Drawing.Size(877, 601);
+            this.splitContainer6.SplitterDistance = 484;
+            this.splitContainer6.TabIndex = 1;
+            // 
+            // splitContainer7
+            // 
+            this.splitContainer7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer7.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer7.Name = "splitContainer7";
+            this.splitContainer7.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer7.Panel1
+            // 
+            this.splitContainer7.Panel1.Controls.Add(this.loadMasterpointsButton);
+            // 
+            // splitContainer7.Panel2
+            // 
+            this.splitContainer7.Panel2.Controls.Add(this.masterpointsTextbox);
+            this.splitContainer7.Size = new System.Drawing.Size(877, 484);
+            this.splitContainer7.SplitterDistance = 106;
+            this.splitContainer7.TabIndex = 0;
+            // 
+            // loadMasterpointsButton
+            // 
+            this.loadMasterpointsButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.loadMasterpointsButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loadMasterpointsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadMasterpointsButton.Location = new System.Drawing.Point(0, 0);
+            this.loadMasterpointsButton.Name = "loadMasterpointsButton";
+            this.loadMasterpointsButton.Size = new System.Drawing.Size(877, 106);
+            this.loadMasterpointsButton.TabIndex = 2;
+            this.loadMasterpointsButton.Text = "Load Masterpoints From File";
+            this.loadMasterpointsButton.UseVisualStyleBackColor = false;
+            // 
+            // masterpointsTextbox
+            // 
+            this.masterpointsTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.masterpointsTextbox.Location = new System.Drawing.Point(0, 0);
+            this.masterpointsTextbox.Multiline = true;
+            this.masterpointsTextbox.Name = "masterpointsTextbox";
+            this.masterpointsTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.masterpointsTextbox.Size = new System.Drawing.Size(877, 374);
+            this.masterpointsTextbox.TabIndex = 2;
+            // 
+            // uploadMasterpointsButton
+            // 
+            this.uploadMasterpointsButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.uploadMasterpointsButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uploadMasterpointsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.uploadMasterpointsButton.Location = new System.Drawing.Point(0, 0);
+            this.uploadMasterpointsButton.Name = "uploadMasterpointsButton";
+            this.uploadMasterpointsButton.Size = new System.Drawing.Size(877, 113);
+            this.uploadMasterpointsButton.TabIndex = 1;
+            this.uploadMasterpointsButton.Text = "Upload Masterpoints";
+            this.uploadMasterpointsButton.UseVisualStyleBackColor = false;
+            this.uploadMasterpointsButton.Click += new System.EventHandler(this.uploadMasterpointsButton_Click);
             // 
             // BFIMasterpointManagement
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(891, 520);
+            this.ClientSize = new System.Drawing.Size(891, 655);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Name = "BFIMasterpointManagement";
@@ -381,22 +548,41 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ttmDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ttmLoadingPicture)).EndInit();
             this.tournamentMaster.ResumeLayout(false);
-            this.eventMaster.ResumeLayout(false);
-            this.addUsers.ResumeLayout(false);
-            this.addMasterpoints.ResumeLayout(false);
-            this.addMasterpoints.PerformLayout();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tmLoadingPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tmDataGridView)).EndInit();
+            this.eventMaster.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.emLoadingPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.emDataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ttmLoadingPicture)).EndInit();
+            this.addUsers.ResumeLayout(false);
+            this.addMasterpoints.ResumeLayout(false);
+            this.splitContainer4.Panel1.ResumeLayout(false);
+            this.splitContainer4.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
+            this.splitContainer4.ResumeLayout(false);
+            this.splitContainer5.Panel1.ResumeLayout(false);
+            this.splitContainer5.Panel2.ResumeLayout(false);
+            this.splitContainer5.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
+            this.splitContainer5.ResumeLayout(false);
+            this.splitContainer6.Panel1.ResumeLayout(false);
+            this.splitContainer6.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
+            this.splitContainer6.ResumeLayout(false);
+            this.splitContainer7.Panel1.ResumeLayout(false);
+            this.splitContainer7.Panel2.ResumeLayout(false);
+            this.splitContainer7.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
+            this.splitContainer7.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -404,9 +590,6 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox tournamentTypesTextbox;
-        private System.Windows.Forms.Button addUsersButton;
-        private System.Windows.Forms.Button addMasterpointsButton;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripUsername;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
@@ -428,6 +611,18 @@
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.DataGridView emDataGridView;
         private System.Windows.Forms.Button addEventButton;
+        private System.Windows.Forms.PictureBox tmLoadingPicture;
+        private System.Windows.Forms.PictureBox emLoadingPicture;
+        private System.Windows.Forms.SplitContainer splitContainer4;
+        private System.Windows.Forms.SplitContainer splitContainer5;
+        private System.Windows.Forms.Button loadUsersButton;
+        private System.Windows.Forms.TextBox usersTextbox;
+        private System.Windows.Forms.Button uploadUsersButton;
+        private System.Windows.Forms.SplitContainer splitContainer6;
+        private System.Windows.Forms.SplitContainer splitContainer7;
+        private System.Windows.Forms.Button loadMasterpointsButton;
+        private System.Windows.Forms.TextBox masterpointsTextbox;
+        private System.Windows.Forms.Button uploadMasterpointsButton;
     }
 }
 
