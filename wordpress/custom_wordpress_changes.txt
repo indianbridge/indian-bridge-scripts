@@ -39,5 +39,24 @@ Updraft Plus
 		Line 658 : change to 				if ( strpos($table, $table_prefix) === 0 || strpos($table,'bfi_') === 0) {
 		
 Mingle Forum
+	in bbcode.php
+		add '/\[bbo](.+)\[\/bbo\]/Ui' to end of $patterns arrray
+		add '<iframe height="300" src="\1">Your browser does not support iFrames</iframe>' to replacements array
 	in wpf.class.php
 		change line 1931 to : $meta = "<p>".__("Welcome Guest, posting in this forum requires BFI Membership", "mingleforum").$this->login_form();
+		replace tr from line 909 with following
+			<tr>
+				<td valign='top' colspan='2' class='topic_text'>";
+				if(!$c) {
+					$out .= apply_filters('mf_thread_start', '', $this->current_thread, $this->get_threadlink($post->parent_id));
+				}
+				$out .= apply_filters('mf_before_reply', '', $post->id);
+													
+				//
+				// @RocketMembership - custom mods in this section to process shortcodes embedded in the thread
+				//
+				$thread_content = make_clickable(convert_smilies(wpautop($this->autoembed($this->output_filter(html_entity_decode($post->text))))));
+				$out .= do_shortcode($thread_content);								
+				$out .= apply_filters('mf_after_reply', '', $post->id);
+				$out .= "</td>
+			</tr>";			
