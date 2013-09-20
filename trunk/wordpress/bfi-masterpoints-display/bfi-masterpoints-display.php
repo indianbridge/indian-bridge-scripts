@@ -490,20 +490,6 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 				else return $this->createErrorMessage("Missing parameter '$indexName'");
 			}
 			
-			/*$this->errorFlag = false;
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
-			if ($this->errorFlag == true) return return_string;
-			$this->errorFlag = false;
-			$args     = $params[3];
-			// required parameters
-			if ( empty( $args['tableName'] ) ) return new IXR_Error( 500, __( "Missing parameter 'tableName'" ) );
-			if ( empty( $args['content'] ) ) return new IXR_Error( 500, __( "Missing parameter 'content'" ) );
-			$tableName = $args['tableName'];
-			if($tableName != $this->table_prefix.'tournament_masterpoint') return new IXR_Error( 500, __( "TableName (".$tableName.") has to be bfi_tournament_masterpoint to add users!" ) );
-			$content = $args['content'];
-			$delimiter = ",";
-			if (!empty($args['delimiter'])) $delimiter = $args['delimiter'];*/
 			$errorFlag = false;
 			$return_message = "Success";
 			$return_string = "";
@@ -514,6 +500,18 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 				if ($index == 0) {
 					$fieldNameLine = $line;
 					$fieldNames = explode($delimiter,$line);
+					$fieldName = 'tournament_code';
+					if (!in_array($fieldName, $fieldNames)) {
+						return $this->createErrorMessage("addMasterpoints: Missing field '$fieldName'");
+					}
+					$fieldName = 'event_code';
+					if (!in_array($fieldName, $fieldNames)) {
+						return $this->createErrorMessage("addMasterpoints: Missing field '$fieldName'");
+					}
+					$fieldName = 'member_id';
+					if (!in_array($fieldName, $fieldNames)) {
+						return $this->createErrorMessage("addMasterpoints: Missing field '$fieldName'");
+					}
 				}
 				else {
 					$fields = explode($delimiter,$line);
@@ -528,6 +526,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 							$values[$fieldName] = $fields[$fieldIndex];
 						}
 						$temp_string = $this->bfi_addMasterpoint($values);
+						return $temp_string;
 						$result = json_decode($temp_string_string,true);
 						$errorFlag = $errorFlag | $result->error;
 						if ($result->error) {
@@ -565,7 +564,13 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			$alreadyExists = $this->bfi_masterpoint_db->get_var( $this->bfi_masterpoint_db->prepare("SELECT COUNT(*) FROM  $tableName WHERE event_code = %s",$args['event_code']));
 			if ($alreadyExists < 1) {
 				return $this->createErrorMessage("addMasterpoint - event_code : ".$args['event_code'].' does not exist in database!');
-			}						
+			}		
+			// Check if member exists
+			$tableName = $this->table_prefix.'member';
+			$alreadyExists = $this->bfi_masterpoint_db->get_var( $this->bfi_masterpoint_db->prepare("SELECT COUNT(*) FROM  $tableName WHERE member_id = %s",$args['member_id']));
+			if ($alreadyExists < 1) {
+				return $this->createErrorMessage("addMasterpoint - member_id: ".$args['member_id'].' does not exist in database!');
+			}							
 			$member_id = $args['member_id'];
 			$tableName = $this->table_prefix.'tournament_masterpoint';
 			$result = $this->bfi_masterpoint_db->insert($tableName,$args);
@@ -625,6 +630,9 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 				if ($index == 0) {
 					$fieldNameLine = $line;
 					$fieldNames = explode($delimiter,$line);
+					if (!in_array('member_id', $fieldNames)) {
+						return $this->createErrorMessage("addUsers: Missing field 'member_id'");
+					}
 				}
 				else {
 					$fields = explode($delimiter,$line);
