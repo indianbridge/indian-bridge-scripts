@@ -985,7 +985,7 @@ class mingleforum{
           {
             if($this->options['forum_use_seo_friendly_urls'])
             {
-              if(!$this->is_closed())
+              if(!$this->is_closed() && $user_ID)
                  $o .= "<td nowrap='nowrap' width='10%'><img src='$this->skin_url/images/buttons/quote.gif' alt='' align='left'><a href='$this->post_reply_link&quote=$post_id.$this->curr_page'> ".__("Quote", "mingleforum")."</a></td>";
               if($this->is_moderator($user_ID, $this->current_forum))
                  $o .= "<td nowrap='nowrap' width='10%'><img src='$this->skin_url/images/buttons/delete.gif' alt='' align='left'><a onclick=\"return wpf_confirm();\" href='".$this->thread_link.$this->current_thread."&remove_post&id=$post_id'> ".__("Remove", "mingleforum")."</a></td>";
@@ -994,7 +994,7 @@ class mingleforum{
             }
             else
             {
-              if(!$this->is_closed())
+              if(!$this->is_closed() && $user_ID)
                  $o .= "<td nowrap='nowrap' width='10%'><img src='$this->skin_url/images/buttons/quote.gif' alt='' align='left'><a href='$this->post_reply_link&quote=$post_id.$this->curr_page'> ".__("Quote", "mingleforum")."</a></td>";
               if($this->is_moderator($user_ID, $this->current_forum))
                  $o .= "<td nowrap='nowrap' width='10%'><img src='$this->skin_url/images/buttons/delete.gif' alt='' align='left'><a onclick=\"return wpf_confirm();\" href='".$this->get_threadlink($this->current_thread)."&remove_post&id=$post_id'> ".__("Remove", "mingleforum")."</a></td>";
