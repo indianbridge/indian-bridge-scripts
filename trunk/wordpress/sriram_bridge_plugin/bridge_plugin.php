@@ -22,13 +22,18 @@ if (!class_exists('Sriram_Bridge_Plugin')) {
 		private $images_directory;
         public function __construct() {
         	add_filter('the_content',array($this,'replace_suit_symbols'));
+			add_shortcode( 'bbo', array($this,'display_bbo_hand_viewer') );
         }      
+		
+		public function display_bbo_hand_viewer($atts, $content="" ) {
+			return '<iframe height="300" src="'.$content.'">Your browser does not support iFrames</iframe>';
+		}
 
 		public function replace_suit_symbols($content) {
-			$content = str_ireplace('!s', '<img src="' . plugins_url( 'images/s.png' , __FILE__ ) . '" > ', $content);
-			$content = str_ireplace('!h', '<img src="' . plugins_url( 'images/h.png' , __FILE__ ) . '" > ', $content);
-			$content = str_ireplace('!d', '<img src="' . plugins_url( 'images/d.png' , __FILE__ ) . '" > ', $content);
-			$content = str_ireplace('!c', '<img src="' . plugins_url( 'images/c.png' , __FILE__ ) . '" > ', $content);
+			$content = str_ireplace('!s', '&spades;',$content);
+			$content = str_ireplace('!h', '<span style="color:#CB0000;">&hearts;</span>',$content);
+			$content = str_ireplace('!d', '<span style="color:#CB0000;">&diams;</span>',$content);
+			$content = str_ireplace('!c', '&clubs;',$content);
 			return $content;
 		}
     }
