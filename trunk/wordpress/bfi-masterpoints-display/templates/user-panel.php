@@ -38,7 +38,7 @@ Theme My Login will always look in your theme's directory first, before using th
 	//$mydb= new wpdb('bfinem7l_sriram','kibitzer','bfinem7l_masterpoints','localhost');
 	$current_user = wp_get_current_user();
 	$member_id = $current_user->user_login;
-	$masterpointURL = home_url("/meber_services/masterpoints");
+	$masterpointURL = home_url("/member_services/masterpoints");
 	?>
 	<h5>Masterpoints</h5>
 	<h6><a href="<?php echo $masterpointURL; ?>">Click for Detailed Masterpoint Page</a></h6>
