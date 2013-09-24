@@ -125,7 +125,7 @@
 					// Comments
 					if ($theme_options['post_comments'] == 'enable') :
 						$out .= '<div><!-- divider --></div>';
-						$out .= '<div class="f11 ico com" title="Comments">'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).'</a></div>';
+						$out .= '<div class="f11 ico com" title="Comments">'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).' Comments</a></div>';
 					endif;
 
 					// Tags
