@@ -945,6 +945,7 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 			echo '<span class="ico trophy-silver-icon">Fed Points: '.$membership_info->fed_points.'</span><br/>';
 			echo '<span class="ico trophy-bronze-icon">Local Points: '.$membership_info->local_points.'</span>';
 			echo '</div>';
+			echo '<div class="clear h10"><!-- --></div>';
 			$tabs = array('mymasterpoint'=>"My Masterpoints",'leaderboard'=>"Masterpoint Leaderboard", "allmasterpoint"=>"All Masterpoints");
 			$selectedTab = 'mymasterpoint';
 			echo $this->getMasterpointTabs($tabs,$selectedTab,$current_user->user_login);
