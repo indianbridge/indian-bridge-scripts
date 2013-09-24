@@ -235,9 +235,9 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 								endif;
 
 								// Comments
-								if ($comments == 'yes' && get_comments_number($post->ID) != 0) :
+								if ($theme_options['post_comments'] == 'enable' && get_comments_number($post->ID) != 0) :
 									$response .= '<div><!-- divider --></div>';
-									$response .= '<div class="f11 ico com" title="Comments">'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).'</a></div>';
+									$response .= '<div class="f11 ico com" title="Comments">'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).' Comments</a></div>';
 
 								endif;
 
@@ -364,9 +364,9 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 					endif;
 
 					// Comments
-					if ($comments == 'yes' && get_comments_number($post->ID) != 0) :
+					if ($theme_options['post_comments'] == 'enable' && get_comments_number($post->ID) != 0) :
 						$response .= '<div><!-- divider --></div>';
-						$response .= '<div class="f11 ico com" title="Comments>'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).'</a></div>';
+						$response .= '<div class="f11 ico com" title="Comments>'.__('','pandathemes').' <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).' Comments</a></div>';
 					endif;
 
 					// Tags
