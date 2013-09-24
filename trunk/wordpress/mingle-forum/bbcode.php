@@ -29,8 +29,8 @@ if (!class_exists('cartpaujBBCodeParser'))
 			'/\[img=(.+)\](.+)\[\/img\]/Ui',
 			'/\[code\](.+)\[\/code\]/Uis',
 			'/\[color=(\#[0-9a-f]{6}|[a-z]+)\](.+)\[\/color\]/Ui',
-			'/\[color=(\#[0-9a-f]{6}|[a-z]+)\](.+)\[\/color\]/Uis',
-			'/\[bbo](.+)\[\/bbo\]/Ui'
+			'/\[color=(\#[0-9a-f]{6}|[a-z]+)\](.+)\[\/color\]/Uis'
+			//'/\[bbo](.+)\[\/bbo\]/Ui'
 		);
 
 		var $replacements = array
@@ -53,8 +53,8 @@ if (!class_exists('cartpaujBBCodeParser'))
 			'<a href = "\1"><img src = "\1" alt = "\2" /></a>',
 			'<pre class = "code">\1</pre>',
 			'<span style = "color: \1;">\2</span>',
-			'<div style = "color: \1;">\2</div>',
-			'<iframe height="300" src="\1">Your browser does not support iFrames</iframe>'
+			'<div style = "color: \1;">\2</div>'
+			//'<iframe height="300" src="\1">Your browser does not support iFrames</iframe>'
 		);
 
 		function bbc2html($subject)
