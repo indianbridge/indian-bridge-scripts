@@ -34,6 +34,7 @@ class mingleforum{
 		add_filter('mf_ad_above_quick_reply', array(&$this, 'mf_ad_above_quick_reply'));
 		add_filter('mf_ad_above_breadcrumbs', array(&$this, 'mf_ad_above_breadcrumbs'));
 		add_filter('mf_ad_below_first_post', array(&$this, 'mf_ad_below_first_post'));
+		add_filter( 'admin_bar_menu', array($this,'customize_admin_bar'),25 );
 		$this->init();
 	}
 
@@ -43,6 +44,7 @@ class mingleforum{
 	var $page_id		= "";
 	var $reg_link 		= "";
 	var $profile_link 	= "";
+	var $posts_link 	= "";
 	var $logout_link 	= "";
 	var $home_url 		= "";
 	var $forum_link		= "";
@@ -72,6 +74,76 @@ class mingleforum{
 	var $user_options = array();
 	var $options = array();
 	var $ads_options = array();
+	
+	public function customize_admin_bar( $wp_admin_bar ) {
+		if (is_user_logged_in()) {
+			$this->add_forum_admin_bar($wp_admin_bar);
+		}
+	}	
+
+	public function add_forum_admin_bar($wp_admin_bar) {
+		global $wpdb;
+		$wp_admin_bar->add_menu(array(
+		'parent' => 'top-secondary',
+		"id" => "my-forums",
+		"title" => __('myForums'),
+		"href" => home_url("/member_services/forums"),
+		));
+		$wp_admin_bar->add_group( array(
+		'parent' => 'my-forums',
+		'id'     => 'my-forums-list',
+		) );
+		$wp_admin_bar->add_menu( array(
+		'parent' => 'my-forums-list',
+		'id' => 'forums-recent',
+		'title' => __('<h6>Recent Forum Activity</h6>'),
+		));
+
+		$recent_forum_activity_html = '';
+		$my_forum_posts_html = '';
+		$current_user = wp_get_current_user();
+		$member_id = $current_user->ID;
+		$table_prefix = 'wp_';
+		$mydb = $wpdb;
+		$posts_tableName = $table_prefix.'forum_posts';
+		$query = "SELECT * FROM $posts_tableName ORDER BY date DESC LIMIT 5";
+		$rows = $mydb->get_results( $query);
+		$numItems = count($rows);
+		if ($numItems < 1) {
+			$wp_admin_bar->add_menu( array(
+			'parent' => 'my-forums-list',
+			'id' => 'forums-list-post1',
+			'title' => '<div class="ab-item ab-empty-item">No Posts Found!</div>'
+			));
+		}
+		else {
+			foreach($rows as $index=>$row) {
+				$wp_admin_bar->add_menu( array(
+				'parent' => 'my-forums-list',
+				'id' => 'forums-list-post'.$index,
+				'title' => $this->getForumPostInformation($row)
+				));
+			}
+		}
+
+
+	}
+
+	public function getForumPostInformation($row) {
+		global $wpdb;	
+		$threads_tableName = 'wp_forum_threads';
+		$threadRow = $wpdb->get_row("SELECT * FROM $threads_tableName WHERE id = $row->parent_id");
+		$forums_tableName = 'wp_forum_forums';
+		$forumName = $wpdb->get_var("SELECT name FROM $forums_tableName WHERE id = $threadRow->parent_id");
+		$postLink = $this->get_paged_threadlink($row->parent_id, '#postid-'.$row->id);
+		$html = '<a title="'.$row->text.'" href="'.$postLink.'">';
+		$html .= get_avatar( $row->author_id,'16' ).' '.get_the_author_meta( 'display_name',$row->author_id).' posted ';
+		$html .= $row->subject;
+		$html .= ' in '.$forumName.'/'.$threadRow->subject;
+		$html .= '</a>';
+		return $html;				
+	}
+
 
 	// Initialize varables
 	function init(){
@@ -214,7 +286,6 @@ class mingleforum{
 		foreach($posts as $post) {
 			if(!in_array($post->parent_id, $unique) && $toShow < $widget_option["wpf_num"])
 			{
-				//$user = get_userdata($post->author_id);
 				if($this->have_access($this->forum_get_group_from_post($post->parent_id)))
 					echo "<li><a href='".$this->get_paged_threadlink($post->parent_id, '#postid-'.$post->id)."'>".$this->output_filter($post->subject)."</a><br/>".__("by:", "mingleforum")." ".$this->profile_link($post->author_id)."<br /><small>".$this->format_date($post->date)."</small></li>";
 				$unique[] = $post->parent_id;
@@ -234,7 +305,6 @@ class mingleforum{
 		foreach($posts as $post){
 			if(!in_array($post->parent_id, $unique) && $toShow < $num)
 			{
-				//$user = get_userdata($post->author_id);
 				if($this->have_access($this->forum_get_group_from_post($post->parent_id)))
 					echo "<li class='forum'><a href='".$this->get_paged_threadlink($post->parent_id, '#postid-'.$post->id)."'>".$this->output_filter($post->subject)."</a><br />".__("by:", "mingleforum")." ".$this->profile_link($post->author_id)."<br/><small>".$this->format_date($post->date)."</small></li>";
 				$unique[] = $post->parent_id;
@@ -404,8 +474,20 @@ class mingleforum{
 
 	function get_paged_threadlink($id, $postid = ''){
 		global $wpdb;
-		$wpdb->query("SELECT * FROM {$this->t_posts} WHERE parent_id = {$id}");
-		$num = ceil($wpdb->num_rows / $this->options['forum_posts_per_page']) - 1;
+		$rows = $wpdb->get_results("SELECT * FROM {$this->t_posts} WHERE parent_id = {$id}");
+		$totalRows = $wpdb->num_rows;
+		$num = ceil($totalRows / $this->options['forum_posts_per_page']) - 1;
+
+		if ($num > 0 && $postid) {
+			$index = 1;
+			foreach($rows as $row) {
+				if ('#postid-'.$row->id == $postid) {
+					$num = ceil($index/$this->options['forum_posts_per_page']) -1;
+					break;
+				}
+				$index++;
+			}
+		}
 		if($num < 0)
 			$num = 0;
 		if($this->options['forum_use_seo_friendly_urls'])
@@ -644,7 +726,7 @@ class mingleforum{
 						include(WPFPATH.'wpf-post.php');
 						break;
 				case 'profile':
-						$this->view_profile();
+						$this->view_profile($this->check_parms($_GET['id']));
 						break;
 				case 'search':
 						$this->search_results();
@@ -776,22 +858,22 @@ class mingleforum{
 					$sticky_img = "<img alt='' src='$this->skin_url/images/topic/normal_post_sticky.gif'/>";
 					$out .= "<tr>
 									<td class='forumIcon' align='center'>$sticky_img</td>
-									<td class='wpf-alt sticky'><span class='topicTitle'><a href='"
+									<td sticky'><span class='topicTitle'><a href='"
 										.$this->get_threadlink($thread->id)."'>"
 										.$this->output_filter($thread->subject)."</a>&nbsp;&nbsp;$image</span> $del
 									</td>
 									<td>".$this->profile_link($thread->starter)."</td>
-									<td class='wpf-alt' align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
-									<td class='wpf-alt' align='center'>".$thread->views."</td>
+									<td align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
+									<td align='center'>".$thread->views."</td>
 									<td><small>".$this->get_lastpost($thread->id)."</small></td>
 								</tr>";
 					}
 		/********************************************************************************************************/
 				$out .= "<tr><th class='wpf-bright forumTopics' colspan='6'>".__("Forum Topics", "mingleforum")."</th></tr>";
 				}
-				$alt = "alt even";
+				$alt = "wpf-alt alt even";
 				foreach($threads as $thread){
-					$alt = ($alt=="alt even")?"odd":"alt even";
+					$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";
 					if($user_ID){
 					$image = "";
 						$poster_id = $this->last_posterid_thread($thread->id); // date and author_id
@@ -811,13 +893,13 @@ class mingleforum{
 					}
 					$out .= "<tr class='$alt'>
 									<td class='forumIcon' align='center'>".$this->get_topic_image($thread->id)."</td>
-									<td class='wpf-alt'><span class='topicTitle'><a href='"
+									<td><span class='topicTitle'><a href='"
 										.$this->get_threadlink($thread->id)."'>"
 										.$this->output_filter($thread->subject)."</a>&nbsp;&nbsp;$image</span> $del
 									</td>
 									<td>".$this->profile_link($thread->starter)."</td>
-									<td class='wpf-alt' align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
-									<td class='wpf-alt' align='center'>".$thread->views."</td>
+									<td align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
+									<td align='center'>".$thread->views."</td>
 									<td><small>".$this->get_lastpost($thread->id)."</small></td>
 								</tr>";
 					}
@@ -913,18 +995,12 @@ class mingleforum{
 										}
 										$out .= apply_filters('mf_before_reply', '', $post->id);
 																			
-										//
-										// @RocketMembership - custom mods in this section to process shortcodes embedded in the thread
-										//
-										//$thread_content = make_clickable(convert_smilies(wpautop($this->autoembed($this->output_filter(html_entity_decode($post->text))))));
-										//$out .= do_shortcode($thread_content);	
 										$out .= $this->custom_output($post->text,true,true,true);
 										$out .= apply_filters('mf_after_reply', '', $post->id);
 										$out .= "</td>
 									</tr>";
 									if($user['signature'] && $this->options['forum_show_bio']){
 										$custom_content = $this->custom_output($user['signature'],true,false,true);
-										//$out .= "<tr><td class='user_desc'><small>".$this->output_filter(make_clickable(convert_smilies(wpautop(html_entity_decode($user['signature']), true))))."</small></td></tr>";
 										$out .= "<tr><td class='user_desc'><small>".$custom_content."</small></td></tr>";
 									}
 								$out .= "</table>
@@ -936,33 +1012,33 @@ class mingleforum{
 				$c += 1;
 			}
 			$quick_thread = $this->check_parms($_GET['t']);
-		//QUICK REPLY AREA
-    if(!in_array($this->current_group, $this->options['forum_disabled_cats']) || is_super_admin() || $this->is_moderator($user_ID, $this->current_forum) || $this->options['allow_user_replies_locked_cats'])
-    {
-      if(!$this->is_closed() && ($user_ID || !$this->options['forum_require_registration'])) {
-        $out .= "<table class='wpf-post-table' width='100%' id='wpf-quick-reply'>
-          <form action='".WPFURL."wpf-insert.php' name='addform' method='post'>
-            <tr>
-              <td>";
-              $out .= apply_filters('mf_ad_above_quick_reply', ''); //Adsense Area -- Above Quick Reply Form
-              $out .= "<strong>".__("Quick Reply", "mingleforum").": </strong><br/>".
-                $this->form_buttons()."<br/>
-                  <input type='hidden' name='add_post_subject' value='".__('Re:', 'mingleforum')." ".$this->get_subject(floor($quick_thread))."'/>
-                  <textarea rows='6' style='width:99% !important;' name='message' class='wpf-textarea' ></textarea>
-              </td>
-            </tr>";
-            $out .= $this->get_quick_reply_captcha();
-            $out .= "<tr>
-              <td>
-                <input type='submit' id='quick-reply-submit' name='add_post_submit' value='".__("Submit Quick Reply", "mingleforum")."' />
-                <input type='hidden' name='add_post_forumid' value='".floor($quick_thread)."'/>
-                <input type='hidden' name='add_topic_plink' value='".get_permalink($this->page_id)."'/>
-              </td>
-            </tr>				
-          </form>
-        </table>";
-      }
-    }
+			//QUICK REPLY AREA
+		    if(!in_array($this->current_group, $this->options['forum_disabled_cats']) || is_super_admin() || $this->is_moderator($user_ID, $this->current_forum) || $this->options['allow_user_replies_locked_cats'])
+		    {
+		      if(!$this->is_closed() && ($user_ID || !$this->options['forum_require_registration'])) {
+		        $out .= "<table class='wpf-post-table' width='100%' id='wpf-quick-reply'>
+		          <form action='".WPFURL."wpf-insert.php' name='addform' method='post'>
+		            <tr>
+		              <td>";
+		              $out .= apply_filters('mf_ad_above_quick_reply', ''); //Adsense Area -- Above Quick Reply Form
+		              $out .= "<strong>".__("Quick Reply", "mingleforum").": </strong><br/>".
+		                $this->form_buttons()."<br/>
+		                  <input type='hidden' name='add_post_subject' value='".__('Re:', 'mingleforum')." ".$this->get_subject(floor($quick_thread))."'/>
+		                  <textarea rows='6' style='width:99% !important;' name='message' class='wpf-textarea' ></textarea>
+		              </td>
+		            </tr>";
+		            $out .= $this->get_quick_reply_captcha();
+		            $out .= "<tr>
+		              <td>
+		                <input type='submit' id='quick-reply-submit' name='add_post_submit' value='".__("Submit Quick Reply", "mingleforum")."' />
+		                <input type='hidden' name='add_post_forumid' value='".floor($quick_thread)."'/>
+		                <input type='hidden' name='add_topic_plink' value='".get_permalink($this->page_id)."'/>
+		              </td>
+		            </tr>				
+		          </form>
+		        </table>";
+		      }
+		    }
 			$out .= "<table cellpadding='0' cellspacing='0'>
 						<tr class='pop_menus'>
 							<td width='100%'>".$this->post_pageing($thread_id)."</td>
@@ -1056,7 +1132,7 @@ class mingleforum{
 				$this->o .= "<tr><th colspan='4'><a href='".$this->get_grouplink($g->id)."'>".$this->output_filter($g->name)."</a></th></tr>";
 				$frs = $this->get_forums($g->id);
 				foreach($frs as $f){
-				$alt = ($alt=="alt even")?"odd":"alt even";
+				$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";
 					$this->o .= "<tr class='$alt'>";
 					$image = "off.gif";
 					if($user_ID){
@@ -1072,14 +1148,14 @@ class mingleforum{
 						}
 					}
 					$this->o .= "
-							<td class='wpf-alt forumIcon' width='6%' align='center'><img alt='' src='$this->skin_url/images/$image' /></td>
+							<td forumIcon' width='6%' align='center'><img alt='' src='$this->skin_url/images/$image' /></td>
 							<td valign='top'><strong><a href='".$this->get_forumlink($f->id)."'>"
 								.$this->output_filter($f->name)."</a></strong><br />"
 								.$this->output_filter($f->description);
 								if($f->description != "")$this->o .= "<br />";
 								$this->o .= $this->get_forum_moderators($f->id)
 							."</td>";
-					$this->o .= "<td nowrap='nowrap' width='11%' align='left' class='wpf-alt'><small>".__("Topics: ", "mingleforum")."".$this->num_threads($f->id)."<br />".__("Posts: ", "mingleforum").$this->num_posts_forum($f->id)."</small></td>";
+					$this->o .= "<td nowrap='nowrap' width='11%' align='left'><small>".__("Topics: ", "mingleforum")."".$this->num_threads($f->id)."<br />".__("Posts: ", "mingleforum").$this->num_posts_forum($f->id)."</small></td>";
 					$this->o .= "<td  width='28%' ><small>".$this->last_poster_in_forum($f->id)."</small></td>";
 					$this->o .= "</tr>";
 				}
@@ -1107,7 +1183,7 @@ class mingleforum{
 				$this->o .= "<tr><th colspan='4'><a href='".$this->get_grouplink($g->id)."'>".$this->output_filter($g->name)."</a></th></tr>";
 				$frs = $this->get_forums($g->id);
 				foreach($frs as $f){
-				$alt = ($alt=="alt even")?"odd":"alt even";
+				$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";
 					$this->o .= "<tr class='$alt'>";
 					$image = "off.gif";
 					if($user_ID){
@@ -1664,11 +1740,11 @@ class mingleforum{
 					$myProfURL2 = "{$permalink}{$param_char}u={$MnglUser->user_login}";
 				}
 			}
-			$link = "<a id='user_button' href='" . $myProfURL2 . "' title='".__("My profile", "mingleforum")."'>".__("My Profile", "mingleforum")."</a>";
+			$link = "<a id='user_button' href='" . $myProfURL2 . "' title='".__("My Forum Posts", "mingleforum")."'>".__("My Forum Posts", "mingleforum")."</a>";
 		}
 		else
 		{
-			$link = "<a id='user_button' href='".$this->base_url."profile&id=$user_ID' title='".__("My profile", "mingleforum")."'>".__("My Profile", "mingleforum")."</a>";
+			$link = "<a id='user_button' href='".$this->base_url."profile&id=$user_ID' title='".__("My Forum Posts", "mingleforum")."'>".__("My Forum Posts", "mingleforum")."</a>";
 		}
 		//END MINGLE MY PROFILE LINK
 
@@ -1744,12 +1820,6 @@ class mingleforum{
 		else
 			return $login_msg;
 	}
-
-	// function pre($array){
-		// echo "<pre>";
-		// print_r($array);
-		// echo "</pre>";
-	// }
 
 	function print_curr(){
 		$this->o .= "<p>Group: $this->current_group<br>
@@ -1855,8 +1925,11 @@ class mingleforum{
 			$trail .= " <strong>&raquo;</strong> ".__("Search Results", "mingleforum")." &raquo; $terms";
 		}
 
-		if($this->current_view == PROFILE)
-			$trail .= " <strong>&raquo;</strong> ".__("Profile Info", "mingleforum");
+		if($this->current_view == PROFILE) {
+			$user_id = $this->check_parms($_GET['id']);
+			$title = $this->get_userdata($user_id, $this->options['forum_display_name'])."'s Forum Posts";
+			$trail .= " <strong>&raquo;</strong> ".__($title, "mingleforum");
+		}
 
 		if($this->current_view == POSTREPLY)
 			$trail .= " <strong>&raquo;</strong> ".__("Post Reply", "mingleforum");
@@ -1974,27 +2047,6 @@ class mingleforum{
 		$this->o .= $o;
 	}
 
-/*	function get_pagelinks($thread_id){
-		global $wpdb;
-
-		$pages = $wpdb->get_results("SELECT * FROM $this->t_posts WHERE parent_id = $thread_id");
-
-		if(count($pages) > $this->opt['forum_posts_per_page']){
-			$num_pages = ceil(count($pages)/$this->opt['forum_posts_per_page']);
-
-			for($i = 0; $i < $num_pages; ++$i){
-				if($this->options['forum_use_seo_friendly_urls'])
-					$out .= " <a href='".$this->get_threadlink($thread_id).".".$i."'>".($i+1)."</a>";
-				else
-					$out .= " <a href='".$this->thread_link.$thread_id.".".$i."'>".($i+1)."</a>";
-			}
-			return " &laquo; $out &raquo;";
-		}
-		else
-			return "";
-	}
-DISABLED THIS IN 1.0.25*/
-
 	function post_pageing($thread_id){
 		global $wpdb;
 		$out =  __("Pages:", "mingleforum");
@@ -2056,6 +2108,37 @@ DISABLED THIS IN 1.0.25*/
 		}
 		return "<span class='wpf-pages'>".$out."</span>";
 	}
+	
+	function user_pageing($user_id){
+		global $wpdb;
+		$out = __("Pages:", "mingleforum");
+		$count = $wpdb->get_var("SELECT count(*) FROM $this->t_posts WHERE author_id = $user_id");
+		$num_pages = ceil($count/$this->opt['forum_posts_per_page']);
+		if($num_pages <= 6) {
+			for($i = 0; $i < $num_pages; ++$i){
+				if($i ==  $this->curr_page)
+					$out .= " [<strong>".($i+1)."</strong>]";
+				else
+					$out .= " <a href='".$this->get_profile_link($user_id).".".$i."'>".($i+1)."</a>";
+			}
+		}
+		else {
+			if($this->curr_page >= 4)
+				$out .= " <a href='".$this->get_profile_link($user_id).".0'>".__("First", "mingleforum")."</a> << ";
+			for($i = 3; $i > 0; $i--) {
+				if((($this->curr_page + 1) - $i) > 0)
+					$out .= " <a href='".$this->get_profile_link($user_id).".".($this->curr_page - $i)."'>".(($this->curr_page + 1) - $i)."</a>";
+			}
+			$out .= " [<strong>".($this->curr_page + 1)."</strong>]";
+			for($i = 1; $i <= 3; $i++) {
+				if((($this->curr_page + 1) + $i) <= $num_pages)
+					$out .= " <a href='".$this->get_profile_link($user_id).".".($this->curr_page + $i)."'>".(($this->curr_page + 1) + $i)."</a>";
+			}
+			if($num_pages - $this->curr_page >= 5)
+				$out .= " >> <a href='".$this->get_profile_link($user_id).".".($num_pages-1)."'>".__("Last", "mingleforum")."</a>";
+		}
+		return "<span class='wpf-pages'>".$out."</span>";
+	}	
 
 	function remove_topic(){
 		global $user_ID, $wpdb;
@@ -2307,7 +2390,51 @@ DISABLED THIS IN 1.0.25*/
 			return true;
 		return false;
 	}
-
+	
+	function get_profile_link($user_id, $toWrap = false){
+		if($toWrap)
+			$user = wordwrap($this->get_userdata($user_id, $this->options['forum_display_name']), 10, "-<br/>", 1);
+		else
+			$user = $this->get_userdata($user_id, $this->options['forum_display_name']);
+		//START MINGLE PROFILE LINKS
+		if(!function_exists('is_plugin_active'))
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if(is_plugin_active('mingle/mingle.php'))
+		{
+			$MnglUser = get_userdata($user_id);
+			global $mngl_options;
+			$myProfURL3 = '';
+			if(isset($mngl_options->profile_page_id) and $mngl_options->profile_page_id != 0)
+			{
+				if( MnglUtils::rewriting_on() and $mngl_options->pretty_profile_urls )
+				{
+					global $mngl_blogurl;
+					$struct = MnglUtils::get_permalink_pre_slug_uri();
+					$myProfURL3 = "{$mngl_blogurl}{$struct}{$MnglUser->user_login}";
+				}
+				else
+				{
+					$permalink = get_permalink($mngl_options->profile_page_id);
+					$param_char = ((preg_match("#\?#",$permalink))?'&':'?');
+					$myProfURL3 = "{$permalink}{$param_char}u={$MnglUser->user_login}";
+				}
+			}
+			$link = $myProfURL3;
+		}
+		else
+		{
+			$link = $this->base_url."profile&id=$user_id";
+		}
+		//END MINGLE PROFILE LINKS
+		if($user == __("Guest", "mingleforum"))
+			return $user;
+		$user_op = get_user_meta($user_id, "wpf_useroptions", true);
+		if($user_op)
+			if($user_op['allow_profile'] == false)
+				return $user;
+		return $link;
+	}
+	
 	function profile_link($user_id, $toWrap = false){
 		if($toWrap)
 			$user = wordwrap($this->get_userdata($user_id, $this->options['forum_display_name']), 10, "-<br/>", 1);
@@ -2398,38 +2525,41 @@ DISABLED THIS IN 1.0.25*/
 	}
 
 	function show_new(){
-	$this->current_view = NEWTOPICS;
+		$this->current_view = NEWTOPICS;
 		global $wpdb;
 		$this->header();
 		$lastvisit = $this->last_visit();
 		$threads = $wpdb->get_results("select distinct($this->t_threads.id) from $this->t_posts inner join $this->t_threads on $this->t_posts.parent_id = $this->t_threads.id where $this->t_posts.date > '$lastvisit' order by $this->t_posts.date desc");
-			$o = "<div class='wpf'><table class='wpf-table' cellpadding='0' cellspacing='0'>
-							<tr>
-							<th colspan='5' class='wpf-bright'>".__("New topics since your last visit", "mingleforum")."</th>
-						</tr>
+		$o = "<div class='wpf'><table class='wpf-table' cellpadding='0' cellspacing='0'>
 						<tr>
-							<th width='7%'>".__("Status", "mingleforum")."</th>
-							<th>".__("Topic Title", "mingleforum")."</th>
-							<th width='11%' nowrap='nowrap'>".__("Started by", "mingleforum")."</th>
-							<th width='4%'>".__("Replies", "mingleforum")."</th>
-							<th width='22%'>".__("Last post", "mingleforum")."</th>
-						</tr>";
-				foreach($threads as $thread){
-						if($this->have_access($this->forum_get_group_from_post($thread->id)))
-						{
-							$starter_id = $wpdb->get_var("SELECT starter FROM $this->t_threads WHERE id = $thread->id");
-							$o .= "<tr>
-							<td align='center' class='forumIcon'>".$this->get_topic_image($thread->id)."</td>
-							<td class='wpf-alt' align='top'><a href='"
-								.$this->get_paged_threadlink($thread->id)."'>"
-								.$this->output_filter($this->get_threadname($thread->id))."</a>
-							</td>
-							<td>".$this->profile_link($starter_id)."</td>
-							<td class='wpf-alt' align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
-							<td><small>".$this->get_lastpost($thread->id)."</small></td>
-						</tr>";
-						}
+						<th colspan='5' class='wpf-bright'>".__("New topics since your last visit", "mingleforum")."</th>
+					</tr>
+					<tr>
+						<th width='7%'>".__("Status", "mingleforum")."</th>
+						<th>".__("Topic Title", "mingleforum")."</th>
+						<th width='11%' nowrap='nowrap'>".__("Started by", "mingleforum")."</th>
+						<th width='4%'>".__("Replies", "mingleforum")."</th>
+						<th width='22%'>".__("Last post", "mingleforum")."</th>
+					</tr>";
+		$alt = "wpf-alt alt even";	
+		foreach($threads as $thread){
+				if($this->have_access($this->forum_get_group_from_post($thread->id)))
+				{
+					$starter_id = $wpdb->get_var("SELECT starter FROM $this->t_threads WHERE id = $thread->id");
+					$o .= "<tr class='$alt'>
+					<td align='center' class='forumIcon'>".$this->get_topic_image($thread->id)."</td>
+					<td align='top'><a href='"
+						.$this->get_paged_threadlink($thread->id)."'>"
+						.$this->output_filter($this->get_threadname($thread->id))."</a>
+					</td>
+					<td>".$this->profile_link($starter_id)."</td>
+					<td align='center'>".( $this->num_posts($thread->id) - 1 )."</td>
+					<td><small>".$this->get_lastpost($thread->id)."</small></td>
+					</tr>";
+					$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";		
 				}
+				
+		}
 		$o .= "</table></div>";
 		$this->o .= $o;
 		$this->footer();
@@ -2439,66 +2569,66 @@ DISABLED THIS IN 1.0.25*/
 		global $wpdb;
 		return $wpdb->get_var("SELECT count(author_id) FROM $this->t_posts WHERE author_id = $user");
 	}
+	
+	function show_posts() {
+		
+	}
 
 	function view_profile(){
-	global $wpdb, $user_ID;
-	$this->current_view = PROFILE;
-	if(is_numeric($_GET['id'])) //Security fix to prevent SQL injections
-		$user_id = $_GET['id'];
-    else
-		$user_id = 0;
-	$user = get_userdata($user_id);
-	$this->header();
-	$custom_content = $this->custom_output($user->description,true,false,true);
-	$o = "<div class='wpf'>
-			<table class='wpf-table' cellpadding='0' cellspacing='0' width='100%'>
+		global $wpdb, $user_ID;
+		$this->current_view = PROFILE;
+		$user_id = $this->check_parms($_GET['id']);
+		$user = get_userdata($user_id);
+		$this->header();
+		$custom_content = $this->custom_output($user->description,true,false,true);
+		$o = "<table cellpadding='0' cellspacing='0'>
+				<tr class='pop_menus'>
+					<td width='100%'>".$this->user_pageing($user_id)."</td>
+				</tr>
+			</table>";
+		$this->o .= $o;			
+		$o = "<table class='wpf-table' cellspacing='0' cellpadding='0' width='100%'>
 				<tr>
-					<th class='wpf-bright'>".__("Summary", "mingleforum")." - ".$this->get_userdata($user_id, $this->options['forum_display_name'])."</th>
+				<th class='wpf-bright' colspan=5>".$this->get_userdata($user_id, $this->options['forum_display_name'])."'s forum posts: ".$this->get_userposts_num($user_id)."</th>
 				</tr>
 				<tr>
-					<td>
-						<table class='wpf-table' cellpadding='0' cellspacing='0' width='100%'>
-							<tr>
-								<td width='20%'><strong>".__("Name:", "mingleforum")."</strong></td>
-								<td>$user->first_name $user->last_name</td>
-								<td rowspan='9' valign='top' width='1%'>".$this->get_avatar($user_id, 60)."</td>
-							</tr>
-							<tr>
-								<td><strong>".__("Registered:", "mingleforum")."</strong></td>
-								<td>".$this->format_date($user->user_registered)."</td>
-							</tr>
-							<tr>
-								<td><strong>".__("Posts:", "mingleforum")."</strong></td>
-								<td>".$this->num_post_user($user_id)."</td>
-							</tr>
-							<tr>
-								<td><strong>".__("Position:", "mingleforum")."</strong></td>
-								<td>".$this->get_userrole($user_id)."</td></tr>
-							<tr>
-								<td><strong>".__("Website:", "mingleforum")."</strong></td>
-								<td><a href='$user->user_url'>$user->user_url</a></td>
-							</tr>
-							<tr>
-								<td><strong>".__("AIM:", "mingleforum")."</strong></td>
-								<td>$user->aim</td>
-							</tr>
-							<tr>
-								<td><strong>".__("Yahoo:", "mingleforum")."</strong></td>
-								<td>$user->yim</td></tr>
-							<tr>
-								<td><strong>".__("Jabber/google Talk:", "mingleforum")."</strong></td>
-								<td>$user->jabber</td>
-							</tr>
-							<tr>
-								<td valign='top'><strong>".__("Biographical Info:", "mingleforum")."</strong></td>
-								<td valign='top'>".$custom_content."</td>
-							</tr>
-						</table>
-					</td>
+					<th width='8%'>Status</th>
+					<th width='100%'>".__("Subject", "mingleforum")."</th>
+					<th>".__("In Thread", "mingleforum")."</th>
+					<th>".__("In Forum", "mingleforum")."</th>					
+					<th>".__("Posted On", "mingleforum")."</th>
+				</tr>";	
+		$posts_per_page = $this->opt['forum_posts_per_page'];
+		$limitStart = $this->curr_page * $posts_per_page;		
+		$results = $wpdb->get_results("SELECT * FROM $this->t_posts WHERE author_id = $user_id ORDER BY date LIMIT $limitStart,$posts_per_page");
+		$alt = "wpf-alt alt even";					
+		if (count($results) < 1) {
+			$o .= "<tr class='$alt'><td valign='top' align='center' colspan=5>".$this->get_userdata($user_id, $this->options['forum_display_name'])." has no posts!</td></tr>";
+		}
+		else {
+			foreach($results as $result){
+				if($this->have_access($this->forum_get_group_from_post($result->parent_id))){
+				$forum_row = $wpdb->get_row("select * from {$this->t_threads} where id = {$result->parent_id}");
+				$forum_name = $wpdb->get_var("select name from {$this->t_forums} where id = {$forum_row->parent_id}");
+				$o .= "<tr class='$alt'>
+							<td valign='top' align='center'>".$this->get_topic_image($result->parent_id)."</td>
+							<td valign='top' ><a href='".$this->get_paged_threadlink($result->parent_id, '#postid-'.$result->id)."'>".stripslashes($result->subject)."</a></td>
+							<td valign='top' nowrap='nowrap' ><a href='".$this->get_threadlink($result->parent_id)."'>".stripslashes($forum_row->subject)."</a></td>
+							<td valign='top' nowrap='nowrap' ><a href='".$this->get_forumlink($forum_row->parent_id)."'>".stripslashes($forum_name)."</a></td>
+							<td valign='top' nowrap='nowrap'>".$this->format_date($result->date)."</td>
+						</tr>";
+				}
+				$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";		
+			}
+		}
+		$o .= "</table>";	
+		$this->o .= $o;							
+		$o = "<table cellpadding='0' cellspacing='0'>
+				<tr class='pop_menus'>
+					<td width='100%'>".$this->user_pageing($user_id)."</td>
 				</tr>
-			</table></div>";
-		//Replaced above $this->output_filter(make_clickable(convert_smilies(wpautop($user->description))))
-		$this->o .= $o;
+			</table>";
+		$this->o .= $o;			
 		$this->footer();
 	}
   
@@ -2508,7 +2638,7 @@ DISABLED THIS IN 1.0.25*/
 		$this->current_view = SEARCH;
 		$this->header();
 		$search_string = $wpdb->escape($_POST['search_words']);
-		$sql = "SELECT $this->t_posts.id, `text`, $this->t_posts.subject, $this->t_posts.parent_id, $this->t_posts.`date`, MATCH (`text`) AGAINST (' {$search_string}') AS score
+		$sql = "SELECT $this->t_posts.id, `text`, $this->t_posts.subject, $this->t_posts.parent_id, $this->t_posts.author_id, $this->t_posts.`date`, MATCH (`text`) AGAINST (' {$search_string}') AS score
 		FROM $this->t_posts JOIN $this->t_threads on $this->t_posts.parent_id = $this->t_threads.id
 		AND MATCH (`text`) AGAINST ('{$search_string}')
 		ORDER BY score DESC
@@ -2525,20 +2655,32 @@ DISABLED THIS IN 1.0.25*/
 					<th width='8%'>Status</th>
 					<th width='100%'>".__("Subject", "mingleforum")."</th>
 					<th>".__("Relevance", "mingleforum")."</th>
-					<th>".__("Started by", "mingleforum")."</th>
-					<th>".__("Posted", "mingleforum")."</th>
+					<th>".__("In Thread", "mingleforum")."</th>
+					<th>".__("In Forum", "mingleforum")."</th>					
+					<th>".__("Posted By", "mingleforum")."</th>
+					<th>".__("Posted On", "mingleforum")."</th>
 				</tr>";
-		foreach($results as $result){
-			if($this->have_access($this->forum_get_group_from_post($result->parent_id))){
-			$starter = $wpdb->get_var("select starter from {$this->t_threads} where id = {$result->parent_id}");
-				$o .= "<tr>
-							<td valign='top' align='center'>".$this->get_topic_image($result->parent_id)."</td>
-							<td valign='top' class='wpf-alt'><a href='".$this->get_threadlink($result->parent_id)."'>".stripslashes($result->subject)."</a>
-							</td>
-							<td valign='top'><small>".round($result->score*$const, 1)."%</small></td>
-							<td valign='top' nowrap='nowrap' class='wpf-alt'>".$this->profile_link($starter)."</td>
-							<td valign='top' class='wpf-alt' nowrap='nowrap'>".$this->format_date($result->date)."</td>
-						</tr>";
+		$alt = "wpf-alt alt even";					
+		if (count($results) < 1) {
+			$o .= "<tr class='$alt'><td valign='top' align='center' colspan=7>No search results found!</td></tr>";
+		}
+		else {			
+			foreach($results as $result){
+				if($this->have_access($this->forum_get_group_from_post($result->parent_id))){
+				$forum_row = $wpdb->get_row("select * from {$this->t_threads} where id = {$result->parent_id}");
+				$forum_name = $wpdb->get_var("select name from {$this->t_forums} where id = {$forum_row->parent_id}");	
+					$o .= "<tr class='$alt'>
+								<td valign='top' align='center'>".$this->get_topic_image($result->parent_id)."</td>
+								<td valign='top'><a href='".$this->get_paged_threadlink($result->parent_id, '#postid-'.$result->id)."'>".stripslashes($result->subject)."</a>
+								</td>
+								<td valign='top'><small>".round($result->score*$const, 1)."%</small></td>
+								<td valign='top' nowrap='nowrap'><a href='".$this->get_threadlink($result->parent_id)."'>".stripslashes($forum_row->subject)."</a></td>
+								<td valign='top' nowrap='nowrap'><a href='".$this->get_forumlink($forum_row->parent_id)."'>".stripslashes($forum_name)."</a></td>							
+								<td valign='top' nowrap='nowrap'>".$this->profile_link($result->author_id)."</td>
+								<td valign='top' nowrap='nowrap'>".$this->format_date($result->date)."</td>
+							</tr>";
+					$alt = ($alt=="wpf-alt alt even")?"odd":"wpf-alt alt even";									
+				}
 			}
 		}
 		$o .= "</table>";
@@ -3041,6 +3183,7 @@ DISABLED THIS IN 1.0.25*/
 		$custom_content = $auto_embed?$this->autoembed($custom_content):$custom_content;
 		$custom_content = make_clickable(convert_smilies(wpautop($this->output_filter(html_entity_decode($custom_content)))));		
 		$custom_content = $do_shortcode?do_shortcode($custom_content):$custom_content;
+		$custom_content = apply_filters('the_content', $custom_content);
 		return $custom_content;
 	}
 
