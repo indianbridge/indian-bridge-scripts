@@ -49,8 +49,6 @@
             this.selectFileOrFolderDialog = new System.Windows.Forms.OpenFileDialog();
             this.selectFileToUploadButton = new System.Windows.Forms.Button();
             this.useTourneyTemplateCheckbox = new System.Windows.Forms.CheckBox();
-            this.csvContentTextbox = new System.Windows.Forms.TextBox();
-            this.postMasterpointsButton = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -170,7 +168,7 @@
             this.cancelPublishResultsButton});
             this.statusStrip1.Location = new System.Drawing.Point(0, 374);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(955, 23);
+            this.statusStrip1.Size = new System.Drawing.Size(437, 23);
             this.statusStrip1.TabIndex = 25;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -215,34 +213,11 @@
             this.useTourneyTemplateCheckbox.Text = "Use Tourney Template";
             this.useTourneyTemplateCheckbox.UseVisualStyleBackColor = true;
             // 
-            // csvContentTextbox
-            // 
-            this.csvContentTextbox.Location = new System.Drawing.Point(425, 12);
-            this.csvContentTextbox.Multiline = true;
-            this.csvContentTextbox.Name = "csvContentTextbox";
-            this.csvContentTextbox.Size = new System.Drawing.Size(508, 144);
-            this.csvContentTextbox.TabIndex = 28;
-            // 
-            // postMasterpointsButton
-            // 
-            this.postMasterpointsButton.BackColor = System.Drawing.Color.Green;
-            this.postMasterpointsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.postMasterpointsButton.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.postMasterpointsButton.Location = new System.Drawing.Point(425, 162);
-            this.postMasterpointsButton.Name = "postMasterpointsButton";
-            this.postMasterpointsButton.Size = new System.Drawing.Size(404, 68);
-            this.postMasterpointsButton.TabIndex = 29;
-            this.postMasterpointsButton.Text = "Post Masterpoints";
-            this.postMasterpointsButton.UseVisualStyleBackColor = false;
-            this.postMasterpointsButton.Click += new System.EventHandler(this.postMasterpointsButton_Click);
-            // 
             // UploadFolderToWordpress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(955, 397);
-            this.Controls.Add(this.postMasterpointsButton);
-            this.Controls.Add(this.csvContentTextbox);
+            this.ClientSize = new System.Drawing.Size(437, 397);
             this.Controls.Add(this.useTourneyTemplateCheckbox);
             this.Controls.Add(this.selectFileToUploadButton);
             this.Controls.Add(this.statusStrip1);
@@ -289,8 +264,6 @@
         private System.Windows.Forms.OpenFileDialog selectFileOrFolderDialog;
         private System.Windows.Forms.Button selectFileToUploadButton;
         private System.Windows.Forms.CheckBox useTourneyTemplateCheckbox;
-        private System.Windows.Forms.TextBox csvContentTextbox;
-        private System.Windows.Forms.Button postMasterpointsButton;
     }
 }
 

@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddTourneys.cs" />
     <Compile Include="ManageMasterpoints.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UploadWebpages.cs" />
