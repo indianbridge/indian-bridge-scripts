@@ -273,9 +273,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 			public function bfi_getTableData($params) {
 			// Check credentials first
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string,true);
-			if ($result->error) return $return_string;
+			$return_string = $this->bfi_validateEditPageCredentials($params);
+			$result = json_decode($return_string);
+			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
+			if ($error_flag) return $return_string;		
 
 			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 
@@ -317,9 +318,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 			public function bfi_addTournamentLevel($params) {
 			// Check credentials first
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string,true);
-			if ($result->error) return $return_string;
+			$return_string = $this->bfi_validateEditPageCredentials($params);
+			$result = json_decode($return_string);
+			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
+			if ($error_flag) return $return_string;		
 
 			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 
@@ -375,9 +377,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 			public function bfi_addTournament($params) {
 			// Check credentials first
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string,true);
-			if ($result->error) return $return_string;
+			$return_string = $this->bfi_validateEditPageCredentials($params);
+			$result = json_decode($return_string);
+			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
+			if ($error_flag) return $return_string;		
 
 			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 
@@ -439,9 +442,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 			public function bfi_addEvent($params) {
 			// Check credentials first
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string,true);
-			if ($result->error) return $return_string;
+			$return_string = $this->bfi_validateEditPageCredentials($params);
+			$result = json_decode($return_string);
+			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
+			if ($error_flag) return $return_string;		
 
 			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 
@@ -606,9 +610,10 @@ if ( ! class_exists( 'BFI_Masterpoint_Display' ) ) {
 
 			public function bfi_addMasterpoints($params) {
 			// Check credentials first
-			$return_string = $this->bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string,true);
-			if ($result->error) return $return_string;
+			$return_string = $this->bfi_validateEditPageCredentials($params);
+			$result = json_decode($return_string);
+			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
+			if ($error_flag) return $return_string;		
 
 			do_action( 'xmlrpc_call', __FUNCTION__); // patterned on the core XML-RPC actions
 
