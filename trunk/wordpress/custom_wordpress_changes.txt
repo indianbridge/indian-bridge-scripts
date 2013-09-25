@@ -59,4 +59,19 @@ Mingle Forum
 				$out .= do_shortcode($thread_content);								
 				$out .= apply_filters('mf_after_reply', '', $post->id);
 				$out .= "</td>
-			</tr>";			
+			</tr>";		
+
+
+Wordpress Admin Bar Improved
+	in wpabi.php
+		line 223 change  to 			
+			$loginform .= '<div class="loginform">
+				<form action="'.wp_login_url().'" method="post" id="adminbarlogin">
+					<input class="adminbar-input" name="log" id="adminbarlogin-log" type="text" value="'.__('Username/BFI ID/Email', $this->textdomain).'" />
+					<input class="adminbar-input" name="pwd" id="adminbarlogin-pwd" type="password" value="'.__('Password', $this->textdomain).'" />
+					<input type="submit" class="adminbar-button" value="'.__('Login').'"/>
+					<span class="adminbar-loginmeta">
+						<input type="checkbox" checked="checked" tabindex="3" value="forever" id="rememberme" name="rememberme">
+						<label for="rememberme">'.__('Remember me', $this->textdomain).'</label>
+						<a href="'.wp_login_url().'?action=lostpassword">'.__('Lost your password?', $this->textdomain).'</a>
+						<a href="'.home_url("/member_services/masterpoints").'">'.__('Find your BFI Member ID', $this->textdomain).'</a>';
