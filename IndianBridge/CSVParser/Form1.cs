@@ -48,59 +48,27 @@ namespace CSVParser
 			txtResults.AppendText("File size is " + size + "\n");
 			txtResults.AppendText(result.ToString());
 
-			m_parseResults = ParseCSV(fileContents);
+			ParseFile(fileContents);
 
 			txtFileContents.Visible = lblContents.Visible = btnSaveHtml.Visible = txtTitle.Visible = lblTitle.Visible = true;
 		}
 
-		private Tuple<DataTable, string[]> ParseCSV(string fileContents)
+		private void ParseFile(string fileContents)
 		{
-			Tuple<DataTable, string[]> parseResults = null;
 			try
 			{
-				// Tracks the position within the file
-				var previousPosition = 0;
-
-				// Skip empty lines at the beginning of the file, if any
-				var results = SkipEmptyLines(fileContents);
-
-				var currentPosition = results.IndexOf("\n");
-				var headerLine = results.Substring(previousPosition, currentPosition - previousPosition);
-
-				var columnNames = GetColumns(headerLine);
-				var values = ConstructDataTable(columnNames);
+				m_parseResults = CSVUtilities.ParseCSV(fileContents);
 
 				txtResults.AppendText("\n");
 				txtResults.AppendText("Columns: ");
-				var columnsOutput = columnNames.Aggregate(String.Empty,
+				var columnsOutput = m_parseResults.Item2.Aggregate(String.Empty,
 				                                          (current, column) => current + String.Format("{0} ,", column));
 
 				columnsOutput = columnsOutput.TrimEnd(new[] {','});
 				txtResults.AppendText(columnsOutput);
 
-				// Skip empty lines after the header, if any
-				results = SkipEmptyLines(results.Substring(currentPosition + 1));
-
-				//txtFileContents.AppendText(results);
-
-				previousPosition = 0;
-				currentPosition = results.IndexOf("\n");
-
-				while (true)
-				{
-					var currentLine = results.Substring(previousPosition, currentPosition - previousPosition);
-					if (currentLine == String.Empty || currentLine == "\r") break;
-					var rowValues = currentLine.Split(new[] {','});
-					AddRow(rowValues, columnNames, ref values);
-					previousPosition = currentPosition + 1;
-					currentPosition = results.IndexOf("\n", previousPosition);
-					if (currentPosition < 0) break;
-				}
-
 				// Show the preview
-				PublishResults(values);
-
-				parseResults = new Tuple<DataTable, string[]>(values, columnNames);
+				PublishResults(m_parseResults.Item1);
 			}
 			catch (Exception exc)
 			{
@@ -109,103 +77,25 @@ namespace CSVParser
 				txtResults.AppendText("\n");
 				txtResults.AppendText(exc.StackTrace);
 			}
-
-			return parseResults;
 		}
 
 		private void PublishResults(DataTable results)
 		{
 			foreach (DataRow row in results.Rows)
 			{
-				WriteRowResult(row.ItemArray);
+				txtFileContents.AppendText(Utilities.WriteRowResult(row.ItemArray));
 			}
 		}
 
 		private void PublishResultsToHTML(DataTable results, IEnumerable<string> columnNames, string fileName = @"C:\results.html")
 		{
-			string tableContainerClass = "datagrid";
+			const string tableContainerClass = "datagrid";
 			var htmlHeader = String.Format("<html><head><title></title>{0}</head><h2>{1}</h2><div class=\"{2}\"><table class=\"stripeme\"><thead>\n", txtTitle.Text,txtTitle.Text,tableContainerClass);
-			var htmlString = htmlHeader  + GetHTMLTableHeader(columnNames)+"</thead><tbody>";
-			htmlString = results.Rows.Cast<DataRow>().Aggregate(htmlString, (current, row) => 
-				current + GetHTMLRowResult(row.ItemArray));
+			var htmlString = htmlHeader + Utilities.GetHTMLTableHeader(columnNames) + "</thead><tbody>";
+			htmlString = results.Rows.Cast<DataRow>().Aggregate(htmlString, (current, row) =>
+				current + Utilities.GetHTMLRowResult(row.ItemArray));
 			htmlString += "\n</tbody></table><div></html>";
-			WriteFile(fileName, htmlString);
-		}
-
-		private static void WriteFile(string fileName, string content)
-		{
-			var fileStream = new StreamWriter(fileName);
-			fileStream.Write(content);
-			fileStream.Close();
-		}
-
-		private static string GetHTMLTableHeader(IEnumerable<object> columnNames)
-		{
-			var tableHeader = columnNames.Aggregate("<tr>", (current, value) =>
-				current + String.Format("<th>{0}</th>", value.ToString().Trim()));
-			tableHeader += "</tr>\n";
-			return tableHeader;
-		}
-
-		private string GetHTMLRowResult(IEnumerable<object> rowValues)
-		{
-			var rowString = rowValues.Aggregate("<tr>", (current, value) => 
-				current + String.Format("<td>{0}</td>", value.ToString().Trim()));
-			rowString += "</tr>\n";
-			return rowString;
-		}
-
-		private void WriteRowResult(IEnumerable<object> rowValues)
-		{
-			var rowString = rowValues.Aggregate(String.Empty, (current, rowValue) => current + String.Format("{0},", rowValue.ToString().Trim()));
-			rowString = rowString.TrimEnd(new[] { ',' });
-			rowString = rowString.Replace("\r", String.Empty);
-			txtFileContents.AppendText(rowString + "\n");
-		}
-
-		private static DataTable ConstructDataTable(IEnumerable<string> columnNames)
-		{
-			var result = new DataTable();
-			foreach (var columnName in columnNames)
-			{
-				result.Columns.Add(columnName, Type.GetType("System.String"));
-			}
-			return result;
-		}
-
-		private void AddRow(string[] rowValues, string[] columnNames, ref DataTable result)
-		{
-			var row = result.NewRow();
-			for (var i = 0; i < columnNames.Length; i++ )
-			{
-				row[columnNames[i]] = rowValues[i];
-			}
-			result.Rows.Add(row);
-		}
-
-		private string[] GetColumns(string headerLine)
-		{
-			return headerLine.Split(new char[] { ',' });
-		}
-
-		private string SkipEmptyLines(string contents)
-		{
-			var previousPosition = 0;
-			var currentPosition = contents.IndexOf("\n");
-			var line = contents.Substring(previousPosition, currentPosition - previousPosition);
-			while (true)
-			{
-				if (line != "\r")
-				{
-					break;
-				}
-
-				previousPosition = currentPosition + 1;
-				currentPosition = contents.IndexOf("\n", previousPosition);
-				line = contents.Substring(previousPosition, currentPosition - previousPosition);
-			}
-
-			return contents.Substring(previousPosition);
+			Utilities.WriteFile(fileName, htmlString);
 		}
 
 		private void checkBox1_CheckedChanged(object sender, EventArgs e)
