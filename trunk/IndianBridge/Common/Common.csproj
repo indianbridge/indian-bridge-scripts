@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessDatabaseUtilities.cs" />
+    <Compile Include="CSVUtilities.cs" />
     <Compile Include="CustomBackgroundWorker.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="NiniUtilities.cs" />
