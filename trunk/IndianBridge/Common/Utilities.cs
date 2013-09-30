@@ -398,7 +398,13 @@ namespace IndianBridge.Common
 		}
 		public static string[] GetColumns(string headerLine)
 		{
-			return headerLine.Split(new char[] { ',' });
+			string[] columnNames = headerLine.Split(new char[] { ',' });
+            for (int i = 0; i < columnNames.Length; ++i)
+            {
+                columnNames[i] = columnNames[i].Replace("\n", String.Empty);
+                columnNames[i] = columnNames[i].Replace("\r", String.Empty);
+            }
+            return columnNames;
 		}
 		public static string GetHTMLTableHeader(IEnumerable<object> columnNames)
 		{
