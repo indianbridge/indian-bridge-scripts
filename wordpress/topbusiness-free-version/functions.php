@@ -58,8 +58,8 @@ $template_url = get_bloginfo('template_url');
 
 		// Cufon
 		if (
-				$panda_ty['titles_font_group'] == 'cufon' && $panda_ty['cufon_panda'] != '- select -' ||
-				$panda_ty['titles_font_group'] == 'cufon' && $panda_ty['cufon_custom']
+				isset($panda_ty['titles_font_group']) && isset($panda_ty['cufon_panda']) && isset($panda_ty['cufon_custom']) && ($panda_ty['titles_font_group'] == 'cufon' && $panda_ty['cufon_panda'] != '- select -' ||
+				$panda_ty['titles_font_group'] == 'cufon' && $panda_ty['cufon_custom'])
 			) :
 
 				// Register Cufon base
@@ -248,7 +248,7 @@ $template_url = get_bloginfo('template_url');
 	require_once (TEMPLATEPATH.'/admin/includes/custom_post_type/sliders.php');
 
 	// PRODUCTS & RATING
-	if ($panda_pr['products'] == 'enable') :
+	if (isset($panda_pr['products']) && $panda_pr['products'] == 'enable') :
 		
 		require_once (TEMPLATEPATH.'/admin/includes/custom_post_type/products.php');
 		require_once (TEMPLATEPATH.'/admin/includes/shortcodes/products.php');
@@ -435,7 +435,7 @@ $template_url = get_bloginfo('template_url');
 
 
 		// BuddyPress
-		if ( $panda_bp['compatibility'] == 'yes' )
+		if ( isset($panda_bp['compatibility']) && $panda_bp['compatibility'] == 'yes' )
 			wp_register_style('bp-style', $template_url.'/styles/buddy/bp.css', false, null); wp_enqueue_style('bp-style', false, null);
 
 
@@ -478,7 +478,7 @@ $template_url = get_bloginfo('template_url');
 
 
 
-	if ( $panda_bp['compatibility'] == 'yes' ) :
+	if ( isset($panda_bp['compatibility']) && $panda_bp['compatibility'] == 'yes' ) :
 
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
@@ -575,7 +575,7 @@ $template_url = get_bloginfo('template_url');
 	function google_fonts() {
 		global $panda_ty;
 
-			if ( $panda_ty['titles_font_group'] == 'google' ) :
+			if ( isset($panda_ty['titles_font_group']) && $panda_ty['titles_font_group'] == 'google' ) :
 
 				// Custom font
 				if ( $panda_ty['google_custom'] ) :

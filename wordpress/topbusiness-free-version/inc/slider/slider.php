@@ -15,10 +15,10 @@
 	// CHECK THE CURRENT PAGE
 
 		// Homepage
-		if ( is_front_page() && $panda_sl['slider_on_homepage'] == 'enable' ) : panda_slider(); endif;
+		if ( is_front_page() && isset($panda_sl['slider_on_homepage']) && $panda_sl['slider_on_homepage'] == 'enable' ) : panda_slider(); endif;
 
 		// Page
-		if ( is_page() && ! is_page_template('archive-blog.php') && ! is_page_template('page-blank.php') && ! is_page_template('archive-products.php') && $panda_sl['slider_on_page'] == 'enable' ) : panda_slider(); endif;
+		if ( is_page() && ! is_page_template('archive-blog.php') && ! is_page_template('page-blank.php') && ! is_page_template('archive-products.php') && isset($panda_sl['slider_on_page']) && $panda_sl['slider_on_page'] == 'enable' ) : panda_slider(); endif;
 
 		// Page Blank
 		if ( is_page_template('page-blank.php') && ! is_front_page() && $panda_sl['slider_on_page'] == 'enable' ) : panda_slider(); endif;
@@ -42,7 +42,7 @@
 		if ( is_search() && $panda_sl['slider_on_search'] == 'enable' ) : panda_slider(); endif;
 
 		// 404
-		if ( is_404() && $panda_sl['slider_on_404'] == 'enable' ) : panda_slider(); endif;
+		if ( is_404() && isset($panda_sl['slider_on_404']) && $panda_sl['slider_on_404'] == 'enable' ) : panda_slider(); endif;
 
 
 
