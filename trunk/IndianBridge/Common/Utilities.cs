@@ -103,6 +103,15 @@ namespace IndianBridge.Common
 			return result == DialogResult.Yes;
 		}
 
+        public static string getNewLineCharacter(string message)
+        {
+            string splitter = Environment.NewLine;
+            if (message.Contains(splitter)) return splitter;
+            splitter = "\r\n";
+            if (message.Contains(splitter)) return splitter;
+            return "\n";
+        }
+
 		public static void showErrorMessage(string message)
 		{
 			MessageBox.Show(message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);

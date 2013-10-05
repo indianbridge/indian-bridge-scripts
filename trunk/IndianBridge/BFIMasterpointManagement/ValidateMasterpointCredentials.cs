@@ -36,7 +36,8 @@ namespace BFIMasterpointManagement
             loadingPicture.Visible = true;
             loadingPicture.BringToFront();
             this.Refresh();
-            mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
+            mm = new ManageMasterpoints("http://bridgefederationofindia.zippysites.com/", usernameTextbox.Text, passwordTextbox.Text);
+            //mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
             string json_result = mm.validateMasterpointCredentials();
             var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
             Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
