@@ -72,7 +72,8 @@ namespace BFIMasterpointManagement
 				return;
 			}
 			string m_emData = m_getEventResult["content"];
-			string[] lines = m_emData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            //string splitter = m_emData.Contains(Environment.NewLine) ? Environment.NewLine : "\n";
+            string[] lines = m_emData.Split(new string[] { Utilities.getNewLineCharacter(m_emData) }, StringSplitOptions.RemoveEmptyEntries);
 			string[] columnHeaders = lines[0].Split(',');
 			emDataGridView.Columns.Clear();
 			emDataGridView.Rows.Clear();
@@ -107,7 +108,8 @@ namespace BFIMasterpointManagement
 				return;
 			}
 			string m_tmData = m_getTournamentResult["content"];
-			string[] lines = m_tmData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            //string splitter = m_tmData.Contains(Environment.NewLine) ? Environment.NewLine : "\n";
+            string[] lines = m_tmData.Split(new string[] { Utilities.getNewLineCharacter(m_tmData) }, StringSplitOptions.RemoveEmptyEntries);
 			string[] columnHeaders = lines[0].Split(',');
 			tmDataGridView.Columns.Clear();
 			tmDataGridView.Rows.Clear();
@@ -141,7 +143,9 @@ namespace BFIMasterpointManagement
 				return;
 			}
 			string m_ttmData = m_getTournamentLevelResult["content"];
-			string[] lines = m_ttmData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            MessageBox.Show(m_ttmData);
+            //string splitter = m_ttmData.Contains(Environment.NewLine)?Environment.NewLine:"\n";
+			string[] lines = m_ttmData.Split(new string[] { Utilities.getNewLineCharacter(m_ttmData)}, StringSplitOptions.RemoveEmptyEntries);
 			string[] columnHeaders = lines[0].Split(',');
 			ttmDataGridView.Columns.Clear();
 			ttmDataGridView.Rows.Clear();
