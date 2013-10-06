@@ -43,8 +43,6 @@
 			this.txtPath = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
-			this.label3 = new System.Windows.Forms.Label();
-			this.txtDomainName = new System.Windows.Forms.TextBox();
 			this.SuspendLayout();
 			// 
 			// btnSelectFile
@@ -76,7 +74,7 @@
 			// 
 			// txtResults
 			// 
-			this.txtResults.Location = new System.Drawing.Point(39, 283);
+			this.txtResults.Location = new System.Drawing.Point(39, 264);
 			this.txtResults.Multiline = true;
 			this.txtResults.Name = "txtResults";
 			this.txtResults.Size = new System.Drawing.Size(294, 216);
@@ -96,7 +94,7 @@
 			// 
 			// btnSaveHtml
 			// 
-			this.btnSaveHtml.Location = new System.Drawing.Point(39, 244);
+			this.btnSaveHtml.Location = new System.Drawing.Point(39, 216);
 			this.btnSaveHtml.Name = "btnSaveHtml";
 			this.btnSaveHtml.Size = new System.Drawing.Size(96, 32);
 			this.btnSaveHtml.TabIndex = 6;
@@ -133,13 +131,14 @@
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(36, 115);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(47, 13);
+			this.label1.Size = new System.Drawing.Size(127, 13);
 			this.label1.TabIndex = 10;
-			this.label1.Text = "Save As";
+			this.label1.Text = "Save As (File Name Only)";
+			this.label1.Click += new System.EventHandler(this.label1_Click);
 			// 
 			// txtPath
 			// 
-			this.txtPath.Location = new System.Drawing.Point(39, 218);
+			this.txtPath.Location = new System.Drawing.Point(39, 179);
 			this.txtPath.Name = "txtPath";
 			this.txtPath.Size = new System.Drawing.Size(192, 20);
 			this.txtPath.TabIndex = 11;
@@ -147,7 +146,7 @@
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(36, 202);
+			this.label2.Location = new System.Drawing.Point(36, 158);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(86, 13);
 			this.label2.TabIndex = 12;
@@ -163,29 +162,11 @@
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(36, 161);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(43, 13);
-			this.label3.TabIndex = 15;
-			this.label3.Text = "Domain";
-			// 
-			// txtDomainName
-			// 
-			this.txtDomainName.Location = new System.Drawing.Point(39, 177);
-			this.txtDomainName.Name = "txtDomainName";
-			this.txtDomainName.Size = new System.Drawing.Size(192, 20);
-			this.txtDomainName.TabIndex = 14;
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(959, 509);
-			this.Controls.Add(this.label3);
-			this.Controls.Add(this.txtDomainName);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.txtPath);
@@ -223,8 +204,6 @@
 		private System.Windows.Forms.TextBox txtPath;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Button button1;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.TextBox txtDomainName;
 	}
 }
 

@@ -90,7 +90,7 @@ namespace CSVParser
 		private void PublishResultsToHTML(DataTable results, IEnumerable<string> columnNames, string fileName = @"C:\results.html")
 		{
 			const string tableContainerClass = "datagrid";
-			var htmlHeader = String.Format("<html><head><title></title>{0}</head><h2>{1}</h2><div class=\"{2}\"><table class=\"stripeme\"><thead>\n", txtTitle.Text,txtTitle.Text,tableContainerClass);
+			var htmlHeader = String.Format("<html><head><title>{0}</title></head><h2>{0}</h2><div class=\"{1}\"><table class=\"stripeme\"><thead>\n", txtTitle.Text, tableContainerClass);
 			var htmlString = htmlHeader + Utilities.GetHTMLTableHeader(columnNames) + "</thead><tbody>";
 			htmlString = results.Rows.Cast<DataRow>().Aggregate(htmlString, (current, row) =>
 				current + Utilities.GetHTMLRowResult(row.ItemArray));
@@ -117,18 +117,23 @@ namespace CSVParser
 			if (result != DialogResult.OK) return;
 
 			var foldername = folderBrowserDialog1.SelectedPath;
-			PublishResultsToHTML(m_parseResults.Item1, m_parseResults.Item2, String.Format(@"{0}\results.html", foldername));
+			var fileName = String.IsNullOrEmpty(txtFileName.Text) ? "results.html" : String.Format("{0}.html", txtFileName.Text);
+			PublishResultsToHTML(m_parseResults.Item1, m_parseResults.Item2, String.Format(@"{0}\{1}", foldername, fileName));
 
-			MessageBox.Show("HTML File (results.html) saved successfully", "Success");
+			MessageBox.Show("Results file saved successfully", "Success");
 		}
 
 		private void button1_Click(object sender, EventArgs e)
 		{
+			// TODO : Use form values (or use login form)
 			string siteName = "http://bfitest.bfi.net.in/";
-			string pagePath = "/tourneys/winter-national/y2012/results/team-event";
 			string username = "vdevadass";
 			string password = "bitspilani";
-			UploadWebpages uw = new UploadWebpages(siteName, username, password, true, true);
+
+			string pagePath = txtPath.Text; // /tourneys/winter-national/y2012/results/team-event
+			if (!pagePath.StartsWith("/"))
+				pagePath = String.Format("/{0}", pagePath);
+			var uw = new UploadWebpages(siteName, username, password, true, true);
 			var m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, 
 				publishResultsCompleted, null, null, null, null);
 			oldFontSize = Utilities.fontSize;
@@ -144,7 +149,12 @@ namespace CSVParser
 		{
 			m_publishResultsRunning = false;
 			Utilities.fontSize = oldFontSize;
-			if (success) txtResults.Text = ("Results published succesfully at " + txtDomainName.Text);
+			if (success) txtResults.Text = ("Results published succesfully");
+		}
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

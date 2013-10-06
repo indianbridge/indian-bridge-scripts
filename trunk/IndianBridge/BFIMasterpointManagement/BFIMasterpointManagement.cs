@@ -53,7 +53,7 @@ namespace BFIMasterpointManagement
 		private void loadTournamentLevels()
 		{
 			ttmDataGridView.Enabled = false;
-            ttmLoadingPicture.BringToFront();
+			ttmLoadingPicture.BringToFront();
 			ttmLoadingPicture.Visible = true;
 			BackgroundWorker bw = new BackgroundWorker();
 			bw.WorkerSupportsCancellation = false;
@@ -158,7 +158,7 @@ namespace BFIMasterpointManagement
 				ttmDataGridView.Rows.Add(lines[i].Split(','));
 			}
 			ttmLoadingPicture.Visible = false;
-            ttmLoadingPicture.SendToBack();
+			ttmLoadingPicture.SendToBack();
 			ttmDataGridView.Enabled = true;
 		}
 
@@ -245,36 +245,36 @@ namespace BFIMasterpointManagement
 
 		private void uploadUsersButton_Click(object sender, EventArgs e)
 		{
-            statusMessageTextbox.ForeColor = Color.Blue;
-            statusMessageTextbox.Text = "Processing...";
-            controlTabs.SelectTab("responseMessage");
+			statusMessageTextbox.ForeColor = Color.Blue;
+			statusMessageTextbox.Text = "Processing...";
+			controlTabs.SelectTab("responseMessage");
 			TableInfo tableInfo = new TableInfo();
 			tableInfo.content = usersTextbox.Text;
 			tableInfo.delimiter = ",";
-            try
-            {
-                string json_result = mm.addUsers(tableInfo);
-                var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
-                Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
-                bool errorStatus = Convert.ToBoolean(result["error"]);
-                if (errorStatus)
-                {
-                    statusMessageTextbox.ForeColor = Color.Red;
-                    statusMessageTextbox.Text = result["message"] + Environment.NewLine + result["content"];
-                    //MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Error adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    statusMessageTextbox.ForeColor = Color.Green;
-                    statusMessageTextbox.Text = result["message"] + Environment.NewLine + result["content"];
-                    //MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Success adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                statusMessageTextbox.ForeColor = Color.Red;
-                statusMessageTextbox.Text = ex.Message;
-            }
+			try
+			{
+				string json_result = mm.addUsers(tableInfo);
+				var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
+				Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
+				bool errorStatus = Convert.ToBoolean(result["error"]);
+				if (errorStatus)
+				{
+					statusMessageTextbox.ForeColor = Color.Red;
+					statusMessageTextbox.Text = result["message"] + Environment.NewLine + result["content"];
+					//MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Error adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+				else
+				{
+					statusMessageTextbox.ForeColor = Color.Green;
+					statusMessageTextbox.Text = result["message"] + Environment.NewLine + result["content"];
+					//MessageBox.Show(result["message"] + Environment.NewLine + result["content"], "Success adding Users !", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
+			}
+			catch (Exception ex)
+			{
+				statusMessageTextbox.ForeColor = Color.Red;
+				statusMessageTextbox.Text = ex.Message;
+			}
  
 		}
 
@@ -311,7 +311,7 @@ namespace BFIMasterpointManagement
 				}
 				catch (Exception exc)
 				{
-                    usersTextbox.ForeColor = Color.Red;
+					usersTextbox.ForeColor = Color.Red;
 					usersTextbox.Text = exc.Message;
 					usersTextbox.Visible = true;
 				}
@@ -320,8 +320,8 @@ namespace BFIMasterpointManagement
 			// Get the column names and the datatable of results
 			var table = CSVUtilities.ParseCSV(fileContents).Item1;
 
-            bool error = false;
-            string message = CheckUserDatabaseColumns(table, out error);
+			bool error = false;
+			string message = CheckUserDatabaseColumns(table, out error);
 			// Insert default values for missing columns that are required in the db
 			CheckForColumn(ref table, "address_1", typeof(String), String.Empty);
 			CheckForColumn(ref table, "city", typeof(String), String.Empty);
@@ -336,98 +336,98 @@ namespace BFIMasterpointManagement
 			CheckForColumn(ref table, "state", typeof(String), String.Empty);
 			CheckForColumn(ref table, "zone_code", typeof(String), "AM0");
 
-            bool tempError = false;
-            message += CheckUserColumns(table, out tempError);
-            error = error | tempError;
-            if (error)
-            {
-                MessageBox.Show("Errors in file contents! Please see textbox for details!", "Errors Found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                usersTextbox.ForeColor = Color.Red;
-                usersTextbox.Text = message;
-            }
-            else
-            {
-                var contents = GetColumnNames(table) + "\r\n";
-                contents += GetRowData(table);
-                usersTextbox.ForeColor = Color.Black;
-                usersTextbox.Text = contents;
-            }
+			bool tempError = false;
+			message += CheckUserColumns(table, out tempError);
+			error = error | tempError;
+			if (error)
+			{
+				MessageBox.Show("Errors in file contents! Please see textbox for details!", "Errors Found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				usersTextbox.ForeColor = Color.Red;
+				usersTextbox.Text = message;
+			}
+			else
+			{
+				var contents = GetColumnNames(table) + "\r\n";
+				contents += GetRowData(table);
+				usersTextbox.ForeColor = Color.Black;
+				usersTextbox.Text = contents;
+			}
 
 		}
 
-        private string CheckValueLength(DataRow row, string columnName, int length, ref bool error)
-        {
-                string tempMessage = "";
-                string value = (string)row[columnName];
-                if (string.IsNullOrWhiteSpace(value)) {
-                    tempMessage += "Value for " + columnName + " - " + value + " cannot be empty!";
-                    error = true;
-                }
-                else if (value.Length != length) {
-                    tempMessage += "Value for " + columnName + " - " + value + " has to be exactly "+length+" characters long!";
-                    error = true;
-                }
-                return tempMessage;
-        }
+		private string CheckValueLength(DataRow row, string columnName, int length, ref bool error)
+		{
+				string tempMessage = "";
+				string value = (string)row[columnName];
+				if (string.IsNullOrWhiteSpace(value)) {
+					tempMessage += "Value for " + columnName + " - " + value + " cannot be empty!";
+					error = true;
+				}
+				else if (value.Length != length) {
+					tempMessage += "Value for " + columnName + " - " + value + " has to be exactly "+length+" characters long!";
+					error = true;
+				}
+				return tempMessage;
+		}
 
-        private string CheckDouble(DataRow row, string columnName, ref bool error)
-        {
-            double num;
-            string value = (string)row[columnName];
-            error = Double.TryParse(value, out num);
-            return error ? "Value for " + columnName + " : " + value + " is not numeric!" : "";
-        }
+		private string CheckDouble(DataRow row, string columnName, ref bool error)
+		{
+			double num;
+			string value = (string)row[columnName];
+			error = Double.TryParse(value, out num);
+			return error ? "Value for " + columnName + " : " + value + " is not numeric!" : "";
+		}
 
-        private string CheckInt(DataRow row, string columnName,ref bool error)
-        {
-            int num;
-            string value = (string)row[columnName];
-            error = Int32.TryParse(value, out num);
-            return error ? "Value for "+columnName+" : "+value+" is not an integer!" : "";
-        }
+		private string CheckInt(DataRow row, string columnName,ref bool error)
+		{
+			int num;
+			string value = (string)row[columnName];
+			error = Int32.TryParse(value, out num);
+			return error ? "Value for "+columnName+" : "+value+" is not an integer!" : "";
+		}
 
-        private string CheckUserColumns(DataTable table, out bool outError)
-        {
-            outError = false;
-            string message = "";
-            int rowIndex = 1;
-            foreach (DataRow row in table.Rows)
-            {
-                bool error = false;
-                string tempMessage = "";
-                tempMessage += CheckValueLength(row, "member_id", 8, ref error);
-                if (error)
-                {
-                    message += "In Row : " + rowIndex + " - " + tempMessage + Environment.NewLine;
-                }
-                outError = outError | error;
-                rowIndex++;
-            }
-            return message;
-        }
+		private string CheckUserColumns(DataTable table, out bool outError)
+		{
+			outError = false;
+			string message = "";
+			int rowIndex = 1;
+			foreach (DataRow row in table.Rows)
+			{
+				bool error = false;
+				string tempMessage = "";
+				tempMessage += CheckValueLength(row, "member_id", 8, ref error);
+				if (error)
+				{
+					message += "In Row : " + rowIndex + " - " + tempMessage + Environment.NewLine;
+				}
+				outError = outError | error;
+				rowIndex++;
+			}
+			return message;
+		}
 
-        private string CheckMasterpointColumns(DataTable table,out bool outError)
-        {
-            outError = false;
-            string message = "";
-            int rowIndex = 1;
-            foreach (DataRow row in table.Rows)
-            {
-                bool error = false;
-                string tempMessage = "";
-                tempMessage += CheckValueLength(row, "tournament_code", 5, ref error);
-                tempMessage += CheckValueLength(row, "event_code", 3, ref error);
-                tempMessage += CheckValueLength(row, "member_id", 8, ref error);
-                tempMessage += CheckDouble(row, "localpoints_earned", ref error);
-                tempMessage += CheckDouble(row, "fedpoints_earned", ref error);
-                if (error) {
-                    message += "In Row : "+rowIndex+" - "+tempMessage + Environment.NewLine;
-                }
-                outError = outError | error;
-                rowIndex++;
-            }
-            return message;
-        }
+		private string CheckMasterpointColumns(DataTable table,out bool outError)
+		{
+			outError = false;
+			string message = "";
+			int rowIndex = 1;
+			foreach (DataRow row in table.Rows)
+			{
+				bool error = false;
+				string tempMessage = "";
+				tempMessage += CheckValueLength(row, "tournament_code", 5, ref error);
+				tempMessage += CheckValueLength(row, "event_code", 3, ref error);
+				tempMessage += CheckValueLength(row, "member_id", 8, ref error);
+				tempMessage += CheckDouble(row, "localpoints_earned", ref error);
+				tempMessage += CheckDouble(row, "fedpoints_earned", ref error);
+				if (error) {
+					message += "In Row : "+rowIndex+" - "+tempMessage + Environment.NewLine;
+				}
+				outError = outError | error;
+				rowIndex++;
+			}
+			return message;
+		}
 
 		// Check for the existence of a column in a datatable and if not present, add it
 		private static void CheckForColumn(ref DataTable table, string columnName, Type columnType, object defaultValue)
@@ -464,93 +464,93 @@ namespace BFIMasterpointManagement
 			}
 			return result;
 		}
-        private string CheckMasterpointDatabaseColumns(DataTable table, out bool error)
-        {
-            error = false;
-            string message = "";
-            string[] columnNames = {"tournament_code","event_code","member_id", "event_date","participant_no","rank","localpoints_earned","fedpoints_earned"};
-            foreach (DataColumn column in table.Columns)
-            {
-                if (!columnNames.Contains(column.ColumnName))
-                {
-                    error = true;
-                    message += "Column Name : " + column.ColumnName + " is not masterpoints database column name!" + Environment.NewLine;
-                }
-            }
-            return message;
-        }
+		private string CheckMasterpointDatabaseColumns(DataTable table, out bool error)
+		{
+			error = false;
+			string message = "";
+			string[] columnNames = {"tournament_code","event_code","member_id", "event_date","participant_no","rank","localpoints_earned","fedpoints_earned"};
+			foreach (DataColumn column in table.Columns)
+			{
+				if (!columnNames.Contains(column.ColumnName))
+				{
+					error = true;
+					message += "Column Name : " + column.ColumnName + " is not masterpoints database column name!" + Environment.NewLine;
+				}
+			}
+			return message;
+		}
 
-        private string CheckUserDatabaseColumns(DataTable table, out bool error)
-        {
-            error = false;
-            string message = "";
-            string[] columnNames = { "member_id", "first_name", "last_name", "address_1", "address_2", "address_3", "city", "country","email",
-                                   "residence_phone","mobile_no","sex","dob","rank","total_current_lp","total_current_fp"
-                                   ,"total_lp_yearend","total_fp_yearend"
-                                   ,"activation","block","area_code","country_code","state","mob_country_code","zone_code"};
-            foreach (DataColumn column in table.Columns)
-            {
-                if (!columnNames.Contains(column.ColumnName))
-                {
-                    error = true;
-                    message += "Column Name : " + column.ColumnName + " is not user database column name!" + Environment.NewLine;
-                }
-            }
-            return message;
-        }
+		private string CheckUserDatabaseColumns(DataTable table, out bool error)
+		{
+			error = false;
+			string message = "";
+			string[] columnNames = { "member_id", "first_name", "last_name", "address_1", "address_2", "address_3", "city", "country","email",
+								   "residence_phone","mobile_no","sex","dob","rank","total_current_lp","total_current_fp"
+								   ,"total_lp_yearend","total_fp_yearend"
+								   ,"activation","block","area_code","country_code","state","mob_country_code","zone_code"};
+			foreach (DataColumn column in table.Columns)
+			{
+				if (!columnNames.Contains(column.ColumnName))
+				{
+					error = true;
+					message += "Column Name : " + column.ColumnName + " is not user database column name!" + Environment.NewLine;
+				}
+			}
+			return message;
+		}
 
-        private void loadMasterpointsButton_Click(object sender, EventArgs e)
-        {
-            var fileContents = String.Empty;
-            // Show the dialog and get result.
-            var result = openFileDialog1.ShowDialog();
-            if (result == DialogResult.OK) // Test result.
-            {
-                var file = openFileDialog1.FileName;
-                try
-                {
-                    fileContents = File.ReadAllText(file);
-                }
-                catch (Exception exc)
-                {
-                    masterpointsTextbox.ForeColor = Color.Red;
-                    masterpointsTextbox.Text = exc.Message;
-                    masterpointsTextbox.Visible = true;
-                }
-            }
+		private void loadMasterpointsButton_Click(object sender, EventArgs e)
+		{
+			var fileContents = String.Empty;
+			// Show the dialog and get result.
+			var result = openFileDialog1.ShowDialog();
+			if (result == DialogResult.OK) // Test result.
+			{
+				var file = openFileDialog1.FileName;
+				try
+				{
+					fileContents = File.ReadAllText(file);
+				}
+				catch (Exception exc)
+				{
+					masterpointsTextbox.ForeColor = Color.Red;
+					masterpointsTextbox.Text = exc.Message;
+					masterpointsTextbox.Visible = true;
+				}
+			}
 
-            // Get the column names and the datatable of results
-            var table = CSVUtilities.ParseCSV(fileContents).Item1;
+			// Get the column names and the datatable of results
+			var table = CSVUtilities.ParseCSV(fileContents).Item1;
 
-            // Check for non-database columns
-            bool error = false;
-            string message = CheckMasterpointDatabaseColumns(table, out error);
-            // Insert default values for missing columns that are required in the db
-            CheckForColumn(ref table, "tournament_code", typeof(String), String.Empty);
-            CheckForColumn(ref table, "event_code", typeof(String), String.Empty);
-            CheckForColumn(ref table, "member_id", typeof(String), String.Empty);
-            DateTime time = DateTime.Now; 
-            CheckForColumn(ref table, "event_date", typeof(String), time.ToString("yyyy-MM-dd"));
-            CheckForColumn(ref table, "participant_no", typeof(Int16), 0);
-            CheckForColumn(ref table, "rank", typeof(Int16), 0);
-            CheckForColumn(ref table, "local_points_earned", typeof(Decimal), 0);
-            CheckForColumn(ref table, "fed_points_earned", typeof(Decimal), 0);
-            bool tempError = false;
-            message += CheckMasterpointColumns(table, out tempError);
-            error = error | tempError;
-            if (error)
-            {
-                MessageBox.Show("Errors in file contents! Please see textbox for details!", "Errors Found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                masterpointsTextbox.ForeColor = Color.Red;
-                masterpointsTextbox.Text = message;
-            }
-            else
-            {
-                var contents = GetColumnNames(table) + "\r\n";
-                contents += GetRowData(table);
-                masterpointsTextbox.ForeColor = Color.Black;
-                masterpointsTextbox.Text = contents;
-            }
-        }
+			// Check for non-database columns
+			bool error = false;
+			string message = CheckMasterpointDatabaseColumns(table, out error);
+			// Insert default values for missing columns that are required in the db
+			CheckForColumn(ref table, "tournament_code", typeof(String), String.Empty);
+			CheckForColumn(ref table, "event_code", typeof(String), String.Empty);
+			CheckForColumn(ref table, "member_id", typeof(String), String.Empty);
+			DateTime time = DateTime.Now; 
+			CheckForColumn(ref table, "event_date", typeof(String), time.ToString("yyyy-MM-dd"));
+			CheckForColumn(ref table, "participant_no", typeof(Int16), 0);
+			CheckForColumn(ref table, "rank", typeof(Int16), 0);
+			CheckForColumn(ref table, "local_points_earned", typeof(Decimal), 0);
+			CheckForColumn(ref table, "fed_points_earned", typeof(Decimal), 0);
+			bool tempError = false;
+			message += CheckMasterpointColumns(table, out tempError);
+			error = error | tempError;
+			if (error)
+			{
+				MessageBox.Show("Errors in file contents! Please see textbox for details!", "Errors Found!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				masterpointsTextbox.ForeColor = Color.Red;
+				masterpointsTextbox.Text = message;
+			}
+			else
+			{
+				var contents = GetColumnNames(table) + "\r\n";
+				contents += GetRowData(table);
+				masterpointsTextbox.ForeColor = Color.Black;
+				masterpointsTextbox.Text = contents;
+			}
+		}
 	}
 }
