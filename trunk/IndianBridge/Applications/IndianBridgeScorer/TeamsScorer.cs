@@ -44,6 +44,7 @@ namespace IndianBridgeScorer
             m_eventName = eventName;
             InitializeComponent();
             initialize();
+            mainControlTab.TabPages.RemoveByKey("wordpressUpload");
         }
 
         private void initialize()
@@ -97,13 +98,15 @@ namespace IndianBridgeScorer
 
         private void loadVPScaleTable()
         {
-            int numberOfBoards = m_swissTeamEventInfo.NumberOfBoardsPerRound;
-            string query = " WHERE VP_Scale=30 AND Number_Of_Boards_Lower<=" + numberOfBoards + " AND Number_Of_Boards_Upper>=" + numberOfBoards;
-            DataTable table = AccessDatabaseUtilities.loadDatabaseToTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale, query);
-            DataView dView = new DataView(table);
-            dView.RowFilter = "";
-            dView.Sort = "Number_Of_IMPs_Lower ASC";
-            editVPScaleDataGridView.DataSource = dView;
+            string vpScaleMaximum = (m_swissTeamEventInfo.VPScale == VPScaleOptions.BFI_30VP_Scale)?"30":"20";
+
+                int numberOfBoards = m_swissTeamEventInfo.NumberOfBoardsPerRound;
+                string query = " WHERE VP_Scale="+vpScaleMaximum+" AND Number_Of_Boards_Lower<=" + numberOfBoards + " AND Number_Of_Boards_Upper>=" + numberOfBoards;
+                DataTable table = AccessDatabaseUtilities.loadDatabaseToTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale, query);
+                DataView dView = new DataView(table);
+                dView.RowFilter = "";
+                dView.Sort = "Number_Of_IMPs_Lower ASC";
+                editVPScaleDataGridView.DataSource = dView;
         }
 
         private void loadDatabases()
@@ -175,8 +178,8 @@ namespace IndianBridgeScorer
             fields.Add(new DatabaseField("Team_2_Number", "INTEGER"));
             fields.Add(new DatabaseField("Team_1_IMPs", "NUMBER"));
             fields.Add(new DatabaseField("Team_2_IMPs", "NUMBER"));
-            fields.Add(new DatabaseField("Team_1_VPs", "NUMBER"));
-            fields.Add(new DatabaseField("Team_2_VPs", "NUMBER"));
+            fields.Add(new DatabaseField("Team_1_VPs", "DECIMAL"));
+            fields.Add(new DatabaseField("Team_2_VPs", "DECIMAL"));
             fields.Add(new DatabaseField("Team_1_VP_Adjustment", "NUMBER"));
             fields.Add(new DatabaseField("Team_2_VP_Adjustment", "NUMBER"));
             List<string> primaryKeys = new List<string>();
@@ -559,7 +562,7 @@ namespace IndianBridgeScorer
             m_swissTeamScoringProgressParameters.DrawsCompleted = value;
             populateComboboxes();
             updateComboboxes();
-            mainControlTab.SelectedTab = mainControlTab.TabPages["printDrawTab"];
+            mainControlTab.SelectedTab = mainControlTab.TabPages["printDrawTab"]; 
             m_swissTeamPrintDrawParameters.DrawForRound = value;
             printDrawPropertyGrid.Refresh();
             generateDrawHtml();
@@ -690,6 +693,8 @@ namespace IndianBridgeScorer
             dView.RowFilter = "Round_Number = " + selectedRound + " AND Table_Number <= " + numberOfMatches;
             dView.Sort = "Table_Number ASC";
             scoresDataGridView.DataSource = dView;
+            //scoresDataGridView.Columns["Team_1_VPs"].DefaultCellStyle.Format = "N2";
+            //scoresDataGridView.Columns["Team_2_VPs"].DefaultCellStyle.Format = "N2";
         }
 
         private void scoresDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -734,8 +739,8 @@ namespace IndianBridgeScorer
             DataTable table = AccessDatabaseUtilities.getDataTable(Path.Combine(Directory.GetCurrentDirectory(), "Databases", Constants.TableName.VPScale + ".mdb"), Constants.TableName.VPScale);
             DataRow[] dRows = table.Select("Number_Of_IMPs_Lower<=" + absoluteDifference + " AND Number_Of_IMPs_Upper>=" + absoluteDifference);
             Debug.Assert(dRows.Length == 1, "There should be exactly one row in VP Scale for given number of imps");
-            int team1VPs = (difference >= 0) ? (int)dRows[0]["Team_1_VPs"] : (int)dRows[0]["Team_2_VPs"];
-            int team2VPs = (difference < 0) ? (int)dRows[0]["Team_1_VPs"] : (int)dRows[0]["Team_2_VPs"];
+            double team1VPs = (difference >= 0) ? (double)dRows[0]["Team_1_VPs"] : (double)dRows[0]["Team_2_VPs"];
+            double team2VPs = (difference < 0) ? (double)dRows[0]["Team_1_VPs"] : (double)dRows[0]["Team_2_VPs"];
             scoresDataGridView.Rows[rowNumber].Cells["Team_1_VPs"].Value = team1VPs;
             scoresDataGridView.Rows[rowNumber].Cells["Team_2_VPs"].Value = team2VPs;
         }
@@ -743,21 +748,29 @@ namespace IndianBridgeScorer
         private bool calculateComplementaryVPs(int rowNumber, string columnName)
         {
             string otherColumnName = (columnName == "Team_1_VPs") ? "Team_2_VPs" : "Team_1_VPs";
-            double vps = (double)scoresDataGridView.Rows[rowNumber].Cells[columnName].Value;
-            if (vps < 0 || vps > 25)
+            decimal vps = (decimal)scoresDataGridView.Rows[rowNumber].Cells[columnName].Value;
+            decimal maxVPs = (m_swissTeamEventInfo.VPScale == VPScaleOptions.BFI_30VP_Scale) ? 25 : 20;
+            if (vps < 0 || vps > maxVPs)
             {
-                MessageBox.Show(columnName + " is not between 0 and 25", "Not in Range!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(columnName + " is not between 0 and "+maxVPs, "Not in Range!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             Object otherCell = scoresDataGridView.Rows[rowNumber].Cells[otherColumnName].Value;
-            double otherValue;
-            if (vps == 25 && otherCell != DBNull.Value)
+            decimal otherValue;
+            if (m_swissTeamEventInfo.VPScale == VPScaleOptions.BFI_30VP_Scale)
             {
-                otherValue = (double)otherCell;
-                if (otherValue <= 5) return true;
+                if (vps == 25 && otherCell != DBNull.Value)
+                {
+                    otherValue = (decimal)otherCell;
+                    if (otherValue <= 5) return true;
+                }
+                otherValue = 30 - vps;
+                if (otherValue > 25) otherValue = 25;
             }
-            otherValue = 30 - vps;
-            if (otherValue > 25) otherValue = 25;
+            else
+            {
+                otherValue = 20 - vps;
+            }
             scoresDataGridView.Rows[rowNumber].Cells[otherColumnName].Value = otherValue;
             return true;
         }

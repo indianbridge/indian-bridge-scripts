@@ -21,6 +21,11 @@ namespace IndianBridgeScorer
         Quotient,
         TeamNumber
     };
+    public enum VPScaleOptions
+    {
+        WBF_20VP_Scale,
+        BFI_30VP_Scale
+    };
 
     public class KnockoutSessions
     {
@@ -809,6 +814,7 @@ namespace IndianBridgeScorer
         private int numberOfRounds = 0;
         private int numberOfBoardsPerRound = 0;
         private int numberOfQualifiers = 0;
+        private VPScaleOptions vpScale = VPScaleOptions.WBF_20VP_Scale;
         private bool m_autoSave = false;
 
         [BrowsableAttribute(false)]
@@ -840,6 +846,7 @@ namespace IndianBridgeScorer
             fields.Add(new NiniField(Constants.NumberOfRoundsFieldName, "Integer", "0", ""));
             fields.Add(new NiniField(Constants.NumberOfBoardsFieldName, "Integer", "0", ""));
             fields.Add(new NiniField(Constants.NumberOfQualifiersFieldName, "Integer", "0", ""));
+            fields.Add(new NiniField(Constants.VPScaleFieldName,"List",VPScaleOptions.WBF_20VP_Scale.ToString(),string.Join(",",Enum.GetNames(typeof(VPScaleOptions)))));
             NiniUtilities.createNiniFile(m_niniFileName, fields);
         }
 
@@ -857,8 +864,22 @@ namespace IndianBridgeScorer
             numberOfRounds = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfRoundsFieldName);
             numberOfBoardsPerRound = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfBoardsFieldName);
             numberOfQualifiers = NiniUtilities.getIntValue(m_niniFileName, Constants.NumberOfQualifiersFieldName);
+            string vpScaleString = NiniUtilities.getStringValue(m_niniFileName, Constants.VPScaleFieldName, VPScaleOptions.BFI_30VP_Scale.ToString(), string.Join(",", Enum.GetNames(typeof(VPScaleOptions))));
+            if (string.IsNullOrWhiteSpace(vpScaleString)) vpScale = VPScaleOptions.BFI_30VP_Scale;
+            else vpScale = (VPScaleOptions)Enum.Parse(typeof(VPScaleOptions), vpScaleString, true);
             previousNumberOfRounds = numberOfRounds;
             previousNumberOfTeams = numberOfTeams;
+        }
+
+        [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Teams in the Swiss League")]
+        public VPScaleOptions VPScale
+        {
+            get { return vpScale; }
+            set
+            {
+                vpScale = value;
+                NiniUtilities.setValue(m_niniFileName, Constants.VPScaleFieldName, vpScale.ToString(), m_autoSave);
+            }
         }
 
         [CategoryAttribute("Swiss Team Event Setup Parameters"), DescriptionAttribute("Number of Teams in the Swiss League")]

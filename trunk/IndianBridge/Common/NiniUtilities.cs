@@ -176,43 +176,43 @@ namespace IndianBridge.Common
 
         public static string getStringValue(string fileName, string parameterName)
         {
-            return getStringValue(fileName, parameterName, "");
+            return getStringValue(fileName, parameterName,"");
         }
 
-        private static void checkParameter<T>(string fileName, string parameterName, T defaultValue)
+        private static void checkParameter<T>(string fileName, string parameterName, string parameterType, T defaultValue, string source = "")
         {
-            IniConfigSource source = m_niniFiles[fileName];
-            if (source.Configs[parameterName] == null)
+            IniConfigSource configSource = m_niniFiles[fileName];
+            if (configSource.Configs[parameterName] == null)
             {
-                IConfig config = source.AddConfig(parameterName);
-                config.Set("Type", "Integer");
+                IConfig config = configSource.AddConfig(parameterName);
+                config.Set("Type", parameterType);
                 config.Set("Value", defaultValue);
-                config.Set("Source", "");
-                source.Save();
+                config.Set("Source", source);
+                configSource.Save();
             }
         }
 
         public static int getIntValue(string fileName, string parameterName, int defaultValue)
         {
-            checkParameter(fileName, parameterName, defaultValue);
+            checkParameter(fileName, parameterName, "Integer", defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetInt("Value", defaultValue);
         }
 
         public static double getDoubleValue(string fileName, string parameterName, double defaultValue)
         {
-            checkParameter(fileName, parameterName, defaultValue);
+            checkParameter(fileName, parameterName, "Number",defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetDouble("Value", defaultValue);
         }
 
         public static bool getBooleanValue(string fileName, string parameterName, bool defaultValue)
         {
-            checkParameter(fileName, parameterName, defaultValue);
+            checkParameter(fileName, parameterName,"Boolean", defaultValue);
             return m_niniFiles[fileName].Configs[parameterName].GetBoolean("Value", defaultValue);
         }
 
-        public static string getStringValue(string fileName, string parameterName, string defaultValue)
+        public static string getStringValue(string fileName, string parameterName, string defaultValue, string source = "")
         {
-            checkParameter(fileName, parameterName, defaultValue);
+            checkParameter(fileName, parameterName, string.IsNullOrWhiteSpace(source)?"String":"List",defaultValue,source);
             return m_niniFiles[fileName].Configs[parameterName].GetString("Value", defaultValue);
         }
 
