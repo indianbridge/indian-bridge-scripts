@@ -100,6 +100,7 @@ namespace IndianBridgeScorer
         public static string NumberOfRoundsFieldName = "Number_Of_Rounds";
         public static string NumberOfBoardsFieldName = "Number_Of_Boards";
         public static string NumberOfQualifiersFieldName = "Number_Of_Qualifiers";
+        public static string VPScaleFieldName = "VP_Scale";
         public static string DrawsCompletedFieldName = "Draws_Completed";
         public static string RoundsCompletedFieldName = "Rounds_Completed";
         public static string RoundsScoredFieldName = "Rounds_Scored";
