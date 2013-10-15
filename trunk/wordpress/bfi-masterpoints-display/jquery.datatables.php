@@ -1,5 +1,9 @@
 <?php
-$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>"bfi_","db_user"=>"bfinem7l_sriram","db_password"=>"kibitzer","db_name"=>"");
+$wpconfig = '..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'wp-config.php';
+foreach (explode(PHP_EOL, file_get_contents($wpconfig)) as $line) {
+	if (preg_match('/define.+?DB_|table_prefix/', $line))	eval($line);
+}
+$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>"bfi_");
 foreach($params as $paramName=>$value) {
 	if (isset( $_GET[$paramName]) && !empty($_GET[$paramName])) { 
 		$params[$paramName] = $_GET[$paramName];
@@ -8,8 +12,6 @@ foreach($params as $paramName=>$value) {
 $member_id = $params['member_id'];
 $tableType = $params['BFI_Table_Type'];
 $table_prefix = $params['table_prefix'];
-//$table_prefix = "bfi_";
-
 
 switch ($tableType) {
 	case "leaderboard":
@@ -25,28 +27,16 @@ switch ($tableType) {
 		doLookupMemberID();
 		break;
 }
-/*if ($params['BFI_Table_Type'] == 'leaderboard' || $member_id == '') {
-	doLeaderboard();
-}
-else if ($params['BFI_Table_Type'] == 'mymasterpoint') {
-	doMyMasterpoint();
-}
-else if ($params['BFI_Table_Type'] == 'tournamentlist') {
-	doTournamentList();
-}
-else if ($params['BFI_Table_Type'] == 'allmasterpoint') {
-	doAllMasterpoint();
-}*/
+
 
 function connectToDB() {
 	
 	/* Database connection information */
 	global $params;	
-	$gaSql['user']       = $params['db_user'];
-	$gaSql['password']   = $params['db_password'];
-	$gaSql['db']         = $params['db_name'];
-	$gaSql['server']     = "localhost";
-	
+	$gaSql['user']       = DB_USER;
+	$gaSql['password']   = DB_PASSWORD;
+	$gaSql['db']         = DB_NAME;
+	$gaSql['server']     = DB_HOST;
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * If you just want to use the basic configuration for DataTables with PHP server-side, there is
@@ -224,11 +214,6 @@ function doLeaderboard() {
 	$sOrder = getOrder($aColumns);
 	
 	$sWhere = getWhere("", $aColumns);
-	/*$sWhereSearch = doSearch($aColumns);
-	$sWhere = "";
-	if($sWhereSearch != "") {
-		$sWhere .= " WHERE ".$sWhereSearch;
-	}*/
 	$sJoin = "";
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ";
@@ -273,11 +258,6 @@ function doAllMasterpoint() {
 	
 	//Filtering
 	$sWhere = getWhere("", $aColumns);
-	/*$sWhereSearch = doSearch($aColumns);
-	$sWhere = "";
-	if($sWhereSearch != "") {
-		$sWhere .= " WHERE ".$sWhereSearch;
-	}*/
 	
 	//Join
 	$sJoin = "";
@@ -324,12 +304,6 @@ function doMyMasterpoint() {
 	
 	//Filtering
 	$sWhere = getWhere("member_id = '".$member_id."'", $aColumns);
-	/*$sWhereSearch = doSearch($aColumns);
-	$sWhere = "WHERE (member_id = '".$member_id."'";
-	if($sWhereSearch != "") {
-		$sWhere .= " AND ".$sWhereSearch;
-	}
-	$sWhere .= ")";*/
 	
 	//Join
 	$sJoin = "";

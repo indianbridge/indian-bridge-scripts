@@ -62,17 +62,8 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 				"name" : "member_id",
 				"value" : member_id
 			});
-			aoData.push({
-				"name" : "db_name",
-				"value" : db_name
-			});
 		},
 		"sAjaxSource" : server_side_url
 	});
 
-	/*jQuery('#bfi_masterpoints_table').on('click', 'tr', function(event) {
-		var id = myTable.fnGetData(this)[0];
-		alert('Sriram');
-		alert(id);
-	});*/
 }
