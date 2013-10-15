@@ -19,7 +19,58 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 	class BFI_Post_Results {
 		
 		public function __construct() {
+			$dataGridName = "datatables";
+
+			$jsFilePath = 'js/jquery.' . $dataGridName . '.min.js';
+			$cssFilePath = 'css/jquery.' . $dataGridName . '.css';
+			$jsIdentifier = 'jquery_' . $dataGridName . '_js';
+			$cssIdentifier = 'jquery_' . $dataGridName . '_css';
+
+			// register the javascript
+			//wp_register_script($jsIdentifier, plugins_url($jsFilePath, __FILE__), array('jquery'));
+			//wp_enqueue_script($jsIdentifier);
+
+			// Register bfi master point javascript
+			wp_register_script('bfi_post_results', plugins_url('bfi_post_results.js', __FILE__), array('jquery'));
+			wp_enqueue_script('bfi_post_results');
+
+			// register the css
+			//wp_register_style($cssIdentifier, plugins_url('css/jquery.datatables_themeroller.css', __FILE__));
+			//wp_enqueue_style($cssIdentifier);
+			//wp_register_style('jquery_dataTables_redmond_css', plugins_url('css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__));
+			//wp_enqueue_style('jquery_dataTables_redmond_css');
+			
+			add_shortcode('bfi_results_display', array($this, 'bfi_results_display'));			
 			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
+		}
+
+		/**
+		 * Replace shortcode with posts
+		 */
+		function bfi_results_display($atts, $content = null) {
+			ob_start();
+			echo '<h1>You have to be a member of BFI and be logged in to see Masterpoint Summary and Details</h1>';
+			$tabs = array('lookupmemberid' => 'Find Your BFI Member ID', 'leaderboard' => "Masterpoint Leaderboard");
+			$selectedTab = 'lookupmemberid';
+			$html = "";
+			$html .= '<div class="tabber-widget-default">';
+			$html .= '<ul class="tabber-widget-tabs">';
+			$tabIDPrefix = 'masterpoint_page_tab_';
+			foreach ($tabs as $tab => $tabName) {
+				$html .= '<li><a id="' . $tabIDPrefix . $tab . '" onclick="switchResultsTab(\'' . $tab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.results_display.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');" href="javascript:void(0)">' . $tabName . '</a></li>';
+			}
+			$html .= '</ul>';
+			$html .= '<div class="tabber-widget-content">';
+			$html .= '<div class="tabber-widget">';
+			$html .= '<div id="bfi_masterpoints_table_container">';
+			$html .= '</div></div></div></div>';
+			$html .= '<script type="text/javascript">';
+			$html .= 'switchResultsTab(\'' . $selectedTab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.results_display.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');';
+			$html .= '</script>';
+			echo $html;			
+			//echo $this -> getMasterpointTabs($tabs, $selectedTab, '');
+			$out = ob_get_clean();
+			return $out;					
 		}
 		
 		
