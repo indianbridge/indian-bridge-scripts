@@ -12,6 +12,8 @@ using Microsoft.VisualBasic;
 using IndianBridge.GoogleAPIs;
 using IndianBridge.Common;
 using System.IO;
+using System.Net;
+using FtpLib;
 
 namespace IndianBridge
 {
@@ -23,42 +25,27 @@ namespace IndianBridge
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs ea)
         {
-            this.Enabled = false;
-            this.Opacity = 0.75;
-            LoadingEvents le = new LoadingEvents();
-            le.StartPosition = FormStartPosition.CenterParent;
-            le.ShowDialog();
-            this.Enabled = true;
-            this.Opacity = 1;
-            /*if (folderBrowserDialog1.ShowDialog() != DialogResult.Cancel)
+            string _remoteHost = "ftp.bfi.net.in";
+            string _remoteUser = "bfi@bfi.net.in";
+            string _remotePass = "bfi";
+            string source = @"C:\Users\snarasim\Downloads\test.pdf";
+            string destination = "/test.pdf";
+            using (FtpConnection ftp = new FtpConnection(_remoteHost, _remoteUser, _remotePass))
             {
-                DocsAPI da = new DocsAPI("indianbridge.dummy@gmail.com","kibitzer");
-                Dictionary<string, string> fileFilters = new Dictionary<string, string>();
-                fileFilters.Add(".ini", "text/plain");
-                fileFilters.Add(".mdb", "application/msaccess");
-                //da.downloadGoogleDocsToDirectory(Path.Combine("Indian Bridge Scorer", "Tourneys", "Test_2012_10_02"), folderBrowserDialog1.SelectedPath, fileFilters);
-                m_cbw = new CustomBackgroundWorker("Upload Google Docs", da.DownloadGoogleDocsToDirectoryInBackground, uploadCompleted, operationStatus,
-                        operationProgressBar, operationCancelButton, null);
-                Tuple<string, string, Dictionary<string, string>> values = new Tuple<string, string, Dictionary<string, string>>(Path.Combine("Indian Bridge Scorer", "Tourneys", "Test_2012_10_02"), folderBrowserDialog1.SelectedPath, fileFilters);
-                m_cbw.run(values);
-            }*/
-
-        }
-
-        private void uploadCompleted(bool success)
-        {
-            MessageBox.Show("Done");
-        }
-
-        private string getMimeType(string fileName)
-        {
-            string fileExtension = System.IO.Path.GetExtension(fileName).ToLower();
-            Microsoft.Win32.RegistryKey rk = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileExtension);
-            if (rk != null && rk.GetValue("Content Type") != null)
-                return rk.GetValue("Content Type").ToString();
-            return null;
+                try
+                {
+                    ftp.Open(); // Open the FTP connection 
+                    ftp.Login(); // Login using previously provided credentials
+                    ftp.PutFile(source, destination);
+                    MessageBox.Show("Done");
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+            }
         }
     }
 }
