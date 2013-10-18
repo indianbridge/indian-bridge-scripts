@@ -103,11 +103,22 @@ namespace IndianBridge.Common
 			return result == DialogResult.Yes;
 		}
 
+        public static Dictionary<string, string> convertJsonOutput(string json_result)
+        {
+            string jsonDelimiter = "!@#";
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            string[] lines = json_result.Split(new string[] { jsonDelimiter }, StringSplitOptions.None);
+            result["error"] = lines[0];
+            result["message"] = lines[1];
+            result["content"] = lines[2];
+            return result;
+        }
+
         public static string getNewLineCharacter(string message)
         {
-            string splitter = Environment.NewLine;
+            string splitter = "\r\n";
             if (message.Contains(splitter)) return splitter;
-            splitter = "\r\n";
+            splitter = Environment.NewLine;
             if (message.Contains(splitter)) return splitter;
             return "\n";
         }
@@ -407,7 +418,7 @@ namespace IndianBridge.Common
 		}
 		public static string[] GetColumns(string headerLine)
 		{
-			string[] columnNames = headerLine.Split(new char[] { ',' });
+			string[] columnNames = headerLine.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < columnNames.Length; ++i)
             {
                 columnNames[i] = columnNames[i].Replace("\n", String.Empty);

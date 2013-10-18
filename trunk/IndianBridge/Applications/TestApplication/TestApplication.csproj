@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Excel">
+      <HintPath>..\..\ExternalAssemblies\Excel.dll</HintPath>
+    </Reference>
     <Reference Include="ftplib">
       <HintPath>..\..\ExternalAssemblies\ftplib.dll</HintPath>
     </Reference>
