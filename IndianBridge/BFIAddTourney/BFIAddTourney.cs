@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using WordpressAPIs;
 using System.Web.Script.Serialization;
+using IndianBridge.Common;
 
 namespace BFIAddTourney
 {
@@ -85,8 +86,7 @@ namespace BFIAddTourney
                 tourneyInfo.tourneyYear = Convert.ToInt32(tourneyYearCombobox.Text);
                 tourneyInfo.tourneyPages = pageNames;
                 string json_result = addTourneys.addTourney(tourneyInfo);
-                var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
-                Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
+                Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
                 bool errorStatus = Convert.ToBoolean(result["error"]);
                 if (errorStatus) {
                     MessageBox.Show("Errors when adding tourney : "+Environment.NewLine+result["message"],"Errors!",MessageBoxButtons.OK,MessageBoxIcon.Error);

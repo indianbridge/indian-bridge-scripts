@@ -90,6 +90,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{1C337ECB-18C4-4F1E-8557-C29696777EC6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WordpressAPIs\WordpressAPIs.csproj">
       <Project>{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}</Project>
       <Name>WordpressAPIs</Name>

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using IndianBridge.WordpressAPIs;
 using System.Web.Script.Serialization;
+using IndianBridge.Common;
 
 namespace BFIMasterpointManagement
 {
@@ -48,8 +49,7 @@ namespace BFIMasterpointManagement
             tournamentLevelInfo.description = descriptionTextbox.Text;
             tournamentLevelInfo.tournament_type = typeTextbox.Text;
             string json_result = m_mm.addTournamentLevel(tournamentLevelInfo);
-            var serializer = new JavaScriptSerializer(); //using System.Web.Script.Serialization;
-            Dictionary<string, string> result = serializer.Deserialize<Dictionary<string, string>>(json_result);
+            Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
