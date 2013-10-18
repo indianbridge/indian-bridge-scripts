@@ -17,7 +17,7 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 	
 
 	class BFI_Post_Results {
-		
+		private $jsonDelimiter;
 		public function __construct() {
 			$dataGridName = "datatables";
 
@@ -42,6 +42,8 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 			
 			add_shortcode('bfi_results_display', array($this, 'bfi_results_display'));			
 			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
+			
+			$this->jsonDelimiter = "!@#";
 		}
 
 		/**
@@ -135,17 +137,34 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 			return $this->createSuccessMessage('Success',$content);
 		}
 
-		public function createMessage($error,$message,$content) {
-			$return_value = array("error"=>$error,"message"=>__($message),"content"=>$content);
-			return json_encode($return_value);
+		public function hasError($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return filter_var($lines[0], FILTER_VALIDATE_BOOLEAN);
+		}
+		
+		public function getMessage($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return $lines[1];
+		}
+		
+		public function getContent($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return $lines[2];			
 		}
 
-		public function createErrorMessage($message, $content='') {
-			return $this->createMessage("true",$message,$content);
+		public function createMessage($error, $message, $content) {
+			$lines[] = $error;
+			$lines[] = $message;
+			$lines[] = $content;
+			return implode($this->jsonDelimiter, $lines);
 		}
 
-		public function createSuccessMessage($message,$content='') {
-			return $this->createMessage("false",$message,$content);
+		public function createErrorMessage($message, $content = '') {
+			return $this -> createMessage("true", $message, $content);
+		}
+
+		public function createSuccessMessage($message, $content = '') {
+			return $this -> createMessage("false", $message, $content);
 		}
 		
 		public function bfi_addTourney($params) {
