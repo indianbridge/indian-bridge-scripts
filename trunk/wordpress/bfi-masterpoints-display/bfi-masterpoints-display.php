@@ -23,6 +23,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		private $table_prefix;
 		private $custom_admin_bar_css;
 		private $custom_user_profile;
+		private $jsonDelimiter;
 		public function __construct() {
 			$dataGridName = "datatables";
 
@@ -62,8 +63,10 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 
 			// Customize the admin bar
 			$this -> custom_admin_bar_css = new BFI_Custom_Admin_Bar();
-
-			$this -> errorFlag = false;
+			
+			// Some constants
+			$this -> errorFlag = false;	
+			$this->jsonDelimiter = "!@#";
 		}
 
 		public function add_masterpoint_admin_bar($wp_admin_bar) {
@@ -127,10 +130,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		}
 
 		public function add_xml_rpc_methods($methods) {
-			//$methods['bfi.getTableCount'] = array($this,'bfi_getTableCount');
 			$methods['bfi.getTableData'] = array($this, 'bfi_getTableData');
-			//$methods['bfi.addTableData'] = array($this,'bfi_addTableData');
-			//$methods['bfi.removeTableData'] = array($this,'bfi_removeTableData');
 			$methods['bfi.validateMasterpointCredentials'] = array($this, 'bfi_checkManageMasterpointCredentials');
 			$methods['bfi.addTournamentLevel'] = array($this, 'bfi_addTournamentLevel');
 			$methods['bfi.addTournament'] = array($this, 'bfi_addTournament');
@@ -139,10 +139,27 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			$methods['bfi.addMasterpoints'] = array($this, 'bfi_addMasterpoints');
 			return $methods;
 		}
+		
+		public function hasError($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return filter_var($lines[0], FILTER_VALIDATE_BOOLEAN);
+		}
+		
+		public function getMessage($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return $lines[1];
+		}
+		
+		public function getContent($message) {
+			$lines = explode($this->jsonDelimiter, $message);
+			return $lines[2];			
+		}
 
 		public function createMessage($error, $message, $content) {
-			$return_value = array("error" => $error, "message" => $message, "content" => $content);
-			return json_encode($return_value);
+			$lines[] = $error;
+			$lines[] = $message;
+			$lines[] = $content;
+			return implode($this->jsonDelimiter, $lines);
 		}
 
 		public function createErrorMessage($message, $content = '') {
@@ -182,17 +199,16 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		public function bfi_getTableData($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result -> error, FILTER_VALIDATE_BOOLEAN);
+			$error_flag = $this->hasError($return_string);
 			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
-			$tableInfo = array("tableName" => "", "content" => "", "delimiter" => ",", "where" => "", "orderBy" => "", "limit" => "");
+			$tableInfo = array("tableName" => "", "content" => "", "delimiter" => $this->jsonDelimiter, "where" => "", "orderBy" => "", "limit" => "");
 			foreach ($tableInfo as $indexName => $value) {
 				if (!empty($args[$indexName]))
 					$tableInfo[$indexName] = $args[$indexName];
@@ -232,13 +248,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		public function bfi_addTournamentLevel($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result -> error, FILTER_VALIDATE_BOOLEAN);
+			$error_flag = $this->hasError($return_string);
 			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
@@ -289,13 +304,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		public function bfi_addTournament($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result -> error, FILTER_VALIDATE_BOOLEAN);
+			$error_flag = $this->hasError($return_string);
 			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
@@ -352,13 +366,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		public function bfi_addEvent($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result -> error, FILTER_VALIDATE_BOOLEAN);
+			$error_flag = $this->hasError($return_string);
 			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
@@ -404,13 +417,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		public function bfi_addMasterpoints($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result -> error, FILTER_VALIDATE_BOOLEAN);
+			$error_flag = $this->hasError($return_string);
 			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
@@ -457,13 +469,13 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 							$values[$fieldName] = $fields[$fieldIndex];
 						}
 						$temp_string = $this -> bfi_addMasterpoint($values);
-						return $temp_string;
-						$result = json_decode($temp_string_string, true);
-						$errorFlag = $errorFlag | $result -> error;
-						if ($result -> error) {
+						$temp_error_flag = $this->hasError($temp_string);
+						
+						$errorFlag = $errorFlag | $temp_error_flag;
+						if ($temp_error_flag) {
 							$return_message = "Errors found!";
 						}
-						$return_string .= $result -> message . PHP_EOL;
+						$return_string .= $this->getMessage($temp_string) . PHP_EOL;
 					}
 				}
 			}
@@ -530,18 +542,19 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			if (false === $results) {
 				return $this -> createErrorMessage('Error trying to update ' . $tableName . ' for member_id : ' . $member_id . ' with local points : ' . $localpoints_earned . ' and fed points : ' . $fedpoints_earned . ' because : ' . $this -> bfi_masterpoint_db -> last_error);
 			}
-			return $this -> createSuccessMessage('Successfully inserted into masterpoint table and updated ' . $results . ' rows in member table for member id : ' . $member_id . ' with local points : ' . $localpoints_earned . ' and fed points : ' . $fedpoints_earned);
+			return $this -> createSuccessMessage('Successfully inserted into masterpoint table for member id : ' . $member_id . ' with local points : ' . $args['localpoints_earned'] . ' and fed points : ' . $args['fedpoints_earned']);
 		}
 
 		public function bfi_addUsers($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			$result = json_decode($return_string, true);
-			if ($result -> error)
+			
+			$error_flag = $this->hasError($return_string);
+			if ($error_flag)
 				return $return_string;
 
-			do_action('xmlrpc_call', __FUNCTION__);
 			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
 
 			// Parse the parameters
 			$args = $params[3];
@@ -598,13 +611,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 							$masterpointdata['localpoints_earned'] = empty($values['total_current_lp']) ? 0 : $values['total_current_lp'];
 							$masterpointdata['fedpoints_earned'] = empty($values['total_current_fp']) ? 0 : $values['total_current_fp'];
 							$temp_string = $this -> bfi_addMasterpoint($masterpointdata);
-							$result = json_decode($temp_string_string, true);
-							$errorFlag = $errorFlag | $result -> error;
+							$temp_error_flag = $this->hasError($temp_string);
+							$errorFlag = $errorFlag | $temp_error_flag;
 							if ($result -> error) {
 								$return_message = "Errors found!";
 							}
-							$return_string .= $result -> message . PHP_EOL;
-							//$return_string .= $this->bfi_addMasterpoint($masterpointdata);
+							$return_string .= $result -> message;
 							$userdata = array();
 							$userdata['user_login'] = $values['member_id'];
 							$userdata['user_pass'] = 'bridge';
@@ -637,16 +649,18 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			} else {
 				return $this -> createSuccessMessage($return_message, $return_string);
 			}
-			//return $return_string;
 		}
 
 		public function bfi_getTableCount($params) {
 			$this -> errorFlag = false;
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
-			do_action('xmlrpc_call', __FUNCTION__);
-			// patterned on the core XML-RPC actions
 			if ($errorFlag == true)
 				return return_string;
+			
+			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
+			
+			
 			$args = $params[3];
 			// required parameters
 			$tableInfo = array("tableName" => "", "content" => "", "delimiter" => "", "where" => "", "orderBy" => "", "limit" => "");
