@@ -14,6 +14,7 @@
 
 require_once (plugin_dir_path(__FILE__) . 'includes' . DIRECTORY_SEPARATOR . 'custom_admin_bar_css.php');
 require_once (plugin_dir_path(__FILE__) . 'includes' . DIRECTORY_SEPARATOR . 'custom_user_profile.php');
+require_once( ABSPATH . '/wp-admin/includes/user.php');
 
 if (!class_exists('BFI_Masterpoint_Display')) {
 
@@ -136,6 +137,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			$methods['bfi.addTournament'] = array($this, 'bfi_addTournament');
 			$methods['bfi.addEvent'] = array($this, 'bfi_addEvent');
 			$methods['bfi.addUsers'] = array($this, 'bfi_addUsers');
+			$methods['bfi.deleteUsers'] = array($this, 'bfi_deleteUsers');
 			$methods['bfi.addMasterpoints'] = array($this, 'bfi_addMasterpoints');
 			return $methods;
 		}
@@ -474,8 +476,9 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 						$errorFlag = $errorFlag | $temp_error_flag;
 						if ($temp_error_flag) {
 							$return_message = "Errors found!";
+							$return_string .= $this->getMessage($temp_string) . PHP_EOL;
 						}
-						$return_string .= $this->getMessage($temp_string) . PHP_EOL;
+						//$return_string .= $this->getMessage($temp_string) . PHP_EOL;
 					}
 				}
 			}
@@ -542,8 +545,91 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			if (false === $results) {
 				return $this -> createErrorMessage('Error trying to update ' . $tableName . ' for member_id : ' . $member_id . ' with local points : ' . $localpoints_earned . ' and fed points : ' . $fedpoints_earned . ' because : ' . $this -> bfi_masterpoint_db -> last_error);
 			}
-			return $this -> createSuccessMessage('Successfully inserted into masterpoint table for member id : ' . $member_id . ' with local points : ' . $args['localpoints_earned'] . ' and fed points : ' . $args['fedpoints_earned']);
+			return $this -> createSuccessMessage('');
+			//return $this -> createSuccessMessage('Successfully inserted into masterpoint table for member id : ' . $member_id . ' with local points : ' . $args['localpoints_earned'] . ' and fed points : ' . $args['fedpoints_earned']);
 		}
+		
+		public function bfi_deleteUsers($params) {
+			// Check credentials first
+			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);
+			
+			$error_flag = $this->hasError($return_string);
+			if ($error_flag)
+				return $return_string;
+
+			// patterned on the core XML-RPC actions
+			do_action('xmlrpc_call', __FUNCTION__);
+
+			// Parse the parameters
+			$args = $params[3];
+			$tableInfo = array("content" => "");
+			foreach ($tableInfo as $indexName => $value) {
+				if (!empty($args[$indexName]))
+					$tableInfo[$indexName] = $args[$indexName];
+				else
+					return $this -> createErrorMessage("Missing parameter '$indexName'");
+			}
+
+			$errorFlag = false;
+			$return_message = "Success";
+			$return_string = "";
+			$content = $tableInfo['content'];
+			$lines = explode(chr(10), $content);
+			foreach ($lines as $index => $line) {
+				if ($index == 0) {
+					$fieldName = $line;
+					if ($fieldName !== "member_id") {
+						return $this -> createErrorMessage("deleteUsers: Missing field 'member_id'");
+					}
+				} else {
+					$member_id = $line;
+					
+					$reassign = 1;
+					$user = get_userdatabylogin($member_id);
+					$result = wp_delete_user($user->ID,$reassign);
+					//return (string)$result;
+					if (is_wp_error($result)) {
+						$errorFlag = true;
+						$return_message = "Errors found!";
+						$return_string .= 'Cannot delete user : ' . $member_id . ' because ' . $result -> get_error_message() . PHP_EOL;
+					}
+					else if (true !== $result) {
+						$errorFlag = true;
+						$return_message = "Errors found!";
+						$return_string .= 'Unknown Error trying to delete user ' . $member_id. PHP_EOL;						
+					}
+					else {
+						//$return_string .= "Successfully removed member $member_id from user database".PHP_EOL;
+					}
+					$tableName = $this -> table_prefix . "member";
+					$where = array('member_id'=>$member_id);
+					$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
+					if (false === $result) {
+						$errorFlag = true;
+						$return_message = "Errors found!";
+						$return_string .= 'Unknown Error trying to delete ' . $member_id . ' from ' . $tableName . PHP_EOL;
+					} 
+					else {
+						//$return_string .= "Successfully removed member $member_id from $tableName".PHP_EOL;
+					}
+					$tableName = $this -> table_prefix . "tournament_masterpoint";
+					$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
+					if (false === $result) {
+						$errorFlag = true;
+						$return_message = "Errors found!";
+						$return_string .= 'Unknown Error trying to delete ' . $member_id . ' from ' . $tableName . PHP_EOL;
+					} 	
+					else {
+						//$return_string .= "Successfully removed member $member_id from $tableName".PHP_EOL;
+					}
+				}
+			}
+			if ($errorFlag) {
+				return $this -> createErrorMessage($return_message, $return_string);
+			} else {
+				return $this -> createSuccessMessage($return_message, $return_string);
+			}
+		}		
 
 		public function bfi_addUsers($params) {
 			// Check credentials first
@@ -600,7 +686,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 							$return_message = "Errors found!";
 							$return_string .= 'Error trying to insert ' . $line . ' : ' . $this -> bfi_masterpoint_db -> last_error . PHP_EOL;
 						} else {
-							$return_string .= 'Successfully added member ' . $line . PHP_EOL;
+							//$return_string .= 'Successfully added member ' . $line . PHP_EOL;
 							// Add masterpoint data
 							$masterpointdata = array();
 							$masterpointdata['member_id'] = $values['member_id'];
@@ -638,7 +724,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 								$return_message = "Errors found!";
 								$return_string .= 'Cannot create user : ' . $userdata['user_login'] . ' because ' . $user_id -> get_error_message() . PHP_EOL;
 							} else {
-								$return_string .= 'Successfully created user : ' . $userdata['user_login'] . PHP_EOL;
+								//$return_string .= 'Successfully created user : ' . $userdata['user_login'] . PHP_EOL;
 							}
 						}
 					}
