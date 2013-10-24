@@ -76,8 +76,15 @@
     <Compile Include="BFIMasterpointManagement.Designer.cs">
       <DependentUpon>BFIMasterpointManagement.cs</DependentUpon>
     </Compile>
+    <Compile Include="MasterpointTableData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UploadProgress.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UploadProgress.Designer.cs">
+      <DependentUpon>UploadProgress.cs</DependentUpon>
+    </Compile>
     <Compile Include="ValidateMasterpointCredentials.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -107,6 +114,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="UploadProgress.resx">
+      <DependentUpon>UploadProgress.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ValidateMasterpointCredentials.resx">
       <DependentUpon>ValidateMasterpointCredentials.cs</DependentUpon>
     </EmbeddedResource>

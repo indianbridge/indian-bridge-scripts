@@ -56,6 +56,12 @@
             this.loadUsersButton = new System.Windows.Forms.Button();
             this.usersTextbox = new System.Windows.Forms.TextBox();
             this.uploadUsersButton = new System.Windows.Forms.Button();
+            this.deleteUsers = new System.Windows.Forms.TabPage();
+            this.splitContainer8 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer9 = new System.Windows.Forms.SplitContainer();
+            this.loadUsersToDeleteButton = new System.Windows.Forms.Button();
+            this.deleteUsersTextbox = new System.Windows.Forms.TextBox();
+            this.deleteUsersButton = new System.Windows.Forms.Button();
             this.addMasterpoints = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
@@ -99,6 +105,15 @@
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
+            this.deleteUsers.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).BeginInit();
+            this.splitContainer8.Panel1.SuspendLayout();
+            this.splitContainer8.Panel2.SuspendLayout();
+            this.splitContainer8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer9)).BeginInit();
+            this.splitContainer9.Panel1.SuspendLayout();
+            this.splitContainer9.Panel2.SuspendLayout();
+            this.splitContainer9.SuspendLayout();
             this.addMasterpoints.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
             this.splitContainer6.Panel1.SuspendLayout();
@@ -153,6 +168,7 @@
             this.controlTabs.Controls.Add(this.tournamentMaster);
             this.controlTabs.Controls.Add(this.eventMaster);
             this.controlTabs.Controls.Add(this.addUsers);
+            this.controlTabs.Controls.Add(this.deleteUsers);
             this.controlTabs.Controls.Add(this.addMasterpoints);
             this.controlTabs.Controls.Add(this.responseMessage);
             this.controlTabs.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -439,6 +455,7 @@
             // 
             this.uploadUsersButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.uploadUsersButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uploadUsersButton.Enabled = false;
             this.uploadUsersButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uploadUsersButton.Location = new System.Drawing.Point(0, 0);
             this.uploadUsersButton.Name = "uploadUsersButton";
@@ -446,7 +463,93 @@
             this.uploadUsersButton.TabIndex = 1;
             this.uploadUsersButton.Text = "Upload Users";
             this.uploadUsersButton.UseVisualStyleBackColor = false;
+            this.uploadUsersButton.Visible = false;
             this.uploadUsersButton.Click += new System.EventHandler(this.uploadUsersButton_Click);
+            // 
+            // deleteUsers
+            // 
+            this.deleteUsers.Controls.Add(this.splitContainer8);
+            this.deleteUsers.Location = new System.Drawing.Point(4, 22);
+            this.deleteUsers.Name = "deleteUsers";
+            this.deleteUsers.Padding = new System.Windows.Forms.Padding(3);
+            this.deleteUsers.Size = new System.Drawing.Size(883, 607);
+            this.deleteUsers.TabIndex = 6;
+            this.deleteUsers.Text = "Delete Users";
+            this.deleteUsers.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer8
+            // 
+            this.splitContainer8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer8.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer8.Name = "splitContainer8";
+            this.splitContainer8.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer8.Panel1
+            // 
+            this.splitContainer8.Panel1.Controls.Add(this.splitContainer9);
+            // 
+            // splitContainer8.Panel2
+            // 
+            this.splitContainer8.Panel2.Controls.Add(this.deleteUsersButton);
+            this.splitContainer8.Size = new System.Drawing.Size(877, 601);
+            this.splitContainer8.SplitterDistance = 484;
+            this.splitContainer8.TabIndex = 1;
+            // 
+            // splitContainer9
+            // 
+            this.splitContainer9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer9.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer9.Name = "splitContainer9";
+            this.splitContainer9.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer9.Panel1
+            // 
+            this.splitContainer9.Panel1.Controls.Add(this.loadUsersToDeleteButton);
+            // 
+            // splitContainer9.Panel2
+            // 
+            this.splitContainer9.Panel2.Controls.Add(this.deleteUsersTextbox);
+            this.splitContainer9.Size = new System.Drawing.Size(877, 484);
+            this.splitContainer9.SplitterDistance = 105;
+            this.splitContainer9.TabIndex = 0;
+            // 
+            // loadUsersToDeleteButton
+            // 
+            this.loadUsersToDeleteButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.loadUsersToDeleteButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loadUsersToDeleteButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadUsersToDeleteButton.Location = new System.Drawing.Point(0, 0);
+            this.loadUsersToDeleteButton.Name = "loadUsersToDeleteButton";
+            this.loadUsersToDeleteButton.Size = new System.Drawing.Size(877, 105);
+            this.loadUsersToDeleteButton.TabIndex = 2;
+            this.loadUsersToDeleteButton.Text = "Load Users to Delete from File";
+            this.loadUsersToDeleteButton.UseVisualStyleBackColor = false;
+            this.loadUsersToDeleteButton.Click += new System.EventHandler(this.loadUsersToDeleteButton_Click);
+            // 
+            // deleteUsersTextbox
+            // 
+            this.deleteUsersTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.deleteUsersTextbox.Location = new System.Drawing.Point(0, 0);
+            this.deleteUsersTextbox.Multiline = true;
+            this.deleteUsersTextbox.Name = "deleteUsersTextbox";
+            this.deleteUsersTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.deleteUsersTextbox.Size = new System.Drawing.Size(877, 375);
+            this.deleteUsersTextbox.TabIndex = 2;
+            // 
+            // deleteUsersButton
+            // 
+            this.deleteUsersButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.deleteUsersButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.deleteUsersButton.Enabled = false;
+            this.deleteUsersButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.deleteUsersButton.Location = new System.Drawing.Point(0, 0);
+            this.deleteUsersButton.Name = "deleteUsersButton";
+            this.deleteUsersButton.Size = new System.Drawing.Size(877, 113);
+            this.deleteUsersButton.TabIndex = 1;
+            this.deleteUsersButton.Text = "Delete Users";
+            this.deleteUsersButton.UseVisualStyleBackColor = false;
+            this.deleteUsersButton.Visible = false;
+            this.deleteUsersButton.Click += new System.EventHandler(this.deleteUsersButton_Click);
             // 
             // addMasterpoints
             // 
@@ -522,6 +625,7 @@
             // 
             this.uploadMasterpointsButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.uploadMasterpointsButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uploadMasterpointsButton.Enabled = false;
             this.uploadMasterpointsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.uploadMasterpointsButton.Location = new System.Drawing.Point(0, 0);
             this.uploadMasterpointsButton.Name = "uploadMasterpointsButton";
@@ -529,6 +633,7 @@
             this.uploadMasterpointsButton.TabIndex = 1;
             this.uploadMasterpointsButton.Text = "Upload Masterpoints";
             this.uploadMasterpointsButton.UseVisualStyleBackColor = false;
+            this.uploadMasterpointsButton.Visible = false;
             this.uploadMasterpointsButton.Click += new System.EventHandler(this.uploadMasterpointsButton_Click);
             // 
             // responseMessage
@@ -616,6 +721,16 @@
             this.splitContainer5.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
+            this.deleteUsers.ResumeLayout(false);
+            this.splitContainer8.Panel1.ResumeLayout(false);
+            this.splitContainer8.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).EndInit();
+            this.splitContainer8.ResumeLayout(false);
+            this.splitContainer9.Panel1.ResumeLayout(false);
+            this.splitContainer9.Panel2.ResumeLayout(false);
+            this.splitContainer9.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer9)).EndInit();
+            this.splitContainer9.ResumeLayout(false);
             this.addMasterpoints.ResumeLayout(false);
             this.splitContainer6.Panel1.ResumeLayout(false);
             this.splitContainer6.Panel2.ResumeLayout(false);
@@ -672,6 +787,12 @@
         private System.Windows.Forms.TabPage responseMessage;
         private System.Windows.Forms.TextBox statusMessageTextbox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabPage deleteUsers;
+        private System.Windows.Forms.SplitContainer splitContainer8;
+        private System.Windows.Forms.SplitContainer splitContainer9;
+        private System.Windows.Forms.Button loadUsersToDeleteButton;
+        private System.Windows.Forms.TextBox deleteUsersTextbox;
+        private System.Windows.Forms.Button deleteUsersButton;
     }
 }
 
