@@ -51,7 +51,24 @@ namespace IndianBridge
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (openExcelFileDialog.ShowDialog() != DialogResult.Cancel)
+            DataTable table = new DataTable();
+            DataColumn column = new DataColumn("Column1");
+            column.DataType = Type.GetType("System.String");
+            column.AllowDBNull = false;
+            table.Columns.Add(column);
+            column = new DataColumn("Column2");
+            column.DataType = Type.GetType("System.String");
+            column.AllowDBNull = false;
+            column.DefaultValue = "Default";
+            table.Columns.Add(column);
+            column = new DataColumn("Column3");
+            column.DataType = Type.GetType("System.String");
+            column.AllowDBNull = true;
+            table.Columns.Add(column);
+            DataRow row = table.NewRow();
+            //row["Column1"] = "Value1";
+            table.Rows.Add(row);
+            /*if (openExcelFileDialog.ShowDialog() != DialogResult.Cancel)
             {
                 string filePath = openExcelFileDialog.FileName;
                 FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read);
@@ -86,7 +103,7 @@ namespace IndianBridge
                 }
                 textBox1.Text = csvData;
                 MessageBox.Show("Parsed");
-            }
+            }*/
         }
     }
 }
