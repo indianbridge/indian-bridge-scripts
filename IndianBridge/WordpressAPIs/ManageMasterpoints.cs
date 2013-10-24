@@ -13,10 +13,6 @@ namespace IndianBridge.WordpressAPIs
         string validateMasterpointCredentials(int blogId, string username, string password);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.getTableData")]
         string getTableData(int blogId, string username, string password, TableInfo tableInfo);
-        /*[CookComputing.XmlRpc.XmlRpcMethod("bfi.addTableData")]
-        string addTableData(int blogId, string username, string password, TableInfo tableInfo);
-        [CookComputing.XmlRpc.XmlRpcMethod("bfi.removeTableData")]
-        string removeTableData(int blogId, string username, string password, TableInfo tableInfo);*/
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addTournamentLevel")]
         string addTournamentLevel(int blogId, string username, string password, TournamentLevelInfo tournamentInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addTournament")]
@@ -25,6 +21,8 @@ namespace IndianBridge.WordpressAPIs
         string addEvent(int blogId, string username, string password, EventInfo eventInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addUsers")]
         string addUsers(int blogId, string username, string password, TableInfo tableInfo);
+        [CookComputing.XmlRpc.XmlRpcMethod("bfi.deleteUsers")]
+        string deleteUsers(int blogId, string username, string password, TableInfo tableInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addMasterpoints")]
         string addMasterpoints(int blogId, string username, string password, TableInfo tableInfo);
     }
@@ -115,30 +113,6 @@ namespace IndianBridge.WordpressAPIs
             }
         }
 
-        /*public string addTableData(TableInfo tableInfo)
-        {
-            try
-            {
-                return m_interface.addTableData(1, m_userName, m_password, tableInfo);
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
-
-        public string removeTableData(TableInfo tableInfo)
-        {
-            try
-            {
-                return m_interface.removeTableData(1, m_userName, m_password, tableInfo);
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }*/
-
         public string addTournamentLevel(TournamentLevelInfo tournamentLevelInfo)
         {
             try
@@ -180,6 +154,18 @@ namespace IndianBridge.WordpressAPIs
             try
             {
                 return m_interface.addUsers(1, m_userName, m_password, tableInfo);
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
+
+        public string deleteUsers(TableInfo tableInfo)
+        {
+            try
+            {
+                return m_interface.deleteUsers(1, m_userName, m_password, tableInfo);
             }
             catch (Exception e)
             {
