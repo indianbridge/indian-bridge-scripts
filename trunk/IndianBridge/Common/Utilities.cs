@@ -50,6 +50,24 @@ namespace IndianBridge.Common
 			return;
 		}
 
+        public static string[] arraySlice(string[] source, int start, int end)
+        {
+            // Handles negative ends.
+            if (end > source.Length - 1)
+            {
+                end = source.Length - 1;
+            }
+            int len = end - start + 1;
+
+            // Return new array.
+            string[] res = new string[len];
+            for (int i = 0; i < len; i++)
+            {
+                res[i] = source[i + start];
+            }
+            return res;
+        }
+
 		public static void showBalloonNotification(string title, string text)
 		{
 			NotifyIcon notifyMessage = new NotifyIcon();
@@ -108,9 +126,18 @@ namespace IndianBridge.Common
             string jsonDelimiter = "!@#";
             Dictionary<string, string> result = new Dictionary<string, string>();
             string[] lines = json_result.Split(new string[] { jsonDelimiter }, StringSplitOptions.None);
-            result["error"] = lines[0];
-            result["message"] = lines[1];
-            result["content"] = lines[2];
+            if (lines.Length < 3)
+            {
+                result["error"] = "true";
+                result["message"] = lines[0];
+                result["content"] = lines[0];
+            }
+            else
+            {
+                result["error"] = lines[0];
+                result["message"] = lines[1];
+                result["content"] = lines[2];
+            }
             return result;
         }
 
