@@ -692,8 +692,9 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 							$masterpointdata['member_id'] = $values['member_id'];
 							$masterpointdata['tournament_code'] = 'OP000';
 							$masterpointdata['event_code'] = 'OP0';
-							$date = new DateTime('now', new DateTimeZone('Asia/Calcutta'));
-							$masterpointdata['event_date'] = $date -> format('Y-m-d');
+							//$date = new DateTime('now', new DateTimeZone('Asia/Calcutta'));
+							//$masterpointdata['event_date'] = $date -> format('Y-m-d');
+							$masterpointdata['event_date'] = '2010-12-31';
 							$masterpointdata['localpoints_earned'] = empty($values['total_current_lp']) ? 0 : $values['total_current_lp'];
 							$masterpointdata['fedpoints_earned'] = empty($values['total_current_fp']) ? 0 : $values['total_current_fp'];
 							$temp_string = $this -> bfi_addMasterpoint($masterpointdata);
