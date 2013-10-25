@@ -68,6 +68,55 @@ namespace IndianBridge.Common
             return res;
         }
 
+        public static string getNextCode(string value) {
+            int totalLength = value.Length;
+            var numAlpha = new Regex("(?<Alpha>[a-zA-Z]*)(?<Numeric>[0-9]*)");
+            var match = numAlpha.Match(value);
+
+            string alpha = match.Groups["Alpha"].Value;
+            int alphaLength = alpha.Length;
+            int num = int.Parse(match.Groups["Numeric"].Value);
+            int nextNum = num + 1;
+            int numLength = totalLength - alpha.Length;
+            int maxNum = (int)Math.Pow(10, numLength) - 1;
+            if (nextNum <= maxNum)
+            {
+                string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+                return newString;
+            }
+            else
+            {
+                nextNum = 1;
+                if (alpha.Distinct().Count() == 1 && alpha.Distinct().ElementAt(0) == 'Z')
+                {
+                    alpha = "".PadLeft(alphaLength + 1, 'A');
+                    numLength = totalLength - alpha.Length;
+                    string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+                    return newString;
+                }
+                else
+                {
+                    char[] alphaChars = alpha.ToCharArray();
+                    bool flag = true;
+                    int index = alphaChars.Length - 1;
+                    while (flag)
+                    {
+                        if (alphaChars[index] != 'Z')
+                        {
+                            alphaChars[index]++;
+                            flag = false;
+                        }
+                        index--;
+                    }
+                    alpha = new string(alphaChars);
+                    numLength = totalLength - alpha.Length;
+                    string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+                    return newString;
+                }
+
+            }
+        }
+
 		public static void showBalloonNotification(string title, string text)
 		{
 			NotifyIcon notifyMessage = new NotifyIcon();

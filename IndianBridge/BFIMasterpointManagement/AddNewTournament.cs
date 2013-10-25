@@ -15,17 +15,31 @@ namespace BFIMasterpointManagement
     public partial class AddNewTournament : Form
     {
         public ManageMasterpoints m_mm;
-        public AddNewTournament(ManageMasterpoints mm,DataGridView tlm, string tournament_level_code)
+        private string[] tournamentLevelCodes;
+        public AddNewTournament(ManageMasterpoints mm,DataGridView tlm, DataGridView tm, string tournament_level_code)
         {
             m_mm = mm;
             InitializeComponent();
             int colIndex = tlm.Columns["tournament_level_code"].Index;
+            int descIndex = tlm.Columns["description"].Index;
+            tournamentLevelCodes = new string[tlm.Rows.Count];
+            int count = 0;
             foreach (DataGridViewRow row in tlm.Rows)
             {
-                tournamentLevelCombobox.Items.Add((string)(row.Cells[colIndex].Value));
+                tournamentLevelCodes[count++] = (string)(row.Cells[colIndex].Value);
+                tournamentLevelCombobox.Items.Add((string)(row.Cells[descIndex].Value));
             }
             if (tournament_level_code == null) tournamentLevelCombobox.SelectedIndex = 0;
             else tournamentLevelCombobox.Text = tournament_level_code;
+            tm.Sort(tm.Columns["tournament_code"], ListSortDirection.Descending);
+            int tCodeIndex = tm.Columns["tournament_code"].Index;
+            string lastCode = (string)tm.Rows[0].Cells[tCodeIndex].Value;
+            string nextCode = Utilities.getNextCode(lastCode);
+            foreach (DataGridViewRow row in tm.Rows)
+            {
+                if ((string)row.Cells[tCodeIndex].Value == nextCode) return;
+                tournamentCodeTextbox.Text = nextCode;
+            }
         }
 
         private void okButton_Click(object sender, EventArgs e)
@@ -53,7 +67,7 @@ namespace BFIMasterpointManagement
             TournamentInfo tournamentInfo = new TournamentInfo();
             tournamentInfo.tournament_code = tournamentCodeTextbox.Text;
             tournamentInfo.description = descriptionTextbox.Text;
-            tournamentInfo.tournament_level_code = tournamentLevelCombobox.Text;
+            tournamentInfo.tournament_level_code = tournamentLevelCodes[tournamentLevelCombobox.SelectedIndex];
 
             string json_result = m_mm.addTournament(tournamentInfo);
             Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
