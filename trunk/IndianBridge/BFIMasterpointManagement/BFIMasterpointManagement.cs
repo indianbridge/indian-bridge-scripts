@@ -36,6 +36,8 @@ namespace BFIMasterpointManagement
 		{
 			emDataGridView.Enabled = false;
 			emLoadingPicture.Visible = true;
+            addEventButton.Enabled = false;
+            addEventButton.Visible = false;
 			BackgroundWorker bw = new BackgroundWorker();
 			bw.WorkerSupportsCancellation = false;
 			bw.WorkerReportsProgress = false;
@@ -48,6 +50,8 @@ namespace BFIMasterpointManagement
 		{
 			tmDataGridView.Enabled = false;
 			tmLoadingPicture.Visible = true;
+            addTournamentButton.Enabled = false;
+            addTournamentButton.Visible = false;
 			BackgroundWorker bw = new BackgroundWorker();
 			bw.WorkerSupportsCancellation = false;
 			bw.WorkerReportsProgress = false;
@@ -90,8 +94,11 @@ namespace BFIMasterpointManagement
 			{
 				emDataGridView.Rows.Add(lines[i].Split(new string[] { fieldSeparator }, StringSplitOptions.None));
 			}
+            emDataGridView.Sort(emDataGridView.Columns["event_code"], ListSortDirection.Descending);
 			emLoadingPicture.Visible = false;
 			emDataGridView.Enabled = true;
+            addEventButton.Enabled = true;
+            addEventButton.Visible = true;
 		}
 
 		private void getEvents(object sender, DoWorkEventArgs e)
@@ -125,8 +132,11 @@ namespace BFIMasterpointManagement
 			{
 				tmDataGridView.Rows.Add(lines[i].Split(new string[] { fieldSeparator }, StringSplitOptions.None));
 			}
+            tmDataGridView.Sort(tmDataGridView.Columns["tournament_code"], ListSortDirection.Descending);
 			tmLoadingPicture.Visible = false;
 			tmDataGridView.Enabled = true;
+            addTournamentButton.Enabled = true;
+            addTournamentButton.Visible = true;
             tmDataGridView.Refresh();
 		}
 
@@ -218,7 +228,7 @@ namespace BFIMasterpointManagement
 			int rowIndex = e.RowIndex;
 			DataGridView dgv = sender as DataGridView;
 			DataGridViewRow row = dgv.Rows[rowIndex];
-			AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, row.Cells["tournament_level_code"].Value.ToString());
+			AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, tmDataGridView ,row.Cells["description"].Value.ToString());
 			ant.StartPosition = FormStartPosition.CenterParent;
 			if (ant.ShowDialog(this) != DialogResult.Cancel)
 			{
@@ -228,7 +238,7 @@ namespace BFIMasterpointManagement
 
 		private void addTournamentButton_Click(object sender, EventArgs e)
 		{
-			AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, null);
+			AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView,tmDataGridView , null);
 			ant.StartPosition = FormStartPosition.CenterParent;
 			if (ant.ShowDialog(this) != DialogResult.Cancel)
 			{
@@ -239,7 +249,7 @@ namespace BFIMasterpointManagement
 
 		private void addEventButton_Click(object sender, EventArgs e)
 		{
-			AddNewEvent ane = new AddNewEvent(mm);
+			AddNewEvent ane = new AddNewEvent(mm,emDataGridView);
 			ane.StartPosition = FormStartPosition.CenterParent;
 			if (ane.ShowDialog(this) != DialogResult.Cancel)
 			{

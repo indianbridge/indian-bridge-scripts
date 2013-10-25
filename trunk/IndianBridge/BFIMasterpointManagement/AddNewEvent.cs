@@ -15,10 +15,19 @@ namespace BFIMasterpointManagement
     public partial class AddNewEvent : Form
     {
         public ManageMasterpoints m_mm;
-        public AddNewEvent(ManageMasterpoints mm)
+        public AddNewEvent(ManageMasterpoints mm, DataGridView em)
         {
             m_mm = mm;
             InitializeComponent();
+            em.Sort(em.Columns["event_code"], ListSortDirection.Descending);
+            int tCodeIndex = em.Columns["event_code"].Index;
+            string lastCode = (string)em.Rows[2].Cells[tCodeIndex].Value;
+            string nextCode = Utilities.getNextCode(lastCode);
+            foreach (DataGridViewRow row in em.Rows)
+            {
+                if ((string)row.Cells[tCodeIndex].Value == nextCode) return;
+                eventCodeTextbox.Text = nextCode;
+            }
         }
 
         private void okButton_Click(object sender, EventArgs e)
