@@ -83,45 +83,90 @@ class mingleforum{
 
 	public function add_forum_admin_bar($wp_admin_bar) {
 		global $wpdb;
-		$wp_admin_bar->add_menu(array(
-		'parent' => 'top-secondary',
-		"id" => "my-forums",
-		"title" => __('myForums'),
-		"href" => home_url("/member_services/forums"),
-		));
-		$wp_admin_bar->add_group( array(
-		'parent' => 'my-forums',
-		'id'     => 'my-forums-list',
-		) );
-		$wp_admin_bar->add_menu( array(
-		'parent' => 'my-forums-list',
-		'id' => 'forums-recent',
-		'title' => __('<h6>Recent Forum Activity</h6>'),
-		));
+			/*$wp_admin_bar -> add_menu(array('parent' => 'top-secondary', "id" => "my-masterpoints", "title" => __('myMasterpoints'), "href" => home_url("/member_services/masterpoints"), ));
+			$wp_admin_bar -> add_group(array('parent' => 'my-masterpoints', 'id' => 'my-masterpoint-summary', ));
+			$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoints-summary', 'title' => __('<h6>Masterpoint Summary</h6>'), ));
+			$wp_admin_bar -> add_group(array('parent' => 'my-masterpoints', 'id' => 'my-masterpoint-recent', ));
+			$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-recent', 'id' => 'masterpoints-recent', 'title' => __('<h6>Recent Masterpoints</h6>'), ));*/
+		
+		$wp_admin_bar->add_menu(array('parent' => 'top-secondary',"id" => "my-forums","title" => __('myForums'),"href" => home_url("/member_services/forums")));
+		$wp_admin_bar->add_group( array('parent' => 'my-forums','id'     => 'my-forums-started') );
+		$wp_admin_bar->add_menu( array('parent' => 'my-forums-started',	'id' => 'forums-started','title' => __('<h6>My 5 Recent Threads</h6>')));
+		$wp_admin_bar->add_group( array('parent' => 'my-forums','id'     => 'my-forums-posted') );
+		$wp_admin_bar->add_menu( array('parent' => 'my-forums-posted',	'id' => 'forums-posted','title' => __('<h6>My 5 Recent Posts</h6>')));
+		$wp_admin_bar->add_group( array('parent' => 'my-forums','id'     => 'all-forums-posted') );
+		$wp_admin_bar->add_menu( array('parent' => 'all-forums-posted',	'id' => 'all-forums-posted-in','title' => __('<h6>5 Recent Posts by Anyone</h6>')));
 
-		$recent_forum_activity_html = '';
-		$my_forum_posts_html = '';
+
 		$current_user = wp_get_current_user();
-		$member_id = $current_user->ID;
+		$user_id = $current_user->ID;
 		$table_prefix = 'wp_';
 		$mydb = $wpdb;
+		$threads_tableName = $table_prefix.'forum_threads';
+		$query = "SELECT * FROM $threads_tableName WHERE starter = $user_id ORDER BY date DESC LIMIT 5";
+		$rows = $mydb->get_results( $query);
+		$numItems = count($rows);
+		if ($numItems < 1) {
+			$wp_admin_bar->add_menu( array(
+			'parent' => 'my-forums-started',
+			'id' => 'forums-started-post1',
+			'title' => '<div class="ab-item ab-empty-item">You have not started any Threads yet!</div>'
+			));
+		}
+		else {
+			foreach($rows as $index=>$row) {
+				$forums_tableName = 'wp_forum_forums';
+				$forumName = $wpdb->get_var("SELECT name FROM $forums_tableName WHERE id = $row->parent_id");				
+				$postLink = $this->get_threadlink($row->id);
+				$last_post_at = date('l jS \of F Y h:i:s A',strtotime($row->last_post));
+				$html = '<a title="'.$row->views.' Views, Last post on '.$last_post_at.'" href="'.$postLink.'">';
+				$html .= $row->subject;
+				$html .= ' in '.$forumName;
+				$html .= '</a>';				
+				$wp_admin_bar->add_menu( array(
+				'parent' => 'my-forums-started',
+				'id' => 'forums-list-staretd'.$index,
+				'title' => $html
+				));
+			}
+		}	
+		$posts_tableName = $table_prefix.'forum_posts';
+		$query = "SELECT * FROM $posts_tableName WHERE author_id = $user_id ORDER BY date DESC LIMIT 5";
+		$rows = $mydb->get_results( $query);
+		$numItems = count($rows);
+		if ($numItems < 1) {
+			$wp_admin_bar->add_menu( array(
+			'parent' => 'my-forums-posted',
+			'id' => 'my-forums-list-post1',
+			'title' => '<div class="ab-item ab-empty-item">You have not posted anything yet!</div>'
+			));
+		}
+		else {
+			foreach($rows as $index=>$row) {
+				$wp_admin_bar->add_menu( array(
+				'parent' => 'my-forums-posted',
+				'id' => 'my-forums-list-post'.$index,
+				'title' => $this->getForumPostInformation($row,false)
+				));
+			}
+		}
 		$posts_tableName = $table_prefix.'forum_posts';
 		$query = "SELECT * FROM $posts_tableName ORDER BY date DESC LIMIT 5";
 		$rows = $mydb->get_results( $query);
 		$numItems = count($rows);
 		if ($numItems < 1) {
 			$wp_admin_bar->add_menu( array(
-			'parent' => 'my-forums-list',
-			'id' => 'forums-list-post1',
+			'parent' => 'all-forums-posted',
+			'id' => 'all-forums-list-post1',
 			'title' => '<div class="ab-item ab-empty-item">No Posts Found!</div>'
 			));
 		}
 		else {
 			foreach($rows as $index=>$row) {
 				$wp_admin_bar->add_menu( array(
-				'parent' => 'my-forums-list',
-				'id' => 'forums-list-post'.$index,
-				'title' => $this->getForumPostInformation($row)
+				'parent' => 'all-forums-posted',
+				'id' => 'all-forums-list-post'.$index,
+				'title' => $this->getForumPostInformation($row,true)
 				));
 			}
 		}
@@ -129,15 +174,19 @@ class mingleforum{
 
 	}
 
-	public function getForumPostInformation($row) {
+	public function getForumPostInformation($row, $include_author) {
 		global $wpdb;	
 		$threads_tableName = 'wp_forum_threads';
 		$threadRow = $wpdb->get_row("SELECT * FROM $threads_tableName WHERE id = $row->parent_id");
 		$forums_tableName = 'wp_forum_forums';
 		$forumName = $wpdb->get_var("SELECT name FROM $forums_tableName WHERE id = $threadRow->parent_id");
 		$postLink = $this->get_paged_threadlink($row->parent_id, '#postid-'.$row->id);
-		$html = '<a title="'.$row->text.'" href="'.$postLink.'">';
-		$html .= get_avatar( $row->author_id,'16' ).' '.get_the_author_meta( 'display_name',$row->author_id).' posted ';
+		$post_at = date('l jS \of F Y h:i:s A',strtotime($row->date));
+		$text = wp_trim_words("Posted on ".$post_at.PHP_EOL.strip_tags(stripslashes(html_entity_decode($row->text))));
+		$html = '<a title="'.$text.'" href="'.$postLink.'">';
+		if ($include_author) {
+			$html .= get_avatar( $row->author_id,'16' ).' '.get_the_author_meta( 'display_name',$row->author_id).' posted ';
+		}
 		$html .= $row->subject;
 		$html .= ' in '.$forumName.'/'.$threadRow->subject;
 		$html .= '</a>';
@@ -2481,7 +2530,7 @@ class mingleforum{
 
 	function form_buttons(){
 		$button = '
-	<a title="'.__("Bold", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[b]", "[/b]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/b.png" /></a><a title="'.__("Italic", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[i]", "[/i]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/i.png" /></a><a title="'.__("Underline", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[u]", "[/u]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/u.png" /></a><a title="'.__("Strikethrough", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[s]", "[/s]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/s.png" /></a><a title="'.__("Code", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[code]", "[/code]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/code.png" /></a><a title="'.__("Quote", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[quote]", "[/quote]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/quote.png" /></a><a title="'.__("List", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[list]", "[/list]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/list.png" /></a><a title="'.__("List item", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[*]", "", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/li.png" /></a><a title="'.__("Link", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[url]", "[/url]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/url.png" /></a><a title="'.__("Image", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[img]", "[/img]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/img.png" /></a><a title="'.__("Email", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[email]", "[/email]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/email.png" /></a><a title="'.__("Add Hex Color", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[color=#]", "[/color]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/color.png" /></a><a title="'.__("Embed YouTube Video", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[embed]", "[/embed]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/yt.png" /></a><a title="'.__("Embed Google Map", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[map]", "[/map]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/gm.png" /></a>';
+	<a title="'.__("Bold", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[b]", "[/b]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/b.png" /></a><a title="'.__("Italic", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[i]", "[/i]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/i.png" /></a><a title="'.__("Underline", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[u]", "[/u]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/u.png" /></a><a title="'.__("Strikethrough", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[s]", "[/s]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/s.png" /></a><a title="'.__("Code", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[code]", "[/code]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/code.png" /></a><a title="'.__("Quote", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[quote]", "[/quote]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/quote.png" /></a><a title="'.__("List", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[list]", "[/list]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/list.png" /></a><a title="'.__("List item", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[*]", "", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/li.png" /></a><a title="'.__("Link", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[url]", "[/url]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/url.png" /></a><a title="'.__("Image", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[img]", "[/img]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/img.png" /></a><a title="'.__("Email", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[email]", "[/email]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/email.png" /></a><a title="'.__("Add Hex Color", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[color=#]", "[/color]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/color.png" /></a><a title="'.__("Embed YouTube Video", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[embed]", "[/embed]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/yt.png" /></a><a title="'.__("Embed Google Map", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText("[map]", "[/map]", document.forms.addform.message); return false;\'><img src="'.$this->skin_url.'/images/bbc/gm.png" /></a><a title="'.__("Spade Symbol", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText(" !S ", "", document.forms.addform.message); return false;\'><span style="color:#000000;font-size:200%">&spades;</span></a><a title="'.__("Heart Symbol", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText(" !H ", "", document.forms.addform.message); return false;\'><span style="color:#CB0000;font-size:200%">&hearts;</span></a><a title="'.__("Diamond Symbol", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText(" !D ", "", document.forms.addform.message); return false;\'><span style="color:#CB0000;font-size:200%">&diams;</span></a><a title="'.__("Club Symbol", "mingleforum").'" href="javascript:void(0);" onclick=\'surroundText(" !C ", "", document.forms.addform.message); return false;\'><span style="color:#000000;font-size:200%">&clubs;</span></a><a title="'.__("Insert Bridge Hand", "mingleforum").'" href="javascript:void(0);" onclick=\'var url=prompt("Generate a hand diagram using the BBO Hand Viewer Tool and post the link in the box below. Copy the text in the box below (http://www.bridgebase.com/tools/hvdoc.html) to a new window on your web browser to see instructions on creating a hand viewer link/url.","http://www.bridgebase.com/tools/hvdoc.html");if(url!=null && url != "http://www.bridgebase.com/tools/hvdoc.html"){surroundText(" [bbo]"+url+"[/bbo] ", "", document.forms.addform.message);}; return false;\'><img src="'.$this->skin_url.'/images/bbc/insert_hand.png" /></a>';
 		return $button;
 	}
 

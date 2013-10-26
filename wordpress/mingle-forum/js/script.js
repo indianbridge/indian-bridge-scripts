@@ -6,6 +6,8 @@ function surroundText(tag1, tag2, myarea)
 		myarea.focus();
 		var sel = document.selection.createRange();
 		sel.text = tag1 + sel.text + tag2;
+		sel.collapse(false);
+		sel.select();
 	}
 	else //Other Browsers
 	{
@@ -19,6 +21,8 @@ function surroundText(tag1, tag2, myarea)
 		myarea.value =  myarea.value.substring(0,start) + rep + myarea.value.substring(end,len);
 		myarea.scrollTop = scrollTop;
 		myarea.scrollLeft = scrollLeft;
+		myarea.focus();
+		myarea.setSelectionRange(end+rep.length,end+rep.length);
 	}
 }
 
