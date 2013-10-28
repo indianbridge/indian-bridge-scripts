@@ -23,7 +23,26 @@ if (!class_exists('Sriram_Bridge_Plugin')) {
         public function __construct() {
         	add_filter('the_content',array($this,'replace_suit_symbols'));
 			add_shortcode( 'bbo', array($this,'display_bbo_hand_viewer') );
+			
+			// Customizing where wordpress emails get sent from.
+			add_filter( 'wp_mail_from', array($this, 'fb_mail_from') );
+			add_filter( 'wp_mail_from_name', array($this, 'fb_mail_from_name') );
         }      
+		
+
+		// new name
+		function fb_mail_from_name() {
+			$name = 'BFI Website Team';
+			$name = esc_attr($name);
+			return $name;
+		}
+
+		// new email-adress
+		function fb_mail_from() {
+			$email = 'bfi-website@googlegroups.com';
+			$email = is_email($email);
+			return $email;
+		}		
 		
 		public function display_bbo_hand_viewer($atts, $content="" ) {
 			return '<iframe height="300" src="'.$content.'">Your browser does not support iFrames</iframe>';
