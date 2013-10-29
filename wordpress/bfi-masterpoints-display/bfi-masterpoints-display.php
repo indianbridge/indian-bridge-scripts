@@ -560,6 +560,10 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			//return $this -> createSuccessMessage('Successfully inserted into masterpoint table for member id : ' . $member_id . ' with local points : ' . $args['localpoints_earned'] . ' and fed points : ' . $args['fedpoints_earned']);
 		}
 		
+		public function bfi_deleteUser($table_name, $member_id) {
+			$where = array('member_id'=>$member_id);
+		}
+		
 		public function bfi_deleteUsers($params) {
 			// Check credentials first
 			$return_string = $this -> bfi_checkManageMasterpointCredentials($params);

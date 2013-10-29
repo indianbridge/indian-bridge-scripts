@@ -12,7 +12,7 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 	var html = '<table id="bfi_masterpoints_table"><thead><tr>';
 	//var columnFilters = new Array({ type: "text" },null,null,null,null);
 	if (tableType == "leaderboard") {
-		var columns = new Array("ID", "NAME", "Total", "Fed", "Local");
+		var columns = new Array("ID", "NAME", "Total", "Fed", "Local","Zone","State");
 		var sortColumn = "Total";
 		var SortOrder = "desc";
 		//columnFilters = new Array({ type: "text" },{ type: "text" });

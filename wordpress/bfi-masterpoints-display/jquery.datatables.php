@@ -243,7 +243,9 @@ function doLookupMemberID() {
 function doLeaderboard() {
 	global $table_prefix;
 	$sqlLink = connectToDB();
-	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name','(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp');
+	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name',
+	'(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp',
+	$table_prefix.'zone_master.description'=>'zone',$table_prefix.'country_state.state'=>'state');
 
 	// Indexed column (used for fast and accurate table cardinality) 
 	$sIndexColumn = "member_id";
@@ -255,6 +257,10 @@ function doLeaderboard() {
 	
 	$sWhere = getWhere("", $aColumns);
 	$sJoin = "";
+	$sJoin .= "JOIN ".$table_prefix."zone_master ON ".$table_prefix."member.zone_code = ".$table_prefix."zone_master.zone_code ";
+	$sJoin .= "JOIN ".$table_prefix."zone_state ON ".$table_prefix."member.zone_code = ".$table_prefix."zone_state.zone_code ";
+	$sJoin .= "JOIN ".$table_prefix."country_state ON ".$table_prefix."zone_state.cs_id = ".$table_prefix."country_state.cs_id ";
+	
 	$sQuery = "
 		SELECT SQL_CALC_FOUND_ROWS ";
 	foreach ($aColumns as $key => $value) {
