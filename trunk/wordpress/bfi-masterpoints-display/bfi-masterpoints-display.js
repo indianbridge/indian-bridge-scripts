@@ -10,10 +10,12 @@ function switchMasterpointPageTab(newTab, tabIDPrefix, server_side_url, member_i
 
 function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, member_id, db_name) {
 	var html = '<table id="bfi_masterpoints_table"><thead><tr>';
+	//var columnFilters = new Array({ type: "text" },null,null,null,null);
 	if (tableType == "leaderboard") {
 		var columns = new Array("ID", "NAME", "Total", "Fed", "Local");
 		var sortColumn = "Total";
 		var SortOrder = "desc";
+		//columnFilters = new Array({ type: "text" },{ type: "text" });
 	} else if (tableType == "mymasterpoint") {
 		var columns = new Array("Event Date", "Tourney", "Tourney Type", "Event", "Local Points", "Fed Points", "Total Points");
 		var sortColumn = "Event Date";
@@ -26,6 +28,7 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 		var columns = new Array("Event Date", "Tourney", "Tourney Type", "Event", "Member ID", "Member Name", "Local Points", "Fed Points", "Total Points");
 		var sortColumn = "Event Date";
 		var SortOrder = "desc";
+		//columnFilters = new Array({ type: "date-range" },{ type: "text" },{ type: "text" },{ type: "text" },{ type: "text" },{ type: "text" });
 	}
 	else if (tableType == "lookupmemberid") {
 		var columns = new Array("ID", "NAME");
@@ -43,7 +46,12 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 	jQuery.each(columns, function(index, value) {
 		html += '<th>' + value + '</th>';
 	});
+	/*html += '</tr><tr>';
+	jQuery.each(columns, function(index, value) {
+		html += '<th>' + value + '</th>';
+	});*/
 	html += '</tr></thead></table>';
+
 	var tableID = '#bfi_masterpoints_table';
 	jQuery('#bfi_masterpoints_table_container').html(html);
 	var myTable = jQuery(tableID).dataTable({
@@ -65,5 +73,10 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 		},
 		"sAjaxSource" : server_side_url
 	});
+
+	/*myTable.columnFilter({ 	sPlaceHolder: "head:before",
+	aoColumns:columnFilters});
+	jQuery.datepicker.regional[""].dateFormat = 'yyyy-mm-dd';
+    jQuery.datepicker.setDefaults($.datepicker.regional[''])*/
 
 }
