@@ -4,7 +4,7 @@
 	DO NOT MODIFY THIS FILE. ALL CUSTOM CHANGES WILL BE LOST.
 */
 
-body.login { background-color:#1569a2; }body.login { background-image:url(http://localhost/bfi/wp-content/themes/topbusiness-free-version/images/grd-white-80.png); }body, body.login { background-position:top center; } body, body.login { background-repeat:repeat-x; } body, body.login { background-attachment:scroll; } body.login h1 a { background:transparent url(http://localhost/bfi/wp-content/uploads/files/images/BFI_Header.png) center center no-repeat; }body.login form { box-shadow:0 10px 30px rgba(0, 0, 0, 0.3); }
+body.login { background-color:#1569a2; }body.login { background-image:url(http://localhost/bfi/wp-content/themes/topbusiness-free-version/images/grd-white-80.png); }body, body.login { background-position:top center; } body, body.login { background-repeat:repeat-x; } body, body.login { background-attachment:scroll; } body.login h1 a { background:transparent url(http://bfi.net.in/wp-content/uploads/files/images/bfi_header.png) center center no-repeat; }body.login form { box-shadow:0 10px 30px rgba(0, 0, 0, 0.3); }
 				.login #nav a,
 				.login #nav a:hover,
 				.login #backtoblog a,
