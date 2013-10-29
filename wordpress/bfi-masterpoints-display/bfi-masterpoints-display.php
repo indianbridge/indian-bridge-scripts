@@ -36,7 +36,11 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			// register the javascript
 			wp_register_script($jsIdentifier, plugins_url($jsFilePath, __FILE__), array('jquery'));
 			wp_enqueue_script($jsIdentifier);
-
+			/*$js_columnFilterIdentifier = 'columnFilter';
+			$js_columnFilterFile = 'js/jquery.dataTables.columnFilter.js';
+			wp_register_script($js_columnFilterIdentifier, plugins_url($js_columnFilterFile, __FILE__), array('jquery'));
+			wp_enqueue_script($js_columnFilterIdentifier);*/
+			
 			// Register bfi master point javascript
 			wp_register_script('bfi_masterpoints_display', plugins_url('bfi-masterpoints-display.js', __FILE__), array('jquery'));
 			wp_enqueue_script('bfi_masterpoints_display');
@@ -51,6 +55,7 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));
 			add_filter('xmlrpc_methods', array($this, 'add_xml_rpc_methods'));
 			add_action('admin_bar_menu', array($this, 'customize_admin_bar'));
+			//add_filter( 'query_vars', array($this, 'add_query_vars_filter' ));
 
 			register_activation_hook(__FILE__, array($this, 'activate'));
 			register_deactivation_hook(__FILE__, array($this, 'deactivate'));
@@ -69,6 +74,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			$this -> errorFlag = false;	
 			$this->jsonDelimiter = "!@#";
 		}
+		
+		/*function add_query_vars_filter( $vars ){
+			  $vars[] = "bfi_member_id";
+			   return $vars;
+		}*/
+
 
 		public function add_masterpoint_admin_bar($wp_admin_bar) {
 			$wp_admin_bar -> add_menu(array('parent' => 'top-secondary', "id" => "my-masterpoints", "title" => __('myMasterpoints'), "href" => home_url("/member_services/masterpoints"), ));
@@ -862,9 +873,17 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 		function showNonMemberShortcodeContent($current_user) {
 			ob_start();
 			echo $this -> getMemberSummary($current_user);
+			//$member_id = get_query_var('bfi_member_id');
 			echo '<h1>You have to be a member of BFI to see your Masterpoint Summary and Details</h1>';
-			$tabs = array('leaderboard' => "Masterpoint Leaderboard", "allmasterpoint" => "All Masterpoints");
+			//if (empty($member_id)) {
+				$tabs = array('leaderboard' => "Masterpoint Leaderboard", "allmasterpoint" => "All Masterpoints");
+			/*}
+			else {
+				$tabs = array('mymasterpoint' => $member_id."'s Masterpoints", 'leaderboard' => "Masterpoint Leaderboard", "allmasterpoint" => "All Masterpoints");
+				$selectedTab = 'mymasterpoint';	
+			}*/
 			$selectedTab = 'leaderboard';
+			//echo $this -> getMasterpointTabs($tabs, $selectedTab, $member_id);
 			echo $this -> getMasterpointTabs($tabs, $selectedTab, '');
 			$out = ob_get_clean();
 			return $out;

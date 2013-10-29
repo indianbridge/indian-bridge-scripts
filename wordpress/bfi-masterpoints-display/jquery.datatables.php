@@ -116,6 +116,43 @@ function doSearch($aColumns) {
 		$sWhere = "";
 	}	
 	return $sWhere;
+	//if ( $_GET['sSearch'] != "" )
+	//{
+		
+		/*$i=0;
+		foreach ($aColumns as $key => $value) {
+			if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' ) {
+				$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch_'.$i] )."%' OR ";
+			}
+			//$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
+			$i++;
+		}
+		if (!empty($sWhere)) {
+		$sWhere = substr_replace( $sWhere, "", -3 );
+			$sWhere = "(".$sWhere.")";
+		}*/
+		//$sWhere .= ')';
+ /* Individual column filtering */
+    /*for ( $i=0 ; $i<count($aColumns) ; $i++ )  // this is the column-specific filter
+    {
+        if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
+        {
+            if ( $sWhere == "" )
+            {
+                $sWhere = "WHERE ";
+            }
+            else
+            {
+                $sWhere .= " AND ";
+            }
+            $sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
+        }
+    }	*/	
+	//}
+	//else {
+		//$sWhere = "";
+	//}	
+	//return $sWhere;
 }
 
 function getResults($sqlLink, $sQuery_old, $sIndexColumn, $sTable, $aColumns) {
@@ -158,6 +195,9 @@ function getResults($sqlLink, $sQuery_old, $sIndexColumn, $sTable, $aColumns) {
 				// Special output formatting for 'version' column 
 				$row[] = ($aRow[ $value ]=="0") ? '-' : $aRow[ $value ];
 			}
+			/*else if ($value == "member_id") {
+				$row[] = '<a href="http://localhost/bfi/member-services/masterpoints/?bfi_member_id='.$aRow[$value].'">'.$aRow[$value].'</a>';
+			}*/
 			else if ( $value != ' ' )
 			{
 				// General output 
