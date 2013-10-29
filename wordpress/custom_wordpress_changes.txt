@@ -5,7 +5,18 @@ Simple Local Avatar
 		remove lines 274 - 289 (display rating)
 	In simple-local-avatars.php missing argument problem
 		on line 64 change $id_or_email to $id_or_email = ''
-		
+
+
+Theme My Login
+	in includes/class-theme-my-login.php
+		in function retrieve_password line 1031 add
+			if (!is_email($user_email)) {
+				$errors->add('invalid_email', __('<strong>ERROR</strong>: There is no email address associated with that account or the associated email address is invalid. Please contact the BFI website team to reset your password.'));
+				return $errors;
+			}
+		in function retrieve_password ~line 1070 change wp_die to
+			$errors->add('invalid_email', __('<strong>ERROR</strong>: The e-mail could not be sent. Please contact the BFI website team to reset your password.'));
+			return $errors;		
 		
 All in one calendar
 	in app/model/class-ai1ec-event.php
@@ -35,7 +46,7 @@ All in one calendar
 				
 Updraft Plus
 
-	in backup.php
+	in backup.php in function backup_db
 		Line 768 : change to 				if ( strpos($table, $table_prefix) === 0 || strpos($table,'bfi_') === 0) {
 		
 Mingle Forum
