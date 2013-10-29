@@ -40,7 +40,7 @@
 				
 									// Reply link
 									if (comments_open() && is_user_logged_in()) :
-										$out .= '<span class="reply">';
+										$out .= '<br/><span class="reply">';
 											$out .= ' &nbsp;<a title="'.get_comment_ID().'" class="button quick-reply" href="/?p='.get_the_ID().'&replytocom='.get_comment_ID().'#respond">'.__('Reply','pandathemes').'</a>';
 										$out .= '</span>';
 									endif;
