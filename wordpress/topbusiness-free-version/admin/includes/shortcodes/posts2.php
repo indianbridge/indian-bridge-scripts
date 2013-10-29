@@ -183,7 +183,7 @@
 
 								// Comments
 								if ($comments == 'yes' && get_comments_number($post->ID) != 0) :
-									$out .= '<em class="f11 ico com" title="Comments"> <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).'</a></em><div class="clear h5"><!-- divider --></div>';
+									$out .= '<em class="f11 ico com" title="Comments"> <a href="'.get_comments_link($post->ID).'">'.get_comments_number($post->ID).' Comments</a></em><div class="clear h5"><!-- divider --></div>';
 
 								endif;
 
