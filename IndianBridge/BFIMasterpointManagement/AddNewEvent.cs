@@ -55,7 +55,7 @@ namespace BFIMasterpointManagement
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Error when trying to add Event because : " + result["content"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error when trying to add Event because : " + result["message"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {

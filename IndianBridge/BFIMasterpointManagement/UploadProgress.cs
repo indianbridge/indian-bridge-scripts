@@ -16,11 +16,13 @@ namespace BFIMasterpointManagement
         public string statusText;
         public bool errorFound;
         public string m_content;
+        public string m_returnContent = "";
         ManageMasterpoints m_mm;
         int m_incrementSize = 25;
         enum Operation {
             UploadUsers,
             UploadMasterpoints,
+            TransferUsers,
             DeleteUsers
         };
         Operation m_currentOperation;
@@ -34,10 +36,11 @@ namespace BFIMasterpointManagement
         private void startOperation(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
+            m_returnContent = "";
             int maxLinesToUploadPerTry = m_incrementSize;
             string newLineCharacter = Utilities.getNewLineCharacter(m_content);
             string[] lines = m_content.Split(new string[] { newLineCharacter }, StringSplitOptions.RemoveEmptyEntries);
-            worker.ReportProgress(0, new Tuple<bool,string>(false,"Total Records to processed = " + (lines.Length - 1)+Environment.NewLine));
+            worker.ReportProgress(0, new Tuple<bool,string,string,string>(false,"Total Records to processed = " + (lines.Length - 1),"",""));
             string headerLine = lines[0];
             int processedLines = 1;
             while (processedLines < lines.Length)
@@ -47,7 +50,7 @@ namespace BFIMasterpointManagement
                 if (endIndex >= lines.Length) endIndex = lines.Length - 1;
                 processedLines = endIndex + 1;
                 int progress = (int)Math.Floor(startIndex * 100.0 / (lines.Length - 1));
-                worker.ReportProgress(progress, new Tuple<bool,string>(false,"Processing entries from " + startIndex + " to " + endIndex + Environment.NewLine));
+                worker.ReportProgress(progress, new Tuple<bool,string,string,string>(false,"Processing entries from " + startIndex + " to " + endIndex,"",""));
                 TableInfo tableInfo = new TableInfo();
                 string[] partialContent = Utilities.arraySlice(lines, startIndex, endIndex);
                 tableInfo.content = headerLine + newLineCharacter + string.Join(newLineCharacter, partialContent);
@@ -62,6 +65,9 @@ namespace BFIMasterpointManagement
                         case Operation.UploadMasterpoints:
                         json_result = m_mm.addMasterpoints(tableInfo);
                         break;
+                        case Operation.TransferUsers:
+                        json_result = m_mm.transferUsers(tableInfo);
+                        break;
                         case Operation.DeleteUsers:
                         json_result = m_mm.deleteUsers(tableInfo);
                         break;
@@ -73,12 +79,12 @@ namespace BFIMasterpointManagement
                     Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
                     bool errorStatus = Convert.ToBoolean(result["error"]);
                     result["content"] = result["content"].Replace(Utilities.getNewLineCharacter(result["content"]), System.Environment.NewLine);
-                    worker.ReportProgress(progress, new Tuple<bool,string>(errorStatus,result["message"] + Environment.NewLine + result["content"]));
+                    worker.ReportProgress(progress, new Tuple<bool,string,string,string>(errorStatus,result["message"],result["content"],tableInfo.delimiter));
                 }
                 catch (Exception ex)
                 {
                     progress = (int)Math.Floor(endIndex * 100.0 / (lines.Length - 1));
-                    worker.ReportProgress(endIndex / lines.Length, new Tuple<bool,string>(true,ex.Message));
+                    worker.ReportProgress(endIndex / lines.Length, new Tuple<bool,string,string,string>(true,ex.Message,"",""));
                 }
             }
         }
@@ -95,11 +101,21 @@ namespace BFIMasterpointManagement
         private void operationProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             uploadProgressBar.Value = e.ProgressPercentage;
-            Tuple<bool, string> value = e.UserState as Tuple<bool, string>;
-            errorFound = errorFound | value.Item1;
-            if (errorFound) statusMessageTextbox.ForeColor = Color.Red;
-            else statusMessageTextbox.ForeColor = Color.Green;
-            statusMessageTextbox.AppendText(value.Item2);
+            Tuple<bool, string,string,string> value = e.UserState as Tuple<bool, string,string,string>;
+            if (String.IsNullOrWhiteSpace(value.Item3))
+            {
+                statusMessageTextbox.AppendText(value.Item2+Environment.NewLine);
+                return;
+            }
+            m_returnContent += value.Item3;
+            string[] lines = value.Item3.Split(new string[] { Utilities.getNewLineCharacter(value.Item3) }, StringSplitOptions.RemoveEmptyEntries);
+            int success = 0, failure = 0;
+            foreach (string line in lines)
+            {
+                if (line.IndexOf("failure", StringComparison.OrdinalIgnoreCase) >= 0) failure++;
+                else success++;
+            }
+            statusMessageTextbox.AppendText("" + success + " items succeeded, " + failure + " items failed"+Environment.NewLine);
         }
 
         public void uploadUsers(string content, int incrementSize = 25)
@@ -108,6 +124,15 @@ namespace BFIMasterpointManagement
             m_incrementSize = incrementSize;
             m_currentOperation = Operation.UploadUsers;
             statusMessageTextbox.Text = "Upload Users"+Environment.NewLine;
+            this.ShowDialog();
+        }
+
+        public void transferUsers(string content, int incrementSize = 25)
+        {
+            m_content = content;
+            m_incrementSize = incrementSize;
+            m_currentOperation = Operation.TransferUsers;
+            statusMessageTextbox.Text = "Transfer Users" + Environment.NewLine;
             this.ShowDialog();
         }
 

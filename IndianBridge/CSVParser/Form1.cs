@@ -126,8 +126,9 @@ namespace CSVParser
 		private void button1_Click(object sender, EventArgs e)
 		{
 			// TODO : Use form values (or use login form)
-			string siteName = "http://bfitest.bfi.net.in/";
-			string username = "vdevadass";
+            string siteName = "http://127.0.0.1/bfi/";
+            //string siteName = "http://bfitest.bfi.net.in/";
+            string username = "vdevadass";
 			string password = "bitspilani";
 
 			string pagePath = txtPath.Text; // /tourneys/winter-national/y2012/results/team-event
