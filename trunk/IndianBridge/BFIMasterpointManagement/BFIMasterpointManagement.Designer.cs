@@ -56,6 +56,12 @@
             this.loadUsersButton = new System.Windows.Forms.Button();
             this.usersTextbox = new System.Windows.Forms.TextBox();
             this.uploadUsersButton = new System.Windows.Forms.Button();
+            this.transferUsers = new System.Windows.Forms.TabPage();
+            this.splitContainer10 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer11 = new System.Windows.Forms.SplitContainer();
+            this.loadUsersToTransferButton = new System.Windows.Forms.Button();
+            this.transferUsersTextbox = new System.Windows.Forms.TextBox();
+            this.transferUsersButton = new System.Windows.Forms.Button();
             this.deleteUsers = new System.Windows.Forms.TabPage();
             this.splitContainer8 = new System.Windows.Forms.SplitContainer();
             this.splitContainer9 = new System.Windows.Forms.SplitContainer();
@@ -73,6 +79,7 @@
             this.statusMessageTextbox = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.loggingOutLabel = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.controlTabs.SuspendLayout();
             this.tournamentLevelMaster.SuspendLayout();
@@ -105,6 +112,15 @@
             this.splitContainer5.Panel1.SuspendLayout();
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
+            this.transferUsers.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).BeginInit();
+            this.splitContainer10.Panel1.SuspendLayout();
+            this.splitContainer10.Panel2.SuspendLayout();
+            this.splitContainer10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer11)).BeginInit();
+            this.splitContainer11.Panel1.SuspendLayout();
+            this.splitContainer11.Panel2.SuspendLayout();
+            this.splitContainer11.SuspendLayout();
             this.deleteUsers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer8)).BeginInit();
             this.splitContainer8.Panel1.SuspendLayout();
@@ -168,6 +184,7 @@
             this.controlTabs.Controls.Add(this.tournamentMaster);
             this.controlTabs.Controls.Add(this.eventMaster);
             this.controlTabs.Controls.Add(this.addUsers);
+            this.controlTabs.Controls.Add(this.transferUsers);
             this.controlTabs.Controls.Add(this.deleteUsers);
             this.controlTabs.Controls.Add(this.addMasterpoints);
             this.controlTabs.Controls.Add(this.responseMessage);
@@ -466,6 +483,91 @@
             this.uploadUsersButton.Visible = false;
             this.uploadUsersButton.Click += new System.EventHandler(this.uploadUsersButton_Click);
             // 
+            // transferUsers
+            // 
+            this.transferUsers.Controls.Add(this.splitContainer10);
+            this.transferUsers.Location = new System.Drawing.Point(4, 22);
+            this.transferUsers.Name = "transferUsers";
+            this.transferUsers.Padding = new System.Windows.Forms.Padding(3);
+            this.transferUsers.Size = new System.Drawing.Size(883, 607);
+            this.transferUsers.TabIndex = 7;
+            this.transferUsers.Text = "Transfer Users";
+            this.transferUsers.UseVisualStyleBackColor = true;
+            // 
+            // splitContainer10
+            // 
+            this.splitContainer10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer10.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer10.Name = "splitContainer10";
+            this.splitContainer10.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer10.Panel1
+            // 
+            this.splitContainer10.Panel1.Controls.Add(this.splitContainer11);
+            // 
+            // splitContainer10.Panel2
+            // 
+            this.splitContainer10.Panel2.Controls.Add(this.transferUsersButton);
+            this.splitContainer10.Size = new System.Drawing.Size(877, 601);
+            this.splitContainer10.SplitterDistance = 484;
+            this.splitContainer10.TabIndex = 2;
+            // 
+            // splitContainer11
+            // 
+            this.splitContainer11.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer11.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer11.Name = "splitContainer11";
+            this.splitContainer11.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer11.Panel1
+            // 
+            this.splitContainer11.Panel1.Controls.Add(this.loadUsersToTransferButton);
+            // 
+            // splitContainer11.Panel2
+            // 
+            this.splitContainer11.Panel2.Controls.Add(this.transferUsersTextbox);
+            this.splitContainer11.Size = new System.Drawing.Size(877, 484);
+            this.splitContainer11.SplitterDistance = 105;
+            this.splitContainer11.TabIndex = 0;
+            // 
+            // loadUsersToTransferButton
+            // 
+            this.loadUsersToTransferButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.loadUsersToTransferButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loadUsersToTransferButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loadUsersToTransferButton.Location = new System.Drawing.Point(0, 0);
+            this.loadUsersToTransferButton.Name = "loadUsersToTransferButton";
+            this.loadUsersToTransferButton.Size = new System.Drawing.Size(877, 105);
+            this.loadUsersToTransferButton.TabIndex = 2;
+            this.loadUsersToTransferButton.Text = "Load Users to Transfer from File";
+            this.loadUsersToTransferButton.UseVisualStyleBackColor = false;
+            this.loadUsersToTransferButton.Click += new System.EventHandler(this.loadUsersToTransferButton_Click);
+            // 
+            // transferUsersTextbox
+            // 
+            this.transferUsersTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.transferUsersTextbox.Location = new System.Drawing.Point(0, 0);
+            this.transferUsersTextbox.Multiline = true;
+            this.transferUsersTextbox.Name = "transferUsersTextbox";
+            this.transferUsersTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.transferUsersTextbox.Size = new System.Drawing.Size(877, 375);
+            this.transferUsersTextbox.TabIndex = 2;
+            // 
+            // transferUsersButton
+            // 
+            this.transferUsersButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.transferUsersButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.transferUsersButton.Enabled = false;
+            this.transferUsersButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.transferUsersButton.Location = new System.Drawing.Point(0, 0);
+            this.transferUsersButton.Name = "transferUsersButton";
+            this.transferUsersButton.Size = new System.Drawing.Size(877, 113);
+            this.transferUsersButton.TabIndex = 1;
+            this.transferUsersButton.Text = "Transfer Users";
+            this.transferUsersButton.UseVisualStyleBackColor = false;
+            this.transferUsersButton.Visible = false;
+            this.transferUsersButton.Click += new System.EventHandler(this.transferUsersButton_Click);
+            // 
             // deleteUsers
             // 
             this.deleteUsers.Controls.Add(this.splitContainer8);
@@ -677,15 +779,28 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
+            // loggingOutLabel
+            // 
+            this.loggingOutLabel.AutoSize = true;
+            this.loggingOutLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.loggingOutLabel.ForeColor = System.Drawing.Color.Red;
+            this.loggingOutLabel.Location = new System.Drawing.Point(285, 313);
+            this.loggingOutLabel.Name = "loggingOutLabel";
+            this.loggingOutLabel.Size = new System.Drawing.Size(321, 29);
+            this.loggingOutLabel.TabIndex = 9;
+            this.loggingOutLabel.Text = "Logging out. Please wait...";
+            // 
             // BFIMasterpointManagement
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(891, 655);
+            this.Controls.Add(this.loggingOutLabel);
             this.Controls.Add(this.controlTabs);
             this.Controls.Add(this.statusStrip1);
             this.Name = "BFIMasterpointManagement";
             this.Text = "BFI Masterpoint Management";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BFIMasterpointManagement_FormClosing);
             this.Shown += new System.EventHandler(this.BFIMasterpointManagement_Shown);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -721,6 +836,16 @@
             this.splitContainer5.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
+            this.transferUsers.ResumeLayout(false);
+            this.splitContainer10.Panel1.ResumeLayout(false);
+            this.splitContainer10.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer10)).EndInit();
+            this.splitContainer10.ResumeLayout(false);
+            this.splitContainer11.Panel1.ResumeLayout(false);
+            this.splitContainer11.Panel2.ResumeLayout(false);
+            this.splitContainer11.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer11)).EndInit();
+            this.splitContainer11.ResumeLayout(false);
             this.deleteUsers.ResumeLayout(false);
             this.splitContainer8.Panel1.ResumeLayout(false);
             this.splitContainer8.Panel2.ResumeLayout(false);
@@ -793,6 +918,13 @@
         private System.Windows.Forms.Button loadUsersToDeleteButton;
         private System.Windows.Forms.TextBox deleteUsersTextbox;
         private System.Windows.Forms.Button deleteUsersButton;
+        private System.Windows.Forms.TabPage transferUsers;
+        private System.Windows.Forms.SplitContainer splitContainer10;
+        private System.Windows.Forms.SplitContainer splitContainer11;
+        private System.Windows.Forms.Button loadUsersToTransferButton;
+        private System.Windows.Forms.TextBox transferUsersTextbox;
+        private System.Windows.Forms.Button transferUsersButton;
+        private System.Windows.Forms.Label loggingOutLabel;
     }
 }
 

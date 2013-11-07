@@ -53,7 +53,7 @@ namespace BFIMasterpointManagement
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Error when trying to add Tournament Level because : " + result["content"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error when trying to add Tournament Level because : " + result["message"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {

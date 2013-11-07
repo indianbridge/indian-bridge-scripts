@@ -39,6 +39,12 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.openExcelFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.usernameTB = new System.Windows.Forms.TextBox();
+            this.passwordTB = new System.Windows.Forms.TextBox();
+            this.sessionIDTB = new System.Windows.Forms.TextBox();
+            this.validateButton = new System.Windows.Forms.Button();
+            this.invalidateButton = new System.Windows.Forms.Button();
+            this.getTableDataButton = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,7 +68,7 @@
             this.operationStatus,
             this.operationProgressBar,
             this.operationCancelButton});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 192);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 345);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(927, 23);
             this.statusStrip1.TabIndex = 1;
@@ -111,11 +117,68 @@
             // 
             this.openExcelFileDialog.FileName = "openExcelFiledialog";
             // 
+            // usernameTB
+            // 
+            this.usernameTB.Location = new System.Drawing.Point(47, 221);
+            this.usernameTB.Name = "usernameTB";
+            this.usernameTB.Size = new System.Drawing.Size(263, 20);
+            this.usernameTB.TabIndex = 4;
+            // 
+            // passwordTB
+            // 
+            this.passwordTB.Location = new System.Drawing.Point(47, 247);
+            this.passwordTB.Name = "passwordTB";
+            this.passwordTB.Size = new System.Drawing.Size(263, 20);
+            this.passwordTB.TabIndex = 5;
+            // 
+            // sessionIDTB
+            // 
+            this.sessionIDTB.Location = new System.Drawing.Point(47, 273);
+            this.sessionIDTB.Name = "sessionIDTB";
+            this.sessionIDTB.Size = new System.Drawing.Size(263, 20);
+            this.sessionIDTB.TabIndex = 6;
+            // 
+            // validateButton
+            // 
+            this.validateButton.Location = new System.Drawing.Point(413, 192);
+            this.validateButton.Name = "validateButton";
+            this.validateButton.Size = new System.Drawing.Size(185, 49);
+            this.validateButton.TabIndex = 7;
+            this.validateButton.Text = "Validate";
+            this.validateButton.UseVisualStyleBackColor = true;
+            this.validateButton.Click += new System.EventHandler(this.validateButton_Click);
+            // 
+            // invalidateButton
+            // 
+            this.invalidateButton.Location = new System.Drawing.Point(413, 247);
+            this.invalidateButton.Name = "invalidateButton";
+            this.invalidateButton.Size = new System.Drawing.Size(185, 49);
+            this.invalidateButton.TabIndex = 8;
+            this.invalidateButton.Text = "Invalidate";
+            this.invalidateButton.UseVisualStyleBackColor = true;
+            this.invalidateButton.Click += new System.EventHandler(this.invalidateButton_Click);
+            // 
+            // getTableDataButton
+            // 
+            this.getTableDataButton.Location = new System.Drawing.Point(637, 192);
+            this.getTableDataButton.Name = "getTableDataButton";
+            this.getTableDataButton.Size = new System.Drawing.Size(185, 49);
+            this.getTableDataButton.TabIndex = 9;
+            this.getTableDataButton.Text = "Get Table Data";
+            this.getTableDataButton.UseVisualStyleBackColor = true;
+            this.getTableDataButton.Click += new System.EventHandler(this.getTableDataButton_Click);
+            // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(927, 215);
+            this.ClientSize = new System.Drawing.Size(927, 368);
+            this.Controls.Add(this.getTableDataButton);
+            this.Controls.Add(this.invalidateButton);
+            this.Controls.Add(this.validateButton);
+            this.Controls.Add(this.sessionIDTB);
+            this.Controls.Add(this.passwordTB);
+            this.Controls.Add(this.usernameTB);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.statusStrip1);
@@ -141,6 +204,12 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.OpenFileDialog openExcelFileDialog;
+        private System.Windows.Forms.TextBox usernameTB;
+        private System.Windows.Forms.TextBox passwordTB;
+        private System.Windows.Forms.TextBox sessionIDTB;
+        private System.Windows.Forms.Button validateButton;
+        private System.Windows.Forms.Button invalidateButton;
+        private System.Windows.Forms.Button getTableDataButton;
 
 
 

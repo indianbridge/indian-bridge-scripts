@@ -16,11 +16,13 @@ using System.Net;
 using FtpLib;
 using Excel;
 using System.Text.RegularExpressions;
+using IndianBridge.WordpressAPIs;
 
 namespace IndianBridge
 {
     public partial class TestForm : Form
     {
+        ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfi", "", "");
         public TestForm()
         {
             InitializeComponent();
@@ -54,6 +56,27 @@ namespace IndianBridge
         {
             string value = textBox1.Text;
             MessageBox.Show(Utilities.getNextCode(value));
+        }
+
+        private void validateButton_Click(object sender, EventArgs e)
+        {
+            string result = mm.validateCredentials();
+            MessageBox.Show(result);
+            textBox1.Text = result;
+        }
+
+        private void invalidateButton_Click(object sender, EventArgs e)
+        {
+            string result = mm.invalidateCredentials();
+            MessageBox.Show(result);
+            textBox1.Text = result;
+        }
+
+        private void getTableDataButton_Click(object sender, EventArgs e)
+        {
+            string result = mm.getTableData("bfi_tournament_master");
+            MessageBox.Show(result);
+            textBox1.Text = result;
         }
     }
 }

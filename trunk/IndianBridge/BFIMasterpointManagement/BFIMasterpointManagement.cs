@@ -20,6 +20,7 @@ namespace BFIMasterpointManagement
 	{
 		ManageMasterpoints mm;
         UploadProgress up = null;
+        bool loggedIn = false;
 		
 		private Dictionary<string, string> m_getTournamentLevelResult;
 		private Dictionary<string, string> m_getTournamentResult;
@@ -103,10 +104,7 @@ namespace BFIMasterpointManagement
 
 		private void getEvents(object sender, DoWorkEventArgs e)
 		{
-			TableInfo tableInfo = new TableInfo();
-			tableInfo.tableName = "bfi_event_master";
-            tableInfo.delimiter = fieldSeparator;
-			string json_result = mm.getTableData(tableInfo);
+            string json_result = mm.getTableData("bfi_event_master");
             m_getEventResult = Utilities.convertJsonOutput(json_result);
 		}
 
@@ -142,10 +140,7 @@ namespace BFIMasterpointManagement
 
 		private void getTournaments(object sender, DoWorkEventArgs e)
 		{
-			TableInfo tableInfo = new TableInfo();
-			tableInfo.tableName = "bfi_tournament_master";
-            tableInfo.delimiter = fieldSeparator;
-			string json_result = mm.getTableData(tableInfo);
+            string json_result = mm.getTableData("bfi_tournament_master");
             m_getTournamentResult = Utilities.convertJsonOutput(json_result);
 		}
 
@@ -177,50 +172,71 @@ namespace BFIMasterpointManagement
 
 		private void getTournamentLevels(object sender, DoWorkEventArgs e)
 		{
-			TableInfo tableInfo = new TableInfo();
-			tableInfo.tableName = "bfi_tournament_level_master";
-            tableInfo.delimiter = fieldSeparator;
-			string json_result = mm.getTableData(tableInfo);
+            string json_result = mm.getTableData("bfi_tournament_level_master");
             m_getTournamentLevelResult = Utilities.convertJsonOutput(json_result);
 		}
 
 
-		private void validateCredentials(bool closeOnError)
+		private void validateCredentials()
 		{
+            loggingOutLabel.SendToBack();
+            loggingOutLabel.Visible = false;
 			AddTournamentLevel vmc = new AddTournamentLevel();
 			vmc.StartPosition = FormStartPosition.CenterParent;
-			if (vmc.ShowDialog(this) == DialogResult.Cancel)
-			{
-				if (closeOnError) this.Close();
-				return;
-			}
-			mm = vmc.mm;
-            up = new UploadProgress(mm);
-			toolStripUsername.Text = "Logged in as : " + mm.UserName;
-			toolStripLoginButton.Enabled = true;
-			loadTournamentLevels();
-			loadTournaments();
-			loadEvents();
+            if (vmc.ShowDialog(this) == DialogResult.Cancel)
+            {
+                toolStripUsername.Text = "Not Logged in";
+                toolStripLoginButton.Enabled = true;
+                loggedIn = false;
+            }
+            else
+            {
+                mm = vmc.mm;
+                up = new UploadProgress(mm);
+                toolStripUsername.Text = "Logged in as : " + mm.UserName;
+                toolStripLoginButton.Enabled = true;
+                loggedIn = true;
+                loadTournamentLevels();
+                loadTournaments();
+                loadEvents();
+            }
 		}
 
 		private void toolStripLoginButton_ButtonClick(object sender, EventArgs e)
 		{
-			validateCredentials(false);
+            DialogResult result = MessageBox.Show("Are you sure you want to logout current user and login as different user?", "Are you Sure", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.Yes)
+            {
+                logOut();
+                validateCredentials();
+            }
 		}
 
 		private void BFIMasterpointManagement_Shown(object sender, EventArgs e)
 		{
-			validateCredentials(true);
+			validateCredentials();
 		}
+
+        private bool checkIfLoggedIn()
+        {
+            if (!loggedIn)
+            {
+                MessageBox.Show("You are not logged in. Please Login using the button at the bottom before proceeding", "Not Logged In!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return loggedIn;
+        }
 
 		private void addTournamentLevelButton_Click(object sender, EventArgs e)
 		{
-			AddNewTournamentLevel atl = new AddNewTournamentLevel(mm);
-			atl.StartPosition = FormStartPosition.CenterParent;
-			if (atl.ShowDialog(this) != DialogResult.Cancel)
-			{
-				loadTournamentLevels();
-			}
+            if (checkIfLoggedIn())
+            {
+                AddNewTournamentLevel atl = new AddNewTournamentLevel(mm);
+                atl.StartPosition = FormStartPosition.CenterParent;
+                if (atl.ShowDialog(this) != DialogResult.Cancel)
+                {
+                    loadTournamentLevels();
+                }
+            }
 		}
 
 		private void ttmDataGridView_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -238,23 +254,29 @@ namespace BFIMasterpointManagement
 
 		private void addTournamentButton_Click(object sender, EventArgs e)
 		{
-			AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView,tmDataGridView , null);
-			ant.StartPosition = FormStartPosition.CenterParent;
-			if (ant.ShowDialog(this) != DialogResult.Cancel)
-			{
-				loadTournaments();
-			}
+            if (checkIfLoggedIn())
+            {
+                AddNewTournament ant = new AddNewTournament(mm, ttmDataGridView, tmDataGridView, null);
+                ant.StartPosition = FormStartPosition.CenterParent;
+                if (ant.ShowDialog(this) != DialogResult.Cancel)
+                {
+                    loadTournaments();
+                }
+            }
 
 		}
 
 		private void addEventButton_Click(object sender, EventArgs e)
 		{
-			AddNewEvent ane = new AddNewEvent(mm,emDataGridView);
-			ane.StartPosition = FormStartPosition.CenterParent;
-			if (ane.ShowDialog(this) != DialogResult.Cancel)
-			{
-				loadEvents();
-			}
+            if (checkIfLoggedIn())
+            {
+                AddNewEvent ane = new AddNewEvent(mm, emDataGridView);
+                ane.StartPosition = FormStartPosition.CenterParent;
+                if (ane.ShowDialog(this) != DialogResult.Cancel)
+                {
+                    loadEvents();
+                }
+            }
 		}
 
 
@@ -286,14 +308,17 @@ namespace BFIMasterpointManagement
 
         private void uploadUsersButton_Click(object sender, EventArgs e)
         {
-            statusMessageTextbox.Text = "";
-            controlTabs.SelectTab("responseMessage");
-            controlTabs.Enabled = false;
-            up.uploadUsers(usersTextbox.Text);
-            if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
-            else statusMessageTextbox.ForeColor = Color.Green;
-            statusMessageTextbox.AppendText(up.statusText);
-            controlTabs.Enabled = true;
+            if (checkIfLoggedIn())
+            {
+                statusMessageTextbox.Text = "";
+                controlTabs.SelectTab("responseMessage");
+                controlTabs.Enabled = false;
+                up.uploadUsers(usersTextbox.Text);
+                if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
+                else statusMessageTextbox.ForeColor = Color.Green;
+                statusMessageTextbox.AppendText(up.statusText + Environment.NewLine + "Details" + Environment.NewLine + up.m_returnContent);
+                controlTabs.Enabled = true;
+            }
         }
 
 		private void loadMasterpointsButton_Click(object sender, EventArgs e)
@@ -324,14 +349,17 @@ namespace BFIMasterpointManagement
 
         private void uploadMasterpointsButton_Click(object sender, EventArgs e)
         {
-            statusMessageTextbox.Text = "";
-            controlTabs.SelectTab("responseMessage");
-            controlTabs.Enabled = false;
-            up.uploadMasterpoints(masterpointsTextbox.Text);
-            if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
-            else statusMessageTextbox.ForeColor = Color.Green;
-            statusMessageTextbox.AppendText(up.statusText);
-            controlTabs.Enabled = true;
+            if (checkIfLoggedIn())
+            {
+                statusMessageTextbox.Text = "";
+                controlTabs.SelectTab("responseMessage");
+                controlTabs.Enabled = false;
+                up.uploadMasterpoints(masterpointsTextbox.Text);
+                if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
+                else statusMessageTextbox.ForeColor = Color.Green;
+                statusMessageTextbox.AppendText(up.statusText);
+                controlTabs.Enabled = true;
+            }
         }
 
         private void loadUsersToDeleteButton_Click(object sender, EventArgs e)
@@ -362,14 +390,77 @@ namespace BFIMasterpointManagement
 
         private void deleteUsersButton_Click(object sender, EventArgs e)
         {
-            statusMessageTextbox.Text = "";
-            controlTabs.SelectTab("responseMessage");
-            controlTabs.Enabled = false;
-            up.deleteUsers(deleteUsersTextbox.Text);
-            if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
-            else statusMessageTextbox.ForeColor = Color.Green;
-            statusMessageTextbox.AppendText(up.statusText);
-            controlTabs.Enabled = true;
+            if (checkIfLoggedIn())
+            {
+                statusMessageTextbox.Text = "";
+                controlTabs.SelectTab("responseMessage");
+                controlTabs.Enabled = false;
+                up.deleteUsers(deleteUsersTextbox.Text);
+                if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
+                else statusMessageTextbox.ForeColor = Color.Green;
+                statusMessageTextbox.AppendText(up.statusText);
+                controlTabs.Enabled = true;
+            }
+        }
+
+        private void loadUsersToTransferButton_Click(object sender, EventArgs e)
+        {
+            var dResult = openFileDialog1.ShowDialog();
+            if (dResult != DialogResult.OK) return;
+            var file = openFileDialog1.FileName;
+            string errorMessage = "";
+            bool error = false;
+            string csvContents = MasterpointManagementUtilties.loadTransferUsersFile(file, ref errorMessage, ref error);
+            if (error)
+            {
+                transferUsersButton.Enabled = false;
+                transferUsersButton.Visible = false;
+                transferUsersTextbox.ForeColor = Color.Red;
+                transferUsersTextbox.Text = errorMessage;
+                Utilities.showErrorMessage("Errors Found! See textbox for details.");
+            }
+            else
+            {
+                transferUsersButton.Enabled = true;
+                transferUsersButton.Visible = true;
+                transferUsersTextbox.ForeColor = Color.Green;
+                transferUsersTextbox.Text = csvContents;
+            }
+            return;
+        }
+
+        private void transferUsersButton_Click(object sender, EventArgs e)
+        {
+            if (checkIfLoggedIn())
+            {
+                statusMessageTextbox.Text = "";
+                controlTabs.SelectTab("responseMessage");
+                controlTabs.Enabled = false;
+                up.transferUsers(transferUsersTextbox.Text);
+                if (up.errorFound) statusMessageTextbox.ForeColor = Color.Red;
+                else statusMessageTextbox.ForeColor = Color.Green;
+                statusMessageTextbox.AppendText(up.statusText);
+                controlTabs.Enabled = true;
+            }
+        }
+
+        private void logOut()
+        {
+            controlTabs.Visible = false;
+            loggingOutLabel.Visible = true;
+            controlTabs.SendToBack();
+            loggingOutLabel.BringToFront();
+            this.Refresh();
+            mm.invalidateCredentials();
+            controlTabs.Visible = true;
+            loggingOutLabel.Visible = false;
+            controlTabs.BringToFront();
+            loggingOutLabel.SendToBack();
+        }
+
+        private void BFIMasterpointManagement_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (loggedIn) logOut();
         }
 	}
 }

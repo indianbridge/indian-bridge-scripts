@@ -104,6 +104,10 @@
       <Project>{042A360C-0A60-43EE-87E6-0FBD16EC7BDF}</Project>
       <Name>GoogleAPIs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\WordpressAPIs\WordpressAPIs.csproj">
+      <Project>{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}</Project>
+      <Name>WordpressAPIs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

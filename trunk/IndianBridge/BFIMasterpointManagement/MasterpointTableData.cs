@@ -41,6 +41,16 @@ namespace BFIMasterpointManagement
             return dataTableToCSV(table);
         }
 
+        public static string loadTransferUsersFile(string fileName, ref string errorMessage, ref bool error)
+        {
+            DataTable table = createTransferUserDataTable();
+            loadDataTable(fileName, ref table, ref errorMessage, ref error);
+            if (error) return "";
+            checkTransferUserDataTable(ref table, ref errorMessage, ref error);
+            if (error) return "";
+            return dataTableToCSV(table);
+        }
+
 
         private static void checkUserDataTable(ref DataTable table, ref string errorMessage, ref bool error)
         {
@@ -48,6 +58,17 @@ namespace BFIMasterpointManagement
             foreach (DataRow row in table.Rows)
             {
                 checkStringLength(row, "member_id", 8, ref errorMessage, ref error, "At Row " + rowNo + " : ");
+                rowNo++;
+            }
+        }
+
+        private static void checkTransferUserDataTable(ref DataTable table, ref string errorMessage, ref bool error)
+        {
+            int rowNo = 2;
+            foreach (DataRow row in table.Rows)
+            {
+                checkStringLength(row, "old_member_id", 8, ref errorMessage, ref error, "At Row " + rowNo + " : ");
+                checkStringLength(row, "new_member_id", 8, ref errorMessage, ref error, "At Row " + rowNo + " : ");
                 rowNo++;
             }
         }
@@ -188,6 +209,14 @@ namespace BFIMasterpointManagement
         {
             DataTable table = new DataTable();
             table.Columns.Add(createStringDataColumn("member_id", false));
+            return table;
+        }
+
+        private static DataTable createTransferUserDataTable()
+        {
+            DataTable table = new DataTable();
+            table.Columns.Add(createStringDataColumn("old_member_id", false));
+            table.Columns.Add(createStringDataColumn("new_member_id", false));
             return table;
         }
 

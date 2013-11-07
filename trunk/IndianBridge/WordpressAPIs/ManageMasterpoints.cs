@@ -9,29 +9,49 @@ namespace IndianBridge.WordpressAPIs
 
     public interface XMLRPCInterface
     {
+        [CookComputing.XmlRpc.XmlRpcMethod("bfi.validateCredentials")]
+        string validateCredentials(Credentials credentials);
+        [CookComputing.XmlRpc.XmlRpcMethod("bfi.invalidateCredentials")]
+        string invalidateCredentials(Session session);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.validateMasterpointCredentials")]
         string validateMasterpointCredentials(int blogId, string username, string password);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.getTableData")]
-        string getTableData(int blogId, string username, string password, TableInfo tableInfo);
+        string getTableData(TableInfo tableInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addTournamentLevel")]
-        string addTournamentLevel(int blogId, string username, string password, TournamentLevelInfo tournamentInfo);
+        string addTournamentLevel(TournamentLevelInfo tournamentInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addTournament")]
-        string addTournament(int blogId, string username, string password, TournamentInfo tournamentInfo);
+        string addTournament(TournamentInfo tournamentInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addEvent")]
-        string addEvent(int blogId, string username, string password, EventInfo eventInfo);
+        string addEvent(EventInfo eventInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addUsers")]
-        string addUsers(int blogId, string username, string password, TableInfo tableInfo);
+        string addUsers(TableInfo tableInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.deleteUsers")]
-        string deleteUsers(int blogId, string username, string password, TableInfo tableInfo);
+        string deleteUsers(TableInfo tableInfo);
+        [CookComputing.XmlRpc.XmlRpcMethod("bfi.transferUsers")]
+        string transferUsers(TableInfo tableInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addMasterpoints")]
-        string addMasterpoints(int blogId, string username, string password, TableInfo tableInfo);
+        string addMasterpoints(TableInfo tableInfo);
+    }
+
+    public class Credentials
+    {
+        public string username = "";
+        public string password = "";
+        public string delimiter = "~";
+    }
+
+    public class Session
+    {
+        public string session_id = "";
+        public string delimiter = "~";
     }
 
     public class TableInfo
     {
-        public string tableName = "";
+        public string session_id = "";
+        public string table_name = "";
         public string content = "";
-        public string delimiter = "";
+        public string delimiter = "~";
         public string where = "";
         public string orderBy = "";
         public string limit = "";
@@ -39,6 +59,7 @@ namespace IndianBridge.WordpressAPIs
 
     public class TournamentLevelInfo
     {
+        public string session_id = "";
         public string tournament_level_code = "";
         public string description = "";
         public string tournament_type = "";
@@ -46,6 +67,7 @@ namespace IndianBridge.WordpressAPIs
 
     public class TournamentInfo
     {
+        public string session_id = "";
         public string tournament_code = "";
         public string description = "";
         public string tournament_level_code = "";
@@ -53,6 +75,7 @@ namespace IndianBridge.WordpressAPIs
 
     public class EventInfo
     {
+        public string session_id = "";
         public string event_code = "";
         public string description = "";
     }
@@ -64,6 +87,8 @@ namespace IndianBridge.WordpressAPIs
         private string m_siteName = null;
         private string m_xmlrpcURL = null;
         private string m_userName = null;
+        public string m_session_id = "";
+        private string m_delimiter = "~";
 
         public string UserName
         {
@@ -88,11 +113,15 @@ namespace IndianBridge.WordpressAPIs
 
         }
 
-        public string validateMasterpointCredentials()
+        public string validateCredentials()
         {
             try
             {
-                return m_interface.validateMasterpointCredentials(1, m_userName, m_password);
+                Credentials credentials = new Credentials();
+                credentials.username = m_userName;
+                credentials.password = m_password;
+                credentials.delimiter = m_delimiter;
+                return m_interface.validateCredentials(credentials);
             }
             catch (Exception e)
             {
@@ -100,12 +129,30 @@ namespace IndianBridge.WordpressAPIs
             }
         }
 
-
-        public string getTableData(TableInfo tableInfo)
+        public string invalidateCredentials()
         {
             try
             {
-                return m_interface.getTableData(1, m_userName, m_password,tableInfo);
+                Session session = new Session();
+                session.session_id = m_session_id;
+                session.delimiter = m_delimiter;
+                return m_interface.invalidateCredentials(session);
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
+
+        public string getTableData(string table_name)
+        {
+            try
+            {
+                TableInfo tableInfo = new TableInfo();
+                tableInfo.session_id = m_session_id;
+                tableInfo.delimiter = m_delimiter;
+                tableInfo.table_name = table_name;
+                return m_interface.getTableData(tableInfo);
             }
             catch (Exception e)
             {
@@ -117,7 +164,8 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.addTournamentLevel(1, m_userName, m_password, tournamentLevelInfo);
+                tournamentLevelInfo.session_id = m_session_id;
+                return m_interface.addTournamentLevel(tournamentLevelInfo);
             }
             catch (Exception e)
             {
@@ -129,7 +177,8 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.addTournament(1, m_userName, m_password, tournamentInfo);
+                tournamentInfo.session_id = m_session_id;
+                return m_interface.addTournament(tournamentInfo);
             }
             catch (Exception e)
             {
@@ -141,7 +190,8 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.addEvent(1, m_userName, m_password, eventInfo);
+                eventInfo.session_id = m_session_id;
+                return m_interface.addEvent(eventInfo);
             }
             catch (Exception e)
             {
@@ -153,7 +203,8 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.addUsers(1, m_userName, m_password, tableInfo);
+                tableInfo.session_id = m_session_id;
+                return m_interface.addUsers(tableInfo);
             }
             catch (Exception e)
             {
@@ -165,7 +216,21 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.deleteUsers(1, m_userName, m_password, tableInfo);
+                tableInfo.session_id = m_session_id;
+                return m_interface.deleteUsers(tableInfo);
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
+
+        public string transferUsers(TableInfo tableInfo)
+        {
+            try
+            {
+                tableInfo.session_id = m_session_id;
+                return m_interface.transferUsers(tableInfo);
             }
             catch (Exception e)
             {
@@ -177,7 +242,8 @@ namespace IndianBridge.WordpressAPIs
         {
             try
             {
-                return m_interface.addMasterpoints(1, m_userName, m_password, tableInfo);
+                tableInfo.session_id = m_session_id;
+                return m_interface.addMasterpoints(tableInfo);
             }
             catch (Exception e)
             {

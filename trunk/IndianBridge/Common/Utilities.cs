@@ -172,7 +172,7 @@ namespace IndianBridge.Common
 
         public static Dictionary<string, string> convertJsonOutput(string json_result)
         {
-            string jsonDelimiter = "!@#";
+            string jsonDelimiter = "~";
             Dictionary<string, string> result = new Dictionary<string, string>();
             string[] lines = json_result.Split(new string[] { jsonDelimiter }, StringSplitOptions.None);
             if (lines.Length < 3)

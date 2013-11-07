@@ -37,16 +37,16 @@ namespace BFIMasterpointManagement
             loadingPicture.Visible = true;
             loadingPicture.BringToFront();
             this.Refresh();
-            //mm = new ManageMasterpoints("http://bridgefederationofindia.zippysites.com/", usernameTextbox.Text, passwordTextbox.Text);
-            //mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
-            mm = new ManageMasterpoints("http://bfi.net.in", usernameTextbox.Text, passwordTextbox.Text);
-            string json_result = mm.validateMasterpointCredentials();
+            mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
+            //mm = new ManageMasterpoints("http://bfi.net.in", usernameTextbox.Text, passwordTextbox.Text);
+            string json_result = mm.validateCredentials();
             Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
             bool errorStatus = Convert.ToBoolean(result["error"]);
             loadingPicture.Visible = false;
             loginPanel.Enabled = true;
             if (!errorStatus)
             {
+                mm.m_session_id = result["content"];
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
