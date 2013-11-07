@@ -47,7 +47,7 @@ All in one calendar
 Updraft Plus
 
 	in backup.php in function backup_db
-		Line 768 : change to 				if ( strpos($table, $table_prefix) === 0 || strpos($table,'bfi_') === 0) {
+		Line 768 : change to 				if ( strpos($table, $this->table_prefix) === 0 || strpos($table,'bfi_') === 0) {
 		
 Mingle Forum
 	in bbcode.php
