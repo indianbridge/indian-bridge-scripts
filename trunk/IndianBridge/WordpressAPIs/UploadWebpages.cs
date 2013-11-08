@@ -130,7 +130,6 @@ namespace IndianBridge.WordpressAPIs
             m_e = e;
             uploadDirectoryInternal(directory, siteRoot);
             if (cancel()) m_e.Cancel = true;
-            
         }
 
         public void uploadDirectory(String directory, String siteRoot)
@@ -139,12 +138,13 @@ namespace IndianBridge.WordpressAPIs
             m_worker = null;
             m_e = null;
             uploadDirectoryInternal(directory, siteRoot.TrimEnd(new[] { '/', '\\' }));
-            if (cancel()) m_e.Cancel = true;
         }
 
         public void uploadDirectoryInternal(String directory, String siteRoot)
         {
             if (File.Exists(directory)) {
+                totalPagesToUpload = 1;
+                numberOfPagesAlreadyUploaded = 0;
                 uploadSingleFile(directory, siteRoot);
                 return;
             }
@@ -239,6 +239,8 @@ namespace IndianBridge.WordpressAPIs
                         printMessage("NOT UPDATED. (Last Modified Time " + lastModified.ToString() + " is earlier than (or equal to) last update time " + lastRunTime.ToString() + ")");
                     }
                 }
+                numberOfPagesAlreadyUploaded++;
+                reportProgress(title);
                 return true;
             }
             catch (Exception ex)
