@@ -67,6 +67,7 @@ namespace BFIMasterpointManagement
                         break;
                         case Operation.TransferUsers:
                         json_result = m_mm.transferUsers(tableInfo);
+                        MessageBox.Show(json_result);
                         break;
                         case Operation.DeleteUsers:
                         json_result = m_mm.deleteUsers(tableInfo);
