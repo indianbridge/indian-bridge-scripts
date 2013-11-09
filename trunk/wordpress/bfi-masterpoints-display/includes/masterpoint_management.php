@@ -86,9 +86,11 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					throw new Exception($content);	
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
+				$this->updateOperationTime();
 				return $this->createSuccessMessage("Success!",$content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}	
@@ -118,9 +120,11 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					throw new Exception($content);	
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
+				$this->updateOperationTime($session);
 				return $this->createSuccessMessage("Success!",$content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}			
@@ -142,9 +146,11 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					throw new Exception($content);	
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
+				$this->updateOperationTime();
 				return $this->createSuccessMessage("Success!",$content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}	
@@ -253,9 +259,11 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 						$return_content .= $line.$delimiter.'failure'.$delimiter.$ex->getMessage().PHP_EOL;
 					}					
 				}
+				$this->updateOperationTime();
 				return $this->createMessage($error_flag, $return_message, $return_content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
@@ -313,46 +321,49 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 						$return_content .= $line.$delimiter.'failure'.$delimiter.$ex->getMessage().PHP_EOL;
 					}					
 				}
+				$this->updateOperationTime();
 				return $this->createMessage($error_flag, $return_message, $return_content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
 
-		public function deleteUser($member_id) {
-			$this->copyUser($member_id, true);
+		private function copyUserToDeleted($member_id, $tableName, $fieldName) {
+			$deleted_tableName = $tableName.'_deleted';
+			$results = $this -> bfi_masterpoint_db -> get_results($this -> bfi_masterpoint_db -> prepare("SELECT * FROM  $tableName WHERE $fieldName = %s", $member_id), ARRAY_A);
+			if ($results != null) {
+				foreach ($results as $index => $result) {
+					$return_value = $this -> bfi_masterpoint_db -> insert($deleted_tableName,$result);
+					if (false === $return_value) {
+						throw new Exception("Unable to copy data for $member_id from $tableName to $deleted_tableName");
+					}
+				}
+			}			
 		}
 
-		public function copyUser($member_id,$delete_after_copy) {
-			// copy existing user to deleted table
-			$tableName = $this -> table_prefix.'member';
-			$deleted_tableName = $tableName.'_deleted';
-			$results = $this -> bfi_masterpoint_db -> get_results($this -> bfi_masterpoint_db -> prepare("SELECT * FROM  $tableName WHERE member_id = %s", $member_id), ARRAY_A);
-			if ($results != null) {
-				foreach ($results as $index => $result) {
-					$return_value = $this -> bfi_masterpoint_db -> insert($deleted_tableName,$result);
-					if (false === $return_value) {
-						throw new Exception("Unable to copy data from $tableName to $deleted_tableName");
-					}
-				}
-			}
-	
-			// Copy Existing masterpoints	
-			$tableName = 	$this -> table_prefix . 'tournament_masterpoint';	
-			$deleted_tableName = $tableName.'_deleted';
-			$results = $this -> bfi_masterpoint_db -> get_results($this -> bfi_masterpoint_db -> prepare("SELECT * FROM  $tableName WHERE member_id = %s", $member_id), ARRAY_A);
-			if ($results != null) {
-				foreach ($results as $index => $result) {
-					$return_value = $this -> bfi_masterpoint_db -> insert($deleted_tableName,$result);
-					if (false === $return_value) {
-						throw new Exception("Unable to copy data from $tableName to $deleted_tableName");
-					}
-				}
-			}	
+		public function deleteUser($member_id,$copy_before_delete) {
 			
-			if ($delete_after_copy) {
-				// Delete the user here										
+			if ($copy_before_delete) {
+				// copy existing user to deleted table
+				$tableName = $this -> table_prefix.'member';
+				$fieldName = 'member_id';
+				$this->copyUserToDeleted($member_id, $tableName, $fieldName);
+		
+				// Copy Existing masterpoints	
+				$tableName = 	$this -> table_prefix . 'tournament_masterpoint';	
+				$fieldName = 'member_id';
+				$this->copyUserToDeleted($member_id, $tableName, $fieldName);				
+				
+				// Copy wordpress user
+				$tableName = "wp_users";
+				$fieldName = 'user_login';
+				$this->copyUserToDeleted($member_id, $tableName, $fieldName);				
+			}
+			
+			// Delete the user here	
+			if (username_exists($member_id)) {									
 				$reassign = 1;
 				$user = get_userdatabylogin($member_id);
 				$result = wp_delete_user($user->ID,$reassign);
@@ -362,18 +373,18 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				else if (true !== $result) {
 					throw new Exception('Unknown Error trying to delete Wordpress user ' . $member_id);						
 				}
-	
-				$tableName = $this -> table_prefix . "member";
-				$where = array('member_id'=>$member_id);
-				$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
-				if (false === $result) {
-					throw new Exception('Unknown Error trying to delete BFI member ' . $member_id);
-				} 
-				$tableName = $this -> table_prefix . "tournament_masterpoint";
-				$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
-				if (false === $result) {
-					throw new Exception('Unknown Error trying to delete masterpoints for BFI member ' . $member_id);
-				}
+			}
+
+			$tableName = $this -> table_prefix . "member";
+			$where = array('member_id'=>$member_id);
+			$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
+			if (false === $result) {
+				throw new Exception('Unknown Error trying to delete BFI member ' . $member_id);
+			} 
+			$tableName = $this -> table_prefix . "tournament_masterpoint";
+			$result = $this -> bfi_masterpoint_db -> delete($tableName, $where);
+			if (false === $result) {
+				throw new Exception('Unknown Error trying to delete masterpoints for BFI member ' . $member_id);
 			}
 		}
 
@@ -399,7 +410,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				for($i=1;$i < count($lines);$i++) {
 					try {
 						$line = $lines[$i];
-						$this->deleteUser($line);
+						$this->deleteUser($line,true);
 						$return_content .= $line.$delimiter.'success'.$delimiter.'Deleted User'.PHP_EOL;
 					}
 					catch (Exception $ex) {
@@ -408,63 +419,72 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 						$return_content .= $line.$delimiter.'failure'.$delimiter.$ex->getMessage().PHP_EOL;
 					}					
 				}
+				$this->updateOperationTime();
 				return $this->createMessage($error_flag, $return_message, $return_content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
 
-		public function transferUser($line,$fieldNames,$delimiter) {
-			$fields = explode($delimiter, $line);
-			if (count($fields) < count($fieldNames)) {
-				throw new Exception('Number of elements (' . strval(count($fields)) . ') is less than number of fieldNames (' . strval(count($fieldNames)) . ')');		
-			}
-			$values = array();
-			foreach ($fieldNames as $fieldIndex => $fieldName) {
-				$values[$fieldName] = $fields[$fieldIndex];
-			}	
-			$old_member_id = $values['old_member_id'];
-			$new_member_id = $values['new_member_id'];
-			
-			// Check if member exists
-			$tableName = $this -> table_prefix . 'member';
-			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE member_id = %s", $old_member_id));
+		private function transferUserInTable($old_member_id,$new_member_id,$tableName, $fieldName) {
+			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE $fieldName = %s", $old_member_id));
 			if ($alreadyExists < 1) {
-				throw new Exception("old_member_id: " . $old_member_id . ' does not exist in database!');
+				throw new Exception("old_member_id: " . $old_member_id . " does not exist in $tableName");
 			}
 			//Check if new member if exists
-			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE member_id = %s", $new_member_id));
+			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE $fieldName = %s", $new_member_id));
 			if ($alreadyExists >= 1) {
-				throw new Exception("new_member_id: " . $new_member_id . ' already exists in database! Delete it first.');
+				throw new Exception("new_member_id: " . $new_member_id . " already exists in $tableName! Delete it first.");
 			}
 			// transfer here
-			$data = array("member_id"=>$new_member_id);
-			$where = array("member_id"=>$old_member_id);
-			$tableName = $this->table_prefix.'member';
+			$data = array($fieldName=>$new_member_id);
+			$where = array($fieldName=>$old_member_id);
 			$result = $this->bfi_masterpoint_db->update($tableName,$data,$where);
 			if (false === result) {
-				throw new Exception("Unable to replace BFI member $old_member_id with $new_member_id");
-			}
+				throw new Exception("Unable to replace BFI member $old_member_id with $new_member_id in $tableName");
+			}	
+		}
 
-			$tableName = $this->table_prefix.'tournament_masterpoint';
-			$result = $this->bfi_masterpoint_db->update($tableName,$data,$where);
-			if (false === result) {
-				throw new Exception("Unable to replace masterpoints for BFI member $new_member_id with masterpoints for $old_member_id");
+		public function transferUser($old_member_id,$new_member_id) {
+			$this->transferUserInTable($old_member_id, $new_member_id, $this -> table_prefix . 'member', 'member_id');
+			$this->transferUserInTable($old_member_id, $new_member_id, $this -> table_prefix . 'tournament_masterpoint', 'member_id');
+			$this->transferUserInTable($old_member_id, $new_member_id, 'wp_users', 'user_login');
+		}
+
+		private function generateTempMemberID($var) {
+			$output = "$var";
+			while(strlen($output) < 8) {
+				$output .= "Z";
 			}
-			$tableName = 'wp_users';
-			$data = array("user_login"=>$new_member_id);
-			$where = array("user_login"=>$old_member_id);
-			$result = $this->bfi_masterpoint_db->update($tableName,$data,$where);
-			if (false === result) {
-				throw new Exception("Unable to replace Wordpress user $old_member_id with $new_member_id");
+			return $output;
+		}
+		
+		private function transferBetweenTempUsers(&$data,$toTemp) {
+			for($i = 0; $i < count($data); ++$i) {
+				$item = $data[$i];
+				if ($item['error'] !== true) {
+					try {
+						if ($toTemp === true) {
+							$this->transferUser($item['old_member_id'], $item['temp_member_id']);
+						}
+						else {
+							$this->transferUser($item['temp_member_id'], $item['new_member_id']);
+						}
+					}
+					catch (Exception $ex) {
+						$data[$i]['error'] = true;
+						$data[$i]['error_message'] = $ex->getMessage();
+					}	
+				}
 			}
 		}
 
 		public function transferUsers($params) {
 			try {
 				$parameterNames = array("session_id","delimiter","content");
-				$parameters = $this->checkParameters($params, $parameterNames);	
+				$parameters = $this->checkParameters($params, $parameterNames);
 				$session_id = $parameters['session_id'];
 				$delimiter = $parameters['delimiter'];		
 				$content = $parameters["content"];			
@@ -479,21 +499,59 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				$error_flag = "false";
 				$return_message = "No Errors Found";
 				$return_content = "";
+				$data = array();
 				for($i=1;$i < count($lines);$i++) {
-					try {
-						$line = $lines[$i];										
-						$this->transferUser($line, $fieldNames, $delimiter);
-						$return_content .= $line.$delimiter.'success'.$delimiter.'Transferred User'.PHP_EOL;
+					$line = $lines[$i];		
+					$fields = explode($delimiter, $line);
+					if (count($fields) < count($fieldNames)) {
+						$error = true;
+						$error_message = 'Number of elements (' . strval(count($fields)) . ') is less than number of fieldNames (' . strval(count($fieldNames)) . ')';
+						$old_member_id = "";
+						$new_member_id = "";
+						$temp_member_id = "";		
+						$data[] = array("line"=>$line,"error"=>$error,"error_message"=>$error_message,"old_member_id"=>$old_member_id,"new_member_id"=>$new_member_id,"temp_member_id"=>$temp_member_id);
 					}
-					catch (Exception $ex) {
+					else {
+						$values = array();
+						foreach ($fieldNames as $fieldIndex => $fieldName) {
+							$values[$fieldName] = $fields[$fieldIndex];
+						}	
+						$error = false;
+						$error_message = "";
+						$old_member_id = $values['old_member_id'];
+						$new_member_id = $values['new_member_id'];
+						$temp_member_id = $this->generateTempMemberID($i);
+						$data[] = array("line"=>$line,"error"=>$error,"error_message"=>$error_message,"old_member_id"=>$old_member_id,"new_member_id"=>$new_member_id,"temp_member_id"=>$temp_member_id);
+					}				
+				}
+				// Transfer to temp id
+				$this->transferBetweenTempUsers($data, true);
+				//return print_r($data,true);
+				// Delete 
+				for($i = 0; $i < count($data); ++$i) {
+					$item = $data[$i];
+					if ($item['error'] !== true) {
+						$this->deleteUser($item['new_member_id'], true);
+					}
+				}
+				// Transfer from temp id
+				$this->transferBetweenTempUsers($data, false);
+				for($i = 0; $i < count($data); ++$i) {
+					if ($data[$i]['error'] === true) {
 						$error_flag = "true";
 						$return_message = "Errors Found";
-						$return_content .= $line.$delimiter.'failure'.$delimiter.$ex->getMessage().PHP_EOL;
-					}					
+						$return_content .= $data[$i]['line'].$delimiter.'failure'.$delimiter.$data[$i]['error_message'].PHP_EOL;
+					}
+					else {
+						$return_content .= $data[$i]['line'].$delimiter.'success'.$delimiter.$data[$i]['error_message'].PHP_EOL;
+					}
 				}
+				//return $return_content;
+				$this->updateOperationTime();
 				return $this->createMessage($error_flag, $return_message, $return_content);
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}			
@@ -522,10 +580,12 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 						$content .= implode($delimiter, array_keys($result)) . PHP_EOL;
 					}
 					$content .= implode($delimiter, array_values($result)) . PHP_EOL;
-				}		
+				}	
+				$this->updateOperationTime();	
 				return $this -> createSuccessMessage("Retrieved Table Data Successfully", $content);		
 			}
 			catch (Exception $ex) {
+				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}
@@ -593,7 +653,8 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 			}	
 			return false;		
 		}
-		private function updateOperationTime($session) {
+		private function updateOperationTime() {
+			$session = get_option($this->option_string);
 			$session["last_operation_time"] = time();
 			update_option($this->option_string,$session);
 		}		
