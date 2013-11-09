@@ -57,11 +57,11 @@
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.loadCSVButton = new System.Windows.Forms.Button();
             this.htmlBrowser = new System.Windows.Forms.WebBrowser();
-            this.uploadFiles = new System.Windows.Forms.TabPage();
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.savedAsLabel = new System.Windows.Forms.Label();
             this.saveAsHTMLButton = new System.Windows.Forms.Button();
+            this.uploadFiles = new System.Windows.Forms.TabPage();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -74,11 +74,11 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            this.uploadFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
+            this.uploadFiles.SuspendLayout();
             this.SuspendLayout();
             // 
             // selectFolderDialog
@@ -342,36 +342,6 @@
             this.htmlBrowser.Size = new System.Drawing.Size(862, 220);
             this.htmlBrowser.TabIndex = 0;
             // 
-            // uploadFiles
-            // 
-            this.uploadFiles.Controls.Add(this.uploadStatusTextbox);
-            this.uploadFiles.Controls.Add(this.label4);
-            this.uploadFiles.Controls.Add(this.selectedFolderTextbox);
-            this.uploadFiles.Controls.Add(this.label1);
-            this.uploadFiles.Controls.Add(this.useTourneyTemplateCheckbox);
-            this.uploadFiles.Controls.Add(this.label2);
-            this.uploadFiles.Controls.Add(this.selectFileToUploadButton);
-            this.uploadFiles.Controls.Add(this.selectFolderButton);
-            this.uploadFiles.Controls.Add(this.wordpressURLTextbox);
-            this.uploadFiles.Controls.Add(this.username);
-            this.uploadFiles.Controls.Add(this.passwordTextbox);
-            this.uploadFiles.Controls.Add(this.wordpressPathTextbox);
-            this.uploadFiles.Controls.Add(this.uploadButton);
-            this.uploadFiles.Controls.Add(this.password);
-            this.uploadFiles.Controls.Add(this.usernameTextbox);
-            this.uploadFiles.Controls.Add(this.label3);
-            this.uploadFiles.Location = new System.Drawing.Point(4, 22);
-            this.uploadFiles.Name = "uploadFiles";
-            this.uploadFiles.Padding = new System.Windows.Forms.Padding(3);
-            this.uploadFiles.Size = new System.Drawing.Size(868, 400);
-            this.uploadFiles.TabIndex = 1;
-            this.uploadFiles.Text = "Upload File/Folder To Website";
-            this.uploadFiles.UseVisualStyleBackColor = true;
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            // 
             // splitContainer3
             // 
             this.splitContainer3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
@@ -416,6 +386,36 @@
             this.saveAsHTMLButton.UseVisualStyleBackColor = false;
             this.saveAsHTMLButton.Click += new System.EventHandler(this.saveAsHTMLButton_Click);
             // 
+            // uploadFiles
+            // 
+            this.uploadFiles.Controls.Add(this.uploadStatusTextbox);
+            this.uploadFiles.Controls.Add(this.label4);
+            this.uploadFiles.Controls.Add(this.selectedFolderTextbox);
+            this.uploadFiles.Controls.Add(this.label1);
+            this.uploadFiles.Controls.Add(this.useTourneyTemplateCheckbox);
+            this.uploadFiles.Controls.Add(this.label2);
+            this.uploadFiles.Controls.Add(this.selectFileToUploadButton);
+            this.uploadFiles.Controls.Add(this.selectFolderButton);
+            this.uploadFiles.Controls.Add(this.wordpressURLTextbox);
+            this.uploadFiles.Controls.Add(this.username);
+            this.uploadFiles.Controls.Add(this.passwordTextbox);
+            this.uploadFiles.Controls.Add(this.wordpressPathTextbox);
+            this.uploadFiles.Controls.Add(this.uploadButton);
+            this.uploadFiles.Controls.Add(this.password);
+            this.uploadFiles.Controls.Add(this.usernameTextbox);
+            this.uploadFiles.Controls.Add(this.label3);
+            this.uploadFiles.Location = new System.Drawing.Point(4, 22);
+            this.uploadFiles.Name = "uploadFiles";
+            this.uploadFiles.Padding = new System.Windows.Forms.Padding(3);
+            this.uploadFiles.Size = new System.Drawing.Size(868, 400);
+            this.uploadFiles.TabIndex = 1;
+            this.uploadFiles.Text = "Upload File/Folder To Website";
+            this.uploadFiles.UseVisualStyleBackColor = true;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
             // saveFileDialog1
             // 
             this.saveFileDialog1.DefaultExt = "html";
@@ -443,13 +443,13 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            this.uploadFiles.ResumeLayout(false);
-            this.uploadFiles.PerformLayout();
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel1.PerformLayout();
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
+            this.uploadFiles.ResumeLayout(false);
+            this.uploadFiles.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
