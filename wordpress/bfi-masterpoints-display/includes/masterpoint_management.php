@@ -87,7 +87,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
 				$this->updateOperationTime();
-				return $this->createSuccessMessage("Success!",$content);
+				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -121,7 +121,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
 				$this->updateOperationTime($session);
-				return $this->createSuccessMessage("Success!",$content);
+				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -147,7 +147,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				}
 				$content .= 'Successfully inserted ' .implode(",", $values);
 				$this->updateOperationTime();
-				return $this->createSuccessMessage("Success!",$content);
+				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -260,7 +260,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					}					
 				}
 				$this->updateOperationTime();
-				return $this->createMessage($error_flag, $return_message, $return_content);
+				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -322,7 +322,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					}					
 				}
 				$this->updateOperationTime();
-				return $this->createMessage($error_flag, $return_message, $return_content);
+				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -420,7 +420,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					}					
 				}
 				$this->updateOperationTime();
-				return $this->createMessage($error_flag, $return_message, $return_content);
+				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -548,7 +548,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				}
 				//return $return_content;
 				$this->updateOperationTime();
-				return $this->createMessage($error_flag, $return_message, $return_content);
+				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -582,7 +582,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 					$content .= implode($delimiter, array_values($result)) . PHP_EOL;
 				}	
 				$this->updateOperationTime();	
-				return $this -> createSuccessMessage("Retrieved Table Data Successfully", $content);		
+				return $this -> createSuccessMessage("Retrieved Table Data Successfully", $content,false);		
 			}
 			catch (Exception $ex) {
 				$this->updateOperationTime();
@@ -597,7 +597,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				$session_id = $parameters['session_id'];
 				$this->delimiter = $parameters['delimiter'];	
 				$username = $this->destroySession($session_id);
-				return $this->createSuccessMessage("Session destroyed for $username");
+				return $this->createSuccessMessage("Session destroyed for $username",'');
 			}
 			catch (Exception $ex) {
 				return $this->createExceptionMessage($ex);
@@ -702,26 +702,25 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 			return $message;
 		}
 		
-		private function createMessage($error, $message, $content) {
+		private function createMessage($error, $message, $content,$writeLog=false) {
+			if ($writeLog) {
+				$this->writeLogMessage(date("Y_m_d_H_i_s").' : Error');
+				$this->writeLogMessage('message : '.$message);
+				$this->writeLogMessage('content : '.$content);
+			}			
 			return "$error$this->delimiter$message$this->delimiter$content";
 		}
 
-		private function createErrorMessage($message, $content = '') {
-			$this->writeLogMessage(date("Y_m_d_H_i_s").' : Error');
-			$this->writeLogMessage('message : '.$message);
-			$this->writeLogMessage('content : '.$content);
-			return $this -> createMessage("true", $message, $content);
+		private function createErrorMessage($message, $content,$writeLog=true) {
+			return $this -> createMessage("true", $message, $content,$writeLog);
 		}
 
-		private function createSuccessMessage($message, $content = '') {
-			$this->writeLogMessage(date("Y_m_d_H_i_s").' : Success');
-			$this->writeLogMessage('message : '.$message);
-			$this->writeLogMessage('content : '.$content);			
-			return $this -> createMessage("false", $message, $content);
+		private function createSuccessMessage($message, $content, $writeLog=true) {	
+			return $this -> createMessage("false", $message, $content,$writeLog);
 		}	
 		
 		private function createExceptionMessage($ex) {
-			return $this->createErrorMessage($ex->getMessage(),$ex->getTraceAsString());
+			return $this->createErrorMessage($ex->getMessage(),$ex->getTraceAsString(),true);
 		}	
 		
 		private function checkHeader($fieldNames, $requiredFieldNames) {
