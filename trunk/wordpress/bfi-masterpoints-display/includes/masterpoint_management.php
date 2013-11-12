@@ -183,7 +183,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 		}
 		
 		private function checkExistence($tableName, $fieldName, $fieldValue, $prefix) {
-			$query = "SELECT COUNT(*) FROM  $table_name WHERE $fieldName = %s";
+			$query = "SELECT COUNT(*) FROM  $tableName WHERE $fieldName = %s";
 			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare($query, $fieldValue));
 			if ($alreadyExists <= 0) {
 				throw new Exception("$prefix - $fieldName with $fieldValue does not exist in $tableName");
@@ -191,7 +191,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 		}
 		
 		private function checkNonExistence($tableName, $fieldName, $fieldValue, $prefix) {
-			$query = "SELECT COUNT(*) FROM  $table_name WHERE $fieldName = %s";
+			$query = "SELECT COUNT(*) FROM  $tablName WHERE $fieldName = %s";
 			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare($query, $fieldValue));
 			if ($alreadyExists > 0) {
 				throw new Exception("$prefix - $fieldName with $fieldValue already exists in $tableName");
@@ -214,7 +214,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 			// Check if tourney event and member exist
 			$this->checkExistence($this -> table_prefix . "tournament_master", 'tournament_code', $values['tournament_code'], 'Cannot add masterpoint entry');
 			$this->checkExistence($this -> table_prefix . "event_master", 'event_code', $values['event_code'], 'Cannot add masterpoint entry');
-			$this->checkExistence($this -> table_prefix . "member_id", 'member_id', $values['member_id'], 'Cannot add masterpoint entry');
+			$this->checkExistence($this -> table_prefix . "member", 'member_id', $values['member_id'], 'Cannot add masterpoint entry');
 						
 			// Check if entry already exists
 			$table_name = $this -> table_prefix . "tournament_masterpoint";
