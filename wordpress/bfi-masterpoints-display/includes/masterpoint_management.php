@@ -622,13 +622,13 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 		private function validateSession($session_id) {
 			$session = get_option($this->option_string);
 			if (!$session || !$session["valid"]) {
-				throw new Exception("No session exists!");
+				throw new Exception("Session cannot be validated! No session exists! Please Login First!");
 			}
 			if ($session["id"] !== $session_id) {
-				throw new Exception("Your session id does not match the current session id (somebody else is logged in) and so you cannot perform any database operations!");
+				throw new Exception("Session cannot be validated! Your session id does not match the current session id (somebody else is logged in) and so you cannot perform any database operations till they finish!");
 			}
 			if ($this->hasSessionExpired($session)) {
-				throw new Exception("Your session has expired! Please login again to create a new session.");				
+				throw new Exception("Session cannot be validated! Your session has expired! Please login again to create a new session.");				
 			}
 			return $session;			
 		}
