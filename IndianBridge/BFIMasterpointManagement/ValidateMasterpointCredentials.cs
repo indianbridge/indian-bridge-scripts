@@ -37,8 +37,8 @@ namespace BFIMasterpointManagement
             loadingPicture.Visible = true;
             loadingPicture.BringToFront();
             this.Refresh();
-            mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
-            //mm = new ManageMasterpoints("http://bfi.net.in", usernameTextbox.Text, passwordTextbox.Text);
+            //mm = new ManageMasterpoints("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
+            mm = new ManageMasterpoints("http://bfi.net.in", usernameTextbox.Text, passwordTextbox.Text);
             //mm = new ManageMasterpoints("http://bfitest.bfi.net.in", usernameTextbox.Text, passwordTextbox.Text);
             string json_result = mm.validateCredentials();
             Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);

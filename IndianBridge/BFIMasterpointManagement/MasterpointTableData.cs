@@ -202,6 +202,15 @@ namespace BFIMasterpointManagement
             table.Columns.Add(createStringDataColumn("last_name", "", true));
             table.Columns.Add(createDoubleDataColumn("total_current_lp", 0, false));
             table.Columns.Add(createDoubleDataColumn("total_current_fp", 0, false));
+            table.Columns.Add(createStringDataColumn("city", true));
+            table.Columns.Add(createStringDataColumn("state", true));
+            table.Columns.Add(createStringDataColumn("email", true));
+            table.Columns.Add(createStringDataColumn("address_1", true));
+            table.Columns.Add(createStringDataColumn("address_2", true));
+            table.Columns.Add(createStringDataColumn("address_3", true));
+            table.Columns.Add(createStringDataColumn("mobile_no", true));
+            table.Columns.Add(createStringDataColumn("residence_phone", true));
+            table.PrimaryKey = new DataColumn[] { table.Columns["member_id"] };
             return table;
         }
 
@@ -209,6 +218,7 @@ namespace BFIMasterpointManagement
         {
             DataTable table = new DataTable();
             table.Columns.Add(createStringDataColumn("member_id", false));
+            table.PrimaryKey = new DataColumn[] { table.Columns["member_id"] };
             return table;
         }
 
@@ -229,6 +239,8 @@ namespace BFIMasterpointManagement
             table.Columns.Add(createStringDataColumn("member_id", false));
             table.Columns.Add(createDoubleDataColumn("localpoints_earned", 0, false));
             table.Columns.Add(createDoubleDataColumn("fedpoints_earned", 0, false));
+            table.PrimaryKey = new DataColumn[] { table.Columns["tournament_code"], 
+                table.Columns["event_code"],table.Columns["member_id"] };
             return table;
         }
 
