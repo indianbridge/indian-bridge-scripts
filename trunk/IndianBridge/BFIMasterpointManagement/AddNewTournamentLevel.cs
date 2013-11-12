@@ -53,7 +53,11 @@ namespace BFIMasterpointManagement
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Error when trying to add Tournament Level because : " + result["message"], "Error adding Table Data !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (result["message"].Contains("Session cannot be validated!"))
+                {
+                    Utilities.showErrorMessage(result["message"]);
+                }
+                else Utilities.showErrorMessage("Error when trying to add Tournament Level because : " + result["content"]);
             }
             else
             {

@@ -74,7 +74,12 @@ namespace BFIMasterpointManagement
             bool errorStatus = Convert.ToBoolean(result["error"]);
             if (errorStatus)
             {
-                MessageBox.Show("Error when trying to add tournament because : " + result["content"], "Error adding tournament !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Utilities.showErrorMessage(result["message"]);
+                /*if (result["message"].Contains("Session cannot be validated!"))
+                {
+                    Utilities.showErrorMessage(result["message"]);
+                }
+                else Utilities.showErrorMessage("Error when trying to add tournament because : " + result["content"]);*/
             }
             else
             {

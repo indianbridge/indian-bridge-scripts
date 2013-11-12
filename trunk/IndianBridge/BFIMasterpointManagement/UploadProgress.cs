@@ -15,6 +15,7 @@ namespace BFIMasterpointManagement
     {
         public string statusText;
         public bool errorFound;
+        public bool sessionNotValidated = false;
         public string m_content;
         public string m_returnContent = "";
         ManageMasterpoints m_mm;
@@ -26,6 +27,7 @@ namespace BFIMasterpointManagement
             DeleteUsers
         };
         Operation m_currentOperation;
+
         public UploadProgress(ManageMasterpoints mm)
         {
             m_mm = mm;                     
@@ -67,7 +69,6 @@ namespace BFIMasterpointManagement
                         break;
                         case Operation.TransferUsers:
                         json_result = m_mm.transferUsers(tableInfo);
-                        MessageBox.Show(json_result);
                         break;
                         case Operation.DeleteUsers:
                         json_result = m_mm.deleteUsers(tableInfo);
@@ -79,6 +80,13 @@ namespace BFIMasterpointManagement
                     progress = (int)Math.Floor(endIndex*100.0 / (lines.Length - 1));
                     Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
                     bool errorStatus = Convert.ToBoolean(result["error"]);
+                    if (result["message"].Contains("Session cannot be validated!"))
+                    {
+                        sessionNotValidated = true;
+                        m_returnContent += Environment.NewLine + result["message"];
+                        Utilities.showErrorMessage(result["message"]);
+                        return;
+                    }
                     result["content"] = result["content"].Replace(Utilities.getNewLineCharacter(result["content"]), System.Environment.NewLine);
                     worker.ReportProgress(progress, new Tuple<bool,string,string,string>(errorStatus,result["message"],result["content"],tableInfo.delimiter));
                 }
@@ -93,9 +101,13 @@ namespace BFIMasterpointManagement
         private void operationCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             uploadProgressBar.Value = 100;
-            statusMessageTextbox.AppendText("Completed Processing");
-            statusText = statusMessageTextbox.Text;
-            MessageBox.Show("Completed Processing. See Textbox for details");
+            if (!sessionNotValidated)
+            {
+                m_returnContent += Environment.NewLine + "Completed Processing";
+                statusMessageTextbox.AppendText("Completed Processing");
+                statusText = statusMessageTextbox.Text;
+                MessageBox.Show("Completed Processing. See Textbox for details");
+            }
             this.Close();
         }
 
