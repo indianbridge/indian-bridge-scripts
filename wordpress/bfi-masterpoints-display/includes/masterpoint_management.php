@@ -90,7 +90,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}	
@@ -108,10 +107,7 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				
 				// Check if tournament level exists
 				$level_table_name = $this -> table_prefix . 'tournament_level_master';
-				$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $level_table_name WHERE tournament_level_code = %s", $parameters['tournament_level_code']));
-				if ($alreadyExists < 1) {
-					throw new Exception("tournament_level_code : " . $parameters['tournament_level_code'] . ' does not exist in database!');
-				}
+				$this->checkExistence($level_table_name, 'tournament_level_code', $parameters['tournament_level_code'], '');
 								
 				$values = array('tournament_level_code' => $parameters['tournament_level_code'], 'description' => $parameters['description'], 'tournament_code' => $parameters['tournament_code']);
 				$result = $this -> bfi_masterpoint_db -> insert($table_name, $values);
@@ -124,7 +120,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}			
@@ -150,7 +145,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createSuccessMessage("Success!",$content,false);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}			
 		}	
@@ -188,6 +182,22 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 			}
 		}
 		
+		private function checkExistence($tableName, $fieldName, $fieldValue, $prefix) {
+			$query = "SELECT COUNT(*) FROM  $table_name WHERE $fieldName = %s";
+			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare($query, $fieldValue));
+			if ($alreadyExists <= 0) {
+				throw new Exception("$prefix - $fieldName with $fieldValue does not exist in $tableName");
+			}			
+		}
+		
+		private function checkNonExistence($tableName, $fieldName, $fieldValue, $prefix) {
+			$query = "SELECT COUNT(*) FROM  $table_name WHERE $fieldName = %s";
+			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare($query, $fieldValue));
+			if ($alreadyExists > 0) {
+				throw new Exception("$prefix - $fieldName with $fieldValue already exists in $tableName");
+			}			
+		}		
+		
 		private function addMasterpoint($line,$fieldNames,$delimiter) {
 			$fields = explode($delimiter, $line);
 			if (count($fields) < count($fieldNames)) {
@@ -200,7 +210,14 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 			}	
 			date_default_timezone_set('Asia/Calcutta');
 			$values["posted_date"] = date("Y_m_d H:i:s");
+			
+			// Check if tourney event and member exist
+			$this->checkExistence($this -> table_prefix . "tournament_master", 'tournament_code', $values['tournament_code'], 'Cannot add masterpoint entry');
+			$this->checkExistence($this -> table_prefix . "event_master", 'event_code', $values['event_code'], 'Cannot add masterpoint entry');
+			$this->checkExistence($this -> table_prefix . "member_id", 'member_id', $values['member_id'], 'Cannot add masterpoint entry');
+						
 			// Check if entry already exists
+			$table_name = $this -> table_prefix . "tournament_masterpoint";
 			$query = "SELECT COUNT(*) FROM  $table_name WHERE tournament_code = %s AND event_code = %s AND member_id = %s";
 			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare($query, $values['tournament_code'], $values['event_code'], $values['member_id']));
 			if ($alreadyExists > 0) {
@@ -263,7 +280,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
@@ -325,7 +341,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
@@ -423,21 +438,17 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}	
 
 		private function transferUserInTable($old_member_id,$new_member_id,$tableName, $fieldName) {
-			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE $fieldName = %s", $old_member_id));
-			if ($alreadyExists < 1) {
-				throw new Exception("old_member_id: " . $old_member_id . " does not exist in $tableName");
-			}
+			// Check if old member does not exist
+			$this->checkNonExistence($tableName, $fieldName, $old_member_id, '');
+
 			//Check if new member if exists
-			$alreadyExists = $this -> bfi_masterpoint_db -> get_var($this -> bfi_masterpoint_db -> prepare("SELECT COUNT(*) FROM  $tableName WHERE $fieldName = %s", $new_member_id));
-			if ($alreadyExists >= 1) {
-				throw new Exception("new_member_id: " . $new_member_id . " already exists in $tableName! Delete it first.");
-			}
+			$this->checkExistence($tableName, $fieldName, $new_member_id, '');
+
 			// transfer here
 			$data = array($fieldName=>$new_member_id);
 			$where = array($fieldName=>$old_member_id);
@@ -526,7 +537,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				}
 				// Transfer to temp id
 				$this->transferBetweenTempUsers($data, true);
-				//return print_r($data,true);
 				// Delete 
 				for($i = 0; $i < count($data); ++$i) {
 					$item = $data[$i];
@@ -546,12 +556,10 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 						$return_content .= $data[$i]['line'].$delimiter.'success'.$delimiter.$data[$i]['error_message'].PHP_EOL;
 					}
 				}
-				//return $return_content;
 				$this->updateOperationTime();
 				return $this->createMessage($error_flag, $return_message, $return_content,true);
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}			
@@ -585,7 +593,6 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 				return $this -> createSuccessMessage("Retrieved Table Data Successfully", $content,false);		
 			}
 			catch (Exception $ex) {
-				$this->updateOperationTime();
 				return $this->createExceptionMessage($ex);
 			}					
 		}
