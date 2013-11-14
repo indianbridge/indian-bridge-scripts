@@ -349,15 +349,7 @@ if (!defined("DRIVER")) {
 	*/
 	function tables_list() {
 		global $connection;
-		$return_val = array();
-		$result = get_key_vals("SHOW" . ($connection->server_info >= 5 ? " FULL" : "") . " TABLES");
-		foreach ($result as $key => $value) {
-			if (strpos($key,'bfi_') !== false) {
-				$return_val[$key] = $value;
-			}
-		}
-		return $return_val;
-		//return get_key_vals("SHOW" . ($connection->server_info >= 5 ? " FULL" : "") . " TABLES");
+		return get_key_vals("SHOW" . ($connection->server_info >= 5 ? " FULL" : "") . " TABLES LIKE 'bfi_%'");
 	}
 
 	/** Count tables in all databases
@@ -381,8 +373,8 @@ if (!defined("DRIVER")) {
 		global $connection;
 		$return = array();
 		foreach (get_rows($fast && $connection->server_info >= 5
-			? "SELECT TABLE_NAME AS Name, Engine, TABLE_COMMENT AS Comment FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() " . ($name != "" ? "AND TABLE_NAME = " . q($name) : "ORDER BY Name")
-			: "SHOW TABLE STATUS" . ($name != "" ? " LIKE " . q(addcslashes($name, "%_\\")) : "")
+			? "SELECT TABLE_NAME AS Name, Engine, TABLE_COMMENT AS Comment FROM information_schema.TABLES WHERE TABLE_NAME LIKE 'bfi_%' AND TABLE_SCHEMA = DATABASE() " . ($name != "" ? "AND TABLE_NAME = " . q($name) : "ORDER BY Name")
+			: "SHOW TABLE STATUS" . ($name != "" ? " LIKE " . q(addcslashes($name, "%_\\")) : " LIKE 'bfi_'")
 		) as $row) {
 			if ($row["Engine"] == "InnoDB") {
 				// ignore internal comment, unnecessary since MySQL 5.1.21

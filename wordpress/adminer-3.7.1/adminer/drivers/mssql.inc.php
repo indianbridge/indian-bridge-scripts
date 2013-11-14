@@ -278,7 +278,7 @@ if (isset($_GET["mssql"])) {
 	}
 
 	function tables_list() {
-		return get_key_vals("SELECT name, type_desc FROM sys.all_objects WHERE schema_id = SCHEMA_ID(" . q(get_schema()) . ") AND name like 'bfi_%' AND type IN ('S', 'U', 'V') ORDER BY name");
+		return get_key_vals("SELECT name, type_desc FROM sys.all_objects WHERE schema_id = SCHEMA_ID(" . q(get_schema()) . ") AND type IN ('S', 'U', 'V') ORDER BY name");
 	}
 
 	function count_tables($databases) {

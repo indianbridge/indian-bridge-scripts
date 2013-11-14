@@ -180,7 +180,7 @@ if (isset($_GET["oracle"])) {
 	}
 
 	function tables_list() {
-		return get_key_vals("SELECT table_name, 'table' FROM all_tables WHERE tablespace_name = " . q(DB) . " AND table_name like 'bfi_%'
+		return get_key_vals("SELECT table_name, 'table' FROM all_tables WHERE tablespace_name = " . q(DB) . "
 UNION SELECT view_name, 'view' FROM user_views
 ORDER BY 1"
 		); //! views don't have schema
