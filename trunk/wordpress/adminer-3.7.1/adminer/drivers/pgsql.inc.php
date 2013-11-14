@@ -197,7 +197,7 @@ if (isset($_GET["pgsql"])) {
 	}
 	
 	function tables_list() {
-		return get_key_vals("SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = current_schema() AND table_name like 'bfi_%' ORDER BY table_name");
+		return get_key_vals("SELECT table_name, table_type FROM information_schema.tables WHERE table_schema = current_schema() ORDER BY table_name");
 	}
 	
 	function count_tables($databases) {
