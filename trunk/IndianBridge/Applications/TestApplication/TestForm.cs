@@ -17,19 +17,20 @@ using FtpLib;
 using Excel;
 using System.Text.RegularExpressions;
 using IndianBridge.WordpressAPIs;
+using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace IndianBridge
 {
     public partial class TestForm : Form
     {
-        ManageMasterpoints mm = new ManageMasterpoints("http://127.0.0.1/bfi", "", "");
         public TestForm()
         {
             InitializeComponent();
 
         }
 
-        private void button1_Click(object sender, EventArgs ea)
+        private void sendViaFTP()
         {
             string _remoteHost = "ftp.bfi.net.in";
             string _remoteUser = "bfi@bfi.net.in";
@@ -52,31 +53,38 @@ namespace IndianBridge
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void sendFileViaFTPButton_Click(object sender, EventArgs e)
         {
-            string value = textBox1.Text;
-            MessageBox.Show(Utilities.getNextCode(value));
+            sendViaFTP();
         }
 
-        private void validateButton_Click(object sender, EventArgs e)
+        private void connectToSQLButton_Click(object sender, EventArgs e)
         {
-            string result = mm.validateCredentials();
-            MessageBox.Show(result);
-            textBox1.Text = result;
+            try
+            {
+                string server = "localhost";
+                string database = "bfinem7l_bfi";
+                string uid = "indianbridge";
+                string password = "kibitzer";
+                string connectionString = "SERVER=" + server + ";" + "DATABASE=" +
+                database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+                MySqlConnection myConnection = new MySqlConnection(connectionString);
+                myConnection.Open();
+                MySqlDataReader myReader = null;
+                MySqlCommand myCommand = new MySqlCommand("select * from bfi_event_master",myConnection);
+                myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    textBox1.AppendText(myReader["event_code"].ToString()+Environment.NewLine);
+                    textBox1.AppendText(myReader["description"].ToString()+Environment.NewLine);
+                }
+                myConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                Utilities.showErrorMessage(ex.ToString());
+            }
         }
 
-        private void invalidateButton_Click(object sender, EventArgs e)
-        {
-            string result = mm.invalidateCredentials();
-            MessageBox.Show(result);
-            textBox1.Text = result;
-        }
-
-        private void getTableDataButton_Click(object sender, EventArgs e)
-        {
-            string result = mm.getTableData("bfi_tournament_master");
-            MessageBox.Show(result);
-            textBox1.Text = result;
-        }
     }
 }
