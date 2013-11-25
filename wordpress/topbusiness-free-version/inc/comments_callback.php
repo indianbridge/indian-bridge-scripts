@@ -50,7 +50,8 @@
 							$out .= '</div>';
 				
 							// COMMENT TEXT
-							$raw_comment_text = apply_filters('the_content', do_shortcode(make_clickable(convert_smilies(wpautop(get_comment_text())))));
+							//$raw_comment_text = apply_filters('the_content', do_shortcode(make_clickable(convert_smilies(wpautop(get_comment_text())))));
+							$raw_comment_text =  do_shortcode(make_clickable(convert_smilies(wpautop(get_comment_text()))));
 							$out .= wpautop($raw_comment_text);
 				
 							// Pre-moderation
