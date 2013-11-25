@@ -5,8 +5,10 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using FtpLib;
 using IndianBridge.Common;
 using IndianBridge.WordpressAPIs;
+using WordpressAPIs;
 
 namespace CSVParser
 {
@@ -15,68 +17,51 @@ namespace CSVParser
 		private Tuple<DataTable, string[]> m_parseResults;
 		private CustomBackgroundWorker m_publishResultsCBW = null;
 		private bool m_publishResultsRunning = false;
+		private string m_resultsFolderPath;
 		private double oldFontSize;
+		string[] tourneyNames;
+		string[] tourneyPageIDs;
 
 		public Form1()
 		{
 			InitializeComponent();
 			this.folderBrowserDialog1.RootFolder = Environment.SpecialFolder.MyComputer;
-			txtFileContents.Visible = lblContents.Visible = btnSaveHtml.Visible = txtTitle.Visible = lblTitle.Visible = false;
+			txtFileContents.Visible = lblContents.Visible = btnSaveHtml.Visible = txtTitle.Visible = label3.Visible = cmbStyling.Visible =
+				lblTitle.Visible = label1.Visible = txtFileName.Visible = label2.Visible = txtPath.Visible = btnPublish.Visible = false;
 		}
 
 		private void btnSelectFile_Click(object sender, EventArgs e)
 		{
-			var size = -1;
 			var fileContents = String.Empty;
 			// Show the dialog and get result.
 			var result = openFileDialog1.ShowDialog();
 			if (result == DialogResult.OK) // Test result.
 			{
 				var file = openFileDialog1.FileName;
-				try
-				{
-					fileContents = File.ReadAllText(file);
-					size = fileContents.Length;
-				}
-				catch (Exception exc)
-				{
-					txtResults.AppendText(exc.Message);
-					txtResults.Visible = true;
-				}
+				fileContents = File.ReadAllText(file);
 			}
-
-			txtResults.AppendText("File size is " + size + "\n");
-			txtResults.AppendText(result.ToString());
 
 			ParseFile(fileContents);
 
-			txtFileContents.Visible = lblContents.Visible = btnSaveHtml.Visible = txtTitle.Visible = lblTitle.Visible = true;
+			btnSaveHtml.Visible = txtTitle.Visible = label3.Visible = cmbStyling.Visible =
+				lblTitle.Visible = label1.Visible = txtFileName.Visible = true;
+
+			txtFileName.Text = openFileDialog1.SafeFileName;
+
+			cmbStyling.SelectedIndex = 0;
 		}
 
 		private void ParseFile(string fileContents)
 		{
-			try
-			{
-				m_parseResults = CSVUtilities.ParseCSV(fileContents);
+			m_parseResults = CSVUtilities.ParseCSV(fileContents);
 
-				txtResults.AppendText("\n");
-				txtResults.AppendText("Columns: ");
-				var columnsOutput = m_parseResults.Item2.Aggregate(String.Empty,
-				                                          (current, column) => current + String.Format("{0} ,", column));
+			var columnsOutput = m_parseResults.Item2.Aggregate(String.Empty,
+				(current, column) => current + String.Format("{0} ,", column));
 
-				columnsOutput = columnsOutput.TrimEnd(new[] {','});
-				txtResults.AppendText(columnsOutput);
+			columnsOutput = columnsOutput.TrimEnd(new[] {','});
 
-				// Show the preview
-				PublishResults(m_parseResults.Item1);
-			}
-			catch (Exception exc)
-			{
-				txtResults.AppendText("\n");
-				txtResults.AppendText(exc.Message);
-				txtResults.AppendText("\n");
-				txtResults.AppendText(exc.StackTrace);
-			}
+			// Show the preview
+			PublishResults(m_parseResults.Item1);
 		}
 
 		private void PublishResults(DataTable results)
@@ -87,29 +72,50 @@ namespace CSVParser
 			}
 		}
 
-		private void PublishResultsToHTML(DataTable results, IEnumerable<string> columnNames, string fileName = @"C:\results.html")
+		private void PublishResultsToHTML(DataTable results, IEnumerable<string> columnNames,
+			string fileName = @"C:\results.html")
 		{
-			const string tableContainerClass = "datagrid";
-			var htmlHeader = String.Format("<html><head><title>{0}</title></head><h2>{0}</h2><div class=\"{1}\"><table class=\"stripeme\"><thead>\n", txtTitle.Text, tableContainerClass);
+			var tableContainerClass = cmbStyling.SelectedItem.ToString();
+			var titleRow = !String.IsNullOrWhiteSpace(txtTitle.Text)
+				? String.Format(
+					"<table><tr><td width=\"90%\"><h2>{0}</h2></td><td width=\"8%\" style=\"vertical-align: middle;align:right\"><a href=\"..\">Up one level</a></td></tr></table>",
+					txtTitle.Text)
+				: "<table><tr><td width=\"90%\"></td><td width=\"8%\" style=\"vertical-align: middle;align:right\"><a href=\"..\">Up one level</a></td></tr></table>";
+
+			var htmlHeader = String.Format("{0}<div class=\"{1}\"><table class=\"stripeme\"><thead>\n", titleRow,
+				tableContainerClass);
 			var htmlString = htmlHeader + Utilities.GetHTMLTableHeader(columnNames) + "</thead><tbody>";
 			htmlString = results.Rows.Cast<DataRow>().Aggregate(htmlString, (current, row) =>
 				current + Utilities.GetHTMLRowResult(row.ItemArray));
-			htmlString += "\n</tbody></table><div></html>";
+			htmlString += "\n</tbody></table></div></html>";
 			Utilities.WriteFile(fileName, htmlString);
 		}
 
-		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		private void GetTourneys()
 		{
-			if (checkBox1.Checked)
-				checkBox1.Text = "Hide debug info";
-			txtResults.Visible = checkBox1.Checked;
+			var addTourneys = new AddTourneys("http://bfitest.bfi.net.in/", "vdevadass", "bitspilani");
+			var jsonResult = addTourneys.getTourneys();
+			var result = Utilities.ConvertJsonOutputToTourneyResults(jsonResult);
+
+			var tourneyList = result.content;
+			var tokens = tourneyList.Split('#');
+			tourneyNames = tokens[0].Split(',');
+			tourneyPageIDs = tokens[1].Split(',');
+			tourneyNamesCombobox.Items.AddRange(tourneyNames);
+			tourneyNamesCombobox.SelectedIndex = 0;
+
+			var currentYear = DateTime.Today.Year;
+			tourneyYearCombobox.Items.Clear();
+			tourneyYearCombobox.Items.Add(currentYear);
+			tourneyYearCombobox.Items.Add(currentYear + 1);
+			tourneyYearCombobox.SelectedIndex = 0;
 		}
 
 		private void btnSaveHtml_Click(object sender, EventArgs e)
 		{
 			if (m_parseResults == null)
 			{
-				txtResults.AppendText("No results found - please check the input file");
+				txtFileContents.AppendText("No results found - please check the input file");
 				return;
 			}
 
@@ -123,39 +129,101 @@ namespace CSVParser
 			MessageBox.Show("Results file saved successfully", "Success");
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private void btnPublish_Click(object sender, EventArgs e)
 		{
 			// TODO : Use form values (or use login form)
-            string siteName = "http://127.0.0.1/bfi/";
-            //string siteName = "http://bfitest.bfi.net.in/";
-            string username = "vdevadass";
+			//string siteName = "http://127.0.0.1/bfi/";
+			string siteName = "http://bfitest.bfi.net.in/";
+			string username = "vdevadass";
 			string password = "bitspilani";
 
 			string pagePath = txtPath.Text; // /tourneys/winter-national/y2012/results/team-event
 			if (!pagePath.StartsWith("/"))
 				pagePath = String.Format("/{0}", pagePath);
-			var uw = new UploadWebpages(siteName, username, password, true, true);
+
+			statusStrip1.Visible = true;
+			txtFileContents.Clear();
+
+			var uw = new UploadWebpages(siteName, username, password, true, true) {ForceUpload = true};
+
 			var m_publishResultsCBW = new CustomBackgroundWorker("Publish Results", uw.uploadDirectoryInBackground, 
-				publishResultsCompleted, null, null, null, null);
+				publishResultsCompleted, publishResultsStatus, publishResultsProgressBar, cancelPublishResultsButton, txtFileContents);
+
 			oldFontSize = Utilities.fontSize;
 			Utilities.fontSize = 5;
-			var values = new Tuple<string, string>(folderBrowserDialog1.SelectedPath, pagePath);
+			var values = new Tuple<string, string>(m_resultsFolderPath, pagePath);
 			m_publishResultsRunning = true;
 			m_publishResultsCBW.run(values);
-			MessageBox.Show("Published successfully", "Success");
-
 		}
 
 		private void publishResultsCompleted(bool success)
 		{
 			m_publishResultsRunning = false;
 			Utilities.fontSize = oldFontSize;
-			if (success) txtResults.Text = ("Results published succesfully");
 		}
 
-		private void label1_Click(object sender, EventArgs e)
+		private void btnUploadResults_Click(object sender, EventArgs e)
 		{
+			pnlResults.Visible = true;
+			pnlBulletin.Visible = false;
+			pnlMenu.Visible = false;
+			btnPublish.Visible = label2.Visible = txtPath.Visible = txtFileContents.Visible = lblContents.Visible = true;
+			GetTourneys();
+		}
+
+		private void btnMainMenu_Click(object sender, EventArgs e)
+		{
+			pnlResults.Visible = false;
+			pnlBulletin.Visible = false;
+			pnlMenu.Visible = true;
+		}
+
+		private void btnUploadBulletin_Click(object sender, EventArgs e)
+		{
+			pnlResults.Visible = false;
+			pnlBulletin.Visible = true;
+			pnlMenu.Visible = false;
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			string _remoteHost = "ftp.bfitest.net.in";
+			string _remoteUser = "bfi@bfitest.net.in";
+			string _remotePass = "bfi";
+			string source = @"C:\Users\snarasim\Downloads\test.pdf";
+			string destination = "/test.pdf";
+			using (FtpConnection ftp = new FtpConnection(_remoteHost, _remoteUser, _remotePass))
+			{
+				try
+				{
+					ftp.Open(); // Open the FTP connection 
+					ftp.Login(); // Login using previously provided credentials
+					ftp.PutFile(source, destination);
+					MessageBox.Show("Done");
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message);
+				}
+			}
 
 		}
+
+		private void btnRootFolder_Click(object sender, EventArgs e)
+		{
+			var result = folderBrowserDialog2.ShowDialog();
+			if (result != DialogResult.OK) return;
+			m_resultsFolderPath = folderBrowserDialog2.SelectedPath;
+
+			panel1.Visible = panel2.Visible = label7.Visible = label8.Visible = true;
+
+			folderBrowserDialog1.SelectedPath = m_resultsFolderPath;
+		}
+
+		private void txtTitle_TextChanged(object sender, EventArgs e)
+		{
+			txtTitle.Select();
+		}
+
 	}
 }

@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
@@ -11,6 +12,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
+using Common;
 
 namespace IndianBridge.Common
 {
@@ -50,72 +52,72 @@ namespace IndianBridge.Common
 			return;
 		}
 
-        public static string[] arraySlice(string[] source, int start, int end)
-        {
-            // Handles negative ends.
-            if (end > source.Length - 1)
-            {
-                end = source.Length - 1;
-            }
-            int len = end - start + 1;
+		public static string[] arraySlice(string[] source, int start, int end)
+		{
+			// Handles negative ends.
+			if (end > source.Length - 1)
+			{
+				end = source.Length - 1;
+			}
+			int len = end - start + 1;
 
-            // Return new array.
-            string[] res = new string[len];
-            for (int i = 0; i < len; i++)
-            {
-                res[i] = source[i + start];
-            }
-            return res;
-        }
+			// Return new array.
+			string[] res = new string[len];
+			for (int i = 0; i < len; i++)
+			{
+				res[i] = source[i + start];
+			}
+			return res;
+		}
 
-        public static string getNextCode(string value) {
-            int totalLength = value.Length;
-            var numAlpha = new Regex("(?<Alpha>[a-zA-Z]*)(?<Numeric>[0-9]*)");
-            var match = numAlpha.Match(value);
+		public static string getNextCode(string value) {
+			int totalLength = value.Length;
+			var numAlpha = new Regex("(?<Alpha>[a-zA-Z]*)(?<Numeric>[0-9]*)");
+			var match = numAlpha.Match(value);
 
-            string alpha = match.Groups["Alpha"].Value;
-            int alphaLength = alpha.Length;
-            int num = int.Parse(match.Groups["Numeric"].Value);
-            int nextNum = num + 1;
-            int numLength = totalLength - alpha.Length;
-            int maxNum = (int)Math.Pow(10, numLength) - 1;
-            if (nextNum <= maxNum)
-            {
-                string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
-                return newString;
-            }
-            else
-            {
-                nextNum = 1;
-                if (alpha.Distinct().Count() == 1 && alpha.Distinct().ElementAt(0) == 'Z')
-                {
-                    alpha = "".PadLeft(alphaLength + 1, 'A');
-                    numLength = totalLength - alpha.Length;
-                    string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
-                    return newString;
-                }
-                else
-                {
-                    char[] alphaChars = alpha.ToCharArray();
-                    bool flag = true;
-                    int index = alphaChars.Length - 1;
-                    while (flag)
-                    {
-                        if (alphaChars[index] != 'Z')
-                        {
-                            alphaChars[index]++;
-                            flag = false;
-                        }
-                        index--;
-                    }
-                    alpha = new string(alphaChars);
-                    numLength = totalLength - alpha.Length;
-                    string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
-                    return newString;
-                }
+			string alpha = match.Groups["Alpha"].Value;
+			int alphaLength = alpha.Length;
+			int num = int.Parse(match.Groups["Numeric"].Value);
+			int nextNum = num + 1;
+			int numLength = totalLength - alpha.Length;
+			int maxNum = (int)Math.Pow(10, numLength) - 1;
+			if (nextNum <= maxNum)
+			{
+				string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+				return newString;
+			}
+			else
+			{
+				nextNum = 1;
+				if (alpha.Distinct().Count() == 1 && alpha.Distinct().ElementAt(0) == 'Z')
+				{
+					alpha = "".PadLeft(alphaLength + 1, 'A');
+					numLength = totalLength - alpha.Length;
+					string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+					return newString;
+				}
+				else
+				{
+					char[] alphaChars = alpha.ToCharArray();
+					bool flag = true;
+					int index = alphaChars.Length - 1;
+					while (flag)
+					{
+						if (alphaChars[index] != 'Z')
+						{
+							alphaChars[index]++;
+							flag = false;
+						}
+						index--;
+					}
+					alpha = new string(alphaChars);
+					numLength = totalLength - alpha.Length;
+					string newString = alpha + nextNum.ToString().PadLeft(numLength, '0');
+					return newString;
+				}
 
-            }
-        }
+			}
+		}
 
 		public static void showBalloonNotification(string title, string text)
 		{
@@ -170,34 +172,39 @@ namespace IndianBridge.Common
 			return result == DialogResult.Yes;
 		}
 
-        public static Dictionary<string, string> convertJsonOutput(string json_result)
-        {
-            string jsonDelimiter = "~";
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            string[] lines = json_result.Split(new string[] { jsonDelimiter }, StringSplitOptions.None);
-            if (lines.Length < 3)
-            {
-                result["error"] = "true";
-                result["message"] = lines[0];
-                result["content"] = lines[0];
-            }
-            else
-            {
-                result["error"] = lines[0];
-                result["message"] = lines[1];
-                result["content"] = lines[2];
-            }
-            return result;
-        }
+		public static TourneyResults ConvertJsonOutputToTourneyResults(string json_result)
+		{
+			return JsonDeserialize<TourneyResults>(json_result);
+		}
+		
+		public static Dictionary<string, string> convertJsonOutput(string json_result)
+		{
+			string jsonDelimiter = "~";
+			Dictionary<string, string> result = new Dictionary<string, string>();
+			string[] lines = json_result.Split(new string[] { jsonDelimiter }, StringSplitOptions.None);
+			if (lines.Length < 3)
+			{
+				result["error"] = "true";
+				result["message"] = lines[0];
+				result["content"] = lines[0];
+			}
+			else
+			{
+				result["error"] = lines[0];
+				result["message"] = lines[1];
+				result["content"] = lines[2];
+			}
+			return result;
+		}
 
-        public static string getNewLineCharacter(string message)
-        {
-            string splitter = "\r\n";
-            if (message.Contains(splitter)) return splitter;
-            splitter = Environment.NewLine;
-            if (message.Contains(splitter)) return splitter;
-            return "\n";
-        }
+		public static string getNewLineCharacter(string message)
+		{
+			string splitter = "\r\n";
+			if (message.Contains(splitter)) return splitter;
+			splitter = Environment.NewLine;
+			if (message.Contains(splitter)) return splitter;
+			return "\n";
+		}
 
 		public static void showErrorMessage(string message)
 		{
@@ -495,12 +502,12 @@ namespace IndianBridge.Common
 		public static string[] GetColumns(string headerLine)
 		{
 			string[] columnNames = headerLine.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < columnNames.Length; ++i)
-            {
-                columnNames[i] = columnNames[i].Replace("\n", String.Empty);
-                columnNames[i] = columnNames[i].Replace("\r", String.Empty);
-            }
-            return columnNames;
+			for (int i = 0; i < columnNames.Length; ++i)
+			{
+				columnNames[i] = columnNames[i].Replace("\n", String.Empty);
+				columnNames[i] = columnNames[i].Replace("\r", String.Empty);
+			}
+			return columnNames;
 		}
 		public static string GetHTMLTableHeader(IEnumerable<object> columnNames)
 		{
@@ -526,6 +533,12 @@ namespace IndianBridge.Common
 			return rowString + "\n";
 		}
 
-
+		public static T JsonDeserialize<T>(string jsonString)
+		{
+			var ser = new DataContractJsonSerializer(typeof(T));
+			var ms = new MemoryStream(Encoding.UTF8.GetBytes(jsonString));
+			var obj = (T)ser.ReadObject(ms);
+			return obj;
+		}
 	}
 }

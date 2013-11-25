@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVParser", "CSVParser.csproj", "{B68844B9-0195-463D-A8F8-83D9F8F42857}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadResults", "UploadResults.csproj", "{B68844B9-0195-463D-A8F8-83D9F8F42857}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordpressAPIs", "..\WordpressAPIs\WordpressAPIs.csproj", "{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{1C337ECB-18C4-4F1E-8557-C29696777EC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F48BF94E-456E-4AD3-91FE-5F388F4F7E79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C337ECB-18C4-4F1E-8557-C29696777EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C337ECB-18C4-4F1E-8557-C29696777EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C337ECB-18C4-4F1E-8557-C29696777EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C337ECB-18C4-4F1E-8557-C29696777EC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
