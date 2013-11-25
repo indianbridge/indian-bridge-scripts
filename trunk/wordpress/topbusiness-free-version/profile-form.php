@@ -14,6 +14,8 @@ Theme My Login will always look in your theme's directory first, before using th
 			<input type="hidden" name="checkuser_id" value="<?php echo $current_user->ID; ?>" />
 		</p>
 
+
+
 		<h3><?php _e( 'Name' ); ?></h3>
 
 		<table class="form-table">
