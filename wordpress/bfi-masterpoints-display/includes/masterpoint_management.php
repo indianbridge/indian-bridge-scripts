@@ -444,13 +444,16 @@ if (!class_exists('BFI_Masterpoint_Manager')) {
 
 		private function transferUserInTable($old_member_id,$new_member_id,$tableName, $fieldName) {
 			// Check if old member does not exist
-			$this->checkNonExistence($tableName, $fieldName, $old_member_id, '');
+			$this->checkExistence($tableName, $fieldName, $old_member_id, '');
 
 			//Check if new member if exists
-			$this->checkExistence($tableName, $fieldName, $new_member_id, '');
+			$this->checkNonExistence($tableName, $fieldName, $new_member_id, '');
 
 			// transfer here
 			$data = array($fieldName=>$new_member_id);
+			if ($tableName === $this -> table_prefix . 'member') {
+				$data['zone_code'] = substr($new_member_id, 0, 3);
+			}
 			$where = array($fieldName=>$old_member_id);
 			$result = $this->bfi_masterpoint_db->update($tableName,$data,$where);
 			if (false === result) {

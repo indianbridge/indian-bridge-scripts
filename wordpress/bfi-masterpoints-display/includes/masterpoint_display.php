@@ -10,25 +10,34 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 		
 		private $bfi_masterpoint_db;
 		private $table_prefix;
+		private $member_id = null;
+		private $tournament_code = null;
+		private $event_code = null;
 		
 		
 		public function __construct($db, $table_prefix) {
 			$this->bfi_masterpoint_db = $db;
 			$this->table_prefix = $table_prefix;
 			// Add the shortcode
-			add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));			
+			add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));	
+			add_filter( 'query_vars', array($this, 'add_query_vars_filter' ));		
 		}	
 		
-		/*function add_query_vars_filter( $vars ){
-			  $vars[] = "bfi_member_id";
-			   return $vars;
-		}*/
+		public function add_query_vars_filter( $vars ){
+			$vars[] = "member_id";
+			$vars[] = "tournament_code";
+			$vars[] = "event_code";
+			return $vars;
+		}
 		
 		
 		/**
 		 * Replace shortcode with posts
 		 */
 		function bfi_masterpoint_display($atts, $content = null) {
+			$this->member_id = get_query_var('member_id');
+			$this->tournament_code = get_query_var('tournament_code');
+			$this->event_code = get_query_var('event_code');
 			if (is_user_logged_in()) {
 				return $this -> showLoggedInShortCodeContent();
 			} else {

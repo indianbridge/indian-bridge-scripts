@@ -40,10 +40,6 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			// register the javascript
 			wp_register_script($jsIdentifier, plugins_url($jsFilePath, __FILE__), array('jquery'));
 			wp_enqueue_script($jsIdentifier);
-			/*$js_columnFilterIdentifier = 'columnFilter';
-			$js_columnFilterFile = 'js/jquery.dataTables.columnFilter.js';
-			wp_register_script($js_columnFilterIdentifier, plugins_url($js_columnFilterFile, __FILE__), array('jquery'));
-			wp_enqueue_script($js_columnFilterIdentifier);*/
 			
 			// Register bfi master point javascript
 			wp_register_script('bfi_masterpoints_display', plugins_url('bfi-masterpoints-display.js', __FILE__), array('jquery'));
@@ -54,30 +50,27 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			wp_enqueue_style($cssIdentifier);
 			wp_register_style('jquery_dataTables_redmond_css', plugins_url('css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__));
 			wp_enqueue_style('jquery_dataTables_redmond_css');
-
 			
 			add_action('admin_bar_menu', array($this, 'customize_admin_bar'));
-			//add_filter( 'query_vars', array($this, 'add_query_vars_filter' ));
 
 			register_activation_hook(__FILE__, array($this, 'activate'));
 			register_deactivation_hook(__FILE__, array($this, 'deactivate'));
 			global $wpdb;
 			$this -> bfi_masterpoint_db = $wpdb;
 			$this -> table_prefix = 'bfi_';
-			//$table_prefix = 'bfi_';
 
 			// Customize the user profile
-			$this -> custom_user_profile = new BFI_Custom_User_Profile($wpdb, $this -> table_prefix);
+			$this -> custom_user_profile = new BFI_Custom_User_Profile($this -> bfi_masterpoint_db, $this -> table_prefix);
 
 			// Customize the admin bar
 			$this -> custom_admin_bar_css = new BFI_Custom_Admin_Bar();
-			$this->bfi_masterpoint_manager = new BFI_Masterpoint_Manager($wpdb,$this->table_prefix);
+			$this->bfi_masterpoint_manager = new BFI_Masterpoint_Manager($this -> bfi_masterpoint_db,$this->table_prefix);
 			
 			// Some constants
 			$this -> errorFlag = false;	
 			$this->jsonDelimiter = "!@#";
 			
-			$bfi_masterpoint_display_shortcode = new BFI_Masterpoint_Display_Shortcode($wpdb,$this->table_prefix);
+			$bfi_masterpoint_display_shortcode = new BFI_Masterpoint_Display_Shortcode($this -> bfi_masterpoint_db,$this->table_prefix);
 		}
 
 		public function add_masterpoint_admin_bar($wp_admin_bar) {
