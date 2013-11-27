@@ -3,7 +3,7 @@ $wpconfig = '..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEP
 foreach (explode(PHP_EOL, file_get_contents($wpconfig)) as $line) {
 	if (preg_match('/define.+?DB_|table_prefix/', $line))	eval($line);
 }
-$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>"bfi_");
+$params = array("member_id"=>"","BFI_Table_Type"=>"","table_prefix"=>"bfi_","from_date"=>"","to_date"=>"");
 foreach($params as $paramName=>$value) {
 	if (isset( $_GET[$paramName]) && !empty($_GET[$paramName])) { 
 		$params[$paramName] = $_GET[$paramName];
@@ -12,6 +12,8 @@ foreach($params as $paramName=>$value) {
 $member_id = $params['member_id'];
 $tableType = $params['BFI_Table_Type'];
 $table_prefix = $params['table_prefix'];
+$from_date = $params['from_date'];
+$to_date = $params['to_date'];
 
 switch ($tableType) {
 	case "leaderboard":
@@ -106,7 +108,7 @@ function doSearch($aColumns) {
 	if ( $_GET['sSearch'] != "" )
 	{
 		$sWhere = "(";	
-		foreach ($aColumns as $key => $value) {
+		foreach ($aColumns as $key) {
 			$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
 		}
 		$sWhere = substr_replace( $sWhere, "", -3 );
@@ -116,43 +118,6 @@ function doSearch($aColumns) {
 		$sWhere = "";
 	}	
 	return $sWhere;
-	//if ( $_GET['sSearch'] != "" )
-	//{
-		
-		/*$i=0;
-		foreach ($aColumns as $key => $value) {
-			if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' ) {
-				$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch_'.$i] )."%' OR ";
-			}
-			//$sWhere .= $key." LIKE '%".mysql_real_escape_string( $_GET['sSearch'] )."%' OR ";
-			$i++;
-		}
-		if (!empty($sWhere)) {
-		$sWhere = substr_replace( $sWhere, "", -3 );
-			$sWhere = "(".$sWhere.")";
-		}*/
-		//$sWhere .= ')';
- /* Individual column filtering */
-    /*for ( $i=0 ; $i<count($aColumns) ; $i++ )  // this is the column-specific filter
-    {
-        if ( $_GET['bSearchable_'.$i] == "true" && $_GET['sSearch_'.$i] != '' )
-        {
-            if ( $sWhere == "" )
-            {
-                $sWhere = "WHERE ";
-            }
-            else
-            {
-                $sWhere .= " AND ";
-            }
-            $sWhere .= $aColumns[$i]." LIKE '%".mysql_real_escape_string($_GET['sSearch_'.$i])."%' ";
-        }
-    }	*/	
-	//}
-	//else {
-		//$sWhere = "";
-	//}	
-	//return $sWhere;
 }
 
 function getResults($sqlLink, $sQuery_old, $sIndexColumn, $sTable, $aColumns) {
@@ -214,6 +179,7 @@ function doLookupMemberID() {
 	global $table_prefix;
 	$sqlLink = connectToDB();
 	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name');
+	$aSearchColumns = array('member_id','first_name','last_name');
 
 	// Indexed column (used for fast and accurate table cardinality) 
 	$sIndexColumn = "member_id";
@@ -221,7 +187,7 @@ function doLookupMemberID() {
 	$sqlLink = connectToDB();
 	$sLimit = getLimit();
 	$sOrder = getOrder($aColumns);
-	$sWhere = getWhere("", $aColumns);
+	$sWhere = getWhere("", $aSearchColumns);
 
 	$sJoin = "";
 	$sQuery = "
@@ -243,11 +209,10 @@ function doLookupMemberID() {
 function doLeaderboard() {
 	global $table_prefix;
 	$sqlLink = connectToDB();
-	$aColumns = array( 'member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name',
-	'(total_current_fp+total_current_lp)'=>'total','total_current_fp'=>'total_current_fp','total_current_lp'=>'total_current_lp',
+	$aColumns = array( 'bfi_member.member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name',
+	'(SUM(bfi_tournament_masterpoint.fedpoints_earned)+SUM(bfi_tournament_masterpoint.localpoints_earned))'=>'total',
+	'SUM(bfi_tournament_masterpoint.fedpoints_earned)'=>'total_current_fp','SUM(bfi_tournament_masterpoint.localpoints_earned)'=>'total_current_lp',
 	$table_prefix.'zone_master.description'=>'zone',$table_prefix.'country_state.state'=>'state');
-
-	// Indexed column (used for fast and accurate table cardinality) 
 	$sIndexColumn = "member_id";
 	$sTable = $table_prefix."member";	
 	$sqlLink = connectToDB();
@@ -255,8 +220,12 @@ function doLeaderboard() {
 	//$sOrder = "";
 	$sOrder = getOrder($aColumns);
 	
-	$sWhere = getWhere("", $aColumns);
+	$dateFilter = getDateFilter("");
+	$aSearchColumns = array('first_name','last_name',$table_prefix.'zone_master.description',$table_prefix.'country_state.state');
+	$sWhere = getWhere($dateFilter, $aSearchColumns);
+	$sGroup = "GROUP BY $sTable.member_id";
 	$sJoin = "";
+	$sJoin .= "JOIN ".$table_prefix."tournament_masterpoint ON ".$table_prefix."member.member_id = ".$table_prefix."tournament_masterpoint.member_id ";
 	$sJoin .= "JOIN ".$table_prefix."zone_master ON ".$table_prefix."member.zone_code = ".$table_prefix."zone_master.zone_code ";
 	$sJoin .= "JOIN ".$table_prefix."zone_state ON ".$table_prefix."member.zone_code = ".$table_prefix."zone_state.zone_code ";
 	$sJoin .= "JOIN ".$table_prefix."country_state ON ".$table_prefix."zone_state.cs_id = ".$table_prefix."country_state.cs_id ";
@@ -270,6 +239,7 @@ function doLeaderboard() {
 	$sQuery .= " FROM   $sTable
 		$sJoin
 		$sWhere
+		$sGroup
 		$sOrder
 		$sLimit
 	";
@@ -277,8 +247,31 @@ function doLeaderboard() {
 	echo json_encode( $output );
 }
 
+function getDateFilter($member_id) {
+	global $table_prefix,$from_date,$to_date;
+	$dateFilter = "";
+	if (empty($from_date)) {
+		if (!empty($to_date)) {
+			$dateFilter = "event_date <= '$to_date'";
+		}
+	}
+	else {
+		if (!empty($to_date)) {
+			$dateFilter = "event_date BETWEEN '$from_date' AND '$to_date'";
+		}
+		else {
+			$dateFilter = "event_date >= '$from_date'";
+		}		
+	}
+	$memberFilter = "";
+	if (!empty($member_id)) $memberFilter = "member_id = '$member_id'";
+	if (empty($memberFilter)) return $dateFilter;
+	else if (empty($dateFilter)) return $memberFilter;
+	return "$memberFilter AND $dateFilter";	
+}
+
 function doAllMasterpoint() {
-	global $table_prefix;
+	global $table_prefix,$from_date,$to_date;
 
 	$aColumns = array( $table_prefix.'tournament_masterpoint.event_date'=>'event_date',
 	$table_prefix.'tournament_master.description'=>'tournament_name',
@@ -289,6 +282,11 @@ function doAllMasterpoint() {
 	$table_prefix.'tournament_masterpoint.localpoints_earned'=>'localpoints_earned',
 	$table_prefix.'tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned',
 	'('.$table_prefix.'tournament_masterpoint.localpoints_earned+'.$table_prefix.'tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
+
+	$aSearchColumns = array($table_prefix.'tournament_master.description',$table_prefix.'tournament_level_master.description',
+	$table_prefix.'event_master.description',$table_prefix.'member.member_id',
+	$table_prefix.'member.first_name',$table_prefix.'member.last_name');
+	
 	// Indexed column (used for fast and accurate table cardinality)
 	$sIndexColumn = "*";
 	$sTable = $table_prefix."tournament_masterpoint";
@@ -303,7 +301,8 @@ function doAllMasterpoint() {
 	$sOrder = getOrder($aColumns);
 	
 	//Filtering
-	$sWhere = getWhere("", $aColumns);
+	$dateFilter = getDateFilter("");
+	$sWhere = getWhere($dateFilter, $aSearchColumns);
 	
 	//Join
 	$sJoin = "";
@@ -334,7 +333,11 @@ function doAllMasterpoint() {
 function doMyMasterpoint() {
 	global $member_id,$table_prefix;
 
-	$aColumns = array( $table_prefix.'tournament_masterpoint.event_date'=>'event_date',$table_prefix.'tournament_master.description'=>'tournament_name',$table_prefix.'tournament_level_master.description'=>'tournament_type',$table_prefix.'event_master.description'=>'event_code',$table_prefix.'tournament_masterpoint.localpoints_earned'=>'localpoints_earned',$table_prefix.'tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(bfi_tournament_masterpoint.localpoints_earned+bfi_tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
+	$aColumns = array( $table_prefix.'tournament_masterpoint.event_date'=>'event_date',$table_prefix.'tournament_master.description'=>'tournament_name',
+	$table_prefix.'tournament_level_master.description'=>'tournament_type',$table_prefix.'event_master.description'=>'event_code',$table_prefix.'tournament_masterpoint.localpoints_earned'=>'localpoints_earned',$table_prefix.'tournament_masterpoint.fedpoints_earned'=>'fedpoints_earned','(bfi_tournament_masterpoint.localpoints_earned+bfi_tournament_masterpoint.fedpoints_earned)'=>'totalpoints');
+	
+	$aSearchColumns = array($table_prefix.'tournament_master.description',$table_prefix.'tournament_level_master.description',
+	$table_prefix.'event_master.description');
 	// Indexed column (used for fast and accurate table cardinality)
 	$sIndexColumn = "*";
 	$sTable = $table_prefix."tournament_masterpoint";
@@ -349,7 +352,8 @@ function doMyMasterpoint() {
 	$sOrder = getOrder($aColumns);
 	
 	//Filtering
-	$sWhere = getWhere("member_id = '".$member_id."'", $aColumns);
+	$dateFilter = getDateFilter($member_id);
+	$sWhere = getWhere($dateFilter, $aSearchColumns);
 	
 	//Join
 	$sJoin = "";

@@ -20,7 +20,12 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 			$this->table_prefix = $table_prefix;
 			// Add the shortcode
 			add_shortcode('bfi_masterpoint_display', array($this, 'bfi_masterpoint_display'));	
-			add_filter( 'query_vars', array($this, 'add_query_vars_filter' ));		
+			add_filter( 'query_vars', array($this, 'add_query_vars_filter' ));	
+			
+			wp_enqueue_script('jquery-ui-datepicker');
+			wp_enqueue_script('jquery-ui-button');
+			//wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+				
 		}	
 		
 		public function add_query_vars_filter( $vars ){
@@ -83,11 +88,89 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 			echo '<span class="ico trophy-bronze-icon">Local Points: ' . $membership_info -> local_points . '</span>';
 			echo '</div>';
 			echo '<div class="clear h10"><!-- --></div>';
+			$this->showFilterParameters();
 			$tabs = array('mymasterpoint' => "My Masterpoints", 'leaderboard' => "Masterpoint Leaderboard", "allmasterpoint" => "All Masterpoints");
 			$selectedTab = 'mymasterpoint';
 			echo $this -> getMasterpointTabs($tabs, $selectedTab, $current_user -> user_login);
 			$out = ob_get_clean();
 			return $out;
+		}
+
+		function showFilterParameters() {
+			?>
+			
+				<div id="current-filter" class="note-yes br3 note-padd mb1e"><div><strong>Current filters : </strong><span id="current-filter-message">No filters!</span></div></div>			
+				<p>
+				<label for="from-date">Select Date Range From : </label>
+				<input type="text" id="from-date" name="from-date" readonly>
+				<input type="hidden" id="from-date-display" name="from-date-display" value="" readonly>				
+				<label for="to-date">to : </label>
+				<input type="text" id="to-date" name="to-date" readonly>
+				<input type="hidden" id="to-date-display" name="to-date-display" value="" readonly>		
+				<button id="set-filters">Set Filters</button>
+				<button id="clear-filters">Clear Filters</button>				
+				<script>
+				 	jQuery(document).ready(function() {
+				 		jQuery('#filter-errors').hide();
+				 		jQuery("#from-date").datepicker({
+				 			defaultDate: "+1w",
+				 			changeMonth: true,
+				 			changeYear: true,
+				 			showButtonPanel: true,
+				 			numberOfMonths: 1,
+				 			dateFormat : "yy-mm-dd",
+				 			altField: "#from-date-display",
+				 			altFormat: "MM d, yy",
+				 			onClose: function(selectedDate) {
+				 				jQuery("#to-date").datepicker( "option", "minDate", selectedDate );
+				 			}
+				 		});
+				 		jQuery("#to-date").datepicker({
+				 			defaultDate: "+1w",
+				 			changeMonth: true,
+				 			changeYear: true,
+				 			showButtonPanel: true,
+				 			numberOfMonths: 1,
+				 			dateFormat : "yy-mm-dd",
+				 			altField: "#to-date-display",
+				 			altFormat: "MM d, yy",
+				 			onClose: function(selectedDate) {
+				 				jQuery("#from-date").datepicker( "option", "maxDate", selectedDate );
+				 			}
+				 		});
+				 		jQuery("#set-filters").button().click(function(event) {
+				 			event.preventDefault();
+				 			fromDate = jQuery('#from-date').val();
+				 			toDate = jQuery('#to-date').val();
+				 			filterFromDate = fromDate;
+				 			filterToDate = toDate;
+				 			if (fromDate == "" && toDate == "") {
+				 				jQuery('#current-filter').removeClass('note-alert').addClass('note-yes');
+				 				jQuery('#current-filter-message').html("No filters");				 				
+				 			}
+				 			else {
+				 				jQuery('#current-filter').removeClass('note-yes').addClass('note-alert');
+				 				html = "Showing entries from "+(fromDate==""?"Any Date":jQuery('#from-date-display').val())+ " to "+(toDate==""?"Any Date":jQuery('#to-date-display').val())
+				 				jQuery('#current-filter-message').html(html);
+				 			}
+				 			setFilter();
+				 		});
+				 		jQuery("#clear-filters").button().click(function(event) {
+				 			event.preventDefault();
+				 			jQuery('#from-date').val("");
+				 			jQuery('#to-date').val("");
+				 			jQuery("#to-date").datepicker( "option", "minDate",null);
+				 			jQuery("#from-date").datepicker( "option", "maxDate",null);
+				 			filterFromDate = "";
+				 			filterToDate = "";
+				 			jQuery('#current-filter').removeClass('note-alert').addClass('note-yes');
+				 			jQuery('#current-filter-message').html("No filters");
+				 			setFilter();
+				 		});				 		
+				 	});
+				</script>
+				</p>
+			<?php			
 		}
 				
 
@@ -96,6 +179,15 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 			echo $this -> getMemberSummary($current_user);
 			//$member_id = get_query_var('bfi_member_id');
 			echo '<h1>You have to be a member of BFI to see your Masterpoint Summary and Details</h1>';
+			$this->showFilterParameters();
+			/*echo '<input type="text" id="MyDate" name="MyDate" value=""/>';
+			echo '<script type="text/javascript">';
+			echo 'jQuery(document).ready(function() {';
+			echo 'jQuery("#MyDate").datepicker({';
+			echo 'dateFormat : "dd-mm-yy"';
+			echo '});';
+			echo '});';
+			echo '</script>';			*/
 			//if (empty($member_id)) {
 				$tabs = array('leaderboard' => "Masterpoint Leaderboard", "allmasterpoint" => "All Masterpoints");
 			/*}
@@ -116,7 +208,7 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 			$html .= '<ul class="tabber-widget-tabs">';
 			$tabIDPrefix = 'masterpoint_page_tab_';
 			foreach ($tabs as $tab => $tabName) {
-				$html .= '<li><a id="' . $tabIDPrefix . $tab . '" onclick="switchMasterpointPageTab(\'' . $tab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');" href="javascript:void(0)">' . $tabName . '</a></li>';
+				$html .= '<li><a id="' . $tabIDPrefix . $tab . '" onclick="switchMasterpointPageTab(\'' . $tab . '\',\'' . $tabIDPrefix . '\');" href="javascript:void(0)">' . $tabName . '</a></li>';
 			}
 			$html .= '</ul>';
 			$html .= '<div class="tabber-widget-content">';
@@ -124,7 +216,9 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 			$html .= '<div id="bfi_masterpoints_table_container">';
 			$html .= '</div></div></div></div>';
 			$html .= '<script type="text/javascript">';
-			$html .= 'switchMasterpointPageTab(\'' . $selectedTab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');';
+			$html .= 'server_side_url = \'' . plugins_url('jquery.datatables.php', __FILE__) . '\';';
+			$html .= 'member_id = \'' . $member_id . '\';';
+			$html .= 'switchMasterpointPageTab(\'' . $selectedTab . '\',\'' . $tabIDPrefix . '\');';
 			$html .= '</script>';
 			return $html;
 		}
