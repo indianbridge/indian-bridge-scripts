@@ -1,21 +1,26 @@
 var previous_masterpoint_page_tab = null;
-function switchMasterpointPageTab(newTab, tabIDPrefix, server_side_url, member_id,db_name) {
+var filterFromDate="";
+var filterToDate="";
+var server_side_url="";
+var member_id="";
+function setFilter() {
+	bfi_masterpoint_renderTable_dataTables(previous_masterpoint_page_tab);
+}
+function switchMasterpointPageTab(newTab, tabIDPrefix) {
 	var selectedClass = 'selected';
 	if (previous_masterpoint_page_tab != null)
 		jQuery("#" + tabIDPrefix + previous_masterpoint_page_tab).removeClass(selectedClass);
 	jQuery("#" + tabIDPrefix + newTab).addClass(selectedClass);
 	previous_masterpoint_page_tab = newTab;
-	bfi_masterpoint_renderTable_dataTables(newTab, server_side_url, member_id,db_name);
+	bfi_masterpoint_renderTable_dataTables(newTab, member_id);
 }
 
-function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, member_id, db_name) {
+function bfi_masterpoint_renderTable_dataTables(tableType) {
 	var html = '<table id="bfi_masterpoints_table"><thead><tr>';
-	//var columnFilters = new Array({ type: "text" },null,null,null,null);
 	if (tableType == "leaderboard") {
 		var columns = new Array("ID", "NAME", "Total", "Fed", "Local","Zone","State");
 		var sortColumn = "Total";
 		var SortOrder = "desc";
-		//columnFilters = new Array({ type: "text" },{ type: "text" });
 	} else if (tableType == "mymasterpoint") {
 		var columns = new Array("Event Date", "Tourney", "Tourney Type", "Event", "Local Points", "Fed Points", "Total Points");
 		var sortColumn = "Event Date";
@@ -28,7 +33,6 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 		var columns = new Array("Event Date", "Tourney", "Tourney Type", "Event", "Member ID", "Member Name", "Local Points", "Fed Points", "Total Points");
 		var sortColumn = "Event Date";
 		var SortOrder = "desc";
-		//columnFilters = new Array({ type: "date-range" },{ type: "text" },{ type: "text" },{ type: "text" },{ type: "text" },{ type: "text" });
 	}
 	else if (tableType == "lookupmemberid") {
 		var columns = new Array("ID", "NAME");
@@ -46,10 +50,6 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 	jQuery.each(columns, function(index, value) {
 		html += '<th>' + value + '</th>';
 	});
-	/*html += '</tr><tr>';
-	jQuery.each(columns, function(index, value) {
-		html += '<th>' + value + '</th>';
-	});*/
 	html += '</tr></thead></table>';
 
 	var tableID = '#bfi_masterpoints_table';
@@ -70,13 +70,15 @@ function bfi_masterpoint_renderTable_dataTables(tableType, server_side_url, memb
 				"name" : "member_id",
 				"value" : member_id
 			});
+			aoData.push({
+				"name" : "from_date",
+				"value" : filterFromDate
+			});
+			aoData.push({
+				"name" : "to_date",
+				"value" : filterToDate
+			});						
 		},
 		"sAjaxSource" : server_side_url
 	});
-
-	/*myTable.columnFilter({ 	sPlaceHolder: "head:before",
-	aoColumns:columnFilters});
-	jQuery.datepicker.regional[""].dateFormat = 'yyyy-mm-dd';
-    jQuery.datepicker.setDefaults($.datepicker.regional[''])*/
-
 }
