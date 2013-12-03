@@ -6,19 +6,66 @@ using CookComputing.XmlRpc;
 
 namespace WordpressAPIs
 {
-    public class TourneyInfo
+    public class AddPagesList
     {
         public int parentPageID = 0;
         public int tourneyYear = 2013;
-        public string tourneyPages = "";
+        public List<NewPageInfo> tourneyPages;
+    }
+
+    public class NewPageInfo
+    {
+        public string title = "";
+        public string content = "";
+    }
+
+    public class TourneyInfo
+    {
+        public string username = "";
+        public string password = "";
+        public string content = "";
+    }
+
+    public class TourneyList
+    {
+        public bool error { get; set; }
+        public string message { get; set; }
+        public List<TourneyPageInfo> content { get; set; }
+    }
+
+    public class AddTourneyPageReturnValue
+    {
+        public bool error { get; set; }
+        public string message { get; set; }
+        public List<AddTourneyPageInfo> content { get; set; }
+    }
+
+    public class AddTourneyPageInfo
+    {
+        public bool error { get; set; }
+        public string message { get; set; }
+    }
+
+    public class TourneyPageInfo
+    {
+        public int id { get; set; }
+        public string title { get; set; }
+        public string url { get; set; }
+        public string directory { get; set; }
+    }
+
+    public class EditCredentials
+    {
+        public string username = "";
+        public string password = "";
     }
 
     public interface AddTourneysInterface
     {
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.addTourney")]
-        string addTourney(int blogId, string username, string password, TourneyInfo tourneyInfo);
+        string addTourney(TourneyInfo tourneyInfo);
         [CookComputing.XmlRpc.XmlRpcMethod("bfi.getTourneys")]
-        string getTourneys(int blogId, string username, string password);
+        string getTourneys(EditCredentials credentials);
     }
 
     public class AddTourneys
@@ -47,7 +94,10 @@ namespace WordpressAPIs
         {
             try
             {
-                return m_interface.getTourneys(1, m_userName, m_password);
+                EditCredentials credentials = new EditCredentials();
+                credentials.username = m_userName;
+                credentials.password = m_password;
+                return m_interface.getTourneys(credentials);
             }
             catch (Exception e)
             {
@@ -55,11 +105,15 @@ namespace WordpressAPIs
             }
         }
 
-        public string addTourney(TourneyInfo tourneyInfo)
+        public string addTourney(string content)
         {
             try
             {
-                return m_interface.addTourney(1, m_userName, m_password,tourneyInfo);
+                TourneyInfo tourneyInfo = new TourneyInfo();
+                tourneyInfo.username = m_userName;
+                tourneyInfo.password = m_password;
+                tourneyInfo.content = content;
+                return m_interface.addTourney(tourneyInfo);
             }
             catch (Exception e)
             {

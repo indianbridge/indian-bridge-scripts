@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using WordpressAPIs;
-using System.Web.Script.Serialization;
 using IndianBridge.Common;
 
 namespace BFIAddTourney
@@ -15,7 +14,7 @@ namespace BFIAddTourney
     public partial class ValidateCredentials : Form
     {
         public AddTourneys addTourneys;
-        public string tourneyList = "";
+        public TourneyList tourneyList = null;
         public ValidateCredentials()
         {
             InitializeComponent();
@@ -46,19 +45,27 @@ namespace BFIAddTourney
             this.Refresh();
             addTourneys = new AddTourneys("http://127.0.0.1/bfi", usernameTextbox.Text, passwordTextbox.Text);
             string json_result = addTourneys.getTourneys();
-            Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
-            bool errorStatus = Convert.ToBoolean(result["error"]);
-            loadingPicture.Visible = false;
-            loginPanel.Enabled = true;
-            if (!errorStatus)
+            try
             {
-                this.DialogResult = DialogResult.OK;
-                tourneyList = result["content"];
-                this.Close();
+                tourneyList = Utilities.JsonDeserialize<TourneyList>(json_result);
+                loadingPicture.Visible = false;
+                loginPanel.Enabled = true;
+                if (tourneyList.error)
+                {
+                    MessageBox.Show("Unable to validate username and password because : " + Environment.NewLine + tourneyList.message);
+                    return;
+                }
+                else
+                {
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to validate username and password because : " + Environment.NewLine + result["message"]);
+                MessageBox.Show("Exception : " + Environment.NewLine + ex.Message);
+                loadingPicture.Visible = false;
+                loginPanel.Enabled = true;
                 return;
             }
         }

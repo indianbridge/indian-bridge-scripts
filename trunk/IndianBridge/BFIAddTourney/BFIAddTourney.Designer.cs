@@ -38,6 +38,8 @@
             this.createPagesButton = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pageNamesDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -47,6 +49,10 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tourneyNamesCombobox
@@ -93,7 +99,7 @@
             this.pageNamesDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pageNamesDataGridView.Location = new System.Drawing.Point(0, 0);
             this.pageNamesDataGridView.Name = "pageNamesDataGridView";
-            this.pageNamesDataGridView.Size = new System.Drawing.Size(520, 261);
+            this.pageNamesDataGridView.Size = new System.Drawing.Size(523, 261);
             this.pageNamesDataGridView.TabIndex = 4;
             // 
             // pageName
@@ -119,7 +125,7 @@
             this.createPagesButton.ForeColor = System.Drawing.Color.White;
             this.createPagesButton.Location = new System.Drawing.Point(0, 0);
             this.createPagesButton.Name = "createPagesButton";
-            this.createPagesButton.Size = new System.Drawing.Size(520, 67);
+            this.createPagesButton.Size = new System.Drawing.Size(523, 67);
             this.createPagesButton.TabIndex = 6;
             this.createPagesButton.Text = "Create Pages";
             this.createPagesButton.UseVisualStyleBackColor = false;
@@ -142,7 +148,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(520, 396);
+            this.splitContainer1.Size = new System.Drawing.Size(523, 396);
             this.splitContainer1.SplitterDistance = 60;
             this.splitContainer1.TabIndex = 7;
             // 
@@ -161,16 +167,43 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.createPagesButton);
-            this.splitContainer2.Size = new System.Drawing.Size(520, 332);
+            this.splitContainer2.Size = new System.Drawing.Size(523, 332);
             this.splitContainer2.SplitterDistance = 261;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add(this.splitContainer1);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add(this.richTextBox1);
+            this.splitContainer3.Size = new System.Drawing.Size(916, 396);
+            this.splitContainer3.SplitterDistance = 523;
+            this.splitContainer3.TabIndex = 8;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(389, 396);
+            this.richTextBox1.TabIndex = 0;
+            this.richTextBox1.Text = "";
             // 
             // BFIAddTourney
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(520, 396);
-            this.Controls.Add(this.splitContainer1);
+            this.ClientSize = new System.Drawing.Size(916, 396);
+            this.Controls.Add(this.splitContainer3);
             this.Name = "BFIAddTourney";
             this.Text = "BFI Add Tourney Application";
             this.Load += new System.EventHandler(this.BFIAddTourney_Load);
@@ -185,6 +218,10 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -201,6 +238,8 @@
         private System.Windows.Forms.Button createPagesButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 
