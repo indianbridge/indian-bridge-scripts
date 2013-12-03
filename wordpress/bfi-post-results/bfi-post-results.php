@@ -17,73 +17,11 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 	
 
 	class BFI_Post_Results {
-		private $jsonDelimiter;
+		
 		public function __construct() {
-			$dataGridName = "datatables";
-
-			$jsFilePath = 'js/jquery.' . $dataGridName . '.min.js';
-			$cssFilePath = 'css/jquery.' . $dataGridName . '.css';
-			$jsIdentifier = 'jquery_' . $dataGridName . '_js';
-			$cssIdentifier = 'jquery_' . $dataGridName . '_css';
-
-			// register the javascript
-			//wp_register_script($jsIdentifier, plugins_url($jsFilePath, __FILE__), array('jquery'));
-			//wp_enqueue_script($jsIdentifier);
-
-			// Register bfi master point javascript
-			wp_register_script('bfi_post_results', plugins_url('bfi_post_results.js', __FILE__), array('jquery'));
-			wp_enqueue_script('bfi_post_results');
-
-			// register the css
-			//wp_register_style($cssIdentifier, plugins_url('css/jquery.datatables_themeroller.css', __FILE__));
-			//wp_enqueue_style($cssIdentifier);
-			//wp_register_style('jquery_dataTables_redmond_css', plugins_url('css/jquery_ui/jquery-ui-1.10.3.custom.min.css', __FILE__));
-			//wp_enqueue_style('jquery_dataTables_redmond_css');
-			
-			add_shortcode('bfi_results_display', array($this, 'bfi_results_display'));			
 			add_filter( 'xmlrpc_methods', array( $this, 'add_xml_rpc_methods' ) );
-			
-			$this->jsonDelimiter = "!@#";
-		}
-
-		/**
-		 * Replace shortcode with posts
-		 */
-		function bfi_results_display($atts, $content = null) {
-			ob_start();
-			echo '<h1>You have to be a member of BFI and be logged in to see Masterpoint Summary and Details</h1>';
-			$tabs = array('lookupmemberid' => 'Find Your BFI Member ID', 'leaderboard' => "Masterpoint Leaderboard");
-			$selectedTab = 'lookupmemberid';
-			$html = "";
-			$html .= '<div class="tabber-widget-default">';
-			$html .= '<ul class="tabber-widget-tabs">';
-			$tabIDPrefix = 'masterpoint_page_tab_';
-			foreach ($tabs as $tab => $tabName) {
-				$html .= '<li><a id="' . $tabIDPrefix . $tab . '" onclick="switchResultsTab(\'' . $tab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.results_display.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');" href="javascript:void(0)">' . $tabName . '</a></li>';
-			}
-			$html .= '</ul>';
-			$html .= '<div class="tabber-widget-content">';
-			$html .= '<div class="tabber-widget">';
-			$html .= '<div id="bfi_masterpoints_table_container">';
-			$html .= '</div></div></div></div>';
-			$html .= '<script type="text/javascript">';
-			$html .= 'switchResultsTab(\'' . $selectedTab . '\',\'' . $tabIDPrefix . '\',\'' . plugins_url('jquery.datatables.results_display.php', __FILE__) . '\',\'' . $member_id . '\',\'' . DB_NAME . '\');';
-			$html .= '</script>';
-			echo $html;			
-			//echo $this -> getMasterpointTabs($tabs, $selectedTab, '');
-			$out = ob_get_clean();
-			return $out;					
 		}
 		
-		
-		/**
-		 * Filter to add our custom XML-RPC methods
-		 * 
-		 * @param array $methods associative array of XMl-RPC method name to 
-		 *        function callback
-		 * @return array associative array of XMl-RPC method name to 
-		 *         function callback
-		 */
 		public function add_xml_rpc_methods( $methods ) {
 			$methods['indianbridge.postResults'] = array( $this, 'bfi_post_results' );
 			$methods['bfi.addTourney'] = array($this,'bfi_addTourney');
@@ -91,142 +29,131 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 			return $methods;
 		}
 		
-		public function bfi_validateEditPageCredentials($params) {
+		private function validateCredentials($params) {
+			$parameterNames = array("username","password");
+			$parameters = $this->checkParameters($params, $parameterNames);	
 			global $wp_xmlrpc_server;
-			$wp_xmlrpc_server->escape( $params );		
-			$blog_id  = (int) $params[0]; // not used, but follow in the form of the wordpress built in XML-RPC actions
-			$username = $params[1];
-			$password = $params[2];
-
+			$username = $parameters['username'];
+			$password = $parameters['password'];
 			// verify credentials
-			if ( ! $user = $wp_xmlrpc_server->login( $username, $password ) ) {
-				return $this->createErrorMessage($wp_xmlrpc_server->error);
+			if (!$user = $wp_xmlrpc_server -> login($username, $password)) {
+				throw new Exception($wp_xmlrpc_server -> error -> message);
 			}
-			
-			// check for edit_posts capability (requires contributor role)
-			if ( ! current_user_can( 'edit_pages' ) ) {
-				return $this->createErrorMessage('User '.$username.' is not allowed to edit pages and so cannot create tourney pages.');
+			// Check if user is allowed to manage masterpoints
+			if (!current_user_can('edit_pages')) {
+				throw new Exception("User $username is not authorized to edit or create tourney pages.");
 			}
-
-			return $this->createSuccessMessage("Validated Credentials");			
+			return $this->createSuccessMessage("Validated $username Successfully.");
+		}	
+		
+		private function checkParameters($params,$parameterNames) {
+			global $wp_xmlrpc_server;
+			$wp_xmlrpc_server -> escape($params);
+			$parameters = $params;
+			foreach ($parameterNames as $parameterName) {
+				if (!array_key_exists($parameterName, $parameters)) {
+					throw new Exception("Missing parameter $parameterName");
+				}
+				if (!$parameters[$parameterName]) {
+					throw new Exception("Invalid value $parameters[$parameterName] for parameter $parameterName");
+				}
+			}	
+			return $parameters;					
+		}
+		
+		private function bfi_getPageInfo($page) {
+			return array('id'=>$page->ID,'title'=>$page->post_title,'url'=>get_permalink($page->ID),'directory'=>get_page_uri($page->ID));
 		}
 		
 		public function bfi_getTourneys($params) {
-			// Check credentials first
-			$return_string = $this->bfi_validateEditPageCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
-			if ($error_flag) return $return_string;			
-			$ignorePageIDs = array(172);
-			$expandPageIDs = array(1464,893);
-			$pages = get_pages( array( 'child_of' => 171,  'parent'=>171 ) );		
-			foreach($pages as $page) {
-				if (!in_array($page->ID, $ignorePageIDs,TRUE) && !in_array($page->ID, $expandPageIDs,TRUE)) {
-					$pageNames[] = $page->post_title;
-					$pageIDs[] = $page->ID;
-				}
-			}	
-			foreach($expandPageIDs as $expandPage) {
-				$pages = get_pages( array( 'child_of' => $expandPage,  'parent'=>$expandPage ) );		
+			try {
+				// Check credentials first
+				$this->validateCredentials($params);	
+				$ignorePageIDs = array(172);
+				$expandPageIDs = array(1464,893);
+				$pages = get_pages( array( 'child_of' => 171,  'parent'=>171 ) );	
+				$content = array();	
 				foreach($pages as $page) {
-					$pageNames[] = $page->post_title;
-					$pageIDs[] = $page->ID;
-				}				
+					if (!in_array($page->ID, $ignorePageIDs,TRUE) && !in_array($page->ID, $expandPageIDs,TRUE)) {
+						$content[] = $this->bfi_getPageInfo($page);
+					}
+				}	
+				foreach($expandPageIDs as $expandPage) {
+					$pages = get_pages( array( 'child_of' => $expandPage,  'parent'=>$expandPage ) );		
+					foreach($pages as $page) {
+						$content[] = $this->bfi_getPageInfo($page);
+					}				
+				}
+				return $this->createSuccessMessage('Success',$content);
 			}
-			$content = implode(",", $pageNames).'#'.implode(",",$pageIDs);
-			return $this->createSuccessMessage('Success',$content);
+			catch (Exception $ex) {
+				return $this->createExceptionMessage($ex);
+			}	
 		}
 
-		public function hasError($message) {
-			$lines = explode($this->jsonDelimiter, $message);
-			return filter_var($lines[0], FILTER_VALIDATE_BOOLEAN);
+		public function createMessage($error,$message,$content) {
+			$return_value = array("error"=>$error,"message"=>__($message),"content"=>$content);
+			return json_encode($return_value);
+		}
+
+		public function createErrorMessage($message, $content=array()) {
+			return $this->createMessage(true,$message,$content);
 		}
 		
-		public function getMessage($message) {
-			$lines = explode($this->jsonDelimiter, $message);
-			return $lines[1];
+		private function createExceptionMessage($ex) {
+			return $this->createErrorMessage($ex->getMessage());
+		}			
+
+		public function createSuccessMessage($message,$content=array()) {
+			return $this->createMessage(false,$message,$content);
 		}
 		
-		public function getContent($message) {
-			$lines = explode($this->jsonDelimiter, $message);
-			return $lines[2];			
-		}
-
-		public function createMessage($error, $message, $content) {
-			$lines[] = $error;
-			$lines[] = $message;
-			$lines[] = $content;
-			return implode($this->jsonDelimiter, $lines);
-		}
-
-		public function createErrorMessage($message, $content = '') {
-			return $this -> createMessage("true", $message, $content);
-		}
-
-		public function createSuccessMessage($message, $content = '') {
-			return $this -> createMessage("false", $message, $content);
-		}
-		
-		public function bfi_addTourney($params) {
-			// Check credentials first
-			$return_string = $this->bfi_validateEditPageCredentials($params);
-			$result = json_decode($return_string);
-			$error_flag = filter_var($result->error, FILTER_VALIDATE_BOOLEAN);
-			if ($error_flag) return $return_string;		
-			
-			do_action( 'xmlrpc_call', 'bfi.addTourney' ); // patterned on the core XML-RPC actions			
-			
-			// Parse the parameters
-			$args     = $params[3];
-			$page_id = $args['parentPageID'];
+		private function bfi_checkParentPageValidity($page_id) {
 			$tourneys_page_id = 171;
 			if (empty($page_id)) {
-				return $this->createErrorMessage("'parentPageID' parameter cannot be empty");
+				throw new Exception("'parentPageID' parameter cannot be empty");
 			}
 			if (!is_numeric($page_id)) {
-				return $this->createErrorMessage("parentPageID : $page_id has to be numeric id of tourney page.");
+				throw new Exception("parentPageID : $page_id has to be numeric id of tourney page.");
 			}
 			$page_id = intval($page_id);
 			if ($page_id === 0) {
-				return $this->createErrorMessage("parentPageID : $page_id is not a valid integer id of page.");
+				throw new Exception("parentPageID : $page_id is not a valid integer id of page.");
 			}
 			$page = get_post($page_id);
 			if ($page == null) {
-				return $this->createErrorMessage("Page with parentPageID : $page_id does not exist.");
+				throw new Exception("Page with parentPageID : $page_id does not exist.");
 			}
 			if ($page->post_status !== 'publish') {
-				return $this->createErrorMessage("Page with parentPageID : $page_id does not have published status.");
+				throw new Exception("Page with parentPageID : $page_id does not have published status.");
 			}
-			
 			// Check if it is child of tourneys
 			$ancestors = get_post_ancestors($page_id);
 			if (!$ancestors || !in_array($tourneys_page_id,$ancestors,TRUE)) {
-				return $this->createErrorMessage("Page with parentPageID : $page_id is not a child page of Tourneys page.");
+				throw new Exception("Page with parentPageID : $page_id is not a child page of Tourneys page.");
 			}
-			
-			// Check if root page already exists
-			$tourneyYear = $args['tourneyYear'];
-			$tourneyPages = $args['tourneyPages'];
-			if (empty($tourneyPages)) {
-				return $this->createErrorMessage("'tourneyPages' parameter cannot be empty");
-			}
+											
+		}
+		
+		private function bfi_createYearPage($page_id, $tourneyYear) {
 			if (empty($tourneyYear)) {
-				return $this->createErrorMessage("'tourneyYear' parameter cannot be empty");
+				throw new Exception("'tourneyYear' parameter cannot be empty");
 			}
 			if (!is_numeric($tourneyYear)) {
-				return $this->createErrorMessage("tourneyYear : $tourneyYear has to be numeric year.");
+				throw new Exception("tourneyYear : $tourneyYear has to be numeric year.");
 			}		
 			$tourneyYear = intval($tourneyYear);
 			$today = getdate();
 			$currentYear = intval($today['year']);	
 			if($tourneyYear !== $currentYear && $tourneyYear !== $currentYear+1) {
-				return $this->createErrorMessage("tourneyYear : $tourneyYear has to be current year ($currentYear) or next year only.");
-			}
-			$pageName = 'y'.$args['tourneyYear'];
+				throw new Exception("tourneyYear : $tourneyYear has to be current year ($currentYear) or next year only.");
+			}	
+			$pageName = 'y'.$tourneyYear;
 			$uri = get_page_uri($page_id).'/'.$pageName;
 			$pageExists = get_page_by_path($uri);
 			if ($pageExists != null) {
-				return $this->createErrorMessage("A page already exists at $uri");
+				//throw new Exception("$uri already exists. Year Page and sub pages can be created only once using this interface.");
+				return;
 			}
 			$page_template = 'page-tourney.php';
 			$page_template_meta = '_wp_page_template';
@@ -242,33 +169,105 @@ if ( ! class_exists( 'BFI_Post_Results' ) ) {
 			);  	
 			$rootPage_id = wp_insert_post($post,true);	
 			if (is_wp_error($rootPage_id)) {
-				return $this->createErrorMessage("Unable to create page at $uri because".$rootPage_id->get_error_message().PHP_EOL.'Subpages will not be created.');
+				throw new Exception("Unable to create page at $uri because".$rootPage_id->get_error_message().PHP_EOL.'Subpages will not be created.');
 			}
 			update_post_meta( $rootPage_id, $page_template_meta, $page_template );
-			$tourneyNames = explode(',', $tourneyPages);
-			$message = '';
-			$error = 'false';
-			foreach($tourneyNames as $tourneyName) {
-				$post = array(
-					'comment_status' => 'closed',
-					'ping_status'    => 'closed',
-					'post_content'   => '<h1>'.$page->post_title.' : '.$tourneyYear.' : '.$tourneyName.'</h1>',
-					'post_parent'    => $rootPage_id,
-					'post_status'    => 'draft',
-					'post_title'     => $tourneyName,
-					'post_type'      => 'page'
-				);  	
-				$newPage_id = wp_insert_post($post,true);	
-				if (is_wp_error($newPage_id)) {
-					$error = 'true';
-					$message .= "Unable to create page at $uri because".$newPage_id->get_error_message().PHP_EOL;
-				}
-				else {
-					update_post_meta( $newPage_id, $page_template_meta, $page_template );		
-				}						
+			$path = get_page_uri($page_id).DIRECTORY_SEPARATOR.$tourneyYear;
+			$this->bfi_createDirectory($path);
+			$this->bfi_createDirectory($path.DIRECTORY_SEPARATOR.'bulletins');
+			$this->bfi_createDirectory($path.DIRECTORY_SEPARATOR.'results');
+			return $rootPage_id;
+		}
+
+		private function bfi_createSubPage($parent_page_id,$post_title,$post_content) {
+			$post = array(
+				'comment_status' => 'closed',
+				'ping_status'    => 'closed',
+				'post_content'   => $post_content,
+				'post_parent'    => $parent_page_id,
+				'post_status'    => 'publish',
+				'post_title'     => $post_title,
+				'post_type'      => 'page'
+			);  	
+			$page_template = 'page-tourney.php';
+			$page_template_meta = '_wp_page_template';	
+			$newPage_id = wp_insert_post($post,true);	
+			if (is_wp_error($newPage_id)) {
+				throw new Exception("Unable to create page at $uri because".$newPage_id->get_error_message());
 			}
-			if ($error === 'false') $message = 'All Pages created successfully';
-			return $this->createMessage($error,$message);
+			else {
+				update_post_meta( $newPage_id, $page_template_meta, $page_template );		
+			}	
+			return "$uri created.";
+		}
+		
+		private function bfi_createDirectory($path) {
+			$replaced_path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+			if (file_exists($replaced_path)) return;
+			$this->bfi_createDirectory(dirname($replaced_path));
+			mkdir($replaced_path);
+			return;
+		}
+		
+		private function bfi_childPageExists($posts,$title) {
+			foreach($posts as $post) {
+				if ($post->post_title === $title) return true;
+			}
+			return false;
+		}
+		
+		public function bfi_addTourney($params) {
+			try {
+				// Check credentials first
+				$this->validateCredentials($params);	
+
+				do_action( 'xmlrpc_call', 'bfi.addTourney' ); // patterned on the core XML-RPC actions			
+				
+				// Parse the parameters	
+				$content = json_decode($params['content'],true);
+				//return print_r($content,true);
+				$page_id = $content['parentPageID'];
+				//return print_r($content['parentPageID'],true);
+				$this->bfi_checkParentPageValidity($page_id);
+
+				// Check if root page already exists or create it
+				$tourneyYear = $content['tourneyYear'];
+				$parent_page_id = $this->bfi_createYearPage($page_id, $tourneyYear);
+				$posts = get_posts(array('post_type' => 'page','post_parent' => $parent_page_id));
+				
+				$tourneyPages = $content['tourneyPages'];
+				if (empty($tourneyPages)) {
+					throw new Exception("'tourneyPages' parameter cannot be empty");
+				}
+
+				$returnContent = array();
+				$error = false;
+				$message = "Success";
+				foreach($tourneyPages as $tourneyPage) {
+					
+					try {
+						$post_content = (empty($tourneyPage['content'])?'<h1>'.$page->post_title.' : '.$tourneyYear.' : '.$tourneyPage['title'].'</h1>':$tourneyPage['content']);
+						$post_title = $tourneyPage['title'];
+						if ($this->bfi_childPageExists($posts, $post_title)) {
+							$returnContent[] = array('error'=>true,'message'=>"$post_title exists already. Nothing done.");
+						}
+						else {
+							$this->bfi_createSubPage($parent_page_id, $post_title, $post_content);
+							$returnContent[] = array('error'=>false,'message'=>"$post_title created successfully");
+						}
+					}	
+					catch (Exception $ex) {
+						$error = true;
+						$message = "Errors Found";
+						$returnContent[] = array('error'=>true,'message'=>$ex->getMessage());
+					}	
+				}
+				return $this->createMessage($error,$message,$returnContent);
+			}
+			catch (Exception $ex) {
+				return $this->createExceptionMessage($ex);
+			}									
+						
 		}
 		
 		
