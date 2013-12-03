@@ -15,8 +15,7 @@ namespace BFIAddTourney
     public partial class BFIAddTourney : Form
     {
         AddTourneys addTourneys;
-        string[] tourneyNames;
-        string[] tourneyPageIDs;
+        TourneyList tourneyList = null;
         public BFIAddTourney()
         {
             InitializeComponent();
@@ -32,15 +31,16 @@ namespace BFIAddTourney
                 return;
             }
             addTourneys = vc.addTourneys;
-            loadTourneyNames(vc.tourneyList);
+            tourneyList = vc.tourneyList;
+            loadTourneyNames(tourneyList);
         }
 
-        private void loadTourneyNames(string tourneyList)
+        private void loadTourneyNames(TourneyList tourneyList)
         {
-            string[] tokens = tourneyList.Split('#');
-            tourneyNames = tokens[0].Split(',');
-            tourneyPageIDs = tokens[1].Split(',');
-            tourneyNamesCombobox.Items.AddRange(tourneyNames);
+            foreach (TourneyPageInfo pageInfo in tourneyList.content)
+            {
+                tourneyNamesCombobox.Items.Add(pageInfo.title);
+            }
             tourneyNamesCombobox.SelectedIndex = 0;
             pageNamesDataGridView.Rows.Add("Information");
             pageNamesDataGridView.Rows.Add("Programme");
@@ -62,7 +62,10 @@ namespace BFIAddTourney
 
         private void createPagesButton_Click(object sender, EventArgs e)
         {
-            string pageNames = "";
+            AddPagesList addPagesList = new AddPagesList();
+            addPagesList.parentPageID = Convert.ToInt32(tourneyList.content[tourneyNamesCombobox.SelectedIndex].id);
+            addPagesList.tourneyYear = Convert.ToInt32(tourneyYearCombobox.Text);
+            addPagesList.tourneyPages = new List<NewPageInfo>();
             string message = "Creating " + tourneyNamesCombobox.Text + " for year " + tourneyYearCombobox.Text + " with following pages :"+Environment.NewLine;
             foreach (DataGridViewRow row in pageNamesDataGridView.Rows)
             {
@@ -71,31 +74,57 @@ namespace BFIAddTourney
                     string value = (string)row.Cells[0].Value.ToString();
                     if (!string.IsNullOrWhiteSpace(value))
                     {
-                        pageNames += value+",";
-                        message += value+Environment.NewLine;
+                        NewPageInfo item = new NewPageInfo();
+                        item.title = value;
+                        message += value + ", ";
+                        item.content = "";
+                        addPagesList.tourneyPages.Add(item);
                     }
                 }
             }
-            pageNames = pageNames.TrimEnd(',');
+            string content = Utilities.JsonSerialize<AddPagesList>(addPagesList);
             DialogResult dResult = MessageBox.Show(message,"Are you Sure?",MessageBoxButtons.YesNo,MessageBoxIcon.Warning);
             if (dResult == DialogResult.Yes)
             {
-                splitContainer1.Enabled = false;
-                TourneyInfo tourneyInfo = new TourneyInfo();
-                tourneyInfo.parentPageID = Convert.ToInt32(tourneyPageIDs[tourneyNamesCombobox.SelectedIndex]);
-                tourneyInfo.tourneyYear = Convert.ToInt32(tourneyYearCombobox.Text);
-                tourneyInfo.tourneyPages = pageNames;
-                string json_result = addTourneys.addTourney(tourneyInfo);
-                Dictionary<string, string> result = Utilities.convertJsonOutput(json_result);
-                bool errorStatus = Convert.ToBoolean(result["error"]);
-                if (errorStatus) {
-                    MessageBox.Show("Errors when adding tourney : "+Environment.NewLine+result["message"],"Errors!",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                richTextBox1.SelectionColor = Color.Black;
+                richTextBox1.AppendText(message+Environment.NewLine);
+                try
+                {
+                    splitContainer1.Enabled = false;
+                    string json_result = addTourneys.addTourney(content);
+                    AddTourneyPageReturnValue returnValue = Utilities.JsonDeserialize<AddTourneyPageReturnValue>(json_result);
+                    if (returnValue.error) {
+                        string errorMessage = "Errors when adding tourney pages : "+Environment.NewLine+returnValue.message;
+                        Utilities.showErrorMessage(errorMessage);
+                        richTextBox1.SelectionColor = Color.Red;
+                        richTextBox1.AppendText(errorMessage + Environment.NewLine);
+                    }
+                    else {
+                        string completedMessage = "Completed adding tourney and pages";
+                        MessageBox.Show(completedMessage,"Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                        richTextBox1.SelectionColor = Color.Black;
+                        richTextBox1.AppendText(completedMessage + Environment.NewLine);
+                        foreach(AddTourneyPageInfo pageInfo in returnValue.content) {
+                            if (pageInfo.error)
+                            {
+                                richTextBox1.SelectionColor = Color.Red;
+                                richTextBox1.AppendText(pageInfo.message + Environment.NewLine);
+                            }
+                            else
+                            {
+                                richTextBox1.SelectionColor = Color.Green;
+                                richTextBox1.AppendText(pageInfo.message + Environment.NewLine);
+                            }
+                        }
+                    }
                 }
-                else {
-                    MessageBox.Show("Successfully added tourney and pages : "+Environment.NewLine+result["message"],"Success",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Exception : " + ex.Message);
                 }
                 splitContainer1.Enabled = true;
             }
         }
+
     }
 }

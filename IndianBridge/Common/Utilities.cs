@@ -540,5 +540,14 @@ namespace IndianBridge.Common
 			var obj = (T)ser.ReadObject(ms);
 			return obj;
 		}
+
+        public static string JsonSerialize<T>(T jsonObject) {
+            MemoryStream stream1 = new MemoryStream();
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+            ser.WriteObject(stream1, jsonObject);
+            stream1.Position = 0;
+            StreamReader sr = new StreamReader(stream1);
+            return sr.ReadToEnd();
+        }
 	}
 }
