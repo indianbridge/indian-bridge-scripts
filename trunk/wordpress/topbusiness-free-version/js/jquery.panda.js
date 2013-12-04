@@ -45,7 +45,7 @@ jQuery(document).ready(function() {
 		// ACTIVATION
 
 			// Common
-			var h = f('.pslides > div:first',this).innerHeight(true);
+			var h = f('.pslides > div:first',this).innerHeight();
 
 				f('.ploading',this).hide();
 				pslides.css({height: 50}).delay(300).animate({height: h}, 750);
@@ -439,7 +439,7 @@ p(function(){
 	
 	function homeSliderHeight() {
 
-		var	contentHeight = p('.pslides .block').innerHeight(true);
+		var	contentHeight = p('.pslides .block').innerHeight();
 
 			p('#homeslider .pslides').animate({'height':contentHeight}, 750);
 	
