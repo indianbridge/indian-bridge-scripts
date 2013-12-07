@@ -34,10 +34,14 @@
 			this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
 			this.tabPublishBulletin = new System.Windows.Forms.TabPage();
 			this.pnlBulletin = new System.Windows.Forms.Panel();
-			this.button2 = new System.Windows.Forms.Button();
+			this.label9 = new System.Windows.Forms.Label();
+			this.cmbYear = new System.Windows.Forms.ComboBox();
+			this.cmbTourneyName = new System.Windows.Forms.ComboBox();
+			this.label10 = new System.Windows.Forms.Label();
+			this.btnPublishBulletin = new System.Windows.Forms.Button();
 			this.label6 = new System.Windows.Forms.Label();
-			this.button3 = new System.Windows.Forms.Button();
-			this.textBox3 = new System.Windows.Forms.TextBox();
+			this.btnSelectBulletin = new System.Windows.Forms.Button();
+			this.txtCaption = new System.Windows.Forms.TextBox();
 			this.tabPublishResults = new System.Windows.Forms.TabPage();
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.publishResultsStatus = new System.Windows.Forms.ToolStripStatusLabel();
@@ -47,11 +51,10 @@
 			this.lblStatus = new System.Windows.Forms.Label();
 			this.btnPublish = new System.Windows.Forms.Button();
 			this.txtStatus = new System.Windows.Forms.TextBox();
-			this.txtPath = new System.Windows.Forms.TextBox();
 			this.tourneyYearCombobox = new System.Windows.Forms.ComboBox();
 			this.tourneyNamesCombobox = new System.Windows.Forms.ComboBox();
-			this.label2 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
+			this.panel3 = new System.Windows.Forms.Panel();
 			this.tabSaveResults = new System.Windows.Forms.TabPage();
 			this.lblPreview = new System.Windows.Forms.Label();
 			this.txtPreview = new System.Windows.Forms.TextBox();
@@ -64,22 +67,26 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.txtFileName = new System.Windows.Forms.TextBox();
 			this.cmbStyling = new System.Windows.Forms.ComboBox();
+			this.panel2 = new System.Windows.Forms.Panel();
 			this.tabCredentials = new System.Windows.Forms.TabPage();
+			this.panel1 = new System.Windows.Forms.Panel();
 			this.loadingPicture = new System.Windows.Forms.PictureBox();
+			this.lblPassword = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
-			this.button1 = new System.Windows.Forms.Button();
+			this.btnRootFolder = new System.Windows.Forms.Button();
+			this.btnLogin = new System.Windows.Forms.Button();
+			this.txtUserName = new System.Windows.Forms.TextBox();
 			this.lblUserName = new System.Windows.Forms.Label();
 			this.txtPassword = new System.Windows.Forms.TextBox();
-			this.txtUserName = new System.Windows.Forms.TextBox();
-			this.lblPassword = new System.Windows.Forms.Label();
-			this.btnRootFolder = new System.Windows.Forms.Button();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
+			this.openFileDialog2 = new System.Windows.Forms.OpenFileDialog();
 			this.tabPublishBulletin.SuspendLayout();
 			this.pnlBulletin.SuspendLayout();
 			this.tabPublishResults.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.tabSaveResults.SuspendLayout();
 			this.tabCredentials.SuspendLayout();
+			this.panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.loadingPicture)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -98,50 +105,96 @@
 			// pnlBulletin
 			// 
 			this.pnlBulletin.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.pnlBulletin.Controls.Add(this.button2);
+			this.pnlBulletin.Controls.Add(this.label9);
+			this.pnlBulletin.Controls.Add(this.cmbYear);
+			this.pnlBulletin.Controls.Add(this.cmbTourneyName);
+			this.pnlBulletin.Controls.Add(this.label10);
+			this.pnlBulletin.Controls.Add(this.btnPublishBulletin);
 			this.pnlBulletin.Controls.Add(this.label6);
-			this.pnlBulletin.Controls.Add(this.button3);
-			this.pnlBulletin.Controls.Add(this.textBox3);
+			this.pnlBulletin.Controls.Add(this.btnSelectBulletin);
+			this.pnlBulletin.Controls.Add(this.txtCaption);
 			this.pnlBulletin.Location = new System.Drawing.Point(54, 38);
 			this.pnlBulletin.Name = "pnlBulletin";
-			this.pnlBulletin.Size = new System.Drawing.Size(397, 297);
+			this.pnlBulletin.Size = new System.Drawing.Size(517, 385);
 			this.pnlBulletin.TabIndex = 17;
-			this.pnlBulletin.Visible = false;
 			// 
-			// button2
+			// label9
 			// 
-			this.button2.Location = new System.Drawing.Point(256, 57);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(85, 162);
-			this.button2.TabIndex = 13;
-			this.button2.Text = "Publish";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
+			this.label9.AutoSize = true;
+			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label9.Location = new System.Drawing.Point(25, 28);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(114, 17);
+			this.label9.TabIndex = 30;
+			this.label9.Text = "Tourney Name : ";
+			// 
+			// cmbYear
+			// 
+			this.cmbYear.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cmbYear.FormattingEnabled = true;
+			this.cmbYear.Location = new System.Drawing.Point(156, 60);
+			this.cmbYear.Name = "cmbYear";
+			this.cmbYear.Size = new System.Drawing.Size(92, 21);
+			this.cmbYear.TabIndex = 32;
+			// 
+			// cmbTourneyName
+			// 
+			this.cmbTourneyName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cmbTourneyName.FormattingEnabled = true;
+			this.cmbTourneyName.Location = new System.Drawing.Point(156, 28);
+			this.cmbTourneyName.Name = "cmbTourneyName";
+			this.cmbTourneyName.Size = new System.Drawing.Size(254, 21);
+			this.cmbTourneyName.TabIndex = 29;
+			// 
+			// label10
+			// 
+			this.label10.AutoSize = true;
+			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label10.Location = new System.Drawing.Point(25, 61);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(107, 17);
+			this.label10.TabIndex = 31;
+			this.label10.Text = "Tourney Year : ";
+			// 
+			// btnPublishBulletin
+			// 
+			this.btnPublishBulletin.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+			this.btnPublishBulletin.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnPublishBulletin.ForeColor = System.Drawing.SystemColors.HotTrack;
+			this.btnPublishBulletin.Location = new System.Drawing.Point(43, 275);
+			this.btnPublishBulletin.Name = "btnPublishBulletin";
+			this.btnPublishBulletin.Size = new System.Drawing.Size(367, 50);
+			this.btnPublishBulletin.TabIndex = 13;
+			this.btnPublishBulletin.Text = "Publish";
+			this.btnPublishBulletin.UseVisualStyleBackColor = false;
+			this.btnPublishBulletin.Click += new System.EventHandler(this.buttonPublishBulletin_Click);
 			// 
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(24, 87);
+			this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label6.Location = new System.Drawing.Point(40, 179);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(70, 13);
+			this.label6.Size = new System.Drawing.Size(246, 17);
 			this.label6.TabIndex = 12;
-			this.label6.Text = "Bulletins path";
+			this.label6.Text = "Caption (leave blank to use file name)";
 			// 
-			// button3
+			// btnSelectBulletin
 			// 
-			this.button3.Location = new System.Drawing.Point(27, 34);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(96, 32);
-			this.button3.TabIndex = 0;
-			this.button3.Text = "Select File";
-			this.button3.UseVisualStyleBackColor = true;
+			this.btnSelectBulletin.Location = new System.Drawing.Point(43, 122);
+			this.btnSelectBulletin.Name = "btnSelectBulletin";
+			this.btnSelectBulletin.Size = new System.Drawing.Size(96, 32);
+			this.btnSelectBulletin.TabIndex = 0;
+			this.btnSelectBulletin.Text = "Select File";
+			this.btnSelectBulletin.UseVisualStyleBackColor = true;
+			this.btnSelectBulletin.Click += new System.EventHandler(this.button3_Click);
 			// 
-			// textBox3
+			// txtCaption
 			// 
-			this.textBox3.Location = new System.Drawing.Point(27, 108);
-			this.textBox3.Name = "textBox3";
-			this.textBox3.Size = new System.Drawing.Size(192, 20);
-			this.textBox3.TabIndex = 11;
+			this.txtCaption.Location = new System.Drawing.Point(43, 205);
+			this.txtCaption.Name = "txtCaption";
+			this.txtCaption.Size = new System.Drawing.Size(243, 20);
+			this.txtCaption.TabIndex = 11;
 			// 
 			// tabPublishResults
 			// 
@@ -150,11 +203,10 @@
 			this.tabPublishResults.Controls.Add(this.lblStatus);
 			this.tabPublishResults.Controls.Add(this.btnPublish);
 			this.tabPublishResults.Controls.Add(this.txtStatus);
-			this.tabPublishResults.Controls.Add(this.txtPath);
 			this.tabPublishResults.Controls.Add(this.tourneyYearCombobox);
 			this.tabPublishResults.Controls.Add(this.tourneyNamesCombobox);
-			this.tabPublishResults.Controls.Add(this.label2);
 			this.tabPublishResults.Controls.Add(this.label5);
+			this.tabPublishResults.Controls.Add(this.panel3);
 			this.tabPublishResults.Location = new System.Drawing.Point(4, 22);
 			this.tabPublishResults.Name = "tabPublishResults";
 			this.tabPublishResults.Padding = new System.Windows.Forms.Padding(3);
@@ -223,7 +275,7 @@
 			this.btnPublish.ForeColor = System.Drawing.SystemColors.HotTrack;
 			this.btnPublish.Location = new System.Drawing.Point(196, 154);
 			this.btnPublish.Name = "btnPublish";
-			this.btnPublish.Size = new System.Drawing.Size(343, 53);
+			this.btnPublish.Size = new System.Drawing.Size(343, 50);
 			this.btnPublish.TabIndex = 24;
 			this.btnPublish.Text = "Publish";
 			this.btnPublish.UseVisualStyleBackColor = false;
@@ -234,16 +286,9 @@
 			this.txtStatus.Location = new System.Drawing.Point(100, 264);
 			this.txtStatus.Multiline = true;
 			this.txtStatus.Name = "txtStatus";
-			this.txtStatus.Size = new System.Drawing.Size(439, 201);
+			this.txtStatus.Size = new System.Drawing.Size(474, 201);
 			this.txtStatus.TabIndex = 20;
 			this.txtStatus.Visible = false;
-			// 
-			// txtPath
-			// 
-			this.txtPath.Location = new System.Drawing.Point(503, 103);
-			this.txtPath.Name = "txtPath";
-			this.txtPath.Size = new System.Drawing.Size(192, 20);
-			this.txtPath.TabIndex = 22;
 			// 
 			// tourneyYearCombobox
 			// 
@@ -264,15 +309,6 @@
 			this.tourneyNamesCombobox.TabIndex = 25;
 			this.tourneyNamesCombobox.SelectedIndexChanged += new System.EventHandler(this.tourneyNamesCombobox_SelectedIndexChanged);
 			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(559, 78);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(86, 13);
-			this.label2.TabIndex = 23;
-			this.label2.Text = "Path on web site";
-			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
@@ -282,6 +318,14 @@
 			this.label5.Size = new System.Drawing.Size(107, 17);
 			this.label5.TabIndex = 27;
 			this.label5.Text = "Tourney Year : ";
+			// 
+			// panel3
+			// 
+			this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel3.Location = new System.Drawing.Point(43, 25);
+			this.panel3.Name = "panel3";
+			this.panel3.Size = new System.Drawing.Size(670, 478);
+			this.panel3.TabIndex = 41;
 			// 
 			// tabSaveResults
 			// 
@@ -296,6 +340,7 @@
 			this.tabSaveResults.Controls.Add(this.label1);
 			this.tabSaveResults.Controls.Add(this.txtFileName);
 			this.tabSaveResults.Controls.Add(this.cmbStyling);
+			this.tabSaveResults.Controls.Add(this.panel2);
 			this.tabSaveResults.Location = new System.Drawing.Point(4, 22);
 			this.tabSaveResults.Name = "tabSaveResults";
 			this.tabSaveResults.Padding = new System.Windows.Forms.Padding(3);
@@ -363,12 +408,15 @@
 			// 
 			// btnSaveHtml
 			// 
+			this.btnSaveHtml.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+			this.btnSaveHtml.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnSaveHtml.ForeColor = System.Drawing.SystemColors.HotTrack;
 			this.btnSaveHtml.Location = new System.Drawing.Point(51, 441);
 			this.btnSaveHtml.Name = "btnSaveHtml";
-			this.btnSaveHtml.Size = new System.Drawing.Size(631, 46);
+			this.btnSaveHtml.Size = new System.Drawing.Size(631, 50);
 			this.btnSaveHtml.TabIndex = 29;
 			this.btnSaveHtml.Text = "Save Results";
-			this.btnSaveHtml.UseVisualStyleBackColor = true;
+			this.btnSaveHtml.UseVisualStyleBackColor = false;
 			this.btnSaveHtml.Visible = false;
 			this.btnSaveHtml.Click += new System.EventHandler(this.btnSaveHtml_Click_1);
 			// 
@@ -413,16 +461,17 @@
 			this.cmbStyling.Size = new System.Drawing.Size(121, 21);
 			this.cmbStyling.TabIndex = 34;
 			// 
+			// panel2
+			// 
+			this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel2.Location = new System.Drawing.Point(18, 17);
+			this.panel2.Name = "panel2";
+			this.panel2.Size = new System.Drawing.Size(708, 500);
+			this.panel2.TabIndex = 39;
+			// 
 			// tabCredentials
 			// 
-			this.tabCredentials.Controls.Add(this.loadingPicture);
-			this.tabCredentials.Controls.Add(this.label8);
-			this.tabCredentials.Controls.Add(this.button1);
-			this.tabCredentials.Controls.Add(this.lblUserName);
-			this.tabCredentials.Controls.Add(this.txtPassword);
-			this.tabCredentials.Controls.Add(this.txtUserName);
-			this.tabCredentials.Controls.Add(this.lblPassword);
-			this.tabCredentials.Controls.Add(this.btnRootFolder);
+			this.tabCredentials.Controls.Add(this.panel1);
 			this.tabCredentials.Location = new System.Drawing.Point(4, 22);
 			this.tabCredentials.Name = "tabCredentials";
 			this.tabCredentials.Padding = new System.Windows.Forms.Padding(3);
@@ -431,10 +480,26 @@
 			this.tabCredentials.Text = "Enter Credentials";
 			this.tabCredentials.UseVisualStyleBackColor = true;
 			// 
+			// panel1
+			// 
+			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.loadingPicture);
+			this.panel1.Controls.Add(this.lblPassword);
+			this.panel1.Controls.Add(this.label8);
+			this.panel1.Controls.Add(this.btnRootFolder);
+			this.panel1.Controls.Add(this.btnLogin);
+			this.panel1.Controls.Add(this.txtUserName);
+			this.panel1.Controls.Add(this.lblUserName);
+			this.panel1.Controls.Add(this.txtPassword);
+			this.panel1.Location = new System.Drawing.Point(68, 49);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(513, 418);
+			this.panel1.TabIndex = 29;
+			// 
 			// loadingPicture
 			// 
 			this.loadingPicture.Image = ((System.Drawing.Image)(resources.GetObject("loadingPicture.Image")));
-			this.loadingPicture.Location = new System.Drawing.Point(209, 105);
+			this.loadingPicture.Location = new System.Drawing.Point(220, 103);
 			this.loadingPicture.Name = "loadingPicture";
 			this.loadingPicture.Size = new System.Drawing.Size(36, 31);
 			this.loadingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -442,31 +507,61 @@
 			this.loadingPicture.TabStop = false;
 			this.loadingPicture.Visible = false;
 			// 
+			// lblPassword
+			// 
+			this.lblPassword.AutoSize = true;
+			this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.lblPassword.Location = new System.Drawing.Point(121, 117);
+			this.lblPassword.Name = "lblPassword";
+			this.lblPassword.Size = new System.Drawing.Size(81, 17);
+			this.lblPassword.TabIndex = 23;
+			this.lblPassword.Text = "Password : ";
+			// 
 			// label8
 			// 
 			this.label8.AutoSize = true;
 			this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label8.Location = new System.Drawing.Point(110, 172);
+			this.label8.Location = new System.Drawing.Point(121, 170);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(107, 17);
 			this.label8.TabIndex = 27;
 			this.label8.Text = "Results folder : ";
 			// 
-			// button1
+			// btnRootFolder
 			// 
-			this.button1.Location = new System.Drawing.Point(113, 230);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(270, 69);
-			this.button1.TabIndex = 26;
-			this.button1.Text = "Save Settings";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.btnRootFolder.Location = new System.Drawing.Point(237, 160);
+			this.btnRootFolder.Name = "btnRootFolder";
+			this.btnRootFolder.Size = new System.Drawing.Size(157, 32);
+			this.btnRootFolder.TabIndex = 21;
+			this.btnRootFolder.Text = "Browse";
+			this.btnRootFolder.UseVisualStyleBackColor = true;
+			this.btnRootFolder.Click += new System.EventHandler(this.btnRootFolder_Click_1);
+			// 
+			// btnLogin
+			// 
+			this.btnLogin.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+			this.btnLogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.btnLogin.ForeColor = System.Drawing.SystemColors.HotTrack;
+			this.btnLogin.Location = new System.Drawing.Point(124, 228);
+			this.btnLogin.Name = "btnLogin";
+			this.btnLogin.Size = new System.Drawing.Size(270, 50);
+			this.btnLogin.TabIndex = 26;
+			this.btnLogin.Text = "Login";
+			this.btnLogin.UseVisualStyleBackColor = false;
+			this.btnLogin.Click += new System.EventHandler(this.authenticate_Click);
+			// 
+			// txtUserName
+			// 
+			this.txtUserName.Location = new System.Drawing.Point(237, 73);
+			this.txtUserName.Name = "txtUserName";
+			this.txtUserName.Size = new System.Drawing.Size(157, 20);
+			this.txtUserName.TabIndex = 24;
 			// 
 			// lblUserName
 			// 
 			this.lblUserName.AutoSize = true;
 			this.lblUserName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lblUserName.Location = new System.Drawing.Point(110, 75);
+			this.lblUserName.Location = new System.Drawing.Point(121, 73);
 			this.lblUserName.Name = "lblUserName";
 			this.lblUserName.Size = new System.Drawing.Size(85, 17);
 			this.lblUserName.TabIndex = 22;
@@ -474,38 +569,11 @@
 			// 
 			// txtPassword
 			// 
-			this.txtPassword.Location = new System.Drawing.Point(226, 116);
+			this.txtPassword.Location = new System.Drawing.Point(237, 114);
 			this.txtPassword.Name = "txtPassword";
 			this.txtPassword.PasswordChar = '*';
 			this.txtPassword.Size = new System.Drawing.Size(157, 20);
 			this.txtPassword.TabIndex = 25;
-			// 
-			// txtUserName
-			// 
-			this.txtUserName.Location = new System.Drawing.Point(226, 75);
-			this.txtUserName.Name = "txtUserName";
-			this.txtUserName.Size = new System.Drawing.Size(157, 20);
-			this.txtUserName.TabIndex = 24;
-			// 
-			// lblPassword
-			// 
-			this.lblPassword.AutoSize = true;
-			this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lblPassword.Location = new System.Drawing.Point(110, 119);
-			this.lblPassword.Name = "lblPassword";
-			this.lblPassword.Size = new System.Drawing.Size(81, 17);
-			this.lblPassword.TabIndex = 23;
-			this.lblPassword.Text = "Password : ";
-			// 
-			// btnRootFolder
-			// 
-			this.btnRootFolder.Location = new System.Drawing.Point(226, 162);
-			this.btnRootFolder.Name = "btnRootFolder";
-			this.btnRootFolder.Size = new System.Drawing.Size(157, 32);
-			this.btnRootFolder.TabIndex = 21;
-			this.btnRootFolder.Text = "Browse";
-			this.btnRootFolder.UseVisualStyleBackColor = true;
-			this.btnRootFolder.Click += new System.EventHandler(this.btnRootFolder_Click_1);
 			// 
 			// tabControl1
 			// 
@@ -518,6 +586,10 @@
 			this.tabControl1.SelectedIndex = 0;
 			this.tabControl1.Size = new System.Drawing.Size(768, 565);
 			this.tabControl1.TabIndex = 27;
+			// 
+			// openFileDialog2
+			// 
+			this.openFileDialog2.FileName = "openFileDialog2";
 			// 
 			// Form1
 			// 
@@ -537,7 +609,8 @@
 			this.tabSaveResults.ResumeLayout(false);
 			this.tabSaveResults.PerformLayout();
 			this.tabCredentials.ResumeLayout(false);
-			this.tabCredentials.PerformLayout();
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.loadingPicture)).EndInit();
 			this.tabControl1.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -551,24 +624,22 @@
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog2;
 		private System.Windows.Forms.TabPage tabPublishBulletin;
 		private System.Windows.Forms.Panel pnlBulletin;
-		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.Button btnPublishBulletin;
 		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.Button button3;
-		private System.Windows.Forms.TextBox textBox3;
+		private System.Windows.Forms.Button btnSelectBulletin;
+		private System.Windows.Forms.TextBox txtCaption;
 		private System.Windows.Forms.TabPage tabPublishResults;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label lblStatus;
 		private System.Windows.Forms.Button btnPublish;
 		private System.Windows.Forms.TextBox txtStatus;
-		private System.Windows.Forms.TextBox txtPath;
 		private System.Windows.Forms.ComboBox tourneyYearCombobox;
 		private System.Windows.Forms.ComboBox tourneyNamesCombobox;
-		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TabPage tabSaveResults;
 		private System.Windows.Forms.TabPage tabCredentials;
 		private System.Windows.Forms.Label label8;
-		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.Button btnLogin;
 		private System.Windows.Forms.Label lblUserName;
 		private System.Windows.Forms.TextBox txtPassword;
 		private System.Windows.Forms.TextBox txtUserName;
@@ -591,6 +662,14 @@
 		private System.Windows.Forms.ToolStripStatusLabel publishResultsStatus;
 		private System.Windows.Forms.ToolStripProgressBar publishResultsProgressBar;
 		private System.Windows.Forms.ToolStripButton cancelPublishResultsButton;
+		private System.Windows.Forms.OpenFileDialog openFileDialog2;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.ComboBox cmbYear;
+		private System.Windows.Forms.ComboBox cmbTourneyName;
+		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Panel panel2;
+		private System.Windows.Forms.Panel panel3;
 	}
 }
 

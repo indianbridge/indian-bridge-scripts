@@ -53,7 +53,6 @@
     <Compile Include="NiniUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextBoxTraceListener.cs" />
-    <Compile Include="TourneyResults.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
