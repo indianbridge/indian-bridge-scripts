@@ -138,15 +138,24 @@ namespace CSVParser
 			var destinationFileName = txtCaption.Text == String.Empty ? fileName : txtCaption.Text.Replace(" ", "_") +
 				fileName.Substring(fileName.LastIndexOf("."));
 
-			var destination = String.Format("{0}/{1}", getBulletinsPagePath(), destinationFileName);
+			var destinationFolder = getBulletinsPagePath();
+
+			var destination = String.Format("{0}/{1}", destinationFolder, destinationFileName);
 			using (var ftp = new FtpConnection(m_ftpSite, m_ftpUsername, m_ftpPassword))
 			{
 				try
 				{
 					ftp.Open();
 					ftp.Login();
+
+					if (!ftp.DirectoryExists(destinationFolder))
+					{
+						MessageBox.Show(
+							"The destination folder doesn't exist on the server. Please contact the BFI website administrator.");
+					}
+
 					ftp.PutFile(source, destination);
-					MessageBox.Show("Done");
+					MessageBox.Show("Published bulletin successfully");
 				}
 				catch (Exception ex)
 				{
