@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Common;
-using FtpLib;
 using IndianBridge.Common;
+using FtpLib;
 using IndianBridge.WordpressAPIs;
 using WordpressAPIs;
 
@@ -18,36 +16,37 @@ namespace CSVParser
 	{
 		private Tuple<DataTable, string[]> m_parseResults;
 		private CustomBackgroundWorker m_publishResultsCBW = null;
-		private bool m_publishResultsRunning = false;
 		private string m_resultsFolderPath;
 		private double oldFontSize;
-		string[] tourneyNames;
-		string[] tourneyPageIDs;
-		private string m_username, m_password, m_site = "http://bfitest.bfi.net.in/";
+		private string m_username, m_password, m_site, m_ftpSite, m_ftpUsername, m_ftpPassword;
+		TourneyList m_tourneyList;
 
 		public Form1()
 		{
 			InitializeComponent();
-			this.folderBrowserDialog1.RootFolder = Environment.SpecialFolder.MyComputer;
 
 			lblTitle.Visible = txtTitle.Visible = label1.Visible =
 						txtFileName.Visible = label3.Visible = cmbStyling.Visible = lblPreview.Visible = txtPreview.Visible = false;
 
 			btnPublish.Enabled = false;
-			button1.Enabled = false;
+			btnLogin.Enabled = false;
 
 			tabSaveResults.Enabled = tabPublishBulletin.Enabled = tabPublishResults.Enabled = loadingPicture.Visible = false;
 
 			var usernameFromConfig = ConfigurationManager.AppSettings["username"];
 			var rootFolderFromConfig = ConfigurationManager.AppSettings["rootFolderDefault"];
+			m_site = ConfigurationManager.AppSettings["site"];
+			m_ftpSite = ConfigurationManager.AppSettings["ftpSite"];
+			m_ftpUsername = ConfigurationManager.AppSettings["ftpUsername"];
+			m_ftpPassword = ConfigurationManager.AppSettings["ftpPassword"];
 
 			if (!String.IsNullOrEmpty(usernameFromConfig))
 				m_username = txtUserName.Text = usernameFromConfig;
 
 			if (!String.IsNullOrEmpty(rootFolderFromConfig))
 			{
-				m_resultsFolderPath = folderBrowserDialog2.SelectedPath = rootFolderFromConfig;
-				button1.Enabled = true;
+				m_resultsFolderPath = folderBrowserDialog1.SelectedPath = folderBrowserDialog2.SelectedPath = rootFolderFromConfig;
+				btnLogin.Enabled = true;
 			}
 		}
 
@@ -92,53 +91,60 @@ namespace CSVParser
 
 		private Tuple<bool, string> GetTourneys(string site, string username, string password)
 		{
-			TourneyResults result = null;
 			var addTourneys = new AddTourneys(site, username, password);
 			var jsonResult = addTourneys.getTourneys();
 
 			try
 			{
-				result = Utilities.ConvertJsonOutputToTourneyResults(jsonResult);
+				m_tourneyList = Utilities.JsonDeserialize<TourneyList>(jsonResult);
 			}
 			catch (Exception)
 			{
 				return null;
 			}
 
-			var tourneyList = result.content;
-			var tokens = tourneyList.Split('#');
-			tourneyNames = tokens[0].Split(',');
-			tourneyPageIDs = tokens[1].Split(',');
-			tourneyNamesCombobox.Items.AddRange(tourneyNames);
+
+			foreach (TourneyPageInfo pageInfo in m_tourneyList.content)
+			{
+				tourneyNamesCombobox.Items.Add(pageInfo.title);
+				cmbTourneyName.Items.Add(pageInfo.title);
+			}
 
 			var currentYear = DateTime.Today.Year;
 			tourneyYearCombobox.Items.Clear();
+			tourneyYearCombobox.Items.Add(currentYear - 1);
 			tourneyYearCombobox.Items.Add(currentYear);
 			tourneyYearCombobox.Items.Add(currentYear + 1);
-			tourneyYearCombobox.SelectedIndex = 0;
+			tourneyYearCombobox.SelectedIndex = 1;
 
-			return new Tuple<bool, string>(result.error, result.message);
+			cmbYear.Items.Clear();
+			cmbYear.Items.Add(currentYear - 1);
+			cmbYear.Items.Add(currentYear);
+			cmbYear.Items.Add(currentYear + 1);
+			cmbYear.SelectedIndex = 1;
+
+			return new Tuple<bool, string>(m_tourneyList.error, m_tourneyList.message);
 		}
 
 		private void publishResultsCompleted(bool success)
 		{
-			m_publishResultsRunning = false;
 			Utilities.fontSize = oldFontSize;
 		}
 
-		private void button2_Click(object sender, EventArgs e)
+		private void buttonPublishBulletin_Click(object sender, EventArgs e)
 		{
-			string _remoteHost = "ftp.bfitest.net.in";
-			string _remoteUser = "bfi@bfitest.net.in";
-			string _remotePass = "bfi";
-			string source = @"C:\Users\snarasim\Downloads\test.pdf";
-			string destination = "/test.pdf";
-			using (FtpConnection ftp = new FtpConnection(_remoteHost, _remoteUser, _remotePass))
+			var source = openFileDialog2.FileName;
+			var fileName = openFileDialog2.SafeFileName;
+			var destinationFileName = txtCaption.Text == String.Empty ? fileName : txtCaption.Text.Replace(" ", "_") +
+				fileName.Substring(fileName.LastIndexOf("."));
+
+			var destination = String.Format("{0}/{1}", getBulletinsPagePath(), destinationFileName);
+			using (var ftp = new FtpConnection(m_ftpSite, m_ftpUsername, m_ftpPassword))
 			{
 				try
 				{
-					ftp.Open(); // Open the FTP connection 
-					ftp.Login(); // Login using previously provided credentials
+					ftp.Open();
+					ftp.Login();
 					ftp.PutFile(source, destination);
 					MessageBox.Show("Done");
 				}
@@ -150,7 +156,7 @@ namespace CSVParser
 
 		}
 
-		private void button1_Click(object sender, EventArgs e)
+		private void authenticate_Click(object sender, EventArgs e)
 		{
 			if (string.IsNullOrWhiteSpace(txtUserName.Text))
 			{
@@ -198,7 +204,7 @@ namespace CSVParser
 
 			folderBrowserDialog1.SelectedPath = m_resultsFolderPath;
 
-			button1.Enabled = true;
+			btnLogin.Enabled = true;
 		}
 
 		private void btnSelectFile_Click_1(object sender, EventArgs e)
@@ -220,7 +226,7 @@ namespace CSVParser
 					txtTitle.Visible = label1.Visible = btnSaveHtml.Visible =
 						txtFileName.Visible = label3.Visible = cmbStyling.Visible = lblPreview.Visible = txtPreview.Visible = true;
 
-				txtTitle.Text = txtFileName.Text = openFileDialog1.SafeFileName;
+				txtTitle.Text = txtFileName.Text = openFileDialog1.SafeFileName.Substring(0, openFileDialog1.SafeFileName.LastIndexOf("."));
 
 				cmbStyling.SelectedIndex = 0;
 			}
@@ -250,9 +256,7 @@ namespace CSVParser
 
 		private void btnPublish_Click_1(object sender, EventArgs e)
 		{
-			var pagePath = txtPath.Text; // /tourneys/winter-national/y2012/results/team-event
-			if (!pagePath.StartsWith("/"))
-				pagePath = String.Format("/{0}", pagePath);
+			var pagePath = getResultsPagePath();
 
 			statusStrip1.Visible = true;
 			txtStatus.Clear();
@@ -267,8 +271,21 @@ namespace CSVParser
 			oldFontSize = Utilities.fontSize;
 			Utilities.fontSize = 5;
 			var values = new Tuple<string, string>(m_resultsFolderPath, pagePath);
-			m_publishResultsRunning = true;
 			m_publishResultsCBW.run(values);
+		}
+
+		private string getResultsPagePath()
+		{
+			var selectedTourneyName = tourneyNamesCombobox.SelectedItem.ToString();
+			var selectedTourney = m_tourneyList.content.Find(x => x.title == selectedTourneyName);
+			return String.Format("/{0}/y{1}/results", selectedTourney.directory, tourneyYearCombobox.SelectedItem);
+		}
+
+		private string getBulletinsPagePath()
+		{
+			var selectedTourneyName = cmbTourneyName.SelectedItem.ToString();
+			var selectedTourney = m_tourneyList.content.Find(x => x.title == selectedTourneyName);
+			return String.Format("/{0}/{1}/bulletins", selectedTourney.directory.Replace("tourneys/", String.Empty), cmbYear.SelectedItem);
 		}
 
 		private void tourneyNamesCombobox_SelectedIndexChanged(object sender, EventArgs e)
@@ -282,6 +299,15 @@ namespace CSVParser
 		private void txtFileName_Click(object sender, EventArgs e)
 		{
 			txtFileName.Select();
+		}
+
+		private void button3_Click(object sender, EventArgs e)
+		{
+			var result = openFileDialog2.ShowDialog();
+			if (result != DialogResult.OK) // Test result.
+			{
+				MessageBox.Show("Please select a valid file to upload");
+			}
 		}
 	}
 }

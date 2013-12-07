@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -7,12 +6,10 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Data;
 using System.Collections;
-using System.Reflection;
 using System.Windows.Forms;
 using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
-using Common;
 
 namespace IndianBridge.Common
 {
@@ -172,11 +169,6 @@ namespace IndianBridge.Common
 			return result == DialogResult.Yes;
 		}
 
-		public static TourneyResults ConvertJsonOutputToTourneyResults(string json_result)
-		{
-			return JsonDeserialize<TourneyResults>(json_result);
-		}
-		
 		public static Dictionary<string, string> convertJsonOutput(string json_result)
 		{
 			string jsonDelimiter = "~";
@@ -541,13 +533,13 @@ namespace IndianBridge.Common
 			return obj;
 		}
 
-        public static string JsonSerialize<T>(T jsonObject) {
-            MemoryStream stream1 = new MemoryStream();
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
-            ser.WriteObject(stream1, jsonObject);
-            stream1.Position = 0;
-            StreamReader sr = new StreamReader(stream1);
-            return sr.ReadToEnd();
-        }
+		public static string JsonSerialize<T>(T jsonObject) {
+			MemoryStream stream1 = new MemoryStream();
+			DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+			ser.WriteObject(stream1, jsonObject);
+			stream1.Position = 0;
+			StreamReader sr = new StreamReader(stream1);
+			return sr.ReadToEnd();
+		}
 	}
 }
