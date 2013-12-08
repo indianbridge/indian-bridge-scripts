@@ -1,6 +1,6 @@
 ﻿namespace CSVParser
 {
-	partial class Form1
+	partial class UploadResults
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UploadResults));
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
 			this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
@@ -187,7 +187,7 @@
 			this.btnSelectBulletin.TabIndex = 0;
 			this.btnSelectBulletin.Text = "Select File";
 			this.btnSelectBulletin.UseVisualStyleBackColor = true;
-			this.btnSelectBulletin.Click += new System.EventHandler(this.button3_Click);
+			this.btnSelectBulletin.Click += new System.EventHandler(this.btnSelectBulletin_Click);
 			// 
 			// txtCaption
 			// 
@@ -586,18 +586,19 @@
 			this.tabControl1.SelectedIndex = 0;
 			this.tabControl1.Size = new System.Drawing.Size(768, 565);
 			this.tabControl1.TabIndex = 27;
+			this.tabControl1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tabControl1_KeyDown);
 			// 
 			// openFileDialog2
 			// 
 			this.openFileDialog2.FileName = "openFileDialog2";
 			// 
-			// Form1
+			// UploadResults
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1150, 611);
 			this.Controls.Add(this.tabControl1);
-			this.Name = "Form1";
+			this.Name = "UploadResults";
 			this.Text = "Form1";
 			this.tabPublishBulletin.ResumeLayout(false);
 			this.pnlBulletin.ResumeLayout(false);

@@ -12,7 +12,7 @@ using WordpressAPIs;
 
 namespace CSVParser
 {
-	public partial class Form1 : Form
+	public partial class UploadResults : Form
 	{
 		private Tuple<DataTable, string[]> m_parseResults;
 		private CustomBackgroundWorker m_publishResultsCBW = null;
@@ -20,8 +20,9 @@ namespace CSVParser
 		private double oldFontSize;
 		private string m_username, m_password, m_site, m_ftpSite, m_ftpUsername, m_ftpPassword;
 		TourneyList m_tourneyList;
+		private const string m_productionSite = "bfi.net.in";
 
-		public Form1()
+		public UploadResults()
 		{
 			InitializeComponent();
 
@@ -36,14 +37,14 @@ namespace CSVParser
 			var usernameFromConfig = ConfigurationManager.AppSettings["username"];
 			var rootFolderFromConfig = ConfigurationManager.AppSettings["rootFolderDefault"];
 			m_site = ConfigurationManager.AppSettings["site"];
-			m_ftpSite = ConfigurationManager.AppSettings["ftpSite"];
-			m_ftpUsername = ConfigurationManager.AppSettings["ftpUsername"];
-			m_ftpPassword = ConfigurationManager.AppSettings["ftpPassword"];
+			m_ftpSite = "ftp.bfi.net.in";
+			m_ftpUsername = "bfi@bfi.net.in";
+			m_ftpPassword = "bfi";
 
 			if (!String.IsNullOrEmpty(usernameFromConfig))
 				m_username = txtUserName.Text = usernameFromConfig;
 
-			if (!String.IsNullOrEmpty(rootFolderFromConfig))
+			if (!String.IsNullOrEmpty(rootFolderFromConfig) && Directory.Exists(rootFolderFromConfig))
 			{
 				m_resultsFolderPath = folderBrowserDialog1.SelectedPath = folderBrowserDialog2.SelectedPath = rootFolderFromConfig;
 				btnLogin.Enabled = true;
@@ -167,6 +168,11 @@ namespace CSVParser
 
 		private void authenticate_Click(object sender, EventArgs e)
 		{
+			login();
+		}
+
+		private void login()
+		{
 			if (string.IsNullOrWhiteSpace(txtUserName.Text))
 			{
 				MessageBox.Show("Username is required!");
@@ -194,13 +200,19 @@ namespace CSVParser
 				tabControl1.TabPages.Remove(tabCredentials);
 				m_username = txtUserName.Text;
 				m_password = txtPassword.Text;
+
+				if (m_site.Contains(m_productionSite))
+				{
+					MessageBox.Show(
+						"Please note that you are logged in to the production site. Your changes will impact content on the official public BFI web site!",
+						"Production Web site warning!!!", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+				}
 			}
 			else
 			{
 				MessageBox.Show(String.Format("Sorry, the credentials you entered are invalid. {0}",
 					result != null ? result.Item2 + "Error message: " + Environment.NewLine : String.Empty));
 			}
-
 		}
 
 		private void btnRootFolder_Click_1(object sender, EventArgs e)
@@ -310,7 +322,7 @@ namespace CSVParser
 			txtFileName.Select();
 		}
 
-		private void button3_Click(object sender, EventArgs e)
+		private void btnSelectBulletin_Click(object sender, EventArgs e)
 		{
 			var result = openFileDialog2.ShowDialog();
 			if (result != DialogResult.OK) // Test result.
@@ -318,5 +330,12 @@ namespace CSVParser
 				MessageBox.Show("Please select a valid file to upload");
 			}
 		}
+
+		private void tabControl1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter && tabControl1.SelectedTab.Text == "Enter Credentials")
+				login();
+		}
+
 	}
 }

@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordpressAPIs", "..\Wordpre
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{1C337ECB-18C4-4F1E-8557-C29696777EC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadResults", "..\CSVParser\UploadResults.csproj", "{B68844B9-0195-463D-A8F8-83D9F8F42857}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadResults", "..\UploadResults\UploadResults.csproj", "{B68844B9-0195-463D-A8F8-83D9F8F42857}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BFIAddTourney", "..\BFIAddTourney\BFIAddTourney.csproj", "{F3C344ED-7355-40CC-8251-E22C20479AB0}"
 EndProject
