@@ -7,8 +7,8 @@
     <ProjectGuid>{B68844B9-0195-463D-A8F8-83D9F8F42857}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSVParser</RootNamespace>
-    <AssemblyName>CSVParser</AssemblyName>
+    <RootNamespace>UploadResults</RootNamespace>
+    <AssemblyName>UploadResults</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -67,6 +67,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
