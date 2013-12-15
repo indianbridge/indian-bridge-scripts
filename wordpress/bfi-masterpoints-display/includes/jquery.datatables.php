@@ -209,9 +209,9 @@ function doLookupMemberID() {
 function doLeaderboard() {
 	global $table_prefix;
 	$sqlLink = connectToDB();
-	$aColumns = array( 'bfi_member.member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name',
-	'(SUM(bfi_tournament_masterpoint.fedpoints_earned)+SUM(bfi_tournament_masterpoint.localpoints_earned))'=>'total',
-	'SUM(bfi_tournament_masterpoint.fedpoints_earned)'=>'total_current_fp','SUM(bfi_tournament_masterpoint.localpoints_earned)'=>'total_current_lp',
+	$aColumns = array( $table_prefix.'member.member_id'=>'member_id',"CONCAT(first_name,' ',last_name)"=>'full_name',
+	'(SUM('.$table_prefix.'tournament_masterpoint.fedpoints_earned)+SUM('.$table_prefix.'tournament_masterpoint.localpoints_earned))'=>'total',
+	'SUM('.$table_prefix.'tournament_masterpoint.fedpoints_earned)'=>'total_current_fp','SUM('.$table_prefix.'tournament_masterpoint.localpoints_earned)'=>'total_current_lp',
 	$table_prefix.'zone_master.description'=>'zone',$table_prefix.'country_state.state'=>'state');
 	$sIndexColumn = "member_id";
 	$sTable = $table_prefix."member";	
@@ -221,7 +221,7 @@ function doLeaderboard() {
 	$sOrder = getOrder($aColumns);
 	
 	$dateFilter = getDateFilter("");
-	$aSearchColumns = array('first_name','last_name',$table_prefix.'zone_master.description',$table_prefix.'country_state.state');
+	$aSearchColumns = array($table_prefix.'member.member_id','first_name','last_name',$table_prefix.'zone_master.description',$table_prefix.'country_state.state');
 	$sWhere = getWhere($dateFilter, $aSearchColumns);
 	$sGroup = "GROUP BY $sTable.member_id";
 	$sJoin = "";
