@@ -99,6 +99,7 @@
             this.pageNamesDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pageNamesDataGridView.Location = new System.Drawing.Point(0, 0);
             this.pageNamesDataGridView.Name = "pageNamesDataGridView";
+            this.pageNamesDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.pageNamesDataGridView.Size = new System.Drawing.Size(523, 261);
             this.pageNamesDataGridView.TabIndex = 4;
             // 
