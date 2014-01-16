@@ -284,6 +284,12 @@ namespace BFIMasterpointManagement
             return sb.ToString();
         }
 
+        private static bool allEmptyRow(string[] fields)
+        {
+            for(int i=0;i<fields.Length;++i) if (!string.IsNullOrWhiteSpace(fields[i])) return false;
+            return true;
+        }
+
         private static void parseExcelSheet(DataTable excelTable, ref DataTable table, ref string errorMessage, ref bool error, string prefix)
         {
             string[] columnNames = excelTable.Columns.Cast<DataColumn>().
@@ -294,7 +300,10 @@ namespace BFIMasterpointManagement
             {
                 string[] fields = row.ItemArray.Select(field => field.ToString()).
                                                 ToArray();
-                addRow(ref table, columnNames, fields, ref errorMessage, ref error, prefix + " at Row " + rowNo + " : ");
+                if (!allEmptyRow(fields))
+                {
+                    addRow(ref table, columnNames, fields, ref errorMessage, ref error, prefix + " at Row " + rowNo + " : ");
+                }
                 rowNo++;
             }
         }
