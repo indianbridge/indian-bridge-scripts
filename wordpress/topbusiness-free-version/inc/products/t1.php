@@ -63,7 +63,7 @@
 
 						// Display image
 						$prettyDesc = ($desc) ? '&lt;span class=&quot;block pb10&quot;> ' . $desc . ' &lt;/span>' : '';
-						if ($src) : $out .= '<a class="hidetitle t1-thumb" rel="prettyPhoto[gallery]" title="'.$prettyDesc.' &lt;a class=&quot;button&quot; href=&quot;'.get_permalink().'&quot;>'.__('Learn more','pandathemes').'&lt;/a>" href="'.$path.'"><div><!-- hover --></div><img src="'.$template_url.'/timthumb.php?src='.$path.'&h=211&w=211&zc=1&q=90&a=t" width="211" height="211" alt="'.get_the_title().'" /></a>'; endif;
+						if ($src) : $out .= '<a class="hidetitle t1-thumb" rel="prettyPhoto[gallery]" title="'.$prettyDesc.' &lt;a class=&quot;button&quot; href=&quot;'.get_permalink().'&quot;>'.__('Learn more','pandathemes').'&lt;/a>" href="'.$path.'"><div><!-- hover --></div><img src="'.$path.'" width="211" height="211" alt="'.get_the_title().'" /></a>'; endif;
 
 
 					// Product metas

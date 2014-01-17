@@ -133,11 +133,10 @@
 							$if = ( $t == 'left' ) ? 'fl' : 'fr';
 
 							// Display image
-							if ($src) : $out .= '<a class="block posts2-img '.$if.'" href="'.get_permalink($post->ID).'"><img src="'.$template_url.'/timthumb.php?src='.$path.'&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>';
+							if ($src) : $out .= '<a class="block posts2-img '.$if.'" href="'.get_permalink($post->ID).'"><img src="'.$path.'" width="'.$tw.'" alt="'.get_the_title($post->ID).'" /></a>';
 
 							// Else default
-							//else : $out .= '<a class="block '.$if.'" href="'.get_permalink($post->ID).'"><img src="'.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg" alt="no image"/></a>';
-							else : $out .= '<a class="block posts2-img '.$if.'" href="'.get_permalink($post->ID).'"><img src="'.$template_url.'/timthumb.php?src='.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="no image"/></a>';
+							else : $out .= '<a class="block posts2-img '.$if.'" href="'.get_permalink($post->ID).'"><img src="'.$template_url.'/images/blog-thumb-240x240.jpg" width="'.$tw.'" alt="no image"/></a>';
 
 							endif;
 

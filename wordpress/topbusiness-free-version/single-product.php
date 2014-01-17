@@ -153,7 +153,7 @@
 								$path = $src;
 							}
 							// Display image
-							if ($src) { $out = '<img id="product-first-image" class="br3 block mb25" src="'.$template_url.'/timthumb.php?src='.$path.'&h=auto&w=600&zc=1&q=90" width="600" alt="'.get_the_title().'" />'; echo $out; }
+							if ($src) { $out = '<img id="product-first-image" class="br3 block mb25" src="'.$path.'" width="600" alt="'.get_the_title().'" />'; echo $out; }
 		
 							// METAS
 							include(TEMPLATEPATH.'/inc/products/metas.php');

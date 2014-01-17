@@ -63,7 +63,7 @@
 				else :
 
 					// Get image source
-					$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'Full Size');
+					$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'medium');
 					$src = ($src) ? $src[0] : get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg';
 			
 					// For multisite WordPress
@@ -85,14 +85,15 @@
 
 					// Display image
 					if ($src) :
+						$imgSrc = '<img id="single-feat-img" class="fr ml10 br3" src="' . $src . '" />';
 
 						if ( $theme_options['post_feat_image_link']=='enable' ) :
 
-							$out = '<a rel="prettyPhoto" href="' . $path . '" title="' . $post->post_excerpt . '"><img id="single-feat-img" class="fr ml10 br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=3&amp;q=90'. $a . '" width="' . $w . '" alt="' . get_the_title($post->ID) . '" /></a>';
+							$out = '<a rel="prettyPhoto" href="' . $path . '" title="' . $post->post_excerpt . '">'.$imgSrc.'</a>';
 
 						else :
 
-							$out = '<img id="single-feat-img" class="fr ml10 br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=3&amp;q=90'. $a . '" width="' . $w . '" alt="' . get_the_title($post->ID) . '" />';
+							$out = $imgSrc;
 
 						endif;
 				
