@@ -186,7 +186,7 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 						else : $a = '';
 						endif;
 						$src = get_the_post_thumbnail($post->ID,'full');
-						$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'Full Size');
+						$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'thumbnail');
 						$src = ($src) ? $src[0] : $theme_options['img_placeholder'];
 						// For multisite WordPress
 						global $blog_id;
@@ -202,8 +202,8 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 						}
 
 						// Display image
-						if ($src) : $response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.$path.'&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
-						else : $response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+						if ($src) : $response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$path.'" width="'.$tw.'" height="'.$th.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+						else : $response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/images/blog-thumb-240x240.jpg width="'.$tw.'" height="'.$th.'" alt="'.get_the_title($post->ID).'" /></a>'; 
 						endif;
 					endif;
 
@@ -331,9 +331,9 @@ if ( ! class_exists( 'Wordpress_Ajax_Filter_Categories' ) ) {
 
 						// Display image
 						if ($src) : 
-							$response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.$path.'&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+							$response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$path.'" width="'.$tw.'" height="'.$th.'" alt="'.get_the_title($post->ID).'" /></a>'; 
 						else : 
-							$response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+							$response .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/images/blog-thumb-240x240.jpg width="'.$tw.'" height="'.$th.'"  alt="'.get_the_title($post->ID).'" /></a>'; 
 						endif;
 					endif;
 
