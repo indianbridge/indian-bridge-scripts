@@ -171,8 +171,8 @@
 										$a = '';
 
 									endif;
-									$src = get_the_post_thumbnail($post->ID,'full');
-									$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'Full Size');
+									//$src = get_the_post_thumbnail($post->ID,'full');
+									$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'thumbnail');
 									$src = ($src) ? $src[0] : $theme_options['img_placeholder'];
 
 										// For multisite WordPress
@@ -190,8 +190,8 @@
 										}
 
 										// Display image
-										if ($src) : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.$path.'&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
-										else : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+										if ($src) : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$path.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+										else : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/images/blog-thumb-240x240.jpg" alt="'.get_the_title($post->ID).'" /></a>'; 
 										endif;
 
 								endif;
@@ -409,8 +409,8 @@
 										}
 
 										// Display image
-										if ($src) : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.$path.'&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
-										else : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/timthumb.php?src='.get_bloginfo('template_url').'/images/blog-thumb-240x240.jpg&w='.$tw.'&h='.$th.'&zc=3&q=90'.$c.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+										if ($src) : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$path.'" alt="'.get_the_title($post->ID).'" /></a>'; 
+										else : $out .= '<a class="'.$a.'" href="'.get_permalink($post->ID).'" style="width:'.$tw.'px; height:'.$th.'px;"><img src="'.$template_url.'/images/blog-thumb-240x240.jpg" alt="'.get_the_title($post->ID).'" /></a>'; 
 										endif;
 
 								endif;

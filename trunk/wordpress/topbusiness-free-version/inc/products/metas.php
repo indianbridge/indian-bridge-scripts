@@ -90,7 +90,7 @@
 					$path = $src;
 				}
 				// Display image
-				echo '<a rel="prettyPhoto[gallery]" class="inline-block relative product-image '.$class.'" href="'.$src.'"><div><!-- hover --></div><img class="br3" src="'.get_bloginfo('template_url').'/timthumb.php?src='.$path.'&h=172&w=172&zc=1&q=90&a=t" width="172" height="172" alt="'.get_the_title().'" /></a>';
+				echo '<a rel="prettyPhoto[gallery]" class="inline-block relative product-image '.$class.'" href="'.$src.'"><div><!-- hover --></div><img class="br3" src="'.$path.'" width="172" height="172" alt="'.get_the_title().'" /></a>';
 
 			};
 			echo '<div class="clear"><!-- --></div>';

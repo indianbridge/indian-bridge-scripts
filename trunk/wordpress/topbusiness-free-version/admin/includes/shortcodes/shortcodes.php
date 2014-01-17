@@ -117,12 +117,12 @@
 			// Without title
 			if ( ! $title ) :
 
-				$out .= '<a rel="prettyPhoto" class="quick-img" title="'.$alt.'" href="'.$src.'"><img class="br3 '.$class.'" src="'.get_bloginfo('template_url').'/timthumb.php?src='.$path.$w.$h.$c.$f.'&zc=1&q=90" alt="" /></a>';
+				$out .= '<a rel="prettyPhoto" class="quick-img" title="'.$alt.'" href="'.$src.'"><img class="br3 '.$class.'" src="'.$path.'" width="'.$img_w.'" alt="" /></a>';
 
 			// With title
 			else :
 
-				$out .= '<span class="quick-img '.$class.'" style="width:'.$img_w.'px;"><a rel="prettyPhoto" title="'.$alt.'" href="'.$src.'"><img class="br3" src="'.get_bloginfo('template_url').'/timthumb.php?src='.$path.$w.$h.$c.$f.'&zc=1&q=90" alt="'.$title.'" /></a>'.$title.'</span>';
+				$out .= '<span class="quick-img '.$class.'" style="width:'.$img_w.'px;"><a rel="prettyPhoto" title="'.$alt.'" href="'.$src.'"><img class="br3" src="'.$path.'" width="'.$img_w.'" alt="'.$title.'" /></a>'.$title.'</span>';
 
 			endif;
 
@@ -476,7 +476,7 @@
 			$path = $src;
 		}
 
-		$image = get_bloginfo('template_url').'/timthumb.php?src='.$path.'&w=35&h=40&zc=1&q=90';
+		$image = $path;
 
 	elseif ($pic) :
 
@@ -503,7 +503,7 @@
 						<tr>
 							<td class="qd f11 lh13">
 	
-								<img class="qc" src="'.$image.'" alt=""/>
+								<img class="qc" src="'.$image.'" width="35" height="40" alt=""/>
 	
 								<strong>'.$cite.'</strong><br/>
 								'.$subcite.'

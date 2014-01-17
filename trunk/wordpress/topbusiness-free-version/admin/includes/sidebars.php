@@ -141,9 +141,7 @@
 						$ext_feat_value = $ext_feat['std'];
 	
 						// POST IMAGE
-						$post_img = $ext_feat_value ? '<p id="feat_img" class="hide-if-no-js"><img width="266" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $ext_feat_value . '&h=300&w=300&zc=1&q=90"></p>' : '';
-
-						echo $post_img;	?>
+			?>
 
 						<table class="pandameta">
 							<tr>

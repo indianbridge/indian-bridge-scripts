@@ -465,10 +465,10 @@
 						}
 
 						$thumb = ($src)
-							? $template_url.'/timthumb.php?src='.$path.'&h=100&w=100&zc=1&q=90'
+							? .$path
 							: $template_url.'/admin/graphics/blog-thumb-100x100.jpg';
 					?>
-					<img src="<?php echo $thumb ?>">
+					<img src="<?php echo $thumb ?>" width="100" height="100">
 				</td>
 				<td class="size80">
 					<input type="text" name="img_placeholder" value="<?php echo $theme_options['img_placeholder'] ?>" class="input size60" id="img-placeholder-input" size="60" />
@@ -499,7 +499,7 @@
 						}
 
 						$thumb = ($src)
-							? $template_url.'/timthumb.php?src='.$path.'&h=100&w=100&zc=1&q=90'
+							? $path
 							: $template_url.'/images/pandaGravatar.png';
 					?>
 					<img src="<?php echo $thumb ?>" width="100" height="100" />

@@ -114,7 +114,7 @@ function widget_recent_posts_multi($args, $vars = array()) {
 						else :
 	
 							// Get image source
-							$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'Full Size');
+							$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'thumbnail');
 							$src = ($src) ? $src[0] : '';
 					
 							// For multisite WordPress
@@ -134,7 +134,7 @@ function widget_recent_posts_multi($args, $vars = array()) {
 						endif;
 
 						// Display image
-						if ($src) : $out .= '<a href="'.get_permalink().'" class="block '.$thumbs_float.'" style="width:'.$width.'px; height:'.$height.'px;"><img src="'.get_bloginfo('template_url').'/timthumb.php?src='.$path.'&h='.$height.'&w='.$width.'&zc=1&q=90'.$crop.'" width="'.$width.'" height="'.$height.'" alt="'.get_the_title().'" /></a>'; endif;
+						if ($src) : $out .= '<a href="'.get_permalink().'" class="block '.$thumbs_float.'" style="width:'.$width.'px; height:'.$height.'px;"><img src="'.$path.'" width="'.$width.'" height="'.$height.'" alt="'.get_the_title().'" /></a>'; endif;
 
 				endif;
 

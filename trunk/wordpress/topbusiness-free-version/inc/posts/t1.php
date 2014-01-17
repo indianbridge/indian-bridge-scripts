@@ -20,7 +20,7 @@
 		else :
 
 			// Get image source
-			$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'Full Size');
+			$src = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'thumbnail');
 			$src = ($src) ? $src[0] : '';
 	
 			// For multisite WordPress
@@ -40,7 +40,7 @@
 		endif;
 
 			// Display image
-			if ($src) : $out = '<a href="' . get_permalink($post->ID) . '"><img class="t1 fl br3" src="' . get_bloginfo('template_url') . '/timthumb.php?src=' . $path . '&amp;h=' . $h . '&amp;w=' . $w . '&amp;zc=1&amp;q=90'. $a . '" width="' . $w . '" alt="' . get_the_title($post->ID) . '" /></a>';
+			if ($src) : $out = '<a href="' . get_permalink($post->ID) . '"><img class="t1 fl br3" src="' . $path . '"width="' . $w . '" alt="' . get_the_title($post->ID) . '" /></a>';
 
 			// Else default
 			else : $out = '<a href="' . get_permalink($post->ID) . '"><img class="t1 fl br3" src="' . get_bloginfo('template_url') . '/images/blog-thumb-100x100.jpg" width="100" height="100" alt="no image"/></a>';
@@ -74,7 +74,6 @@
 			</div>
 			<?php
 		endif;
-
 		echo '<p>'.get_the_excerpt().'<span class="btwrap"><a class="button" href="'.get_permalink().'"><span>'.__('Read More','pandathemes').'</span></a></span></p>';
 
 		echo '<div class="h30"><!-- --></div>';?>
