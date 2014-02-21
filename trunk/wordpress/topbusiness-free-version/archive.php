@@ -114,15 +114,15 @@
 
 									$out = '<blockquote>';
 
-										$category = get_the_category();
+										$category = get_category( get_query_var( 'cat' ) );
 
-										$out .= '<p class="f120 fl">' . $category[0]->cat_name . '</p>';
+										$out .= '<p class="f120 fl">' . $category->cat_name . '</p>';
 
-										$out .= '<span class="icon16 fr" style="margin:3px 0 0 0; background-image:url(' . get_bloginfo('template_url') . '/images/icons/16/led-icons/feed_document.png) !important;"><a class="tooltip-t" style="color:#ff7700;" href="' . get_bloginfo('home') . '/?cat=' . $category[0]->cat_ID . '&feed=rss2" title="' . __('Subscribe to this category','pandathemes') . '">RSS</a></span>';
+										$out .= '<span class="icon16 fr" style="margin:3px 0 0 0; background-image:url(' . get_bloginfo('template_url') . '/images/icons/16/led-icons/feed_document.png) !important;"><a class="tooltip-t" style="color:#ff7700;" href="' . get_bloginfo('home') . '/?cat=' . $category->cat_ID . '&feed=rss2" title="' . __('Subscribe to this category','pandathemes') . '">RSS</a></span>';
 
 										$out .= '<div class="clear"><!-- --></div>';
 
-										$out .= '<span class="f11">' . __('Posts','pandathemes') . ':&nbsp;' . $category[0]->category_count . '</span>';
+										$out .= '<span class="f11">' . __('Posts','pandathemes') . ':&nbsp;' . $category->category_count . '</span>';
 
 										$out .= '<div class="h5"><!-- --></div><em>' . category_description() . '</em>';
 
