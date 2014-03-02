@@ -1,0 +1,29 @@
+/*
+Theme Name: _bootstrap
+Theme URI: None
+Author: Sriram Narasimhan
+Author URI: http://nsriram71.appspot.com
+Description: A theme that starts with underscores and adds Twitter Bootstrap on top of that
+Version: 1.0
+License: GNU General Public License
+License URI: license.txt
+Text Domain: _bootstrap
+Domain Path: /languages/
+Tags:
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+
+ _bootstrap is based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
+
+*/
+
+/*
+ * This theme will be using bootstrap css.
+ * Any minor tweaks may be added here.
+ */
+ 
+ /* Tweak to justify entries in navbar */
+.navbar-nav.nav-justified > li{
+    float:none;
+} 
