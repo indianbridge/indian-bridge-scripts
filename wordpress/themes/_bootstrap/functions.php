@@ -63,6 +63,8 @@ function _bootstrap_setup() {
 	 * @link http://codex.wordpress.org/Function_Reference/add_theme_support#Post_Thumbnails
 	 */
 	add_theme_support( 'post-thumbnails' );
+	// set the default thumbnail size
+	set_post_thumbnail_size( 150, 150 );
 
 	// This theme uses wp_nav_menu() in one location.
 	register_nav_menus( array(
@@ -94,10 +96,10 @@ add_action( 'after_setup_theme', '_bootstrap_setup' );
 */
 function new_excerpt_more( $more ) {
 	// Get the user specified options
-	$text = _bootstrap_get_option( 'read_more_text' );
-	$tag = _bootstrap_get_option( 'read_more_text_tag' );
-	$class = _bootstrap_get_option( 'read_more_text_tag_class' );
-	switch ( $tag ) {
+	$text  = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text' );
+	$style = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text_container_style' );
+	$class = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text_container_class' );
+	switch ( $style ) {
 		case 'label' :
 			return ' <a href="'. get_permalink( get_the_ID() ) . '"><span class="label label-' .
 			$class . '">' . $text . '</span></a>';
@@ -107,7 +109,7 @@ function new_excerpt_more( $more ) {
 			break;
 		case 'plain' :
 		default :
-			return ' <a href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
+			return ' <a class="text-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
 			break;
 	}
 }
