@@ -88,15 +88,28 @@ endif; // _bootstrap_setup
 add_action( 'after_setup_theme', '_bootstrap_setup' );
 
 /**
-* Remove text at end of excerpt. We will add custom buttons later.
+* Remove text at end of excerpt and add our own custom text tag and class.
 * 
 * @return void
 */
 function new_excerpt_more( $more ) {
-	return ' <a class="" href="'. get_permalink( get_the_ID() ) . '"><span class="label label-primary">' .
-	__( 'Read More', '_bootstrap' ) . '</span></a>';
-	/*return '<a href="<?php the_permalink(); ?>" class="btn btn-info btn-xs" role="button">' . 
-	__( 'Read More', '_bootstrap') . '</a>';*/
+	// Get the user specified options
+	$text = _bootstrap_get_option( 'read_more_text' );
+	$tag = _bootstrap_get_option( 'read_more_text_tag' );
+	$class = _bootstrap_get_option( 'read_more_text_tag_class' );
+	switch ( $tag ) {
+		case 'label' :
+			return ' <a href="'. get_permalink( get_the_ID() ) . '"><span class="label label-' .
+			$class . '">' . $text . '</span></a>';
+			break;
+		case 'button' :
+			return ' <a class="btn btn-xs btn-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
+			break;
+		case 'plain' :
+		default :
+			return ' <a href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
+			break;
+	}
 }
 add_filter('excerpt_more', 'new_excerpt_more');
 
