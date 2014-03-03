@@ -13,10 +13,10 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 		wp_enqueue_style( '_bootstrap-style', get_stylesheet_uri() );	
 		
 		// Load the bootstrap style based on options
-		$skin_folder = THEME_DIR . '/css/skins/' . _bootstrap_get_option( 'bootstrap_skins' );
-		$skin_uri = THEME_DIR_URI . '/css/skins/' . _bootstrap_get_option( 'bootstrap_skins' );
+		$skin_folder = THEME_DIR . '/css/skins/' . _bootstrap_get_option( '_bootstrap_skin' );
+		$skin_uri = THEME_DIR_URI . '/css/skins/' . _bootstrap_get_option( '_bootstrap_skin' );
 		$stylesheet = $skin_uri . '/bootstrap.min.css';
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_css' );
+		$use_cdn = _bootstrap_get_option( 'local_or_cdn_css' ) === 'cdn';
 		if ( $use_cdn ) {
 			// Check if cdn link is provided
 			$cdn_file = $skin_folder . '/cdn.link';
@@ -27,7 +27,7 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 		wp_enqueue_style( '_bootstrap-css', $stylesheet );
 		
 		// Font awesome
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_fa' );
+		$use_cdn = _bootstrap_get_option( 'local_or_cdn_fa' ) === 'cdn';
 		$fa_css = $use_cdn ? _bootstrap_get_option( 'cdn_fa_location' ) : THEME_DIR_URI . '/css/font-awesome-4.0.3/css/font-awesome.min.css';
 		wp_enqueue_style( '_bootstrap_font_awesome_css', $fa_css );
 		
@@ -35,7 +35,7 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 		wp_enqueue_style( '_bootstrap_smartmenus_addon_css', THEME_DIR_URI . '/css/jquery.smartmenus.bootstrap.css' );
 		
 		// Enqueue bootstrap js.
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_js' );
+		$use_cdn = _bootstrap_get_option( 'local_or_cdn_js' ) === 'cdn';
 		$bootstrap_js = $use_cdn ? _bootstrap_get_option( 'cdn_js_location' ) : THEME_DIR_URI . '/js/bootstrap.min.js';
 		wp_enqueue_script( '_bootstrap_js', $bootstrap_js, array('jquery'), '20140219', true );
 
