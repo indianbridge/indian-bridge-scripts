@@ -37,14 +37,31 @@ if ( !function_exists( '_bootstrap_module_bootswatch_options' ) ) {
 	        			  __( 'file should be available. If not the local will be used ', '_bootstrap' ) .
 	        			  __( 'even if CDN is select', '_bootstrap' ),
 	        'default'  => FALSE,
-	    );	 
+	    );	
+	    
+	    //Switch to select cdn hosted font awesome icons instead of local
+		$fields[] = array(
+	        'id'       => 'local_or_cdn_fa',
+	        'type'     => 'switch', 
+	        'title'    => __( 'Use CDN Hosted Font Awesome icons instead of Local', '_bootstrap' ),
+	        'desc'     => __( 'If selected then the font awesome icons hosted on link in the next text field will be used.', '_bootstrap' ),
+	        'default'  => FALSE,
+	    );	   
+	    // The bootstrap js cdn location
+	    $fields[] = array(
+	        'id'       => 'cdn_fa_location',
+	        'type'     => 'text',
+	        'title'    => __('Path to CDN hosted Font Awesome icons', '_bootstrap'),
+	        'desc'     => __('This will be used only when use CDN above is switched on.', '_bootstrap'),
+	        'default'  => '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css'
+	    );	     
 	    
 	    //Switch to select cdn hosted js instead of local
 		$fields[] = array(
 	        'id'       => 'local_or_cdn_js',
 	        'type'     => 'switch', 
 	        'title'    => __( 'Use CDN Hosted Bootstrap JS instead of Local', '_bootstrap' ),
-	        'desc'     => __( 'If selected then the js hosted on from link in the next text field will be used.', '_bootstrap' ),
+	        'desc'     => __( 'If selected then the js hosted on link in the next text field will be used.', '_bootstrap' ),
 	        'default'  => FALSE,
 	    );	   
 	    // The bootstrap js cdn location

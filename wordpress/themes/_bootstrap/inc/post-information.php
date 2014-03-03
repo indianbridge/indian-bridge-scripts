@@ -88,7 +88,7 @@ if ( ! function_exists( '_bootstrap_post_categories' ) ) {
 		if ( $categories_list ) {
 		 	$information = array(
 		 		'title' => __( 'Post Categories', '_bootstrap'),
-		 		'icon'	=> 'folder-open', // Icon names so dont internationalized
+		 		'icon'	=> 'folder', // Icon names so dont internationalized
 		 		'links'	=> $categories_list,
 		 	);
 		 	_bootstrap_post_information( $information  );
@@ -127,12 +127,13 @@ if ( ! function_exists( '_bootstrap_post_comments' ) ) {
 	 function _bootstrap_post_comments() {
 	 	$information = array(
 	 		'title' => __( 'Post Comments', '_bootstrap'),
-	 		'icon'	=> 'comment', // Icon names so dont internationalized
+	 		'icon'	=> 'comments', // Icon names so dont internationalized
 	 	);
 	 	// Cannot call __bootstrap_post_information because comments_popup_link() prints instead of returning.
 		$print_string = '<span data-toggle="tooltip" title="' . $information[ 'title' ] . '" ';
 		$print_string .= 'class="label label-primary">';
-		$print_string .= '<span class="glyphicon glyphicon-' . $information[ 'icon' ] . '"></span>';
+		//$print_string .= '<span class="glyphicon glyphicon-' . $information[ 'icon' ] . '"></span>';
+		$print_string .= '<i class="fa fa-' . $information[ 'icon' ] . '"></i>';
 		printf( __( $print_string, '_bootstrap' ) );
 		comments_popup_link( 
  			__( 'Leave a comment', '_bootstrap' ), 
@@ -153,7 +154,8 @@ if ( ! function_exists( '_bootstrap_post_information' ) ) {
 	 function _bootstrap_post_information( $information ) {
 	 	// All information is already internationalized so just print
 	 	echo '<span data-toggle="tooltip" title="' . $information[ 'title' ] . '" class="label label-primary">';
-		echo '<span class="glyphicon glyphicon-' . $information[ 'icon' ] . '"></span>';
+	 	echo '<i class="fa fa-' . $information[ 'icon' ] . '"></i>';
+		//echo '<span class="glyphicon glyphicon-' . $information[ 'icon' ] . '"></span>';
 		if ( array_key_exists( 'links', $information ) ) {
 			printf( '   %1$s</span>', $information[ 'links' ] );			
 		}
