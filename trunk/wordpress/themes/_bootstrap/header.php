@@ -26,7 +26,11 @@
 <div id="page" class="hfeed site">
 <header id="masthead" class="site-header" role="banner">
 	<nav role="navigation">
-		<div class="navbar navbar-default navbar-static-top">
+	<?php
+		$navbar_style = _bootstrap_get_option( '_bootstrap_header_navbar_style' );
+		$navbar_color = _bootstrap_get_option( '_bootstrap_header_navbar_color' );
+	?>
+		<div id="primary-navbar" class="navbar navbar-<?php echo $navbar_color; ?> navbar-<?php echo $navbar_style; ?>-top">
 			<div class="container">
 				<!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
 				<div class="navbar-header">
@@ -41,7 +45,7 @@
 						<span class="icon-bar">
 						</span>
 					</button>
-					<a class="navbar-brand" href="http://cmsbased.com/demo/cloudhost/" title="Cloudhost">
+					<a class="navbar-brand" href="<?php bloginfo( 'url' ); ?>" title="Home">
 						<?php bloginfo( 'name' ); ?>
 					</a>
 				</div>

@@ -25,6 +25,19 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 			}
 		}
 		wp_enqueue_style( '_bootstrap-css', $stylesheet );
+		// Add the padding to body if static navbar will be used
+		$navbar_style = _bootstrap_get_option( '_bootstrap_header_navbar_style' );
+		if ( $navbar_style === 'fixed' ) {
+			$navbar_padding_style = _bootstrap_get_option( '_bootstrap_header_fixed_navbar_padding_style' );
+			if ( $navbar_padding_style === 'constant' ) {
+				$navbar_padding_constant = _bootstrap_get_option( '_bootstrap_header_fixed_navbar_padding_constant' );
+				$custom_css = 'body {  padding-top: ' . $navbar_padding_constant . 'px; }';
+				wp_add_inline_style( '_bootstrap-css', $custom_css );
+			}
+			else {
+				wp_enqueue_script( '_bootstrap_js', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.navbar.js', array('jquery'), '20140219', true );
+			}
+		}
 		
 		// Font awesome
 		$use_cdn = _bootstrap_get_option( 'local_or_cdn_fa' ) === 'cdn';

@@ -8,7 +8,8 @@
 	<?php
 		$style = _bootstrap_get_option( '_bootstrap_post_lists_excerpt_container_style' );
 		$class = _bootstrap_get_option( '_bootstrap_post_lists_excerpt_container_class' );
-				
+		$meta_location = _bootstrap_get_option( '_bootstrap_post_lists_meta_information_location' );
+		$show_meta = _bootstrap_get_option( '_bootstrap_post_lists_show_meta_information');
 		if ( $style == 'panel' ) {
 	?>
 			<div class="panel panel-<?php echo $class; ?>">
@@ -17,14 +18,20 @@
 			    	<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?> </a>
 			    	<?php edit_post_link( __( 'Edit', '_bootstrap' ), '<span class="edit-link">', '</span>' ); ?>
 			    </h3>
-			    
 			  </div>
+			  <?php if ( $show_meta && $meta_location === 'top' ) { ?>
+				  <div class="panel-footer">
+				  	<?php _bootstrap_display_meta_information(); ?>
+				  </div>			  
+			  <?php } ?>
 			  <div class="panel-body">
 			  	<?php _bootstrap_show_post_content(); ?>
 			  </div>
-			  <div class="panel-footer">
-			  	<?php _bootstrap_display_meta_information(); ?>
-			  </div>
+			  <?php if ( $show_meta && $meta_location === 'bottom' ) { ?>
+				  <div class="panel-footer">
+				  	<?php _bootstrap_display_meta_information(); ?>
+				  </div>
+			  <?php } ?>
 			</div>	
 	<?php
 		}
@@ -35,15 +42,21 @@
 			    <h3>
 			    	<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?> </a>
 			    	<?php edit_post_link( __( 'Edit', '_bootstrap' ), '<span class="edit-link">', '</span>' ); ?>
-			    </h3>
-			    
+			    </h3>		    
 			  </div>
+			  <?php if ( $show_meta && $meta_location === 'top' ) { ?>
+				  <div>
+					<?php _bootstrap_display_meta_information(); ?>
+				  </div>			  
+			  <?php } ?>
 			  <div>
 			  	<?php _bootstrap_show_post_content(); ?>
 			  </div>
-			  <div>
-				<?php _bootstrap_display_meta_information(); ?>
-			  </div>
+			  <?php if ( $show_meta && $meta_location === 'bottom' ) { ?>
+				  <div>
+					<?php _bootstrap_display_meta_information(); ?>
+				  </div>
+			  <?php } ?>
 			</div>	
 	<?php	
 		}
@@ -57,14 +70,20 @@
 			    	<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?> </a>
 			    	<?php edit_post_link( __( 'Edit', '_bootstrap' ), '<span class="edit-link">', '</span>' ); ?>
 			    </h3>
-			    
 			  </div>
+			  <?php if ( $show_meta && $meta_location === 'top' ) { ?>
+				  <div>
+					<?php _bootstrap_display_meta_information(); ?>
+				  </div>			  
 			  <div>
 			  	<?php _bootstrap_show_post_content(); ?>
 			  </div>
-			  <div>
-				<?php _bootstrap_display_meta_information(); ?>
-			  </div>			
+			  <?php } ?>
+			  <?php if ( $show_meta && $meta_location === 'bottom' ) { ?>
+				  <div>
+					<?php _bootstrap_display_meta_information(); ?>
+				  </div>	
+			  <?php } ?>		
 			</div>
 	<?php
 		}

@@ -61,6 +61,7 @@ if ( !function_exists( '_bootstrap_module_skin_options' ) ) {
 	    $fields[] = array(
 	        'id'       => '_boostrap_cdn_fa_location',
 	        'type'     => 'text',
+	        'required' => array( '_bootstrap_local_or_cdn_fa', 'equals', 'cdn' ),
 	        'title'    => __('Path to CDN hosted Font Awesome icons and CSS', '_bootstrap'),
 	        'desc'     => __('This will be used only when CDN option above is selected.', '_bootstrap'),
 	        'default'  => '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css'
@@ -83,6 +84,7 @@ if ( !function_exists( '_bootstrap_module_skin_options' ) ) {
 	    $fields[] = array(
 	        'id'       => '_bootstrap_cdn_js_location',
 	        'type'     => 'text',
+	        'required' => array( '_bootstrap_local_or_cdn_js', 'equals', 'cdn' ),
 	        'title'    => __('Path to CDN hosted Boostrap js', '_bootstrap'),
 	        'desc'     => __('This will be used only when CDN option above is selected.', '_bootstrap'),
 	        'default'  => '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js'
