@@ -19,10 +19,20 @@ if ( ! function_exists( '_bootstrap_show_post_content' ) ) {
 			<?php if ( $show_featured_image ) { ?>
 				<a class="pull-left">
 					<?php
-						$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), 'thumbnail');
+						$image_size = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_size' );
+						$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), $image_size );
 						$image_url = $image_attributes[0];
+						$image_container_sized =  _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_container_size' );
+						if ( $image_container_sized ) {
+							$image_dimensions = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_container_dimensions');
+							?>
+								<img width="<?php echo $image_dimensions['width'] . $image_dimensions['units']; ?>" height="<?php echo $image_dimensions['height'] . $image_dimensions['units']; ?>" class="media-object" src="<?php echo $image_url; ?>" alt="Featured Image">
+							<?php
+						}
+						else {
 					?>
-					<img class="media-object" src="<?php echo $image_url; ?>" alt="Featured Image">		
+						<img class="media-object" src="<?php echo $image_url; ?>" alt="Featured Image">		
+					<?php } ?>
 				</a>
 			<?php } ?>
 			<div class="media-body">

@@ -184,3 +184,8 @@ require THEME_DIR . '/inc/ReduxConfig/config.php';
  */
 require THEME_DIR . '/inc/bootstrap-wp-navwalker.php';
 require THEME_DIR . '/inc/bootstrap-wp-list-pages-navwalker.php';
+
+/** 
+ * Add Bootstrap pagination support.
+ */
+require THEME_DIR . '/inc/pagination.php';

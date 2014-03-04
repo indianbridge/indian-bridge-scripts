@@ -91,7 +91,7 @@ get_header(); ?>
 
 			<?php endwhile; ?>
 
-			<?php _bootstrap_paging_nav(); ?>
+			<?php _bootstrap_paginate(); ?>
 
 		<?php else : ?>
 
