@@ -1,11 +1,12 @@
 <?php
 /*
- * The header core options for the _bootstrap theme
+ * The header options for the _bootstrap theme
  */
 if ( !function_exists( '_bootstrap_module_header_options' ) ) {
 	function _bootstrap_module_header_options( $sections ) {
 		$fields = array();
-	    // Default or Inverse navbar
+		
+	    // Default or Inverse navbar.
 	 	$fields[] = array(
 	        'id'       => '_bootstrap_header_navbar_color',
 	        'type'     => 'button_set',
@@ -17,7 +18,8 @@ if ( !function_exists( '_bootstrap_module_header_options' ) ) {
 	        ), 
 	        'default'  => 'default',
 	    );		    
-	    // Static or Fixed navbar
+	    
+	    // Static or Fixed navbar.
 	 	$fields[] = array(
 	        'id'       => '_bootstrap_header_navbar_style',
 	        'type'     => 'button_set',
@@ -29,7 +31,8 @@ if ( !function_exists( '_bootstrap_module_header_options' ) ) {
 	        ), 
 	        'default'  => 'static',
 	    );	  
-		// What type of padding top to use
+	    
+		// What type of padding to use on top for static navbar - constant or dynamic using jquery.
 	 	$fields[] = array(
 	        'id'       => '_bootstrap_header_fixed_navbar_padding_style',
 	        'type'     => 'button_set',
@@ -42,7 +45,9 @@ if ( !function_exists( '_bootstrap_module_header_options' ) ) {
 	        ), 
 	        'default'  => 'dynamic',
 	    );	    
-	    // The bootstrap js cdn location
+	    
+	    // The javascript file that calculates height of header and sets dynamic padding
+	    // This will assume that header has id masthead
 	    $fields[] = array(
 	        'id'       => '_bootstrap_header_fixed_navbar_padding_constant',
 	        'type'     => 'text',

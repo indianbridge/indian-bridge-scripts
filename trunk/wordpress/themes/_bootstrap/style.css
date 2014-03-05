@@ -24,6 +24,4 @@ Use it to make something cool, have fun, and share what you've learned with othe
  */
  
  /* Tweak to justify entries in navbar */
-.navbar-nav.nav-justified > li{
-    float:none;
-} 
+.navbar-nav.nav-justified > li { float:none; } 

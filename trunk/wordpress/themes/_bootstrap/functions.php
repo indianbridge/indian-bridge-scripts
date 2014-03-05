@@ -33,6 +33,12 @@ if ( ! defined( 'THEME_DIR_URI' ) ) {
 }
 
 /**
+ * Load all Redux Admin Options
+ * Include before everthing else because these options might be needed.
+ */
+require THEME_DIR . '/inc/ReduxConfig/config.php';
+
+/**
  * End of CONSTANTS section
  */
 
@@ -116,20 +122,9 @@ function new_excerpt_more( $more ) {
 add_filter('excerpt_more', 'new_excerpt_more');
 
 /**
- * Register widgetized area and update sidebar with default widgets.
+ * Functions to manage widgets/sidebar.
  */
-function _bootstrap_widgets_init() {
-	register_sidebar( array(
-		'name'          => __( 'Sidebar', '_bootstrap' ),
-		'id'            => 'sidebar-1',
-		'before_widget' => '<aside id="%1$s" class="well widget %2$s">',
-		'after_widget'  => '</aside>',
-		'before_title'  => '<h1 class="widget-title">',
-		'after_title'   => '</h1>',
-	) );
-}
-add_action( 'widgets_init', '_bootstrap_widgets_init' );
-
+require THEME_DIR . '/inc/widgets.php';
 
 /**
  * Functions to retrieve bootswatch skins and populate local folder.
@@ -173,11 +168,6 @@ require THEME_DIR . '/inc/customizer.php';
  * Load Jetpack compatibility file.
  */
 require THEME_DIR . '/inc/jetpack.php';
-
-/**
- * Load all Redux Admin Options
- */
-require THEME_DIR . '/inc/ReduxConfig/config.php';
 
 /**
  * Bootrap walker for menu

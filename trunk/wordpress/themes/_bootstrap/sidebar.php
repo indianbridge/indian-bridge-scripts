@@ -4,31 +4,25 @@
  *
  * @package _bootstrap
  */
-?>
-	<div class="col-sm-4">
-	<div id="secondary" class="widget-area" role="complementary">
-		<?php if ( ! dynamic_sidebar( 'sidebar-1' ) ) : ?>
 
-			<aside id="search" class="well widget widget_search">
-				<?php get_search_form(); ?>
-			</aside>
+	// Get the options
+	if ( ! dynamic_sidebar( 'sidebar-1' ) ) {
+		$options = _bootstrap_get_sidebar_options();	
+		?>
+		<div id="secondary" class="col-sm-4 widget-area" role="complementary">
+		<aside id="post-<?php the_ID(); ?>" <?php post_class( $options['container_class'] ); ?> >
+			<header class="<?php echo $options['header_class']; ?>" >
+				<<?php echo $options['title_tag']; ?> class="<?php echo $options['title_class']; ?>" >
+					No Widgets Found!
+				</<?php echo $options['title_tag']; ?>>
+			</header>			
+			<!-- Show content/excerpt -->
+			<section class="<?php echo $options['body_class']; ?>">
+				<p>You can either add some widgets <a href="<?php echo admin_url( 'widgets.php' ); ?>">here</a> or change the layout in theme options to not show a sidebar.</p>
+			</section>
 
-			<aside id="archives" class="well widget">
-				<h1 class="widget-title"><?php _e( 'Archives', '_bootstrap' ); ?></h1>
-				<ul>
-					<?php wp_get_archives( array( 'type' => 'monthly' ) ); ?>
-				</ul>
-			</aside>
-
-			<aside id="meta" class="well widget">
-				<h1 class="widget-title"><?php _e( 'Meta', '_bootstrap' ); ?></h1>
-				<ul>
-					<?php wp_register(); ?>
-					<li><?php wp_loginout(); ?></li>
-					<?php wp_meta(); ?>
-				</ul>
-			</aside>
-
-		<?php endif; // end sidebar widget area ?>
-	</div><!-- #secondary -->
-	</div><!-- .col-sm-4 -->
+		</aside><!-- #post-## -->
+		</div><!-- #secondary .col-sm-4 -->
+	<?php
+	} // end sidebar widget area
+	?>
