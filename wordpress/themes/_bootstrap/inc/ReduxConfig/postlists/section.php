@@ -111,16 +111,42 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 		$fields[] = array( 
 	        'id'       => '_bootstrap_post_lists_archives_raw_2',
 	        'type'     => 'raw',
-	        'content'  => '<h1>' . __( 'Excerpt/Content Container', '_bootstrap' ) . '</h1>',
-	    );		
-	    // What html tag to excerpt
+	        'content'  => '<h1>' . __( 'Excerpt/Content Container and Text Styling', '_bootstrap' ) . '</h1>',
+	    );	
+	    
+	    // What type of styling for content/excerpt title.
+	 	$fields[] = array(
+	        'id'       => '_bootstrap_post_lists_excerpt_title_style',
+	        'type'     => 'button_set',
+	        'title'    => __( 'Excerpt/Content Title Style', '_bootstrap' ),
+	        'desc'     => __( 'How should the Excerpt/Content Title be styled. If you choose custom enter tag name in the text field that appears.', '_bootstrap' ),
+	        'options'  => array(
+	            'h1' 		=> 'h1',
+	            'h2' 		=> 'h2',
+	            'h3' 		=> 'h3',
+	            'h4' 		=> 'h4',
+	            'h5' 		=> 'h5',
+	            'h6' 		=> 'h6',
+	            'custom'	=> 'Custom',
+	        ), 
+	        'default'  => 'h3',
+	    );	   
+	    // Custom tag for title
+	    $fields[] = array(
+	        'id'       => '_bootstrap_post_lists_excerpt_title_custom',
+	        'type'     => 'text',
+	        'required' => array( '_bootstrap_post_lists_excerpt_title_style', 'equals', 'custom' ),
+	        'title'    => __( 'Custom tag for Excerpt/Container Title', '_bootstrap'),
+	        'desc'     => __( 'This will be used only when custom option is selected above.', '_bootstrap' ),
+	        'default'  => 'div'
+	    );	     
+	    	
+	    // What type of container should the content/excerpt be in.
 	 	$fields[] = array(
 	        'id'       => '_bootstrap_post_lists_excerpt_container_style',
 	        'type'     => 'button_set',
-	        'title'    => __( 'Excerpt Container Style', '_bootstrap' ),
+	        'title'    => __( 'Excerpt/Content Container Style', '_bootstrap' ),
 	        'desc'     => __( 'How should the Excerpt/Content Container be styled', '_bootstrap' ),
-
-	        //Must provide key => value pairs
 	        'options'  => array(
 	            'plain' 	=> 'Plain Text',
 	            'panel' 	=> 'Bootstrap Panel',
@@ -128,15 +154,15 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	            'alert'		=> 'Bootstrap Alert',
 	        ), 
 	        'default'  => 'panel',
-	    );	    	   
-	    // What class to apply to the html tag for Excerpt container
+	    );	
+	        	   
+	    // What class to apply to the container when panel is used.
 	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_container_class',
+	        'id'       => '_bootstrap_post_lists_excerpt_container_class_panel',
 	        'type'     => 'button_set',
-	        'title'    => __( 'Excerpt Container Class', '_bootstrap' ),
-	        'desc'     => __( 'What class should be applied to the Excerpt/Content container.', '_bootstrap' ),
-
-	        //Must provide key => value pairs
+	        'title'    => __( 'Bootstrap Panel Styling', '_bootstrap' ),
+	        'desc'     => __( 'What class should be applied to the Panel.', '_bootstrap' ),
+	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', 'panel' ),
 	        'options'  => array(
 	            'default' 	=> 'Default',
 	            'primary' 	=> 'Primary',
@@ -144,9 +170,48 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	            'info' 		=> 'Info',
 	            'warning' 	=> 'Warning',
 	            'danger' 	=> 'Danger',
+	            'none'		=> 'None',
 	        ), 
 	        'default'  => 'primary',      
 	    );	 
+	    
+	    // What class to apply to the container when alert is used.
+	 	$fields[] = array(
+	        'id'       => '_bootstrap_post_lists_excerpt_container_class_alert',
+	        'type'     => 'button_set',
+	        'title'    => __( 'Bootstrap Alert Styling', '_bootstrap' ),
+	        'desc'     => __( 'What class should be applied to the Alert.', '_bootstrap' ),
+	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', 'alert' ),       
+	        'options'  => array(
+	            'success' 	=> 'Success',
+	            'info' 		=> 'Info',
+	            'warning' 	=> 'Warning',
+	            'danger' 	=> 'Danger',
+	            'none'		=> 'None',
+	        ), 
+	        'default'  => 'info',      
+	    );
+	    
+	    // What class to apply to the  text when plain text or well is used.
+	 	$fields[] = array(
+	        'id'       => '_bootstrap_post_lists_excerpt_container_class_text',
+	        'type'     => 'button_set',
+	        'title'    => __( 'Text Styling for Well or Plain Text option', '_bootstrap' ),
+	        'desc'     => __( 'What class should be applied to the text when Well or Plain Text is used.', '_bootstrap' ),
+	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', array( 'well', 'plain' ) ),       
+	        'options'  => array(
+	            'muted' 	=> 'Muted',
+	            'primary' 	=> 'Primary',
+	            'success' 	=> 'Success',
+	            'info' 		=> 'Info',
+	            'warning' 	=> 'Warning',
+	            'danger' 	=> 'Danger',
+	            'none'		=> 'None',
+	        ),
+	        'default'  => 'primary',      
+	    );	    	
+	    
+	    // Meta Information Control	    
 		$fields[] = array( 
 	        'id'       => '_bootstrap_post_lists_archives_raw_3',
 	        'type'     => 'raw',
