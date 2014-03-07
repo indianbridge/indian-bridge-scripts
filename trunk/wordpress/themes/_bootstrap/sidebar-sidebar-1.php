@@ -1,6 +1,6 @@
 <?php
 /**
- * The Sidebar containing the main widget areas.
+ * The Sidebar containing sidebar-1 widgets.
  *
  * @package _bootstrap
  */

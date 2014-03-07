@@ -92,8 +92,8 @@ if ( !function_exists( '_bootstrap_module_skin_options' ) ) {
 	        	    
 
 		$section = array(
-			'title' => __( 'Skins', '_bootstrap' ),
-			'icon' => 'el-icon-css icon-large'
+			'title' => __( 'Bootstrap CSS/JS', '_bootstrap' ),
+			'icon' => 'el-icon-cloud icon-large'
 		);
 		
 		$section['fields'] = $fields;
