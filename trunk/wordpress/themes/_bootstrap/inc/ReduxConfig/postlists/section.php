@@ -13,140 +13,20 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 		// Excerpt Options
 		_bootstrap_archives_add_excerpt_options( $fields, $page_name );
 	    		
+	    // Feature Image
+	    $prefix = __( 'Archives/Post Lists', '_bootstrap' );
+	    _bootstrap_archives_add_featured_image_options( $fields, $page_name, $prefix );
 
-		$fields[] = array( 
-	        'id'       => '_bootstrap_post_lists_archives_raw_fi',
-	        'type'     => 'raw',
-	        'content'  => '<h1>' . __( 'Featured Image Options', '_bootstrap' ) . '</h1>',
-	    );		    
-		$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_show_featured_image',
-	        'type'     => 'switch', 
-	        'title'    => __( 'Show Feature Image left of content', '_bootstrap' ),
-	        'desc'     => __( 'This controls whether the featured image is shown or not', '_bootstrap' ),
-	        'default'  => TRUE,
-	    );	 
-	    $fields[] = array(
-	        'id'       => '_bootstrap_post_lists_show_featured_image_size',
-	        'type'     => 'text',
-	        'required' => array( '_bootstrap_post_lists_show_featured_image', 'equals', TRUE ),
-	        'title'    => __( 'Which size image to use.', '_bootstrap' ),
-	        'desc'     => __( 'Select one of the predefined sizes.', '_bootstrap' ),
-	        'default'  => 'thumbnail'
-	    );	
-		$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_show_featured_image_container_size',
-	        'type'     => 'switch', 
-	        'required' => array( '_bootstrap_post_lists_show_featured_image', 'equals', TRUE ),
-	        'title'    => __( 'Should the Featured Image Container be sized?', '_bootstrap' ),
-	        'desc'     => __( 'This controls whether the featured image container is sized using dimensions specified below', '_bootstrap' ),
-	        'default'  => FALSE,
-	    );	    
- 		$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_show_featured_image_container_dimensions',
-	        'type'     => 'dimensions',
-	        'required' => array( '_bootstrap_post_lists_show_featured_image', 'equals', TRUE ),
-	        'units'    => array( 'em', 'px', '%' ),
-	        'title'    => __( 'Dimensions (Width/Height) For Feature Image Container', '_bootstrap' ),
-	        'desc'     => __( 'Use this to specify the width and height of img tag that will contain feature image.', '_bootstrap' ),
-	        'default'  => array(
-	            'Width'   => '100', 
-	            'Height'  => '100'
-	        ),
-    	);
-    	
     	// Container Styling
-		$section_name = __( 'content', '_bootstrap' );
+		$section_name = 'content';
 		$prefix = __( 'Content/Excerpt Container', '_bootstrap' );
 		
 		// Container options
 		_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix );    	
 	    
-	    
-	    // Meta Information Control	    
-		$fields[] = array( 
-	        'id'       => '_bootstrap_post_lists_archives_raw_meta',
-	        'type'     => 'raw',
-	        'content'  => '<h1>' . __( 'Post Meta Information Styles', '_bootstrap' ) . '</h1>',
-	    );	
-		$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_show_meta_information',
-	        'type'     => 'switch', 
-	        'title'    => __( 'Show Meta Information', '_bootstrap' ),
-	        'desc'     => __( 'This controls whether the meta information for post is displayed in post lists or not.', '_bootstrap' ),
-	        'default'  => TRUE,
-	    );
-	    $fields[] = array(
-	        'id'       => '_bootstrap_post_lists_meta_information_location',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Location of Meta Information', '_bootstrap' ),
-	        'desc'     => __( 'Where should the meta information be displayed.', '_bootstrap' ),
-			'required' => array( '_bootstrap_post_lists_show_meta_information', 'equals', TRUE ),
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'top' 		=> __( 'Top (below title)', '_bootstrap' ),
-	            'bottom' 	=> __( 'Bottom', '_bootstrap'),
-	        ), 
-	        'default'  => 'bottom',      
-	    );
-	    	    
-		$fields[] = array(
-	        'id'      => '_bootstrap_post_meta_information_control',
-	        'type'    => 'sorter',
-	        'required' => array( '_bootstrap_post_lists_show_meta_information', 'equals', TRUE ),
-	        'title'   => __( 'Meta Information Display Control', '_bootstrap' ),
-	        'desc'    => __( 'Organize what meta information you want displayed and in what order on the post lists page', '_bootstrap' ),
-	        'options' => array(
-	            'enabled'  => array(
-	                'placebo'    	=> 'placebo', //REQUIRED!
-	                'publish_date' 	=> __( 'Publish Date', '_bootstrap' ),
-	                'author'     	=> __( 'Author', '_bootstrap' ),
-	                'categories' 	=> __( 'Categories', '_bootstrap' ),
-	                'comments'		=> __( 'Comments', '_bootstrap' ),
-	            ),
-	            'disabled' => array(
-	                'placebo'   		=> 'placebo', //REQUIRED!
-	                'last_updated_date'	=> __( 'Last Updated Date', '_bootstrap' ),
-	                'tags'   			=> __( 'Tags', '_bootstrap' ),
-	            )
-	        ),
-		);	
-			    
-	    // What style to use for meta information
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_post_meta_information_container_style',
-	        'type'     => 'button_set',
-	        'required' => array( '_bootstrap_post_lists_show_meta_information', 'equals', TRUE ),
-	        'title'    => __( 'Post Meta Information Container Style', '_bootstrap' ),
-	        'desc'     => __( 'How should the Post Meta Information items be styled', '_bootstrap' ),
+	    // Meta information
+	    _bootstrap_archives_add_meta_options( $fields, $page_name );
 
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'plain' 	=> 'Plain Text',
-	            'label' 	=> 'Bootstrap Label',
-	            'button' 	=> 'Bootstrap Button',
-	        ), 
-	        'default'  => 'plain',
-	    );	    	   
-	    // What class to apply to the meta information style
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_post_meta_information_container_class',
-	        'type'     => 'button_set',
-	        'required' => array( '_bootstrap_post_lists_show_meta_information', 'equals', TRUE ),
-	        'title'    => __( 'Post Meta Information Container Class', '_bootstrap' ),
-	        'desc'     => __( 'What class should be applied to the Post Meta Information container.', '_bootstrap' ),
-
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'default' 	=> 'Default',
-	            'primary' 	=> 'Primary',
-	            'success' 	=> 'Success',
-	            'info' 		=> 'Info',
-	            'warning' 	=> 'Warning',
-	            'danger' 	=> 'Danger',
-	        ), 
-	        'default'  => 'primary',      
-	    );	 
   
 		$fields[] = array( 
 	        'id'       => '_bootstrap_post_lists_archives_raw_paging',
@@ -195,7 +75,13 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 
 add_filter( 'redux/options/'.REDUX_OPT_NAME.'/sections', '_bootstrap_module_post_lists_options', 50 );
 
-
+/**
+* Add layout related options on archives page.
+* @param array $fields reference to array of options to which the new options will be added.
+* @param string $page_name the name of the page used in forming the option id.
+* 
+* @return nothing
+*/
 function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
 	$section_name = 'layout';
 	// The header for this section
@@ -255,6 +141,14 @@ function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
 	}
 }
 
+/**
+* Add excerpt related options.
+* 
+* @param array $fields reference to array of options to which the new options will be added.
+* @param string $page_name the name of the page used in forming the option id.
+* 
+* @return nothing
+*/
 function _bootstrap_archives_add_excerpt_options( &$fields, $page_name ) {
 	$section_name = 'excerpt';
 	$fields[] = array( 
@@ -329,4 +223,204 @@ function _bootstrap_archives_add_excerpt_options( &$fields, $page_name ) {
         ), 
         'default'  => 'primary',      
     );	 
-}	
+}
+
+/**
+* Add featured image related options on archives page.
+* 
+* @param array $fields reference to array of options to which the new options will be added.
+* @param string $page_name the name of the page used in forming the option id.
+* 
+* @return nothing
+*/
+function _bootstrap_archives_add_featured_image_options( &$fields, $page_name, $prefix ) {	
+	$section_name = 'featured_image';
+	
+	// Title
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . $prefix . __( ' Featured Image Options', '_bootstrap' ) . '</h1>',
+    );		    
+    
+    $show_fi_field = _bootstrap_get_option_name( $page_name, $section_name, 'show' );
+    // Show Featured Image or Not
+	$fields[] = array(
+        'id'       => $show_fi_field,
+        'type'     => 'switch', 
+        'title'    => __( 'Show Feature Image?', '_bootstrap' ),
+        'desc'     => __( 'This controls whether the featured image is shown or not', '_bootstrap' ),
+        'on'		=> __( 'Show Feature Image', '_bootstrap' ),
+        'off'		=> __( 'Don\'t Show Feature Image', '_bootstrap' ),
+        'default'  => TRUE,
+    );	 
+    
+    // Location
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'location' ),
+        'type'     => 'button_set',
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'title'    => __( 'Location of Featured Image', '_bootstrap' ),
+        'desc'     => __( 'Where should the Feature Image be placed?', '_bootstrap' ),
+        'options'  => array(
+        	'left'			=> 'Left of Text',
+            'right' 		=> 'Right of Text',
+            'above-left' 	=> 'Above Text to the Left',
+            'above-center' 	=> 'Above Text Centered',
+            'above-right' 	=> 'Above Text to the Right',
+        ), 
+        'default'  => 'left',
+    );    
+    
+    // Bootstrap class
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'class' ),
+        'type'     => 'button_set',
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'title'    => __( 'Bootstrap Class of Image', '_bootstrap' ),
+        'desc'     => __( 'What bootstrap class should be applied to the img tag.', '_bootstrap' ),
+        'options'  => array(
+        	'none'			=> 'None',
+            'img-rounded' 	=> 'Rounded',
+            'img-circle' 	=> 'Circle',
+            'img-thumbnail' => 'Thumbnail',
+        ), 
+        'default'  => 'img-rounded',
+    );      
+    
+    // The size to show
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'size' ),
+        'type'     => 'text',
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'title'    => __( 'Which size image to use.', '_bootstrap' ),
+        'desc'     => __( 'Select one of the predefined sizes. This will be argument that is passed to the_post_thumbail', '_bootstrap' ),
+        'default'  => 'thumbnail'
+    );	
+    
+   	// Should we restrict container size.
+	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_sized' ),
+        'type'     => 'switch', 
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'title'    => __( 'Should the Featured Image Container be sized?', '_bootstrap' ),
+        'desc'     => __( 'This controls whether the featured image container is sized using dimensions specified below', '_bootstrap' ),
+        'default'  => FALSE,
+    );	    
+    
+    // If container is sized what dimensions to use.
+$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_dimensions' ),
+        'type'     => 'dimensions',
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'units'    => array( 'em', 'px', '%' ),
+        'title'    => __( 'Dimensions (Width/Height) For Container', '_bootstrap' ),
+        'desc'     => __( 'Use this to specify the width and height of img tag that will contain featured image.', '_bootstrap' ),
+        'default'  => array(
+            'Width'   => '100', 
+            'Height'  => '100'
+        ),
+);
+}
+
+/**
+* Add post meta (dates, author, categories, tags etc.) related options on archives page.
+* 
+* @param array $fields reference to array of options to which the new options will be added.
+* @param string $page_name the name of the page used in forming the option id.
+* 
+* @return nothing
+*/
+function _bootstrap_archives_add_meta_options( &$fields, $page_name ) {	
+	$section_name = 'meta';
+	
+    // Section Title   
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . __( 'Post Meta Information Styles', '_bootstrap' ) . '</h1>',
+    );	
+    
+    // Show meta or not
+	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'show' ),
+        'type'     => 'switch', 
+        'title'    => __( 'Show Meta Information?', '_bootstrap' ),
+        'desc'     => __( 'This controls whether the meta information for post is displayed in archives/post lists or not.', '_bootstrap' ),
+        'on'		=> __( 'Show Meta', '_bootstrap' ),
+        'off'		=> __( 'Don\'t Show Meta', '_bootstrap' ),
+        'default'  => TRUE,
+    );
+    
+    // Location of meta
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'location' ),
+        'type'     => 'button_set',
+        'title'    => __( 'Location of Meta Information', '_bootstrap' ),
+        'desc'     => __( 'Where should the meta information be displayed.', '_bootstrap' ),
+		'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'show' ), 'equals', TRUE ),
+        'options'  => array(
+            'top' 		=> __( 'Top (below title)', '_bootstrap' ),
+            'bottom' 	=> __( 'Bottom', '_bootstrap'),
+        ), 
+        'default'  => 'bottom',      
+    );
+    
+    // Which items to show and in what order	    
+	$fields[] = array(
+        'id'      => _bootstrap_get_option_name( $page_name, $section_name, 'items' ),
+        'type'    => 'sorter',
+        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'show' ), 'equals', TRUE ),
+        'title'   => __( 'Meta Information Enable and Order', '_bootstrap' ),
+        'desc'    => __( 'Organize what meta information you want displayed and in what order on the archives/post lists page', '_bootstrap' ),
+        'options' => array(
+            'enabled'  => array(
+                'placebo'    	=> 'placebo', //REQUIRED!
+                'publish_date' 	=> __( 'Publish Date', '_bootstrap' ),
+                'author'     	=> __( 'Author', '_bootstrap' ),
+                'categories' 	=> __( 'Categories', '_bootstrap' ),
+                'comments'		=> __( 'Comments', '_bootstrap' ),
+            ),
+            'disabled' => array(
+                'placebo'   		=> 'placebo', //REQUIRED!
+                'last_updated_date'	=> __( 'Last Updated Date', '_bootstrap' ),
+                'tags'   			=> __( 'Tags', '_bootstrap' ),
+            )
+        ),
+	);	
+		    
+    // How should items be displayed
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ),
+        'type'     => 'button_set',
+        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'show' ), 'equals', TRUE ),
+        'title'    => __( 'Post Meta Information Container Style', '_bootstrap' ),
+        'desc'     => __( 'How should the Post Meta Information items be styled', '_bootstrap' ),
+
+        //Must provide key => value pairs
+        'options'  => array(
+            'plain' 	=> 'Plain Text',
+            'label' 	=> 'Bootstrap Label',
+            'button' 	=> 'Bootstrap Button',
+        ), 
+        'default'  => 'plain',
+    );	    	   
+    // What class to apply to the meta information style
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_class' ),
+        'type'     => 'button_set',
+        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'show' ), 'equals', TRUE ),
+        'title'    => __( 'Post Meta Information Container Class', '_bootstrap' ),
+        'desc'     => __( 'What class should be applied to the Post Meta Information container.', '_bootstrap' ),
+        'options'  => array(
+            'default' 	=> 'Default',
+            'primary' 	=> 'Primary',
+            'success' 	=> 'Success',
+            'info' 		=> 'Info',
+            'warning' 	=> 'Warning',
+            'danger' 	=> 'Danger',
+            'none'		=> 'None',
+        ), 
+        'default'  => 'primary',      
+    );	 
+}
