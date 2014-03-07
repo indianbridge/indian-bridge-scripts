@@ -11,6 +11,11 @@ get_header(); ?>
 		<main id="main" class="site-main" role="main">
 
 			<section class="error-404 not-found">
+<div class="alert alert-warning alert-dismissable">
+<button type="button" class="close" data-dismiss="alert">&times;</button>
+  <?php _e( 'Oops! That page can&rsquo;t be found. Try one of these other options.', '_bootstrap' ); ?>
+  <strong>Warning!</strong> Better check yourself, you're not looking too good.
+</div>			
 				<header class="page-header">
 					<h1 class="page-title"><?php _e( 'Oops! That page can&rsquo;t be found.', '_bootstrap' ); ?></h1>
 				</header><!-- .page-header -->

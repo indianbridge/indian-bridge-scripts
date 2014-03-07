@@ -22,6 +22,11 @@ if ( ! defined( 'REDUX_OPT_NAME' ) ) {
 	define( 'REDUX_OPT_NAME', '_bootstrap' );
 }
 
+// The name of this theme
+if ( ! defined( 'THEME_NAME' ) ) {
+	define( 'THEME_NAME', '_bootstrap' );
+}
+
 // Absolute path to theme directory
 if ( ! defined( 'THEME_DIR' ) ) {
 	define( 'THEME_DIR', get_template_directory() );
@@ -96,32 +101,6 @@ endif; // _bootstrap_setup
 add_action( 'after_setup_theme', '_bootstrap_setup' );
 
 /**
-* Remove text at end of excerpt and add our own custom text tag and class.
-* 
-* @return void
-*/
-function new_excerpt_more( $more ) {
-	// Get the user specified options
-	$text  = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text' );
-	$style = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text_container_style' );
-	$class = _bootstrap_get_option( '_bootstrap_post_lists_read_more_text_container_class' );
-	switch ( $style ) {
-		case 'label' :
-			return ' <a href="'. get_permalink( get_the_ID() ) . '"><span class="label label-' .
-			$class . '">' . $text . '</span></a>';
-			break;
-		case 'button' :
-			return ' <a class="btn btn-xs btn-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
-			break;
-		case 'plain' :
-		default :
-			return ' <a class="text-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
-			break;
-	}
-}
-add_filter('excerpt_more', 'new_excerpt_more');
-
-/**
  * Functions to manage widgets/sidebar.
  */
 require THEME_DIR . '/inc/widgets.php';
@@ -130,9 +109,6 @@ require THEME_DIR . '/inc/widgets.php';
  * Functions to retrieve bootswatch skins and populate local folder.
  */
 require THEME_DIR . '/inc/get-bootswatch-skins.php';
-
-// This should be added as a subpage in a theme option
-//_bootstrap_get_bootswatch_skins( 'http://api.bootswatch.com/3/', THEME_DIR . '/css/skins', TRUE );
 
 /**
  * Enqueue all the necessary css and js files.

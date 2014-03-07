@@ -4,69 +4,16 @@
  */
 if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	function _bootstrap_module_post_lists_options( $sections ) {
+		$page_name = 'archives';
 		$fields = array();
-		$fields[] = array( 
-	        'id'       => '_bootstrap_post_lists_raw_1',
-	        'type'     => 'raw',
-	        'content'  => '<h1>' . __( 'Content and Excerpt', '_bootstrap' ) . '</h1>',
-	    );	
-	    // Content or Excerpt	
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_content_or_excerpt',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Show Excerpt or Content in Post', '_bootstrap' ),
-	        'desc'     => __( 'Controls what is shown in the body of single post in the list of posts.', '_bootstrap' ),
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'excerpt' => 'Excerpt',
-	            'content' => 'Content',
-	        ), 
-	        'default'  => 'excerpt',
-	    );	    
-	    
-		// Read more text
-	    $fields[] = array(
-	        'id'       => '_bootstrap_post_lists_read_more_text',
-	        'type'     => 'text',
-	        'required' => array( '_bootstrap_post_lists_content_or_excerpt', 'equals', 'excerpt' ),
-	        'title'    => __( 'Read More Text', '_bootstrap' ),
-	        'desc'     => __( 'When excerpts are shown, what text should link to full content page.', '_bootstrap' ),
-	        'default'  => __( 'Read More', '_bootstrap' ),
-	    );	
-	    // What html tag to surround the read more text
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_read_more_text_container_style',
-	        'type'     => 'button_set',
-	        'required' => array( '_bootstrap_post_lists_content_or_excerpt', 'equals', 'excerpt' ),
-	        'title'    => __( 'Read More Text Container', '_bootstrap' ),
-	        'desc'     => __( 'How should the Read More Text be styled', '_bootstrap' ),
+		
+		// Layout Options
+		_bootstrap_archives_add_layout_options( $fields, $page_name );
+		
+		// Excerpt Options
+		_bootstrap_archives_add_excerpt_options( $fields, $page_name );
+	    		
 
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'plain' 	=> 'Plain Text',
-	            'label' 	=> 'Bootstrap Label',
-	            'button' 	=> 'Bootstrap Button',
-	        ), 
-	        'default'  => 'label',
-	    );	    	   
-	    // What class to apply to the html tag for Read More text
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_read_more_text_container_class',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Read More Text Container Class', '_bootstrap' ),
-	        'required' => array( '_bootstrap_post_lists_content_or_excerpt', 'equals', 'excerpt' ),
-	        'desc'     => __( 'What class should be applied to the Read More text Container.', '_bootstrap' ),
-	        //Must provide key => value pairs
-	        'options'  => array(
-	            'default' 	=> 'Default',
-	            'primary' 	=> 'Primary',
-	            'success' 	=> 'Success',
-	            'info' 		=> 'Info',
-	            'warning' 	=> 'Warning',
-	            'danger' 	=> 'Danger',
-	        ), 
-	        'default'  => 'primary',      
-	    );	 
 		$fields[] = array( 
 	        'id'       => '_bootstrap_post_lists_archives_raw_fi',
 	        'type'     => 'raw',
@@ -107,113 +54,18 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	            'Height'  => '100'
 	        ),
     	);
+    	
+    	// Container Styling
+		$section_name = __( 'content', '_bootstrap' );
+		$prefix = __( 'Content/Excerpt Container', '_bootstrap' );
+		
+		// Container options
+		_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix );    	
 	    
-		$fields[] = array( 
-	        'id'       => '_bootstrap_post_lists_archives_raw_2',
-	        'type'     => 'raw',
-	        'content'  => '<h1>' . __( 'Excerpt/Content Container and Text Styling', '_bootstrap' ) . '</h1>',
-	    );	
-	    
-	    // What type of styling for content/excerpt title.
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_title_style',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Excerpt/Content Title Style', '_bootstrap' ),
-	        'desc'     => __( 'How should the Excerpt/Content Title be styled. If you choose custom enter tag name in the text field that appears.', '_bootstrap' ),
-	        'options'  => array(
-	            'h1' 		=> 'h1',
-	            'h2' 		=> 'h2',
-	            'h3' 		=> 'h3',
-	            'h4' 		=> 'h4',
-	            'h5' 		=> 'h5',
-	            'h6' 		=> 'h6',
-	            'custom'	=> 'Custom',
-	        ), 
-	        'default'  => 'h3',
-	    );	   
-	    // Custom tag for title
-	    $fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_title_custom',
-	        'type'     => 'text',
-	        'required' => array( '_bootstrap_post_lists_excerpt_title_style', 'equals', 'custom' ),
-	        'title'    => __( 'Custom tag for Excerpt/Container Title', '_bootstrap'),
-	        'desc'     => __( 'This will be used only when custom option is selected above.', '_bootstrap' ),
-	        'default'  => 'div'
-	    );	     
-	    	
-	    // What type of container should the content/excerpt be in.
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_container_style',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Excerpt/Content Container Style', '_bootstrap' ),
-	        'desc'     => __( 'How should the Excerpt/Content Container be styled', '_bootstrap' ),
-	        'options'  => array(
-	            'plain' 	=> 'Plain Text',
-	            'panel' 	=> 'Bootstrap Panel',
-	            'well' 		=> 'Bootstrap Well',
-	            'alert'		=> 'Bootstrap Alert',
-	        ), 
-	        'default'  => 'panel',
-	    );	
-	        	   
-	    // What class to apply to the container when panel is used.
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_container_class_panel',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Bootstrap Panel Styling', '_bootstrap' ),
-	        'desc'     => __( 'What class should be applied to the Panel.', '_bootstrap' ),
-	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', 'panel' ),
-	        'options'  => array(
-	            'default' 	=> 'Default',
-	            'primary' 	=> 'Primary',
-	            'success' 	=> 'Success',
-	            'info' 		=> 'Info',
-	            'warning' 	=> 'Warning',
-	            'danger' 	=> 'Danger',
-	            'none'		=> 'None',
-	        ), 
-	        'default'  => 'primary',      
-	    );	 
-	    
-	    // What class to apply to the container when alert is used.
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_container_class_alert',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Bootstrap Alert Styling', '_bootstrap' ),
-	        'desc'     => __( 'What class should be applied to the Alert.', '_bootstrap' ),
-	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', 'alert' ),       
-	        'options'  => array(
-	            'success' 	=> 'Success',
-	            'info' 		=> 'Info',
-	            'warning' 	=> 'Warning',
-	            'danger' 	=> 'Danger',
-	            'none'		=> 'None',
-	        ), 
-	        'default'  => 'info',      
-	    );
-	    
-	    // What class to apply to the  text when plain text or well is used.
-	 	$fields[] = array(
-	        'id'       => '_bootstrap_post_lists_excerpt_container_class_text',
-	        'type'     => 'button_set',
-	        'title'    => __( 'Text Styling for Well or Plain Text option', '_bootstrap' ),
-	        'desc'     => __( 'What class should be applied to the text when Well or Plain Text is used.', '_bootstrap' ),
-	        'required' => array( '_bootstrap_post_lists_excerpt_container_style', 'equals', array( 'well', 'plain' ) ),       
-	        'options'  => array(
-	            'muted' 	=> 'Muted',
-	            'primary' 	=> 'Primary',
-	            'success' 	=> 'Success',
-	            'info' 		=> 'Info',
-	            'warning' 	=> 'Warning',
-	            'danger' 	=> 'Danger',
-	            'none'		=> 'None',
-	        ),
-	        'default'  => 'primary',      
-	    );	    	
 	    
 	    // Meta Information Control	    
 		$fields[] = array( 
-	        'id'       => '_bootstrap_post_lists_archives_raw_3',
+	        'id'       => '_bootstrap_post_lists_archives_raw_meta',
 	        'type'     => 'raw',
 	        'content'  => '<h1>' . __( 'Post Meta Information Styles', '_bootstrap' ) . '</h1>',
 	    );	
@@ -242,8 +94,8 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	        'id'      => '_bootstrap_post_meta_information_control',
 	        'type'    => 'sorter',
 	        'required' => array( '_bootstrap_post_lists_show_meta_information', 'equals', TRUE ),
-	        'title'   => __( 'Post Information Display Control', '_bootstrap' ),
-	        'desc'    => __( 'Organize what post information you want displayed and in what order on the post lists page', '_bootstrap' ),
+	        'title'   => __( 'Meta Information Display Control', '_bootstrap' ),
+	        'desc'    => __( 'Organize what meta information you want displayed and in what order on the post lists page', '_bootstrap' ),
 	        'options' => array(
 	            'enabled'  => array(
 	                'placebo'    	=> 'placebo', //REQUIRED!
@@ -328,7 +180,7 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	           	    
 
 		$section = array(
-			'title' => __( 'Post Lists Options', '_bootstrap' ),
+			'title' => __( 'Post Lists/Archives Page', '_bootstrap' ),
 			'icon' => 'el-icon-list icon-large'
 		);
 		
@@ -342,3 +194,139 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 }
 
 add_filter( 'redux/options/'.REDUX_OPT_NAME.'/sections', '_bootstrap_module_post_lists_options', 50 );
+
+
+function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
+	$section_name = 'layout';
+	// The header for this section
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'header' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . __( 'Archives/Post Lists Page Layout', '_bootstrap' ) . '</h1>',
+    );
+    
+    $number_of_sidebars = 2;
+    $sidebar_prefix = 'sidebar-';
+    $enabled['placebo'] = 'placebo';
+    $enabled['content'] = __( 'Content', '_bootstrap' );
+    if ( $number_of_sidebars > 0 ) {
+		$enabled[ $sidebar_prefix . '1' ] = __( 'Sidebar 1', '_bootstrap' );
+	}
+    $disabled['placebo'] = 'placebo';
+    for ( $i = 2; $i <= $number_of_sidebars; $i++ ) {
+		$disabled[ $sidebar_prefix . $i ] = sprintf( __( 'Sidebar %d', '_bootstrap' ), $i );
+	}
+    // Content sidebar layout
+	$fields[] = array(
+        'id'      => _bootstrap_get_option_name( $page_name, $section_name, 'layout' ),
+        'type'    => 'sorter',
+        'title'   => __( 'Content/Sidebar Layout', '_bootstrap' ),
+        'desc'    => __( 'How do you want to layout the content and sidebars. Top to bottom will represent left to right', '_bootstrap' ),
+        'options' => array( 'enabled'  => $enabled, 'disabled' => $disabled ),
+	);	
+	
+	// content width
+	$fields[] = array(
+        'id' => _bootstrap_get_option_name( $page_name, $section_name, 'content_width' ),
+        'type' => 'slider',
+        'title' => __( 'Content Width', '_bootstrap' ),
+        'desc' => __( 'How many columns of Bootstrap 12 column grid should content occupy. If content is disabled above then this is ignored.', '_bootstrap' ),
+        "default" => 8,
+        "min" => 0,
+        "step" => 1,
+        "max" => 12,
+        'display_value' => 'select',
+    ); 
+    
+    // sidebar widths
+    for( $i = 1; $i <= $number_of_sidebars; $i++ ) {
+    	$sidebar_name = $sidebar_prefix . $i;
+		$fields[] = array(
+	        'id' => _bootstrap_get_option_name( $page_name, $section_name, $sidebar_name . '_width' ),
+	        'type' => 'slider',
+	        'title' => sprintf(  __( 'Sidebar %d Column Width', '_bootstrap' ), $i ),
+	        'desc' => sprintf( __( 'How many columns of Bootstrap 12 column grid should content occupy. If Sidebar %d is disabled above then this is ignored', '_bootstrap' ), $i ),
+	        "default" => 4,
+	        "min" => 0,
+	        "step" => 1,
+	        "max" => 12,
+	        'display_value' => 'select',
+	    );			
+	}
+}
+
+function _bootstrap_archives_add_excerpt_options( &$fields, $page_name ) {
+	$section_name = 'excerpt';
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'header' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . __( 'Excerpt Options', '_bootstrap' ) . '</h1>',
+    );	
+   
+    // Content or Excerpt	
+    $use_expert_field = _bootstrap_get_option_name( $page_name, $section_name, 'use_excerpt' );
+ 	$fields[] = array(
+        'id'		=> $use_expert_field,
+        'type'      => 'switch',
+        'title'     => __( 'Show Excerpt or Content in Archives/Post Lists', '_bootstrap' ),
+        'desc'      => __( 'Controls what is shown in the body of single post in the archives/list of posts.', '_bootstrap' ),
+        'on'		=> __( 'Excerpt', '_bootstrap' ),
+        'off'		=> __( 'Content', '_bootstrap' ),
+        'default'   => TRUE,
+    );	   
+    
+    // Excerpt length
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'length' ),
+        'type'     => 'text',
+        'required' => array( $use_expert_field, 'equals', TRUE ),
+        'validate' => 'numeric',
+        'title'    => __( 'Excerpt Length', '_bootstrap' ),
+        'desc'     => __( 'What should the excerpt length be?', '_bootstrap' ),
+        'default'  => '55',
+    );	
+    
+	// Read more text
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text' ),
+        'type'     => 'text',
+        'required' => array( $use_expert_field, 'equals', TRUE ),
+        'title'    => __( 'Read More Text', '_bootstrap' ),
+        'desc'     => __( 'When excerpts are shown, what text should link to full content page.', '_bootstrap' ),
+        'default'  => __( 'Read More', '_bootstrap' ),
+    );	
+    // What html tag to surround the read more text
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text_container_style' ),
+        'type'     => 'button_set',
+        'required' => array( $use_expert_field, 'equals', TRUE ),
+        'title'    => __( 'Read More Text Container', '_bootstrap' ),
+        'desc'     => __( 'How should the Read More Text be styled', '_bootstrap' ),
+
+        //Must provide key => value pairs
+        'options'  => array(
+            'plain' 	=> 'Plain Text',
+            'label' 	=> 'Bootstrap Label',
+            'button' 	=> 'Bootstrap Button',
+        ), 
+        'default'  => 'label',
+    );	    	   
+    // What class to apply to the html tag for Read More text
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text_container_class' ),
+        'type'     => 'button_set',
+        'title'    => __( 'Read More Text Container Class', '_bootstrap' ),
+        'required' => array( $use_expert_field, 'equals', TRUE ),
+        'desc'     => __( 'What class should be applied to the Read More text Container.', '_bootstrap' ),
+        //Must provide key => value pairs
+        'options'  => array(
+            'default' 	=> 'Default',
+            'primary' 	=> 'Primary',
+            'success' 	=> 'Success',
+            'info' 		=> 'Info',
+            'warning' 	=> 'Warning',
+            'danger' 	=> 'Danger',
+        ), 
+        'default'  => 'primary',      
+    );	 
+}	

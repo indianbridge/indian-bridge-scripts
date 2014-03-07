@@ -12,7 +12,9 @@ if ( ! function_exists( '_bootstrap_show_post_content' ) ) {
 	 * @return void
 	  */		
 	function _bootstrap_show_post_content( ) {
-		$show_excerpt = _bootstrap_get_option( '_bootstrap_post_lists_content_or_excerpt' ) === 'excerpt';		
+		$page_name = 'archives';
+		$section_name = 'excerpt';
+		$show_excerpt = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'use_excerpt') );		
 		$show_featured_image = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image' );
 		?>
 		<div class="media">
@@ -35,7 +37,7 @@ if ( ! function_exists( '_bootstrap_show_post_content' ) ) {
 					<?php } ?>
 				</a>
 			<?php } ?>
-			<div class="media-body">
+			<div class="media-body">					
 				<?php $show_excerpt ? the_excerpt() : the_content(); ?>
 			</div>
 		</div>
@@ -54,7 +56,7 @@ if ( ! function_exists( '_bootstrap_display_meta_information' ) ) {
 	function _bootstrap_display_meta_information() {
 		$metas = _bootstrap_get_option( '_bootstrap_post_meta_information_control' );
 		if ( is_array( $metas) ) {
-			$enabled_metas = $metas[ 'enabled' ];
+			$enabled_metas = $metas['enabled'];
 			if ( is_array( $enabled_metas) ) {
 				foreach ( $enabled_metas as $meta => $value ) {
 					switch ( $meta ) {	
@@ -352,4 +354,132 @@ if ( ! function_exists( '_bootstrap_get_tags' ) ) {
 		return '';		
 	}
 }
+
+
+if ( ! function_exists( '_bootstrap_echo_archives_page_header' ) ) {
+	/**
+	 * Displays a title and term description for an archive page (like category, tag, author etc.)
+	 * 
+	 * @param nothing
+	 * @return nothing
+	 */	
+	function _bootstrap_echo_archives_page_header() {		
+		?>
+		<div class="page-header">
+			<h1>
+			<?php
+				remove_filter('term_description','wpautop');
+				$term_description = term_description();
+				// Change diaplay title depending on what kind of page.
+				if ( is_category() ) :
+					_e( 'Posts in category ', '_bootstrap' );
+					echo single_cat_title();
+					if ( ! empty($term_description) ) : 
+						echo ' <small>(' . $term_description . ')</small>';
+					endif;
+					
+				elseif ( is_tag() ) :
+					_e( 'Posts tagged ', '_bootstrap' );
+					echo single_tag_title();
+					if ( ! empty($term_description) ) : 
+						echo ' <small>(' . $term_description . ')</small>';
+					endif;
+
+				elseif ( is_author() ) :
+					printf( __( 'Posts by %s %s', '_bootstrap' ), '<span class="vcard">' . get_the_author() . '</span>', get_avatar(get_the_author_meta('ID'),'60') );
+
+				elseif ( is_day() ) :
+					printf( __( 'Day: %s', '_bootstrap' ), '<span>' . get_the_date() . '</span>' );
+
+				elseif ( is_month() ) :
+					printf( __( 'Month: %s', '_bootstrap' ), '<span>' . get_the_date( _x( 'F Y', 'monthly archives date format', '_bootstrap' ) ) . '</span>' );
+
+				elseif ( is_year() ) :
+					printf( __( 'Year: %s', '_bootstrap' ), '<span>' . get_the_date( _x( 'Y', 'yearly archives date format', '_bootstrap' ) ) . '</span>' );
+
+				elseif ( is_tax( 'post_format', 'post-format-aside' ) ) :
+					_e( 'Asides', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-gallery' ) ) :
+					_e( 'Galleries', '_bootstrap');
+
+				elseif ( is_tax( 'post_format', 'post-format-image' ) ) :
+					_e( 'Images', '_bootstrap');
+
+				elseif ( is_tax( 'post_format', 'post-format-video' ) ) :
+					_e( 'Videos', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-quote' ) ) :
+					_e( 'Quotes', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-link' ) ) :
+					_e( 'Links', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-status' ) ) :
+					_e( 'Statuses', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-audio' ) ) :
+					_e( 'Audios', '_bootstrap' );
+
+				elseif ( is_tax( 'post_format', 'post-format-chat' ) ) :
+					_e( 'Chats', '_bootstrap' );
+
+				else :
+					_e( 'Archives ', '_bootstrap' );
+					if ( ! empty($term_description) ) : 
+						echo ' <small>(' . $term_description . ')</small>';
+					endif;				
+					printf ( '%s <small>%s</small>', _e( 'Archives', '_bootstrap' ), $term_description );
+
+				endif;			
+			?>
+			 </h1>
+		</div>
+		<?php
+		
+	}
+}
+
+/**
+* Change the Read More text at end of excerpt to custom text and html.
+*
+* @param string $more the current read more text
+* 
+* @return the new read more html
+*/
+function _bootstrap_new_read_more( $more ) {
+	// Get the user specified options
+	$page_name = 'archives';
+	$section_name = 'excerpt';
+	$text  = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text' ) );
+	$style = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text_container_style' ) );
+	$class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'read_more_text_container_class' ) );
+	switch ( $style ) {
+		case 'label' :
+			return ' <a href="'. get_permalink( get_the_ID() ) . '"><span class="label label-' .
+			$class . '">' . $text . '</span></a>';
+			break;
+		case 'button' :
+			return ' <a class="btn btn-xs btn-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
+			break;
+		case 'plain' :
+		default :
+			return ' <a class="text-' . $class . '" href="'. get_permalink( get_the_ID() ) . '">' . $text . '</a>';
+			break;
+	}
+}
+add_filter( 'excerpt_more', '_bootstrap_new_read_more' );
+
+/**
+* Changed the excerpt length based on user supplied value.
+* 
+* @param number $length the current length
+* 
+* @return the new excerpt length
+*/
+function custom_excerpt_length( $length ) {
+	$option_name = _bootstrap_get_option_name( 'archives', 'excerpt', 'length');
+	return _bootstrap_get_option( $option_name );
+}
+add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 

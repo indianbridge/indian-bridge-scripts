@@ -39,7 +39,7 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 			}
 			else {
 				// Use jquery to compute height of header and set padding accordingly
-				wp_enqueue_script( '_bootstrap_js', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.navbar.js', array('jquery'), '20140219', true );
+				wp_enqueue_script( '_bootstrap_fixed_navbar_js', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.navbar.js', array('jquery'), '20140219', true );
 			}
 		}
 		
@@ -72,6 +72,7 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 		if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 			wp_enqueue_script( 'comment-reply' );
 		}
+		
 	}
 }
 add_action( 'wp_enqueue_scripts', '_bootstrap_scripts' );
