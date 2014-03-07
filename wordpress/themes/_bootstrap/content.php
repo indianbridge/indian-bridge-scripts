@@ -9,11 +9,12 @@ $section_name = 'content';
 $options = _bootstrap_get_container_options( $page_name, $section_name );
 $options['container_class'] .= ' item';
 
+$section_name = 'meta';
 // Should the meta information be shown?
-$show_meta = _bootstrap_get_option( '_bootstrap_post_lists_show_meta_information' );
+$show_meta = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'show' ) );
 
 // The location of the meta information display.
-$meta_location = _bootstrap_get_option( '_bootstrap_post_lists_meta_information_location' );
+$meta_location = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'location' ) );
 ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class( $options['container_class'] ); ?> >
 	<header class="<?php echo $options['header_class']; ?>" >

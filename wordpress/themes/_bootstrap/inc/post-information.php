@@ -14,36 +14,68 @@ if ( ! function_exists( '_bootstrap_show_post_content' ) ) {
 	function _bootstrap_show_post_content( ) {
 		$page_name = 'archives';
 		$section_name = 'excerpt';
-		$show_excerpt = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'use_excerpt') );		
-		$show_featured_image = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image' );
-		?>
+		$show_excerpt = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'use_excerpt') );	
+		$section_name = 'featured_image';	
+		$show_featured_image = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'show' ) );
+		if ( $show_featured_image ) {
+		}
+		if ( ! $show_featured_image ) {
+			$show_excerpt ? the_excerpt() : the_content();
+		}
+		else {
+			_bootstrap_show_feature_image_and_content( $show_excerpt );
+		}		
+	}
+}
+
+/**
+* If featured image is enabled then show the content and featured image based on chosen 
+* options for featured image
+* 
+* @param boolean $show_excerpt should the exceprt be shown instead of content.
+* 
+* @return nothing
+*/
+function _bootstrap_show_feature_image_and_content( $show_excerpt ) {
+	$page_name = 'archives';
+	$section_name = 'featured_image';		
+	$fi_location = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'location' ) );
+	$fi_class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'class' ) );
+	$fi_size = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'size' ) );
+	$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), $fi_size );
+	$image_url = $image_attributes[0];
+	$fi_container_sized = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_sized' ) );
+	$img_string = '<img src="' . $image_url . '" alt="Feature Image" class="img-responsive media-object ' .  $fi_class . ' ';
+	if ( $fi_location === 'above-center' ) {
+		$img_string .= 'center-block ';
+	}
+	else if ( $fi_location === 'left' || $fi_location === 'above-left' ) {
+		$img_string .= 'pull-left ';
+	}
+	else if ( $fi_location === 'right' || $fi_location === 'above-right' ) {
+		$img_string .= 'pull-right ';
+	}
+	$img_string .= '" ';
+	if ( $fi_container_sized ) {
+		$fi_container_dimensions = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_dimensions' ) );
+		$img_string .= 'width="' . $image_dimensions['width'] . $image_dimensions['units'] . '" ';
+		$img_string .= 'height="' . $image_dimensions['height'] . $image_dimensions['units'] . '" ';
+	}	
+	$img_string .= '>';
+	?>
 		<div class="media">
-			<?php if ( $show_featured_image ) { ?>
-				<a class="pull-left">
-					<?php
-						$image_size = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_size' );
-						$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), $image_size );
-						$image_url = $image_attributes[0];
-						$image_container_sized =  _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_container_size' );
-						if ( $image_container_sized ) {
-							$image_dimensions = _bootstrap_get_option( '_bootstrap_post_lists_show_featured_image_container_dimensions');
-							?>
-								<img width="<?php echo $image_dimensions['width'] . $image_dimensions['units']; ?>" height="<?php echo $image_dimensions['height'] . $image_dimensions['units']; ?>" class="media-object" src="<?php echo $image_url; ?>" alt="Featured Image">
-							<?php
-						}
-						else {
-					?>
-						<img class="media-object" src="<?php echo $image_url; ?>" alt="Featured Image">		
-					<?php } ?>
-				</a>
+			<?php 
+				echo $img_string;
+				if ( $fi_location === 'above-left' || $fi_location === 'above-center' || $fi_location === 'above-right' ) {
+			?>
+		</div>
+		<div class="media">
 			<?php } ?>
 			<div class="media-body">					
 				<?php $show_excerpt ? the_excerpt() : the_content(); ?>
 			</div>
 		</div>
-		<?php
-				
-	}
+	<?php
 }
  
 if ( ! function_exists( '_bootstrap_display_meta_information' ) ) {
@@ -54,34 +86,31 @@ if ( ! function_exists( '_bootstrap_display_meta_information' ) ) {
 	 * @return void
 	  */		
 	function _bootstrap_display_meta_information() {
-		$metas = _bootstrap_get_option( '_bootstrap_post_meta_information_control' );
-		if ( is_array( $metas) ) {
-			$enabled_metas = $metas['enabled'];
-			if ( is_array( $enabled_metas) ) {
-				foreach ( $enabled_metas as $meta => $value ) {
-					switch ( $meta ) {	
-						case 'publish_date' : 
-							_bootstrap_get_published_date( );
-							break;
-						case 'last_updated_date' : 
-							_bootstrap_get_updated_date( );
-							break;
-						case 'author' : 
-							_bootstrap_posted_by();
-							break;
-						case 'categories' : 
-							_bootstrap_post_categories();
-							break;
-						case 'tags' : 
-							_bootstrap_post_tags();
-							break;
-						case 'comments' : 
-							_bootstrap_post_comments();
-							break;
-						default :
-							break;
-					}
-				}
+		$page_name = 'archives';
+		$section_name = 'meta';
+		$enabled_metas = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'items' ), 'enabled' );
+		foreach ( $enabled_metas as $meta => $value ) {
+			switch ( $meta ) {	
+				case 'publish_date' : 
+					_bootstrap_get_published_date( );
+					break;
+				case 'last_updated_date' : 
+					_bootstrap_get_updated_date( );
+					break;
+				case 'author' : 
+					_bootstrap_posted_by();
+					break;
+				case 'categories' : 
+					_bootstrap_post_categories();
+					break;
+				case 'tags' : 
+					_bootstrap_post_tags();
+					break;
+				case 'comments' : 
+					_bootstrap_post_comments();
+					break;
+				default :
+					break;
 			}
 		}
 	}
@@ -166,8 +195,10 @@ if ( ! function_exists( '_bootstrap_post_categories' ) ) {
 	 * @return void
 	 */
 	 function _bootstrap_post_categories() {
-		$style = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_style' );
-		$class = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_class' );	
+	 	$page_name = 'archives';
+		$section_name = 'meta';
+		$style = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ) );
+		$class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_class' ) );	
 	 	$categories_list = _bootstrap_get_categories( ' ', $style, $class );
 		if ( $categories_list ) {
 		 	$information = array(
@@ -188,8 +219,10 @@ if ( ! function_exists( '_bootstrap_post_tags' ) ) {
 	 * @return void
 	 */
 	 function _bootstrap_post_tags() {
-		$style = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_style' );
-		$class = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_class' );	
+	 	$page_name = 'archives';
+		$section_name = 'meta';
+		$style = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ) );
+		$class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_class' ) );	
 	 	$tags_list = _bootstrap_get_tags( ' ', $style, $class );
 		if ( $tags_list ) {
 		 	$information = array(
@@ -243,8 +276,10 @@ if ( ! function_exists( '_bootstrap_post_information' ) ) {
 	 */
 	 function _bootstrap_post_information( $information ) {
 	 	// All information is already internationalized so just print
-		$style = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_style' );
-		$class = _bootstrap_get_option( '_bootstrap_post_lists_post_meta_information_container_class' );	
+	 	$page_name = 'archives';
+		$section_name = 'meta';
+		$style = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ) );
+		$class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_class' ) );	
 	 	echo '<i title="' . $information[ 'icon-title' ] . '" class="fa fa-' . $information[ 'icon' ] . '"></i> ';
 		if ( array_key_exists( 'links', $information ) ) {			
 			echo $information[ 'links' ];						
