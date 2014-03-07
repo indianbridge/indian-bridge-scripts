@@ -41,27 +41,42 @@ function _bootstrap_show_feature_image_and_content( $show_excerpt ) {
 	$section_name = 'featured_image';		
 	$fi_location = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'location' ) );
 	$fi_class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'class' ) );
-	$fi_size = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'size' ) );
-	$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), $fi_size );
+	$fi_thumbnail_size = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'size' ) );
+	if ( $fi_thumbnail_size === 'custom' ) {
+		$fi_container_dimensions = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'custom_dimensions' ) );
+		$width = $fi_container_dimensions['width'];
+		$height = $fi_container_dimensions['height'];
+		$fi_size = array(
+			array( $width, $height ),
+			$width,
+			$height,
+		);
+	}
+	else {
+		$fi_size = explode( '~', $fi_thumbnail_size );
+	}
+	$image_attributes = wp_get_attachment_image_src( get_post_thumbnail_id(), $fi_size[0] );
 	$image_url = $image_attributes[0];
-	$fi_container_sized = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_sized' ) );
-	$img_string = '<img src="' . $image_url . '" alt="Feature Image" class="img-responsive media-object ' .  $fi_class . ' ';
-	if ( $fi_location === 'above-center' ) {
-		$img_string .= 'center-block ';
+	if ( ! $image_url ) {
+		$place_holder = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'place_holder' ) );
+		if ( $place_holder ) {
+			$image_url = str_replace( '$width', $fi_size[1], $place_holder );
+			$image_url = str_replace( '$height', $fi_size[2], $image_url );
+			//$image_url = 'http://placehold.it/' . $fi_size[1] . 'x' . $fi_size[2] . '&text=No+Featured+Image';
+		}
 	}
-	else if ( $fi_location === 'left' || $fi_location === 'above-left' ) {
-		$img_string .= 'pull-left ';
-	}
-	else if ( $fi_location === 'right' || $fi_location === 'above-right' ) {
-		$img_string .= 'pull-right ';
-	}
-	$img_string .= '" ';
-	if ( $fi_container_sized ) {
-		$fi_container_dimensions = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_dimensions' ) );
-		$img_string .= 'width="' . $image_dimensions['width'] . $image_dimensions['units'] . '" ';
-		$img_string .= 'height="' . $image_dimensions['height'] . $image_dimensions['units'] . '" ';
-	}	
-	$img_string .= '>';
+	if ( $image_url ) {
+		$img_string = '<img width="' . $fi_size[1] . 'px" height = "' . $fi_size[2] . 'px" src="' . $image_url . '" alt="Feature Image" class="img-responsive media-object ' .  $fi_class . ' ';
+		if ( $fi_location === 'above-center' ) {
+			$img_string .= 'center-block ';
+		}
+		else if ( $fi_location === 'left' || $fi_location === 'above-left' ) {
+			$img_string .= 'pull-left ';
+		}
+		else if ( $fi_location === 'right' || $fi_location === 'above-right' ) {
+			$img_string .= 'pull-right ';
+		}
+		$img_string .= '">';	
 	?>
 		<div class="media">
 			<?php 
@@ -76,6 +91,16 @@ function _bootstrap_show_feature_image_and_content( $show_excerpt ) {
 			</div>
 		</div>
 	<?php
+	} // ( $image_url ) 
+	else {
+		?>
+		<div class="media">
+			<div class="media-body">					
+				<?php $show_excerpt ? the_excerpt() : the_content(); ?>
+			</div>
+		</div>		
+		<?php
+	}
 }
  
 if ( ! function_exists( '_bootstrap_display_meta_information' ) ) {

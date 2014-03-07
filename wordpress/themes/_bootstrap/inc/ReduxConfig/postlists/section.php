@@ -250,10 +250,20 @@ function _bootstrap_archives_add_featured_image_options( &$fields, $page_name, $
         'type'     => 'switch', 
         'title'    => __( 'Show Feature Image?', '_bootstrap' ),
         'desc'     => __( 'This controls whether the featured image is shown or not', '_bootstrap' ),
-        'on'		=> __( 'Show Feature Image', '_bootstrap' ),
-        'off'		=> __( 'Don\'t Show Feature Image', '_bootstrap' ),
+        'on'		=> __( 'Show Featured Image', '_bootstrap' ),
+        'off'		=> __( 'Don\'t Show Featured Image', '_bootstrap' ),
         'default'  => TRUE,
     );	 
+    
+    // What to do if no featured image
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'place_holder' ),
+        'type'     => 'text',
+        'required' => array( $show_fi_field, 'equals', TRUE ),
+        'title'    => __( 'What should happen if there is no featured image', '_bootstrap' ),
+        'desc'     => __( 'Specify the path to a place holder image. Leave blank if you dont want to show anything. You can used $width and $height as placebolders for the size selected in the following fields.', '_bootstrap' ),
+        'default'  => 'http://placehold.it/$widthx$height&text=No+Featured+Image',
+    );	    
     
     // Location
  	$fields[] = array(
@@ -289,36 +299,49 @@ function _bootstrap_archives_add_featured_image_options( &$fields, $page_name, $
     );      
     
     // The size to show
-    $fields[] = array(
+    // First get all built in and user defined sizes
+    global $_wp_additional_image_sizes;
+    $default = FALSE;
+	foreach (get_intermediate_image_sizes() as $s) {
+
+		if (isset($_wp_additional_image_sizes[$s])) {
+			$width = intval($_wp_additional_image_sizes[$s]['width']);
+			$height = intval($_wp_additional_image_sizes[$s]['height']);
+		} else {
+			$width = get_option($s.'_size_w');
+			$height = get_option($s.'_size_h');
+		}
+		$option_name = $s . '~' . $width . '~' . $height;
+		if ( ! $default ) {
+			$default = $option_name;
+		}		
+		$options[ $option_name ] = $s . ' (' . $width . ' x ' . $height . ')';
+	}   
+	// Add option for specifying custom dimensions 
+	$options['custom'] = 'Custom - Specify Dimensions Below';
+	// Populate the select field
+ 	$fields[] = array(
         'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'size' ),
-        'type'     => 'text',
+        'type'     => 'select',
         'required' => array( $show_fi_field, 'equals', TRUE ),
-        'title'    => __( 'Which size image to use.', '_bootstrap' ),
-        'desc'     => __( 'Select one of the predefined sizes. This will be argument that is passed to the_post_thumbail', '_bootstrap' ),
-        'default'  => 'thumbnail'
-    );	
+		'title'    => __( 'Which size image to use.', '_bootstrap' ),
+        'desc'     => __( 'Select one of the predefined sizes. This will be argument that is passed to the_post_thumbail', '_bootstrap' ),        
+        'options'  => $options,
+        'default'  => $default,
+    );    
     
-   	// Should we restrict container size.
-	$fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_sized' ),
-        'type'     => 'switch', 
-        'required' => array( $show_fi_field, 'equals', TRUE ),
-        'title'    => __( 'Should the Featured Image Container be sized?', '_bootstrap' ),
-        'desc'     => __( 'This controls whether the featured image container is sized using dimensions specified below', '_bootstrap' ),
-        'default'  => FALSE,
-    );	    
-    
-    // If container is sized what dimensions to use.
+    // Custom Dimensions
 $fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'container_dimensions' ),
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'custom_dimensions' ),
         'type'     => 'dimensions',
         'required' => array( $show_fi_field, 'equals', TRUE ),
-        'units'    => array( 'em', 'px', '%' ),
-        'title'    => __( 'Dimensions (Width/Height) For Container', '_bootstrap' ),
-        'desc'     => __( 'Use this to specify the width and height of img tag that will contain featured image.', '_bootstrap' ),
+        'units'    => FALSE,
+        'title'    => __( 'Custom Dimensions for Image', '_bootstrap' ),
+        'desc'     => __( 'If you have chose Custom size above then use this to specify the custom width and height for featured image.', '_bootstrap' ),
         'default'  => array(
-            'Width'   => '100', 
-            'Height'  => '100'
+            'width'   => '100', 
+            'height'  => '100',
+            'units'	  => 'px',
         ),
 );
 }
