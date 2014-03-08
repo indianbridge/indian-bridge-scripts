@@ -84,7 +84,7 @@ add_filter( 'redux/options/'.REDUX_OPT_NAME.'/sections', '_bootstrap_module_post
 */
 function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
 	$section_name = 'layout';
-	$prefix = __( 'Content', '_bootstrap' );
+	$prefix = __( 'Content Area Widgets/Sidebars', '_bootstrap' );
 	$items[] = array(
 		'id'		=> 'content',
 		'name'		=> __( 'Content', '_bootstrap' ),
