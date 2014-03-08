@@ -7,7 +7,7 @@ if ( !function_exists( '_bootstrap_module_sidebar_options' ) ) {
 		$fields = array();
 		$page_name = 'sidebar';
 		$section_name = 'sidebar';
-		$prefix = __( 'Widgets/Sidebars', '_bootstrap' );
+		$prefix = __( 'Content Area Widgets/Sidebars', '_bootstrap' );
 		
 		// Container options
 		_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix );

@@ -340,7 +340,7 @@ function _bootstrap_add_sidebar_options( &$fields, $page_name, $section_name, $p
 	$fields[] = array( 
         'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'header' ),
         'type'     => 'raw',
-        'content'  => '<h1>' . sprintf( __( '%s Sidebar Layout Options', '_bootstrap' ), $prefix ) . '</h1>',
+        'content'  => '<h1>' . sprintf( __( '%s Layout Options', '_bootstrap' ), $prefix ) . '</h1>',
     );
     
     $area = $prefix;
@@ -391,5 +391,116 @@ function _bootstrap_get_sidebar_options( $page_name, $section_name ) {
 		$output['items'][ $key ] = $width[ $key ];
 	}
 	$output['total_width'] = $total_width;
+	return $output;
+}
+
+function _bootstrap_add_area_container_options( &$fields, $page_name, $section_name, $prefix ) {
+	
+	// Title
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . sprintf( __( '%s Area Container options ', '_bootstrap' ), $prefix ) . '</h1>',
+    );		
+	// Fixed or Full Width
+	$fields[] = array(
+	    'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'width' ),
+	    'type'     => 'button_set',
+	    'title'    => __( 'Fixed or Full Width', '_bootstrap' ),
+	    'desc'     => __( 'Fixed uses container class, full uses container-fluid class and none does not apply either of these classes', '_bootstrap' ),
+	    'options'  => array(
+	    	'container'			=> 'Fixed Width',
+	    	'container-fluid'	=> 'Full Width',
+	    	'container-none'	=> 'None',
+	    ),                
+	    'default'  => 'container-none',
+	);	
+	// Container options
+	_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix . ' Area' , 'none', FALSE );    	
+}
+
+/**
+* Add the navbar options to the specified page.
+* 
+* @param array $fields the options fields to be added to the page.
+* @param string $page_name the options page where this navbar should be added.
+* 
+* @return array of options related to navbar.
+*/
+function _bootstrap_add_navbar_options( &$fields, $page_name ) {
+	$section_name = 'navbar';
+	// The title for this section
+	$fields[] = array( 
+	    'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
+	    'type'     => 'raw',
+	    'content'  => '<h1>' . __( 'Navbar Options', '_bootstrap' ) . '</h1>',
+	);	
+	
+    // Default or Inverse navbar.
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'color' ),
+        'type'     => 'button_set',
+        'title'    => __( 'Use Default or Inverse Navbar?', '_bootstrap' ),
+        'desc'     => __( 'Choose the styling for navbar.', '_bootstrap' ),
+        'options'  => array(
+            'default'	=> 'Default',
+            'inverse'	=> 'Inverse',
+        ), 
+        'default'  => 'default',
+    );		    
+    
+    // Static or Fixed navbar.
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'style' ),
+        'type'     => 'button_set',
+        'title'    => __( 'Use Static or Fixed Navbar?', '_bootstrap' ),
+        'desc'     => __( 'Fixed keeps the navbar on screen as you scroll.', '_bootstrap' ),
+        'options'  => array(
+            'static'	=> 'Static',
+            'fixed'		=> 'Fixed',
+        ), 
+        'default'  => 'static',
+    );	  
+    
+	// What type of padding to use on top for static navbar - constant or dynamic using jquery.
+ 	$fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'padding_style' ),
+        'type'     => 'button_set',
+        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'style' ), 'equals', 'fixed' ),
+        'title'    => __( 'Constant or Dynamic Padding for Fixed Navbar', '_bootstrap' ),
+        'desc'     => __( 'Fixed navbar needs some padding at top so that content does overlap under the navbar. Should we use a constant padding (use text field below to specify) or dynamic (javascript code will be used).', '_bootstrap' ),
+        'options'  => array(
+            'constant'	=> 'Constant',
+            'dynamic'	=> 'Dynamic',
+        ), 
+        'default'  => 'dynamic',
+    );	    
+    
+    // The javascript file that calculates height of header and sets dynamic padding
+    // This will assume that header has id masthead
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'padding_constant' ),
+        'type'     => 'text',
+        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'style' ), 'equals', 'fixed' ),
+        'validate' => 'numeric',
+        'title'    => __( 'How much padding to use on top', '_bootstrap' ),
+        'desc'     => __( 'This will add a constant padding on top for body when using Fixed navbar', '_bootstrap' ),
+        'default'  => '60',
+    );		         	    	
+}
+
+/**
+* Retrieve the options set for navbar in the give page name.
+* 
+* @param string $page_name the name of the page where the navbar options are.
+* 
+* @return array of option values.
+*/
+function _bootstrap_get_navbar_options( $page_name ) {
+	$section_name = 'navbar';
+	$output['navbar_color'] = _bootstrap_get_redux_option( $page_name, $section_name, 'color');
+	$output['navbar_style'] = _bootstrap_get_redux_option( $page_name, $section_name, 'style');
+	$output['navbar_padding_style'] = _bootstrap_get_redux_option( $page_name, $section_name, 'padding_style');
+	$output['navbar_padding_constant'] = _bootstrap_get_redux_option( $page_name, $section_name, 'padding_constant');
 	return $output;
 }

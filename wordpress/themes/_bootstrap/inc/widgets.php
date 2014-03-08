@@ -14,7 +14,7 @@ function _bootstrap_widgets_init() {
 	$section_name = 'sidebar';
 	_bootstrap_register_sidebars( $page_name, $section_name, 'Content', 2 );
 	$page_name = 'footer';
-	$section_name = 'sidebar';	
+	$section_name = 'widget_container';	
 	_bootstrap_register_sidebars( $page_name, $section_name, 'Footer', 3 );
 
 }
