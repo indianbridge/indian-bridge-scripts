@@ -28,9 +28,8 @@ $meta_location = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, 
 				$edit_url = get_edit_post_link();
 				if ( $edit_url ) {
 					?>
-						<a href="<?php echo get_edit_post_link(); ?>" 
-						class="btn btn-xs">
-							<i class="fa fa-edit"></i> Edit	
+						<a href="<?php echo get_edit_post_link(); ?>" class="btn btn-xs">
+							<?php echo _bootstrap_get_font_awesome_icon( 'edit', '' ); ?> Edit
 						</a>
 					<?php
 				}

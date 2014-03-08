@@ -8,7 +8,7 @@
  */
  
 /**
-* Build the options from prefixes. 
+* Build the option name from prefixes. 
 * 
 * @param string $page_name the page in which this option occurs.
 * @param string $section_name the section in which this option occurs.
@@ -21,31 +21,100 @@ function _bootstrap_get_option_name( $page_name, $section_name, $option_name ) {
 }
 
 /**
+* Check if Font Awesome CSS has been included.
+* 
+* @return true if included false otherwise
+*/
+function _bootstrap_font_awesome_enabled() {
+	$page_name = 'style';
+	$section_name = 'font_awesome_css';
+	$fa_location =  _bootstrap_get_redux_option( $page_name, $section_name, 'font_awesome_css' );	
+	return ( $fa_location !== 'no' );
+}
+
+/**
+* Return a font awesome icon or place holder text if not enabled.
+* 
+* @param string $icon_name name of icon
+* @param string $icon_title place holder text
+* 
+* @return html markup to display icon or name.
+*/
+function _bootstrap_get_font_awesome_icon( $icon_name, $icon_title, $class = '' ) {
+	if ( _bootstrap_font_awesome_enabled() ) {
+	 	return '<i title="' . $icon_title . '" class="fa fa-' . $icon_name . ' ' . $class . '"></i>';
+ 	}
+ 	else {
+ 		return $icon_title;
+		
+	}	
+}
+
+/**
+* Check if Bootstrap JS has been included.
+* 
+* @return true if included false otherwise
+*/
+function _bootstrap_js_enabled() {
+	$page_name = 'style';
+	$section_name = 'bootstrap_js';
+	$js_location =  _bootstrap_get_redux_option( $page_name, $section_name, 'bootstrap_js' );	
+	return ( $js_location !== 'no' );
+}
+
+/**
  * Get the value of speficied option.
  *
  * @param $name the string name of option.
  * @param key the string key whose value is needed.
  * @return mixed the value of the option.
  */ 
-if ( !function_exists( '_bootstrap_get_option' ) ) {
+function _bootstrap_get_option( $name, $key = false ) {
+	global $redux;
+	$options = $redux;
 
-	function _bootstrap_get_option( $name, $key = false ) {
-		global $redux;
-		$options = $redux;
+	// Set this to your preferred default value
+	$var = '';
 
-		// Set this to your preferred default value
-		$var = '';
-
-		if ( empty( $name ) && !empty( $options ) ) {
-			$var = $options;
-		} else {
-			if ( !empty( $options[$name] ) ) {
-				$var = ( !empty( $key ) && !empty( $options[$name][$key] ) && $key !== true ) ? $options[$name][$key] : $var = $options[$name];;
-			}
+	if ( empty( $name ) && !empty( $options ) ) {
+		$var = $options;
+	} else {
+		if ( !empty( $options[$name] ) ) {
+			$var = ( !empty( $key ) && !empty( $options[$name][$key] ) && $key !== true ) ? $options[$name][$key] : $var = $options[$name];;
 		}
-		return $var;
 	}
+	return $var;
 }
+
+/**
+* Get the redux option with specified parameters.
+* 
+* @param string $page_name the options page in which this option appears.
+* @param string $section_name the section in which this option appears.
+* @param string $option_name the name of the option.
+* @param string $key an optional key to a sub property of this option.
+* 
+* @return mixed the value of the option.
+*/
+function _bootstrap_get_redux_option( $page_name, $section_name, $option_name, $key = false ) {
+	global $redux;
+	$options = $redux;
+	
+	$name = _bootstrap_get_option_name( $page_name, $section_name, $option_name );
+	// Set this to your preferred default value
+	$var = '';
+
+	if ( empty( $name ) && !empty( $options ) ) {
+		$var = $options;
+	} else {
+		if ( !empty( $options[$name] ) ) {
+			$var = ( !empty( $key ) && !empty( $options[$name][$key] ) && $key !== true ) ? $options[$name][$key] : $var = $options[$name];;
+		}
+	}
+	return $var;
+}
+
+
 
 /**
 * Create the options layout for a container (could be for content or sidebar etc.)
@@ -57,40 +126,47 @@ if ( !function_exists( '_bootstrap_get_option' ) ) {
 * 
 * @return nothing
 */
-function _bootstrap_add_container_styling_options( &$fields, $page_name, $section_name, $prefix ) {
+function _bootstrap_add_container_styling_options( &$fields, $page_name, $section_name, $prefix, $container_default='panel', $include_title = TRUE ) {
 	
+	$title = $prefix . ' ';
+	if ( $include_title ) {
+		$title .= __( 'Title, ', '_bootstrap' );
+	}
+	$title .= __( 'Container and Text Styling', '_bootstrap' );
 	$fields[] = array( 
         'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
         'type'     => 'raw',
-        'content'  => '<h1>' . sprintf( __( '%s Title, Container and Text Styling', '_bootstrap' ), $prefix ) . '</h1>',
+        'content'  => '<h1>' . $title . '</h1>',
     );	
     
-    // The container title style
- 	$fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ),
-        'type'     => 'button_set',
-        'title'    => $prefix . __( ' Title Style', '_bootstrap' ),
-        'desc'     => sprintf( __( 'How should the %s Title be styled. If you choose custom enter tag name in the text field that appears.', '_bootstrap' ), $prefix ),
-        'options'  => array(
-            'h1' 		=> 'h1',
-            'h2' 		=> 'h2',
-            'h3' 		=> 'h3',
-            'h4' 		=> 'h4',
-            'h5' 		=> 'h5',
-            'h6' 		=> 'h6',
-            'custom'	=> 'Custom',
-        ), 
-        'default'  => 'h3',
-    );	   
-    // Custom tag for title
-    $fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title_custom' ),
-        'type'     => 'text',
-        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ), 'equals', 'custom' ),
-        'title'    => sprintf( __( 'Custom tag for %s Title', '_bootstrap'), $prefix ),
-        'desc'     => __( 'This will be used only when custom option is selected above.', '_bootstrap' ),
-        'default'  => 'div'
-    );	     
+    if ( $include_title ) {
+	    // The container title style
+	 	$fields[] = array(
+	        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ),
+	        'type'     => 'button_set',
+	        'title'    => $prefix . __( ' Title Style', '_bootstrap' ),
+	        'desc'     => sprintf( __( 'How should the %s Title be styled. If you choose custom enter tag name in the text field that appears.', '_bootstrap' ), $prefix ),
+	        'options'  => array(
+	            'h1' 		=> 'h1',
+	            'h2' 		=> 'h2',
+	            'h3' 		=> 'h3',
+	            'h4' 		=> 'h4',
+	            'h5' 		=> 'h5',
+	            'h6' 		=> 'h6',
+	            'custom'	=> 'Custom',
+	        ), 
+	        'default'  => 'h3',
+	    );	   
+	    // Custom tag for title
+	    $fields[] = array(
+	        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title_custom' ),
+	        'type'     => 'text',
+	        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ), 'equals', 'custom' ),
+	        'title'    => sprintf( __( 'Custom tag for %s Title', '_bootstrap'), $prefix ),
+	        'desc'     => __( 'This will be used only when custom option is selected above.', '_bootstrap' ),
+	        'default'  => 'div'
+	    );	     
+    }
     	
     // The container style
  	$fields[] = array(
@@ -103,8 +179,9 @@ function _bootstrap_add_container_styling_options( &$fields, $page_name, $sectio
             'panel' 	=> 'Bootstrap Panel',
             'well' 		=> 'Bootstrap Well',
             'alert'		=> 'Bootstrap Alert',
+            'none'		=> 'None',
         ), 
-        'default'  => 'panel',
+        'default'  => $container_default,
     );	
         	   
     // What class to apply to the container when panel is used.
@@ -164,13 +241,15 @@ function _bootstrap_add_container_styling_options( &$fields, $page_name, $sectio
 }
 
 /**
+* Retreive the container styling options for specified page and section.
 * 
 * @param string $page_name the name of page where options will be found.
 * @param string $section_name the name of section where options will be found.
+* @param boolean $include_title should styling for title be included.
 * 
 * @return associative array of classes for styling content
 */
-function _bootstrap_get_container_options( $page_name, $section_name ) {
+function _bootstrap_get_container_options( $page_name, $section_name, $include_title = TRUE ) {
 	// The style for the container
 	$output['style'] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ) );
 
@@ -189,18 +268,23 @@ function _bootstrap_get_container_options( $page_name, $section_name ) {
 		// Bootstrap well and plain text
 		case 'well' :
 		case 'plain' :
-		default :
 			$class_id = _bootstrap_get_option_name( $page_name, $section_name, 'class_text' );
 			break;	
+		default :
+			break;
 	}
 
-	// The class of the container or the text within.
-	$class = _bootstrap_get_option( $class_id );
+	if ( $class_id ) {
+		// The class of the container or the text within.
+		$class = _bootstrap_get_option( $class_id );
+	}
 
-	// The style to be applied to title.
-	$output['title_tag'] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ) );
-	if ( $output['title_tag'] === 'custom' ) {
-		$output['title_tag'] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'title_custom' ) );
+	if ( $include_title ) {
+		// The style to be applied to title.
+		$output['title_tag'] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'title_style' ) );
+		if ( $output['title_tag'] === 'custom' ) {
+			$output['title_tag'] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'title_custom' ) );
+		}
 	}
 
 	// Classes for article sections that will conditionalized based on type of container being used.
@@ -234,9 +318,78 @@ function _bootstrap_get_container_options( $page_name, $section_name ) {
 		
 		// No container but text is assigned class
 		case 'plain' :
-		default :
 			$output['container_class'] = 'text-' . $class;
+			break;
+		default :
 			break;
 	}		
 	return $output;	
+}
+
+/**
+* Add sidebar layout options in the page
+* 
+* @param array $fields reference to array of options to which to append.
+* @param string $page_name the name of the page used in forming the option id.
+* @param string $section_name the name of section where the option goes.
+* 
+* @return nothing
+*/
+function _bootstrap_add_sidebar_options( &$fields, $page_name, $section_name, $prefix, $items ) {
+	// The header for this section
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'header' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . sprintf( __( '%s Sidebar Layout Options', '_bootstrap' ), $prefix ) . '</h1>',
+    );
+    
+    $area = $prefix;
+    
+    $enabled['placebo'] = 'placebo';
+    $disabled['placebo'] = 'placebo';
+    $count = 0;
+    foreach ( $items as $item ) {
+		if ( $item['enabled'] ) {
+			$enabled[ $item['id'] ] = $item['name'];
+			$count++;
+		}
+		else {
+			$disabled[ $item['id'] ] = $item['name'];
+		}
+	}
+    // Sidebar layout
+	$fields[] = array(
+        'id'      => _bootstrap_get_option_name( $page_name, $section_name, 'layout' ),
+        'type'    => 'sorter',
+        'title'   => sprintf( __( '%s Sidebar Layout', '_bootstrap' ), $area ),
+        'desc'    => __( 'How do you want to layout the sidebars. Top to bottom will represent left to right', '_bootstrap' ),
+        'options' => array( 'enabled'  => $enabled, 'disabled' => $disabled ),
+	);	
+	
+	// widths
+	foreach ( $items as $item ) {
+		$fields[] = array(
+	        'id' => _bootstrap_get_option_name( $page_name, $section_name, $item['id']. '_width' ),
+	        'type' => 'slider',
+	        'title' => sprintf( __( '%s Width', '_bootstrap' ), $item['name'] ),
+	        'desc' => __( 'How many columns of Bootstrap 12 column grid should content occupy. If content is disabled above then this is ignored.', '_bootstrap' ),
+	        "default" => $item['width'],
+	        "min" => 0,
+	        "step" => 1,
+	        "max" => 12,
+	        'display_value' => 'select',
+	    ); 
+    }
+}
+
+function _bootstrap_get_sidebar_options( $page_name, $section_name ) {
+	$elements = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'layout' ), 'enabled' );
+	$total_width = 0;
+	foreach( $elements as $key => $value ) {
+		$width[ $key ] = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, $key . '_width' ) );
+		$total_width += $width[ $key ];
+		$output['items'][ $key ] = $width[ $key ];
+	}
+	$output['total_width'] = $total_width;
+	return $output;
 }

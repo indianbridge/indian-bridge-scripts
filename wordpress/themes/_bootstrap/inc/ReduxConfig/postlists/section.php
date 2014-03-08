@@ -84,61 +84,36 @@ add_filter( 'redux/options/'.REDUX_OPT_NAME.'/sections', '_bootstrap_module_post
 */
 function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
 	$section_name = 'layout';
-	// The header for this section
-	$fields[] = array( 
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'header' ),
-        'type'     => 'raw',
-        'content'  => '<h1>' . __( 'Archives/Post Lists Page Layout', '_bootstrap' ) . '</h1>',
-    );
-    
-    $number_of_sidebars = 2;
-    $sidebar_prefix = 'sidebar-';
-    $enabled['placebo'] = 'placebo';
-    $enabled['content'] = __( 'Content', '_bootstrap' );
-    if ( $number_of_sidebars > 0 ) {
-		$enabled[ $sidebar_prefix . '1' ] = __( 'Sidebar 1', '_bootstrap' );
+	$prefix = __( 'Content', '_bootstrap' );
+	$items[] = array(
+		'id'		=> 'content',
+		'name'		=> __( 'Content', '_bootstrap' ),
+		'width'		=> 8,
+		'enabled'	=> TRUE,
+	);
+	$number_of_sidebars = 2;
+	$area = 'Content';
+	for( $i = 1; $i <= $number_of_sidebars; $i++ ) {
+		$id = sprintf( '%s-sidebar-%d', strtolower( $area ), $i );
+		$name = sprintf( __( 'Sidebar %d', '_bootstrap' ), $i );
+		if ( $i === 1 ) {
+			$items[] = array(
+				'id'		=> $id,
+				'name'		=> $name,
+				'enabled'	=> TRUE,
+				'width'		=> 4,
+			);			
+		} 
+		else {
+			$items[] = array(
+				'id'		=> $id,
+				'name'		=> $name,
+				'enabled'	=> FALSE,
+				'width'		=> 4,
+			);			
+		}
 	}
-    $disabled['placebo'] = 'placebo';
-    for ( $i = 2; $i <= $number_of_sidebars; $i++ ) {
-		$disabled[ $sidebar_prefix . $i ] = sprintf( __( 'Sidebar %d', '_bootstrap' ), $i );
-	}
-    // Content sidebar layout
-	$fields[] = array(
-        'id'      => _bootstrap_get_option_name( $page_name, $section_name, 'layout' ),
-        'type'    => 'sorter',
-        'title'   => __( 'Content/Sidebar Layout', '_bootstrap' ),
-        'desc'    => __( 'How do you want to layout the content and sidebars. Top to bottom will represent left to right', '_bootstrap' ),
-        'options' => array( 'enabled'  => $enabled, 'disabled' => $disabled ),
-	);	
-	
-	// content width
-	$fields[] = array(
-        'id' => _bootstrap_get_option_name( $page_name, $section_name, 'content_width' ),
-        'type' => 'slider',
-        'title' => __( 'Content Width', '_bootstrap' ),
-        'desc' => __( 'How many columns of Bootstrap 12 column grid should content occupy. If content is disabled above then this is ignored.', '_bootstrap' ),
-        "default" => 8,
-        "min" => 0,
-        "step" => 1,
-        "max" => 12,
-        'display_value' => 'select',
-    ); 
-    
-    // sidebar widths
-    for( $i = 1; $i <= $number_of_sidebars; $i++ ) {
-    	$sidebar_name = $sidebar_prefix . $i;
-		$fields[] = array(
-	        'id' => _bootstrap_get_option_name( $page_name, $section_name, $sidebar_name . '_width' ),
-	        'type' => 'slider',
-	        'title' => sprintf(  __( 'Sidebar %d Column Width', '_bootstrap' ), $i ),
-	        'desc' => sprintf( __( 'How many columns of Bootstrap 12 column grid should content occupy. If Sidebar %d is disabled above then this is ignored', '_bootstrap' ), $i ),
-	        "default" => 4,
-	        "min" => 0,
-	        "step" => 1,
-	        "max" => 12,
-	        'display_value' => 'select',
-	    );			
-	}
+	_bootstrap_add_sidebar_options( $fields, $page_name, $section_name, $prefix, $items );
 }
 
 /**

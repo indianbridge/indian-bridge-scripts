@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Include the Plugin Dependency Checker
+ */
+require_once dirname( __FILE__ ) . '/plugin-dependencies.php';
+
+
+/**
+ * Add some utilities for settin up options sections and getting options.
+ */
+require_once dirname( __FILE__ ) . '/utilities.php'; 
+
 /*
  * Require the framework class before doing anything else, so we can use the defined urls and dirs
  * Also if running on windows you may have url problems, which can be fixed by defining the framework url first
@@ -50,25 +61,42 @@ if ( class_exists( 'ReduxFramework' ) ) {
 		endif;
 	}
 	add_action('init', '_bootstrap_redux_init');
+
+	/**
+	* Use font-awesome icons and remove elusive icons.
+	* 
+	* @return nothing
+	*/
+	function _bootstrap_use_font_awesome_in_redux() {
+	    // remove elusive icon from the panel completely
+	    //wp_deregister_style( 'redux-elusive-icon' );
+	    //wp_deregister_style( 'redux-elusive-icon-ie7' );
+
+	    wp_register_style(
+	        'redux-font-awesome',
+	        '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css',
+	        array(),
+	        time(),
+	        'all'
+	    );  
+	    wp_enqueue_style( 'redux-font-awesome' );
+	}
+	// Register the font change actions.
+	add_action( 'redux/page/' . REDUX_OPT_NAME . '/enqueue', '_bootstrap_use_font_awesome_in_redux' );
+
+
+
+	/**
+	 * Add all the sections
+	 * Each folder represents an options module.
+	 * Each folder should include a section.php which defines the options for that module.
+	 */
+	foreach( glob( dirname( __FILE__ ) . '/*/section.php' ) as $module ) {
+		require_once $module;
+	}
+}
+else {
+	// We will probably load defaults here.
 }
 
-/**
- * Include the Plugin Dependency Checker
- */
-require_once dirname( __FILE__ ) . '/plugin-dependencies.php';
-
-
-/**
- * Add some utilities (retrieve option)
- */
-require_once dirname( __FILE__ ) . '/utilities.php'; 
-
-/**
- * Add all the sections
- * Each folder represents an options module.
- * Each folder should include a section.php which defines the options for that module.
- */
-foreach( glob( dirname( __FILE__ ) . '/*/section.php' ) as $module ) {
-	require_once $module;
-}
 ?>
