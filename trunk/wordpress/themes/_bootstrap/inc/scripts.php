@@ -11,22 +11,38 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 	function _bootstrap_scripts() {
 		// Load our main stylesheet. (this should be mostly empty)
 		wp_enqueue_style( '_bootstrap-style', get_stylesheet_uri() );	
+		$page_name = 'style';
+		$section_name = 'skins';
 		
 		// Load the bootstrap style based on options
-		$skin_folder = THEME_DIR . '/css/skins/' . _bootstrap_get_option( '_bootstrap_skin' );
-		$skin_uri = THEME_DIR_URI . '/css/skins/' . _bootstrap_get_option( '_bootstrap_skin' );
-		$stylesheet = $skin_uri . '/bootstrap.min.css';
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_css' ) === 'cdn';
-		if ( $use_cdn ) {
-			// Check if cdn link is provided
-			$cdn_file = $skin_folder . '/cdn.link';
-			if ( is_file( $cdn_file ) ) {
-				$stylesheet = file_get_contents( $cdn_file );
+		$skin = _bootstrap_get_redux_option( $page_name, $section_name, 'skin' );
+		$custom_skin_name = 'Custom_Internal';
+		if ( $skin === $custom_skin_name ) {
+			$stylesheet = _bootstrap_get_redux_option( $page_name, $section_name, 'bootstrap_custom_css_location' );
+		}
+		else {
+			$skin_folder = THEME_DIR . '/css/skins/' . $skin;
+			$skin_uri = THEME_DIR_URI . '/css/skins/' . $skin;
+			$bootstrap_css_location = _bootstrap_get_redux_option( $page_name, $section_name, 'bootstrap_css' );
+			$use_cdn = ( $bootstrap_css_location == 'cdn' );
+			if ( $use_cdn ) {
+				// Check if cdn link is provided
+				$cdn_file = $skin_folder . '/cdn.link';
+				if ( is_file( $cdn_file ) ) {
+					$stylesheet = file_get_contents( $cdn_file );
+				}
+				else {
+					$stylesheet = $skin_uri . '/bootstrap.min.css';
+				}
+			}
+			else {
+				$stylesheet = $skin_uri . '/bootstrap.min.css';
 			}
 		}
 		
 		// Add the selected bootstrap css file
 		wp_enqueue_style( '_bootstrap-css', $stylesheet );
+		
 		// Add the padding to body if static navbar will be used
 		$navbar_style = _bootstrap_get_option( '_bootstrap_header_navbar_style' );
 		if ( $navbar_style === 'fixed' ) {
@@ -43,18 +59,26 @@ if ( ! function_exists( '_bootstrap_scripts' ) ) {
 			}
 		}
 		
-		// Font awesome
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_fa' ) === 'cdn';
-		$fa_css = $use_cdn ? _bootstrap_get_option( 'cdn_fa_location' ) : THEME_DIR_URI . '/css/font-awesome-4.0.3/css/font-awesome.min.css';
-		wp_enqueue_style( '_bootstrap_font_awesome_css', $fa_css );
+		// Enqueue Font awesome is requested
+		$section_name = 'font_awesome_css';
+		$fa_location =  _bootstrap_get_redux_option( $page_name, $section_name, 'font_awesome_css' );
+		if ( $fa_location !== 'no' ) {
+			$use_cdn = ( $fa_location === 'cdn' );
+			$fa_css = $use_cdn ? _bootstrap_get_redux_option( $page_name, $section_name, 'font_awesome_css_cdn_location' ) : THEME_DIR_URI . '/css/font-awesome-4.0.3/css/font-awesome.min.css';
+			wp_enqueue_style( '_bootstrap_font_awesome_css', $fa_css );
+		}
 		
 		// Smartmenus bootstrap addon css
 		wp_enqueue_style( '_bootstrap_smartmenus_addon_css', THEME_DIR_URI . '/css/jquery.smartmenus.bootstrap.css' );
 		
-		// Enqueue bootstrap js.
-		$use_cdn = _bootstrap_get_option( 'local_or_cdn_js' ) === 'cdn';
-		$bootstrap_js = $use_cdn ? _bootstrap_get_option( 'cdn_js_location' ) : THEME_DIR_URI . '/js/bootstrap.min.js';
-		wp_enqueue_script( '_bootstrap_js', $bootstrap_js, array('jquery'), '20140219', true );
+		// Enqueue bootstrap js if requested
+		$section_name = 'bootstrap_js';
+		$bootstrap_js_location = _bootstrap_get_redux_option( $page_name, $section_name, 'bootstrap_js' );
+		if ( $bootstrap_js_location !== 'no' ){
+			$use_cdn = ( $bootstrap_js_location === 'cdn' );
+			$bootstrap_js = $use_cdn ? _bootstrap_get_redux_option( $page_name, $section_name, 'bootstrap_js_cdn_location' ) : THEME_DIR_URI . '/js/bootstrap.min.js';
+			wp_enqueue_script( '_bootstrap_js', $bootstrap_js, array('jquery'), '20140219', true );
+		}
 
 		// Smartmenus js
 		wp_enqueue_script( '_bootstrap_smartmenus_js', THEME_DIR_URI . '/js/jquery.smartmenus.bootstrap.min.js', array('jquery'), '20140219', true );

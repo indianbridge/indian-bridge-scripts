@@ -305,12 +305,12 @@ if ( ! function_exists( '_bootstrap_post_information' ) ) {
 		$section_name = 'meta';
 		$style = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ) );
 		$class = _bootstrap_get_option( _bootstrap_get_option_name( $page_name, $section_name, 'container_class' ) );	
-	 	echo '<i title="' . $information[ 'icon-title' ] . '" class="fa fa-' . $information[ 'icon' ] . '"></i> ';
+		echo _bootstrap_get_font_awesome_icon( $information['icon'], $information['icon-title'] ) . ' ';
 		if ( array_key_exists( 'links', $information ) ) {			
-			echo $information[ 'links' ];						
+			echo $information['links'];						
 		}
 		else {
-			echo '<a href="' . esc_url( $information[ 'url' ] ) . '" title="' . $information[ 'title' ] . '" ';
+			echo '<a href="' . esc_url( $information['url'] ) . '" title="' . $information['title'] . '" ';
 			if ( $style  === 'button' ) {
 				echo 'class="btn btn-xs btn-' . $class . '" ';
 			}
@@ -321,7 +321,7 @@ if ( ! function_exists( '_bootstrap_post_information' ) ) {
 			if ( $style === 'label' ) {
 				echo '<span class="label label-' . $class . '">';
 			}
-			echo esc_html( $information[ 'text' ] );
+			echo esc_html( $information['text'] );
 			if ( $style === 'label' ) {
 				echo '</span>';
 			}	

@@ -6,7 +6,7 @@
  */
 
 	// Get the options
-	if ( ! dynamic_sidebar( 'sidebar-1' ) ) {
+	if ( ! dynamic_sidebar( 'footer-sidebar-2' ) ) {
 		// Set the no widget in sidebar contents
 		get_template_part( 'sidebar', 'none' );
 	} // end sidebar widget area

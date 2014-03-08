@@ -92,19 +92,21 @@ if ( ! function_exists( '_bootstrap_paginate' ) ) {
 		<nav class="navigation paging-navigation" role="navigation">
 			<div class="nav-links">
 				<?php
+					$left = _bootstrap_get_font_awesome_icon( 'chevron-left', '<' );
+					$right = _bootstrap_get_font_awesome_icon( 'chevron-right', '>' );
 					$args_pagination = array(
 				      'base'      => str_replace( 999999999, '%#%', get_pagenum_link( 999999999 ) ),
 				      'format'    => '',
 				      'current'     => max( 1, get_query_var('paged') ),
 				      'total'     => $GLOBALS['wp_query']->max_num_pages,
-				      'prev_text'   => '<i class="fa fa-chevron-left"></i>',
-				      'next_text'   => '<i class="fa fa-chevron-right"></i>',
+				      'prev_text'   => $left,
+				      'next_text'   => $right,
 				      'end_size'    => 3,
 				      'mid_size'    => 3,
 				    );				
 				    $args_paging = array(
-				      'prev_text'   => '<i class="fa fa-chevron-left"></i> Older Entries',
-				      'next_text'   => 'Newer Entries <i class="fa fa-chevron-right"></i>',
+				      'prev_text'   => $left . ' Older Entries',
+				      'next_text'   => 'Newer Entries ' . $right,
 				    );
 					switch ( $style ) {
 						case 'wp_paging' :

@@ -5,8 +5,8 @@
 if ( !function_exists( '_bootstrap_module_sidebar_options' ) ) {
 	function _bootstrap_module_sidebar_options( $sections ) {
 		$fields = array();
-		$page_name = __( 'sidebar', '_bootstrap' );
-		$section_name = __( 'sidebar', '_bootstrap' );
+		$page_name = 'sidebar';
+		$section_name = 'sidebar';
 		$prefix = __( 'Widgets/Sidebars', '_bootstrap' );
 		
 		// Container options
