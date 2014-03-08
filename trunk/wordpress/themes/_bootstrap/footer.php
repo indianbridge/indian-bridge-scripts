@@ -8,7 +8,7 @@
  */
 ?>
 
-<footer id="colophon" class="site-footer" role="contentinfo">
+<footer id="colophon" class="site-footer container" role="contentinfo">
 	
 	<?php
 	// Get laypout options for post lists/archives pages
@@ -56,10 +56,9 @@
 	$section_name = 'copyright_area';
 	$show_copyright_area = _bootstrap_get_redux_option( $page_name, $section_name, 'show' );
 	if ( $show_copyright_area ) {
-		$options = _bootstrap_get_navbar_options( $page_name );
 		?>
 		<div class="site-info row">
-			<nav id="footer-menu" class="navbar navbar-<?php echo $options['navbar_color']; ?> navbar-<?php echo $options['navbar_style']; ?>-bottom">
+			<nav id="footer-menu" class="<?php echo _bootstrap_get_navbar_class( 'bottom', 'header' ); ?>">
 		  		<div class="container">
 		  		<p class="navbar-text navbar-left"><?php echo _bootstrap_get_redux_option( $page_name, $section_name, 'left' ); ?></p>
 		  		<p class="navbar-text navbar-right"><?php echo _bootstrap_get_redux_option( $page_name, $section_name, 'right' ); ?></p>

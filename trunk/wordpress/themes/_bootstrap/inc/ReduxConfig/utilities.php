@@ -1,17 +1,25 @@
 <?php
 /**
- * Utility functions to retrieve option values.
- * If redux is installed it will use the retreived values.
- * If not then a pre-defined set of values will be used (this needs to be implemented).
+ * Convenience functions to setup and retreive Redux Framework option sections. 
  *
- * @package _bootstrap
- */
- 
+ * Defines functions to add repeatedly used option sections as well as
+ * functions to retreive all the values in option sections as an associative array.
+ *
+ * LICENSE: #LICENSE#
+ *
+ * @package    _bootstrap_redux_framework
+ * @author     Sriram Narasimhan
+ * @copyright  #COPYRIGHT#
+ * @version    SVN: $Id$
+ * @since      File available since Release 1.0.0
+ *
+
 /**
-* Build the option name from prefixes. 
+* Construct option name based on page, section and option name. 
+* Uses a constant THEME_NAME which required to be set ( in functions.php ).
 * 
-* @param string $page_name the page in which this option occurs.
-* @param string $section_name the section in which this option occurs.
+* @param string $page_name the page this option belongs to
+* @param string $section_name page section this option belongs to
 * @param string $option_name the actual option name.
 * 
 * @return string full option name
@@ -38,7 +46,7 @@ function _bootstrap_font_awesome_enabled() {
 * @param string $icon_name name of icon
 * @param string $icon_title place holder text
 * 
-* @return html markup to display icon or name.
+* @return string html markup to display icon or name.
 */
 function _bootstrap_get_font_awesome_icon( $icon_name, $icon_title, $class = '' ) {
 	if ( _bootstrap_font_awesome_enabled() ) {
@@ -420,28 +428,42 @@ function _bootstrap_add_area_container_options( &$fields, $page_name, $section_n
 }
 
 /**
-* Add the navbar options to the specified page.
+* Add the Bootstrap navbar option section.
+* Includes style (default vs inverse), alignment (static vs fixed), and padding options when using fixed alignment navbar.
 * 
-* @param array $fields the options fields to be added to the page.
-* @param string $page_name the options page where this navbar should be added.
+* @param array $fields reference to the array of options to which new navbar options will be appended
+* @param array $properties associative array of options used to customize the options
+* 						   example : array ( 
+* 										'page_name' : 'header', 
+* 										'section_name' : 'navbar', 
+* 										'name' : 'Header',
+* 										'js_location' : '/js/navbar.js',
+* 									 )
 * 
-* @return array of options related to navbar.
+* @return void
 */
-function _bootstrap_add_navbar_options( &$fields, $page_name ) {
-	$section_name = 'navbar';
+function _bootstrap_add_navbar_options( &$fields, $properties ) {
+	
+	// Get the variable names
+	extract( $properties );
+	
+	// Use default section name if not specified
+	$section_name = $section_name ?: 'navbar';
+	
 	// The title for this section
+	$title = $name . __( ' Navbar', '_bootstrap' );
 	$fields[] = array( 
 	    'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
 	    'type'     => 'raw',
-	    'content'  => '<h1>' . __( 'Navbar Options', '_bootstrap' ) . '</h1>',
+	    'content'  => '<h1>' . $title . __( ' Options', '_bootstrap' ) . '</h1>',
 	);	
 	
     // Default or Inverse navbar.
  	$fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'color' ),
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'style' ),
         'type'     => 'button_set',
-        'title'    => __( 'Use Default or Inverse Navbar?', '_bootstrap' ),
-        'desc'     => __( 'Choose the styling for navbar.', '_bootstrap' ),
+        'title'    => $title . __( ' Style', '_bootstrap' ),
+        'desc'     => __( 'Choose the Bootstrap style for the ', '_bootstrap' ) . $title . __( '. This will apply bootstrap classes navbar-default or navbar-inverse.', '_bootstrap' ),
         'options'  => array(
             'default'	=> 'Default',
             'inverse'	=> 'Inverse',
@@ -450,11 +472,12 @@ function _bootstrap_add_navbar_options( &$fields, $page_name ) {
     );		    
     
     // Static or Fixed navbar.
+    $alignment_field = _bootstrap_get_option_name( $page_name, $section_name, 'alignment' ); 
  	$fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'style' ),
+        'id'       => $alignment_field,
         'type'     => 'button_set',
-        'title'    => __( 'Use Static or Fixed Navbar?', '_bootstrap' ),
-        'desc'     => __( 'Fixed keeps the navbar on screen as you scroll.', '_bootstrap' ),
+        'title'    => $title . __( 'Alignment', '_bootstrap' ),
+        'desc'     => __( 'Static navbar stays on top of page. Fixed navbar moves and stays on top of screen even as you scroll. Applies class navbar-static and navabar-fixed.', '_bootstrap' ),
         'options'  => array(
             'static'	=> 'Static',
             'fixed'		=> 'Fixed',
@@ -466,7 +489,7 @@ function _bootstrap_add_navbar_options( &$fields, $page_name ) {
  	$fields[] = array(
         'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'padding_style' ),
         'type'     => 'button_set',
-        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'style' ), 'equals', 'fixed' ),
+        'required' => array( $alignment_field, 'equals', 'fixed' ),
         'title'    => __( 'Constant or Dynamic Padding for Fixed Navbar', '_bootstrap' ),
         'desc'     => __( 'Fixed navbar needs some padding at top so that content does overlap under the navbar. Should we use a constant padding (use text field below to specify) or dynamic (javascript code will be used).', '_bootstrap' ),
         'options'  => array(
@@ -476,31 +499,56 @@ function _bootstrap_add_navbar_options( &$fields, $page_name ) {
         'default'  => 'dynamic',
     );	    
     
-    // The javascript file that calculates height of header and sets dynamic padding
-    // This will assume that header has id masthead
+    // The constant padding to use when constant padding is selected above
     $fields[] = array(
         'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'padding_constant' ),
         'type'     => 'text',
-        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'style' ), 'equals', 'fixed' ),
+        'required' => array( $alignment_field, 'equals', 'fixed' ),
         'validate' => 'numeric',
         'title'    => __( 'How much padding to use on top', '_bootstrap' ),
-        'desc'     => __( 'This will add a constant padding on top for body when using Fixed navbar', '_bootstrap' ),
+        'desc'     => __( 'This will add a constant padding on top for body when using Fixed navbar. Used only when Constant Padding is selected above.', '_bootstrap' ),
         'default'  => '60',
-    );		         	    	
+    );		
+    
+    // Location of js file that calculates padding
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'padding_js_location' ),
+        'type'     => 'text',
+        'required' => array( $alignment_field, 'equals', 'fixed' ),
+        'title'    => __( 'Path to Custom Javascript File', '_bootstrap' ),
+        'subtitle' => __( 'Relative to the theme root directory', '_bootstrap' ),
+        'desc'     => __( 'If Dynamic Padding is chose above then the file specified here will loaded to calculate dynamic padding to apply.', '_bootstrap' ),
+        'default'  => $js_location,
+    );             	    	
 }
 
 /**
-* Retrieve the options set for navbar in the give page name.
+* Retrieve the options set for navbar in the given page name.
 * 
-* @param string $page_name the name of the page where the navbar options are.
+* @param string $page_name the name of the page whose options are being retreived
+* @param string $section_name the optional section whose options are being retreived
+* 							  If not specified then the 'navbar' is used as default
 * 
 * @return array of option values.
 */
-function _bootstrap_get_navbar_options( $page_name ) {
-	$section_name = 'navbar';
-	$output['navbar_color'] = _bootstrap_get_redux_option( $page_name, $section_name, 'color');
-	$output['navbar_style'] = _bootstrap_get_redux_option( $page_name, $section_name, 'style');
-	$output['navbar_padding_style'] = _bootstrap_get_redux_option( $page_name, $section_name, 'padding_style');
-	$output['navbar_padding_constant'] = _bootstrap_get_redux_option( $page_name, $section_name, 'padding_constant');
+function _bootstrap_get_navbar_options( $page_name, $section_name = 'navbar' ) {
+	$fields = array( 'style', 'alignment', 'padding_style', 'padding_costant', 'padding_js_location' );
+	foreach( $fields as $field ) {
+		$output[ $field] = _bootstrap_get_redux_option( $page_name, $section_name, $field);
+	}
 	return $output;
+}
+
+/**
+* Determines the Bootstrap class for the navbar based on options set.
+* 
+* @param string $location the location of the navbar (top or bottom)
+* @param string $page_name the page of options where the options are set
+* @param string $section_name the section of the page where the options are set
+* 
+* @return string class to be applied to the navbar
+*/
+function _bootstrap_get_navbar_class ( $location, $page_name, $section_name = 'navbar' ) {
+	$options = _bootstrap_get_navbar_options( $page_name, $section_name );
+	return 'navbar navbar-' . $options['style'] . ' navbar-' . $options['alignment'] . '-top';
 }

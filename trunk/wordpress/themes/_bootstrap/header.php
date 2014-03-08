@@ -30,12 +30,10 @@
 		$container_class = _bootstrap_get_redux_option( $page_name, $section_name, 'width' );
 		$options = _bootstrap_get_container_options( $page_name, $section_name );
 		$container_class .= ' ' . $options['container_class'];		
-		$section_name = 'navbar';
-		$options = _bootstrap_get_navbar_options( $page_name );
 	?>
 		<header id="masthead" class="site-header <?php echo $container_class; ?>" role="banner">
 			<nav role="navigation">
-				<div id="primary-menu" class="navbar navbar-<?php echo $options['navbar_color']; ?> navbar-<?php echo $options['navbar_style']; ?>-top">
+				<div id="primary-menu" class="<?php echo _bootstrap_get_navbar_class( 'top', 'header' ); ?>">
 						<!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
 						<div class="navbar-header">
 							<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-responsive-collapse">

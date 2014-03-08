@@ -71,8 +71,13 @@ function _bootstrap_module_footer_options( $sections ) {
         'default'  => TRUE,
     );	
     
-    	// Navbar Options
-	_bootstrap_add_navbar_options( $fields, $page_name );
+    // Navbar Options
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'name'			=> 'Footer',
+		'js_location'	=> '/js/jquery.bootstrap.fixed.bottom.navbar.js',
+	);     	
+	_bootstrap_add_navbar_options( $fields, $properties );
 	
 	// left
 	$html = '<a href="http://wordpress.org/" rel="generator">' . sprintf( __( 'Proudly powered by %s', '_bootstrap' ), 'WordPress' ). '</a>';
