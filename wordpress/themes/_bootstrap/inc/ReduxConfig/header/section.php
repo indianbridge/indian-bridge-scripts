@@ -14,7 +14,12 @@ function _bootstrap_module_header_options( $sections ) {
 	
 	
 	// Navbar Options
-	_bootstrap_add_navbar_options( $fields, $page_name );
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'name'			=> 'Header',
+		'js_location'	=> '/js/jquery.bootstrap.fixed.top.navbar.js',
+	); 
+	_bootstrap_add_navbar_options( $fields, $properties );
 
 	$section = array(
 		'title' => __( 'Header', '_bootstrap' ),
