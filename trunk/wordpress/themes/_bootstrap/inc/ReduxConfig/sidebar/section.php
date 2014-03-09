@@ -10,7 +10,14 @@ if ( !function_exists( '_bootstrap_module_sidebar_options' ) ) {
 		$prefix = __( 'Content Area Widgets/Sidebars', '_bootstrap' );
 		
 		// Container options
-		_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix );
+		$properties = array (
+			'page_name' 	=> $page_name,
+			'section_name'	=> $section_name,
+			'name'			=> $prefix,
+			'default_container' => 'panel',
+			'include_title' => TRUE,
+		);		
+		_bootstrap_add_container_styling_options( $fields, $properties );
 	    		         	    
 		$section = array(
 			'title' => __( 'Sidebar/Widgets', '_bootstrap' ),

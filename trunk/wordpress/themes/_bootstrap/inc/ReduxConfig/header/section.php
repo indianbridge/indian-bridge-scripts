@@ -10,7 +10,14 @@ function _bootstrap_module_header_options( $sections ) {
 	$page_name = 'header';
 	$section_name = 'container';
 	$prefix = __( 'Header', '_bootstrap' );
-	_bootstrap_add_area_container_options( $fields, $page_name, $section_name, $prefix );
+	
+	// Header Area Container Options
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'name'			=> 'Header',
+		'default_width'	=> 'none',
+	); 
+	_bootstrap_add_area_container_options( $fields, $properties );
 	
 	
 	// Navbar Options
