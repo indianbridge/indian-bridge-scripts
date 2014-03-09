@@ -22,7 +22,14 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 		$prefix = __( 'Content/Excerpt Container', '_bootstrap' );
 		
 		// Container options
-		_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix );    	
+		$properties = array (
+			'page_name' 	=> $page_name,
+			'section_name'	=> $section_name,
+			'name'			=> $prefix,
+			'default_container' => 'panel',
+			'include_title' => TRUE,
+		);		
+		_bootstrap_add_container_styling_options( $fields, $properties );    	
 	    
 	    // Meta information
 	    _bootstrap_archives_add_meta_options( $fields, $page_name );
@@ -113,7 +120,13 @@ function _bootstrap_archives_add_layout_options( &$fields, $page_name ) {
 			);			
 		}
 	}
-	_bootstrap_add_sidebar_options( $fields, $page_name, $section_name, $prefix, $items );
+	$properties = array(
+		'page_name' 	=> $page_name,
+		'section_name'	=> $section_name,
+		'name'			=> $prefix,
+		'items'			=> $items,
+	);
+	_bootstrap_add_sidebar_options( $fields, $properties );
 }
 
 /**

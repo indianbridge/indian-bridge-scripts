@@ -5,32 +5,20 @@
 
 function _bootstrap_module_footer_options( $sections ) {
 	$fields = array();
-	$page_name = 'footer';
-	$section_name = 'widget_area';
 	
-	// Enable widget area
-	// The title for this section
-	$fields[] = array( 
-	    'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
-	    'type'     => 'raw',
-	    'content'  => '<h1>' . __( 'Footer Widget Area Enable', '_bootstrap' ) . '</h1>',
-	);	
-    $show_fi_field = _bootstrap_get_option_name( $page_name, $section_name, 'show' );
-    // Show Widget Area or Not
-	$fields[] = array(
-        'id'       => $show_fi_field,
-        'type'     => 'switch', 
-        'title'    => __( 'Show Widget Area?', '_bootstrap' ),
-        'desc'     => __( 'This controls whether the footer widget area is shown or not', '_bootstrap' ),
-        'on'		=> __( 'Show Widget Area', '_bootstrap' ),
-        'off'		=> __( 'Don\'t Show Widget Area', '_bootstrap' ),
-        'default'  => TRUE,
-    );	
-    
+	$page_name = 'footer';
 	$section_name = 'widget_area_container';
 	$prefix = __( 'Footer Widget', '_bootstrap' );
-	_bootstrap_add_area_container_options( $fields, $page_name, $section_name, $prefix );    
+	// Footer Widget Area Container Options
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'section_name'	=> 'widget_area_container',
+		'name'			=> 'Footer Widget',
+		'default_width'	=> 'container-fluid',
+	); 
+	_bootstrap_add_area_container_options( $fields, $properties );    
 		
+	// Setup the widgets
 	$section_name = 'widgets';
 	$prefix = __( 'Footer Widgets', '_bootstrap' );
 	$number_of_sidebars = 3;
@@ -45,31 +33,33 @@ function _bootstrap_module_footer_options( $sections ) {
 			'width'		=> 4,
 		);			
 	}
-	_bootstrap_add_sidebar_options( $fields, $page_name, $section_name, $prefix, $items );	 
+	$properties = array(
+		'page_name' 	=> $page_name,
+		'section_name'	=> $section_name,
+		'name'			=> $prefix,
+		'items'			=> $items,
+	);	
+	_bootstrap_add_sidebar_options( $fields, $properties );	 
 	
 	// Widget Container
 	$section_name = 'widget_container';
-	_bootstrap_add_container_styling_options( $fields, $page_name, $section_name, $prefix, 'alert' );
-	
-	$section_name = 'copyright_area';
-	// Enable copyright area
-	// The title for this section
-	$fields[] = array( 
-	    'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
-	    'type'     => 'raw',
-	    'content'  => '<h1>' . __( 'Copyright Area Enable', '_bootstrap' ) . '</h1>',
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'section_name'	=> $section_name,
+		'name'			=> $prefix,
+		'default_container' => 'alert',
+		'include_title' => TRUE,
 	);	
-    $show_fi_field = _bootstrap_get_option_name( $page_name, $section_name, 'show' );
-    // Show Copyright Area or Not
-	$fields[] = array(
-        'id'       => $show_fi_field,
-        'type'     => 'switch', 
-        'title'    => __( 'Show Copyright Area?', '_bootstrap' ),
-        'desc'     => __( 'This controls whether the footer copyright area is shown or not', '_bootstrap' ),
-        'on'		=> __( 'Show Copyright Area', '_bootstrap' ),
-        'off'		=> __( 'Don\'t Show Copyright Area', '_bootstrap' ),
-        'default'  => TRUE,
-    );	
+	_bootstrap_add_container_styling_options( $fields, $properties );
+	
+	// Footer Copyright Area Container Options
+	$properties = array (
+		'page_name' 	=> $page_name,
+		'section_name'	=> 'copyright_area_container',
+		'name'			=> 'Footer Copyright',
+		'default_width'	=> 'none',
+	); 
+	_bootstrap_add_area_container_options( $fields, $properties );  		
     
     // Navbar Options
 	$properties = array (
@@ -78,6 +68,8 @@ function _bootstrap_module_footer_options( $sections ) {
 		'js_location'	=> '/js/jquery.bootstrap.fixed.bottom.navbar.js',
 	);     	
 	_bootstrap_add_navbar_options( $fields, $properties );
+	
+	$section_name = 'copyright_area';	
 	
 	// left
 	$html = '<a href="http://wordpress.org/" rel="generator">' . sprintf( __( 'Proudly powered by %s', '_bootstrap' ), 'WordPress' ). '</a>';

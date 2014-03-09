@@ -1,10 +1,18 @@
 <?php
 /**
- * Scripts Enqueuer.
+ * Functions to enqueue all necessary stylesheets and javascript files.
  *
- * Enqueues all css and js files
+ * Defines functions to add repeatedly used option sections as well as
+ * functions to retreive all the values in option sections as an associative array.
  *
- * @package _bootstrap
+ * LICENSE: #LICENSE#
+ *
+ * @package    _bootstrap_core
+ * @author     Sriram Narasimhan
+ * @copyright  #COPYRIGHT#
+ * @version    SVN: $Id$
+ * @since      File available since Release 1.0.0
+ *
  */
 function _bootstrap_scripts() {
 	// Load our main stylesheet. (this should be mostly empty)
@@ -132,12 +140,13 @@ function _bootstrap_navbar_padding( $location, $page_name, $section_name = 'navb
 	if ( $options['alignment'] === 'fixed' ) {
 		if ( $options['padding_style'] === 'constant' ) {
 			// Set a constant padding as set in option
-			$custom_css = 'body {  padding-' . $location . ': ' . $options['navbar_padding_constant'] . 'px; }';
-			wp_add_inline_style( '_bootstrap-' . $location . '_css', $custom_css );
+			$custom_css = 'body {  padding-' . $location . ': ' . $options['padding_constant'] . 'px; }';
+			// wp_add_inline_style has to be added to existing enqueued style
+			wp_add_inline_style( '_bootstrap-css', $custom_css );
 		}
 		else {
 			// Use jquery to compute height of header and set padding accordingly
-			wp_enqueue_script( '_bootstrap_navbar_' . $location . '_js', THEME_DIR_URI . $option['padding_js_location'], array('jquery'), '20140219', true );
+			wp_enqueue_script( '_bootstrap_navbar_' . $location . '_js', THEME_DIR_URI . $options['padding_js_location'], array('jquery'), '20140219', true );
 		}
 	}
 }
