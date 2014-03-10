@@ -24,7 +24,7 @@
 
 <body <?php body_class(); ?>>
 	<div id="page" class="hfeed site"> <!-- This will be closed in footer -->
-		<header id="masthead" class="site-header" role="banner">
-			<?php _bootstrap_show_header_contents(); ?>
-		</header><!-- #masthead -->
+		<header role="banner">
+			<?php get_template_part( 'header', 'navbar' ); ?>	
+		</header>
 		
