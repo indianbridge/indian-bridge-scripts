@@ -465,7 +465,7 @@
 						}
 
 						$thumb = ($src)
-							? .$path
+							? $path
 							: $template_url.'/admin/graphics/blog-thumb-100x100.jpg';
 					?>
 					<img src="<?php echo $thumb ?>" width="100" height="100">
