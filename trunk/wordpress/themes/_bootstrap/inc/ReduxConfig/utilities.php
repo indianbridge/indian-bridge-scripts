@@ -7,7 +7,7 @@
  *
  * LICENSE: #LICENSE#
  *
- * @package    _bootstrap_redux_framework
+ * @package    _bootstrap_redux_config
  * @author     Sriram Narasimhan
  * @copyright  #COPYRIGHT#
  * @version    SVN: $Id$
@@ -618,6 +618,22 @@ function _bootstrap_add_navbar_options( &$fields, $properties ) {
 * Retrieve the options set for navbar in the given page name.
 * 
 * @param string $page_name the name of the page whose options are being retreived
+* @param string $section_name the section whose options are being retreived
+* @param array $fields the names of fields in this option set
+* 
+* @return array of option values.
+*/
+function _bootstrap_get_redux_options( $page_name, $section_name, $fields ) {
+	foreach( $fields as $field ) {
+		$options[ $field] = _bootstrap_get_redux_option( $page_name, $section_name, $field);
+	}
+	return $options;
+}
+
+/**
+* Retrieve the options set for navbar in the given page name.
+* 
+* @param string $page_name the name of the page whose options are being retreived
 * @param string $section_name the optional section whose options are being retreived
 * 							  If not specified then the 'navbar' is used as default
 * 
@@ -625,10 +641,7 @@ function _bootstrap_add_navbar_options( &$fields, $properties ) {
 */
 function _bootstrap_get_navbar_options( $page_name, $section_name = 'navbar' ) {
 	$fields = array( 'style', 'alignment', 'padding_style', 'padding_constant', 'padding_js_location' );
-	foreach( $fields as $field ) {
-		$options[ $field] = _bootstrap_get_redux_option( $page_name, $section_name, $field);
-	}
-	return $options;
+	return _bootstrap_get_redux_options( $page_name, $section_name, $fields );
 }
 
 /**
@@ -645,108 +658,76 @@ function _bootstrap_get_navbar_class ( $location, $page_name, $section_name = 'n
 	return 'navbar navbar-' . $options['style'] . ' navbar-' . $options['alignment'] . '-' . $location;
 }
 
-function _bootstrap_show_footer_widgets() {
-	// Get footer widget area options
-	$page_name = 'footer';
-	$section_name = 'widget_area_container';
-	$options = _bootstrap_get_area_container_options( $page_name, $section_name );
-	if ( $options['show'] ) {
-		?>
-		<div class="<?php echo $options['container_class']; ?>">
-			<?php		
-				// Get footer widget options
-				$section_name = 'widgets';
-				$options = _bootstrap_get_sidebar_options( $page_name, $section_name );
-				if ( $options['total_width'] > 12 ) {
-					?>
-						<div class="alert alert-danger alert-dismissable">
-						<?php if ( _bootstrap_js_enabled() ) { ?>
-							<button type="button" class="close" data-dismiss="alert">&times;</button>
-						<?php } 
-						printf( __( 'Total width of content and sidebar columns (%d) exceeds 12. Content or Sidebar will wrap to the next row.', '_bootstrap' ), $options['total_width'] ); ?>
-						</div>
-					<?php	
-				}
-				foreach( $options['items'] as $key => $value ) {		
-					if ( stristr( $key, 'sidebar') ) {
-						if ($value > 0 && $value < 12 ) {
-						?>
-						<div class="col-sm-<?php echo $value; ?>">
-							<?php get_sidebar( $key ); ?>
-						</div>
-						<?php
-						}
-					}
-				}	
-			?>		
-		</div>	
-	<?php
-	}
+/**
+* Add an options section to select an asset (stylesheet or script) to be enqueued
+* 
+* @param array $fields a reference to fields to append to
+* @param array $properties associative array of options used to customize the options
+* 						   example : array ( 
+										'page_name'		=> 'style', 
+ 										'section_name'	=> 'bootstrap_js', 
+ 										'name'			=> 'Bootstrap JS',
+ 										'default_local' => '',
+ 										'default_cdn'	=> '',
+ 									 )
+* 
+* @return void
+*/
+function _bootstrap_add_asset_location_options( &$fields, $properties ) {
+	extract( $properties );
+	// The header for this section
+	$fields[] = array( 
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'title' ),
+        'type'     => 'raw',
+        'content'  => '<h1>' . $name. __( ' Location', '_bootstrap' ) . '</h1>',
+    );  	    
+	
+    // Select local vs cdn cs no
+    $location_field = _bootstrap_get_option_name( $page_name, $section_name, 'location' );
+ 	$fields[] = array(
+        'id'       => $location_field,
+        'type'     => 'button_set',
+        'title'    => __( 'Location of ', '_bootstrap' ) . $name,
+        'desc'     => __( 'If local or cdn is selected then an additional textbox will appear.', '_bootstrap' ),
+        'options'  => array(
+        	'no'	=> __( 'Don\'t Include %s', '_bootstrap' ) . $name,
+        	'local'	=> __( 'Use Local ', '_bootstrap' ) . $name,
+        	'cdn'	=> __( 'Use CDN Hosted ', '_bootstrap' ) . $name,
+        ),
+        'default'  => 'cdn',
+    );	  
+    
+    // The local location
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'local_location' ),
+        'type'     => 'text',
+        'required' => array( $location_field, 'equals', 'local' ),
+        'title'    => __( 'Path to Local ', '_bootstrap' ) . $name,
+        'desc'     => __( 'This will be used only when local option above is selected. Use $THEME_URI in text to refer to the theme root.', '_bootstrap' ),
+        'default'  => $default_local,
+    );	        
+    
+    // The bootstrap js cdn location
+    $fields[] = array(
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'cdn_location' ),
+        'type'     => 'text',
+        'required' => array( $location_field, 'equals', 'cdn' ),
+        'title'    => __( 'Path to CDN hosted ', '_bootstrap' ) . $name,
+        'desc'     => __( 'This will be used only when CDN option above is selected.', '_bootstrap' ),
+        'default'  => $default_cdn,
+    );		
 }
 
-function _bootstrap_show_copyrights() {
-	// Get options for footer copyright area containter
-	$page_name = 'footer';
-	$section_name = 'copyright_area_container';
-	$options = _bootstrap_get_area_container_options( $page_name, $section_name );
-	$section_name = 'copyright_area';
-	if ( $options['show'] ) {
-	?>
-		<div class="<?php echo $options['container_class']; ?>">
-			<nav id="footer-menu" class="<?php echo _bootstrap_get_navbar_class( 'bottom', 'footer' ); ?>">
-		  		<div class="container">
-			  		<p class="navbar-text navbar-left">
-			  			<?php echo _bootstrap_get_redux_option( $page_name, $section_name, 'left' ); ?>
-			  		</p>
-			  		<p class="navbar-text navbar-right">
-			  			<?php echo _bootstrap_get_redux_option( $page_name, $section_name, 'right' ); ?>
-			  		</p>
-				</div>
-			</nav>
-		</div>
-	<?php 
-	}
+/**
+*  Get options for location of an asset (stylesheet or script)
+* 
+* @param string $page_name the page where the options are set
+* @param string $section_name the section of the page where the options are set
+* 
+* @return array of options for the asset location
+*/
+function _bootstrap_get_asset_location_options( $page_name, $section_name ) {
+	$fields = array( 'location', 'local_location', 'cdn_location' );
+	return _bootstrap_get_redux_options( $page_name, $section_name, $fields );		
 }
 
-function _bootstrap_show_header_contents() {
-	$options = _bootstrap_get_area_container_options( 'header' );
-	if ( $options['show'] ) {
-	?>
-	<nav role="navigation" class="<?php echo $options['container_class']; ?>">
-		<div id="primary-menu" class="<?php echo _bootstrap_get_navbar_class( 'top', 'header' ); ?>">
-				<!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-						<span class="sr-only">
-							Toggle navigation
-						</span>
-						<span class="icon-bar">
-						</span>
-						<span class="icon-bar">
-						</span>
-						<span class="icon-bar">
-						</span>
-					</button>
-					<a class="navbar-brand" href="<?php bloginfo( 'url' ); ?>" title="Home">
-						<?php bloginfo( 'name' ); ?>
-					</a>
-				</div>
-				<div class="navbar-collapse navbar-responsive-collapse navbar-right collapse" style="height: 1px;">
-					<?php
-					wp_nav_menu( array(
-						'menu'           => 'primary',
-						'theme_location' => 'primary',
-						'depth'          => 0,
-						'container'      => 'div',
-						'container_class'=> 'collapse navbar-collapse navbar-ex1-collapse',
-						'menu_class'     => 'nav navbar-nav pull-right',
-						'fallback_cb'=> 'wp_list_pages_bootstrap_navwalker::fallback',
-						'walker'         => new wp_bootstrap_navwalker('NO_CARET'),)
-					);
-					?>
-				</div>
-		</div>
-	</nav>	
-	<?php
-	}
-}
