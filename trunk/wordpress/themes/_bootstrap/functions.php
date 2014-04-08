@@ -146,6 +146,11 @@ require THEME_DIR . '/inc/customizer.php';
 require THEME_DIR . '/inc/jetpack.php';
 
 /**
+ * Load Custom Comment function
+ */
+require THEME_DIR . '/inc/custom-comment.php';
+
+/**
  * Bootrap walker for menu
  */
 require THEME_DIR . '/inc/bootstrap-wp-navwalker.php';

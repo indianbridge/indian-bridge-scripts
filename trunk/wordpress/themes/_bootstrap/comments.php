@@ -17,54 +17,51 @@
 if ( post_password_required() ) {
 	return;
 }
+$page_name = 'comments';
+$options = _bootstrap_get_area_container_options( $page_name );
+if ( $options['show'] ) {
 ?>
+	<section id="comments" class="comments-area <?php echo $options['container_class']; ?>">
+		<?php if ( have_comments() ) { ?>
+			<<?php echo $options['title_tag']; ?> class="comments-title <?php echo $options['title_class']; ?>" >
+				<?php
+					printf( _nx( 'One comment on &ldquo;%2$s&rdquo;', '%1$s comments on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', '_bootstrap' ),
+						number_format_i18n( get_comments_number() ), '<span>' . get_the_title() . '</span>' );
+				?>
+			</<?php echo $options['title_tag']; ?>>
 
-<div id="comments" class="comments-area">
-
-	<?php // You can start editing here -- including this comment! ?>
-
-	<?php if ( have_comments() ) : ?>
-		<h2 class="comments-title">
-			<?php
-				printf( _nx( 'One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', '_bootstrap' ),
-					number_format_i18n( get_comments_number() ), '<span>' . get_the_title() . '</span>' );
+			<?php 
+			if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through
+				_bootstrap_paginate_comments();
+			endif; // check for comment navigation 
 			?>
-		</h2>
-
-		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
-		<nav id="comment-nav-above" class="comment-navigation" role="navigation">
-			<h1 class="screen-reader-text"><?php _e( 'Comment navigation', '_bootstrap' ); ?></h1>
-			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', '_bootstrap' ) ); ?></div>
-			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', '_bootstrap' ) ); ?></div>
-		</nav><!-- #comment-nav-above -->
-		<?php endif; // check for comment navigation ?>
-
-		<ol class="comment-list">
-			<?php
-				wp_list_comments( array(
-					'style'      => 'ol',
-					'short_ping' => true,
-				) );
+			<div>
+			<ul class="media-list">
+				<?php
+					wp_list_comments( array(
+						'style'      => 'ul',
+						'short_ping' => true,
+						'callback' => 'bootstrap_comment',
+					) );
+				?>
+			</ul><!-- .comment-list -->
+			</div>
+			<?php 
+			if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through
+				_bootstrap_paginate_comments();
+			endif; // check for comment navigation 
 			?>
-		</ol><!-- .comment-list -->
 
-		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
-		<nav id="comment-nav-below" class="comment-navigation" role="navigation">
-			<h1 class="screen-reader-text"><?php _e( 'Comment navigation', '_bootstrap' ); ?></h1>
-			<div class="nav-previous"><?php previous_comments_link( __( '&larr; Older Comments', '_bootstrap' ) ); ?></div>
-			<div class="nav-next"><?php next_comments_link( __( 'Newer Comments &rarr;', '_bootstrap' ) ); ?></div>
-		</nav><!-- #comment-nav-below -->
-		<?php endif; // check for comment navigation ?>
+		<?php } // have_comments() ?>
 
-	<?php endif; // have_comments() ?>
+		<?php
+			// If comments are closed and there are comments, let's leave a little note, shall we?
+			if ( ! comments_open() && '0' != get_comments_number() && post_type_supports( get_post_type(), 'comments' ) ) {
+		?>
+			<p class="no-comments"><?php _e( 'Comments are closed.', '_bootstrap' ); ?></p>
+		<?php } ?>
 
-	<?php
-		// If comments are closed and there are comments, let's leave a little note, shall we?
-		if ( ! comments_open() && '0' != get_comments_number() && post_type_supports( get_post_type(), 'comments' ) ) :
-	?>
-		<p class="no-comments"><?php _e( 'Comments are closed.', '_bootstrap' ); ?></p>
-	<?php endif; ?>
+		<?php comment_form(); ?>
 
-	<?php comment_form(); ?>
-
-</div><!-- #comments -->
+	</section>
+<?php } ?>
