@@ -142,6 +142,10 @@ function _bootstrap_add_container_styling_options( &$fields, $properties ) {
 	
 	extract( $properties );
 	
+	if ( ! isset( $section_name ) ) {
+		$section_name = 'container';
+	}	
+	
 	if ( ! isset( $default_container ) ) {
 		$default_container = 'none';
 	}
@@ -198,7 +202,6 @@ function _bootstrap_add_container_styling_options( &$fields, $properties ) {
         'title'    => $name . __( ' Container Style', '_bootstrap' ),
         'desc'     => sprintf( __('How should the %s Container be styled', '_bootstrap' ), $name ),
         'options'  => array(
-            'plain' 	=> 'Plain Text',
             'panel' 	=> 'Bootstrap Panel',
             'well' 		=> 'Bootstrap Well',
             'alert'		=> 'Bootstrap Alert',
@@ -243,13 +246,12 @@ function _bootstrap_add_container_styling_options( &$fields, $properties ) {
         'default'  => 'info',      
     );
     
-    // What class to apply to the  text when plain text or well is used.
+    // What class to apply to the  text of the container
  	$fields[] = array(
-        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'class_text' ),
+        'id'       => _bootstrap_get_option_name( $page_name, $section_name, 'text' ),
         'type'     => 'button_set',
-        'title'    => __( 'Text Class for Well or Plain Text option', '_bootstrap' ),
-        'desc'     => __( 'What class should be applied to the text when Well or Plain Text is used.', '_bootstrap' ),
-        'required' => array( _bootstrap_get_option_name( $page_name, $section_name, 'container_style' ), 'equals', array( 'well', 'plain' ) ),       
+        'title'    => __( 'Text Class for the container', '_bootstrap' ),
+        'desc'     => __( 'What class should be applied to the text.', '_bootstrap' ),      
         'options'  => array(
             'muted' 	=> 'Muted',
             'primary' 	=> 'Primary',
@@ -259,7 +261,7 @@ function _bootstrap_add_container_styling_options( &$fields, $properties ) {
             'danger' 	=> 'Danger',
             'none'		=> 'None',
         ),
-        'default'  => 'primary',      
+        'default'  => 'none',      
     );	    		         	    	
 }
 
@@ -272,7 +274,7 @@ function _bootstrap_add_container_styling_options( &$fields, $properties ) {
 * 
 * @return associative array of classes for styling content
 */
-function _bootstrap_get_container_options( $page_name, $section_name ) {
+function _bootstrap_get_container_options( $page_name, $section_name = 'container' ) {
 	
 	// The style to be applied to title.
 	$output['title_tag'] = _bootstrap_get_redux_option( $page_name, $section_name, 'title_style' );
@@ -303,7 +305,7 @@ function _bootstrap_get_container_options( $page_name, $section_name ) {
 		default :
 			break;
 	}
-
+	
 	// Classes for article sections that will conditionalized based on type of container being used.
 	$output['container_class'] = '';
 	$output['header_class'] = '';
@@ -330,16 +332,17 @@ function _bootstrap_get_container_options( $page_name, $section_name ) {
 			
 		// Bootstrap well and text is assigned class
 		case 'well' :
-			$output['container_class'] = 'well text-' . $class;
+			$output['container_class'] = 'well';
 			break;
 		
 		// No container but text is assigned class
 		case 'plain' :
-			$output['container_class'] = 'text-' . $class;
-			break;
 		default :
 			break;
-	}		
+	}	
+	$text = _bootstrap_get_redux_option( $page_name, $section_name, 'text' );
+	$output['container_class'] .= $text !== 'none' ? ' text-'.$text : '';
+		
 	return $output;	
 }
 
@@ -481,7 +484,7 @@ function _bootstrap_add_area_container_options( &$fields, $properties ) {
 	);	
 	
 	$properties['section_name'] = $section_name;
-	$properties['include_title'] = FALSE;
+	$properties['include_title'] = isset( $include_title ) ? $include_title : FALSE;
 	$properties['default_container'] = 'none';
 	
 	// Container options
@@ -690,7 +693,7 @@ function _bootstrap_add_asset_location_options( &$fields, $properties ) {
         'title'    => __( 'Location of ', '_bootstrap' ) . $name,
         'desc'     => __( 'If local or cdn is selected then an additional textbox will appear.', '_bootstrap' ),
         'options'  => array(
-        	'no'	=> __( 'Don\'t Include %s', '_bootstrap' ) . $name,
+        	'no'	=> __( 'Don\'t Include ', '_bootstrap' ) . $name,
         	'local'	=> __( 'Use Local ', '_bootstrap' ) . $name,
         	'cdn'	=> __( 'Use CDN Hosted ', '_bootstrap' ) . $name,
         ),

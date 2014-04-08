@@ -25,6 +25,6 @@
 <body <?php body_class(); ?>>
 	<div id="page" class="hfeed site"> <!-- This will be closed in footer -->
 		<header role="banner">
-			<?php get_template_part( 'header', 'navbar' ); ?>	
+			<?php get_template_part( 'header', 'navbar' ); ?>
 		</header>
 		

@@ -62,9 +62,7 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 	            'bootstrap_pagination' 	=> 'Bootstrap Pagination',
 	        ), 
 	        'default'  => 'bootstrap_pagination',      
-	    );		
-	    //echo json_encode($fields);         	    	           	    
-	           	    
+	    );		  	    	           	       
 
 		$section = array(
 			'title' => __( 'Post Lists/Archives Page', '_bootstrap' ),
