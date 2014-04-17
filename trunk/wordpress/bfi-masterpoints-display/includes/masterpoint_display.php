@@ -170,6 +170,7 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 				 	});
 				</script>
 				</p>
+				<div class="note-alert br3 note-padd mb1e"><strong>From now on In the search box you have to type something and press enter for the search to proceed.</strong></div>
 			<?php			
 		}
 				
