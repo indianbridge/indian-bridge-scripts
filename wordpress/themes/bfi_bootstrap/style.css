@@ -1,0 +1,27 @@
+/*
+Theme Name: bfi_bootstrap
+Theme URI: http://underscores.me/
+Author: Sriram Narasimhan
+Author URI: http://bfi.net.in
+Description: Theme to be used on Bridge Federation of India site
+Version: 1.0-wpcom
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: bfi_bootstrap
+Domain Path: /languages/
+Tags:
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+
+ bfi_bootstrap is based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
+ */
+
+/*
+ * This theme will be using bootstrap css.
+ * Any minor tweaks may be added here.
+ */
+ 
+ /* Tweak to justify entries in navbar */
+.navbar-nav.nav-justified > li { float:none; } 
+.form-submit{display: none;}
