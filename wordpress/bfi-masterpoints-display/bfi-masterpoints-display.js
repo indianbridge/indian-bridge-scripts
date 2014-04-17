@@ -81,4 +81,10 @@ function bfi_masterpoint_renderTable_dataTables(tableType) {
 		},
 		"sAjaxSource" : server_side_url
 	});
+	jQuery( tableID+'_filter input').unbind();
+	jQuery( tableID+'_filter input').bind('keyup', function(e) {
+		if(e.keyCode == 13) {
+			myTable.fnFilter(this.value);
+		}
+	});
 }
