@@ -8,10 +8,23 @@ function bfi_bootstrap_scripts() {
 	wp_enqueue_style( 'bfi_bootstrap-style', get_stylesheet_uri() );	
 	
 	// Enqueue the bootstrap css
-	$bootstrap_css = 'http://netdna.bootstrapcdn.com/bootswatch/3.1.1/lumen/bootstrap.min.css';
-	//$bootstrap_css = 'http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css';
-	//$bootstrap_css = THEME_DIR_URI . '/css/skins/Default/bootstrap.min.css';
-	wp_enqueue_style( 'bfi_bootstrap-css-core', $bootstrap_css );	
+	$skin = bfi_bootstrap_get_redux_option( 'bootswatch' );
+	if ( ! isset( $skin ) ) {
+		$stylesheet = 'http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css';
+	}
+	else {
+		// Get the appropriate path depending on whether local or cdn option is specified
+		$skin_folder = THEME_DIR . '/css/skins/' . $skin;
+		$skin_uri = THEME_DIR_URI . '/css/skins/' . $skin;
+		$cdn_file = $skin_folder . '/cdn.link';
+		if ( is_file( $cdn_file ) ) {
+			$stylesheet = file_get_contents( $cdn_file );
+		}
+		else {
+			$stylesheet = $skin_uri . '/bootstrap.min.css';
+		}
+	}
+	wp_enqueue_style( 'bfi_bootstrap-css-core', $stylesheet );	
 	
 	// Enqueue bootstrap js
 	$bootstrap_js = 'http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js';
@@ -24,7 +37,10 @@ function bfi_bootstrap_scripts() {
 	
 	
 	// Add the padding to body top for fixed navbar
-	wp_enqueue_script( 'bfi_bootstrap-js-padding-top', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.top.navbar.js', array('jquery'), '20140219', true );
+	$header_alignment = bfi_bootstrap_get_redux_option( 'header-alignment' );
+	if ( $header_alignment === 'fixed' ) {
+		wp_enqueue_script( 'bfi_bootstrap-js-padding-top', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.top.navbar.js', array('jquery'), '20140219', true );
+	}
 	
 	
 	// Smartmenus bootstrap addon css

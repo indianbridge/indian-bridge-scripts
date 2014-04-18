@@ -32,6 +32,12 @@ if ( ! defined( 'THEME_DIR_URI' ) ) {
 	define( 'THEME_DIR_URI', get_template_directory_uri() );
 }
 
+/**
+ * Load all Redux Admin Options
+ * Include before everthing else because these options might be needed.
+ */
+require THEME_DIR . '/inc/ReduxConfig/config.php';
+
 if ( ! function_exists( 'bfi_bootstrap_setup' ) ) :
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -103,7 +109,7 @@ function bfi_bootstrap_widgets_init() {
 		'before_widget' => '<aside id="%1$s" class="panel panel-primary widget %2$s">',
 		'after_widget'  => '</section></aside>',
 		'before_title'  => '<header class="panel-heading"><h3 class="panel-title widget-title">',
-		'after_title'   => '</h1></header><section class="panel-body">',
+		'after_title'   => '</h3></header><section class="panel-body">',
 	) );
 }
 add_action( 'widgets_init', 'bfi_bootstrap_widgets_init' );
