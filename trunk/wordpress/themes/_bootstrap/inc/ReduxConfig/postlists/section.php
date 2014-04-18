@@ -7,6 +7,14 @@ if ( !function_exists( '_bootstrap_module_post_lists_options' ) ) {
 		$page_name = 'archives';
 		$fields = array();
 		
+		// Archives Area Container Options
+		$properties = array (
+			'page_name' 	=> $page_name,
+			'name'			=> 'Archives Content',
+			'default_width'	=> 'container-fluid',
+		); 
+		_bootstrap_add_area_container_options( $fields, $properties );		
+		
 		// Layout Options
 		_bootstrap_archives_add_layout_options( $fields, $page_name );
 		
