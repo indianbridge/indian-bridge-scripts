@@ -24,7 +24,13 @@
 <div id="page" class="hfeed site">
 
 	<header id="header" class="site-header" role="banner">	
-		<nav id="header-navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<?php
+		$header_style = bfi_bootstrap_get_redux_option( 'header-style' );
+		$header_alignment = bfi_bootstrap_get_redux_option( 'header-alignment' );
+		$header_image = bfi_bootstrap_get_redux_option( 'header-image' );
+		$header_image = $header_image[ 'url' ];
+	?>
+		<nav id="header-navbar" class="navbar navbar-<?php echo $header_style; ?> navbar-<?php echo $header_alignment; ?>-top" role="navigation">
 			
 		   <div class="navbar-header">
 		      <button type="button" class="navbar-toggle" data-toggle="collapse" 
@@ -34,7 +40,9 @@
 		         <span class="icon-bar"></span>
 		         <span class="icon-bar"></span>
 		      </button>
-		      <a href="<?php echo esc_url( home_url( '/' ) ); ?>"><img align="middle" class="pull-left" height="50" src=" <?php echo THEME_DIR_URI . '/bfi_logo.png'; ?> "></img></a>
+		      <?php if ( $header_image ) { ?>
+		      <a href="<?php echo esc_url( home_url( '/' ) ); ?>"><img align="middle" class="pull-left" height="50" src=" <?php echo $header_image; ?> "></img></a>
+		      <?php } ?>
 		      <a class="navbar-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">Bridge Federation of India</a>
 		   </div>
 		   <div class="navbar-responsive-collapse navbar-collapse" id="example-navbar-collapse">

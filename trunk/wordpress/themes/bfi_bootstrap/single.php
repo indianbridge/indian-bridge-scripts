@@ -5,7 +5,10 @@
  * @package bfi_bootstrap
  */
 
-get_header(); ?>
+get_header(); 
+$container_class = bfi_bootstrap_get_container_options( 'content' );
+
+?>
 <div class="col-sm-8">
 	<div id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
@@ -13,7 +16,7 @@ get_header(); ?>
 		<?php while ( have_posts() ) : the_post(); ?>
 
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-				<div class="well1">
+				<div class="<?php echo $container_class; ?>">
 					<div class="panel-heading">		
 						<span class="panel-title"><?php the_title(); ?></span> <?php edit_post_link( 'Edit this Page', '(', ')' ); ?>
 					</div>
