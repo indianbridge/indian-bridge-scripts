@@ -10,7 +10,10 @@
  * @package _bootstrap
  */
 
-get_header(); ?>
+get_header(); 
+$options = _bootstrap_get_area_container_options( 'header' );
+if ( $options['show'] ) {
+?>
 
 </div><!-- #content .container -->
 
@@ -33,4 +36,6 @@ get_header(); ?>
 		</main><!-- #main -->
 	</div><!-- #primary -->
 
-<?php get_footer(); ?>
+<?php 
+}
+get_footer(); ?>
