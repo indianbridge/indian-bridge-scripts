@@ -4,7 +4,6 @@
  *
  * @package bfi_bootstrap
  */
- 
  $container_class = bfi_bootstrap_get_container_options( 'content' );
 ?>
 

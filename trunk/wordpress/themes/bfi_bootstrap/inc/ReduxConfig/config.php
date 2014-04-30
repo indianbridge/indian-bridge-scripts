@@ -33,17 +33,17 @@ if ( class_exists( 'ReduxFramework' ) ) {
 	
 		$args['help_tabs'][] = array(
 			'id'      => 'redux-options-1',
-			'title'   => __( 'Theme Information 1', '_bootstrap' ),
-			'content' => __('<p>This is the tab content, HTML is allowed.</p>', '_bootstrap' )
+			'title'   => __( 'Theme Information 1', 'bfi_bootstrap' ),
+			'content' => __('<p>This is the tab content, HTML is allowed.</p>', 'bfi_bootstrap' )
 		);
 		$args['help_tabs'][] = array(
 			'id'      => 'redux-options-2',
-			'title'   => __( 'Theme Information 2', '_bootstrap' ),
-			'content' => __( '<p>This is the tab content, HTML is allowed. Tab2</p>', '_bootstrap' )
+			'title'   => __( 'Theme Information 2', 'bfi_bootstrap' ),
+			'content' => __( '<p>This is the tab content, HTML is allowed. Tab2</p>', 'bfi_bootstrap' )
 		);
 	
 		//Set the Help Sidebar for the options page - no sidebar by default                   
-		$args['help_sidebar'] = __( '<p>This is the sidebar content, HTML is allowed.</p>', '_bootstrap' );
+		$args['help_sidebar'] = __( '<p>This is the sidebar content, HTML is allowed.</p>', 'bfi_bootstrap' );
 	
 		$sections = array();
 		$sections = apply_filters( '_bootstrap_add_sections', $sections );
@@ -59,6 +59,10 @@ if ( class_exists( 'ReduxFramework' ) ) {
 	require_once dirname( __FILE__ ) . '/main-section.php';
 	require_once dirname( __FILE__ ) . '/header-section.php';
 	require_once dirname( __FILE__ ) . '/content-section.php';
+	require_once dirname( __FILE__ ) . '/sidebar-section.php';
+	require_once dirname( __FILE__ ) . '/comments-section.php';
+	require_once dirname( __FILE__ ) . '/footer-section.php';
+	
 }
 else {
 	// We will probably load defaults here.
@@ -101,13 +105,23 @@ function bfi_bootstrap_get_local_skin_list( ) {
 	
 }
 
-function bfi_bootstrap_get_container_config( &$fields, $area_name ) {
+function bfi_bootstrap_get_container_config( &$fields, $page_name, $title ) {
+	$section_name = 'container';
+	
+	$option_name = 'title';
+	$fields[] = array( 
+	    'id'       =>  bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name ),
+	    'type'     => 'raw',
+	    'content'  => '<h1>' . $title . __( ' Container Options', 'bfi_bootstrap' ) . '</h1>',
+	);		  
     // The container style
+    $option_name = 'style';
+    $field_name = bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name );
  	$fields[] = array(
-        'id'       => $area_name . '-container-style',
+        'id'       => $field_name,
         'type'     => 'button_set',
-        'title'    => $area_name . ' Container Style',
-        'desc'     => 'How should the '. $area_name . ' Container be styled',
+        'title'    => $title . __( ' Container Style', 'bfi_bootstrap' ),
+        'desc'     => __( 'How should the ', 'bfi_bootstrap' ). $area_name . __( ' Container be styled', 'bfi_bootstrap' ),
         'options'  => array(
             'panel' 	=> 'Bootstrap Panel',
             'well' 		=> 'Bootstrap Well',
@@ -118,12 +132,13 @@ function bfi_bootstrap_get_container_config( &$fields, $area_name ) {
     );	
         	   
     // What class to apply to the container when panel is used.
+    $option_name = 'panel-style';
  	$fields[] = array(
-        'id'       => $area_name . '-container-panel-style',
+        'id'       => bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name ),
         'type'     => 'button_set',
-        'title'    => $area_name . ' Container Bootstrap Panel Class',
-        'desc'     => 'What class should be applied to the Panel.',
-        'required' => array( $area_name . '-container-style', 'equals', 'panel' ),
+        'title'    => $title . __( ' Container Bootstrap Panel Class', 'bfi_bootstrap' ),
+        'desc'     => __( 'What class should be applied to the Panel.', 'bfi_bootstrap' ),
+        'required' => array( $field_name, 'equals', 'panel' ),
         'options'  => array(
             'default' 	=> 'Default',
             'primary' 	=> 'Primary',
@@ -137,12 +152,13 @@ function bfi_bootstrap_get_container_config( &$fields, $area_name ) {
     );	 
     
     // What class to apply to the container when alert is used.
+    $option_name = 'alert-style';
  	$fields[] = array(
-        'id'       => $area_name . '-container-alert-style',
+        'id'       => bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name ),
         'type'     => 'button_set',
-        'title'    => $area_name . ' Container Bootstrap Alert Class',
-        'desc'     => 'What class should be applied to the Alert.',
-        'required' => array( $area_name . '-container-style', 'equals', 'alert' ),       
+        'title'    => $title . __( ' Container Bootstrap Alert Class', 'bfi_bootstrap' ),
+        'desc'     => __( 'What class should be applied to the Alert.', 'bfi_bootstrap' ),
+        'required' => array( $field_name, 'equals', 'alert' ),       
         'options'  => array(
             'success' 	=> 'Success',
             'info' 		=> 'Info',
@@ -154,11 +170,12 @@ function bfi_bootstrap_get_container_config( &$fields, $area_name ) {
     );
     
     // What class to apply to the  text of the container
+    $option_name = 'text-style';
  	$fields[] = array(
-        'id'       => $area_name . '-container-text-style',
+        'id'       => bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name ),
         'type'     => 'button_set',
-        'title'    => 'Text Class for the ' . $area_name . ' Container',
-        'desc'     => 'What class should be applied to the text.',      
+        'title'    => __( 'Text Class for the ', 'bfi_bootstrap' ) . $title . __( ' Container', 'bfi_bootstrap' ),
+        'desc'     => __( 'What class should be applied to the text.', 'bfi_bootstrap' ),      
         'options'  => array(
             'muted' 	=> 'Muted',
             'primary' 	=> 'Primary',
@@ -172,26 +189,49 @@ function bfi_bootstrap_get_container_config( &$fields, $area_name ) {
     );	  	
 }
 
-function bfi_bootstrap_get_container_options( $prefix ) {
-	 $container_style = bfi_bootstrap_get_redux_option( $prefix . '-container-style' );
-	 $panel_style = bfi_bootstrap_get_redux_option( $prefix . '-container-panel-style' );
-	 $alert_style = bfi_bootstrap_get_redux_option( $prefix . '-container-alert-style' );
-	 $text_style = bfi_bootstrap_get_redux_option( $prefix . '-container-text-style' );
-	 $container_class = '';
-	 if ( $container_style === 'panel' ) {
-	 	$container_class = 'panel panel-' . $panel_style;
-	 }
-	 else if ( $container_style === 'alert' ) {
-	 	$container_class = 'alert alert-' . $alert_style;
-	 }
-	 else if ( $container_style === 'well' ) {
-	 	$container_class = 'well';
-	 }
-	 $container_class .= ' text-' . $text_style;
-	 return $container_class;	
+function bfi_bootstrap_get_container_options( $page_name ) {
+	$section_name = 'container';
+	$container_style = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'style' );
+	$panel_style = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'panel-style' );
+	$alert_style = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'alert-style' );
+	$text_style = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'text-style' );
+	$container_class = '';
+	if ( $container_style === 'panel' ) {
+	$container_class = 'panel panel-' . $panel_style;
+	}
+	else if ( $container_style === 'alert' ) {
+	$container_class = 'alert alert-' . $alert_style;
+	}
+	else if ( $container_style === 'well' ) {
+	$container_class = 'well';
+	}
+	$container_class .= ' text-' . $text_style;
+	return $container_class;	
 }
 
-function bfi_bootstrap_get_redux_option( $name, $key = false ) {
+function bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name ) {
+	return THEME_NAME . '_' . $page_name . '_' . $section_name . '_' . $option_name;
+}
+
+function bfi_bootstrap_get_redux_option( $page_name, $section_name, $option_name, $key = false ) {
+	global $redux;
+	$options = $redux;
+	
+	$name = bfi_bootstrap_get_option_name( $page_name, $section_name, $option_name );
+	// Set this to your preferred default value
+	$var = '';
+
+	if ( empty( $name ) && !empty( $options ) ) {
+		$var = $options;
+	} else {
+		if ( !empty( $options[$name] ) ) {
+			$var = ( !empty( $key ) && !empty( $options[$name][$key] ) && $key !== true ) ? $options[$name][$key] : $var = $options[$name];;
+		}
+	}
+	return $var;
+}
+
+/*function bfi_bootstrap_get_redux_option( $name, $key = false ) {
 	global $redux;
 	$options = $redux;
 	if ( ! isset( $options ) ) return NULL;
@@ -206,6 +246,6 @@ function bfi_bootstrap_get_redux_option( $name, $key = false ) {
 		}
 	}
 	return $var;
-}
+}*/
 
 ?>

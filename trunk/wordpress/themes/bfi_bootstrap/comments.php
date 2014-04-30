@@ -16,20 +16,22 @@
 if ( post_password_required() ) {
 	return;
 }
+$page_name = 'comments';
+$container_class = bfi_bootstrap_get_container_options( $page_name );
 ?>
 
-<div id="comments" class="well comments-area">
+<div id="comments" class="<?php echo $container_class; ?> comments-area">
 
 	<?php // You can start editing here -- including this comment! ?>
 
 	<?php if ( have_comments() ) : ?>
-		<h2 class="comments-title">
+		<div class="panel-heading comments-title">
 			<?php
 				printf( _nx( 'One comment on &ldquo;%2$s&rdquo;', '%1$s comments on &ldquo;%2$s&rdquo;', get_comments_number(), 'comments title', 'bfi_bootstrap' ),
 					number_format_i18n( get_comments_number() ), '<span>' . get_the_title() . '</span>' );
 			?>
-		</h2>
-
+		</div>
+<div class="panel-body">
 		<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
 		<?php _bootstrap_comments_paging_nav(); ?>
 		<?php endif; // check for comment navigation ?>
@@ -57,5 +59,5 @@ if ( post_password_required() ) {
 	<?php endif; ?>
 
 	<?php comment_form( array('comment_notes_after' => '') ); ?>
-
+</Div>
 </div><!-- #comments -->

@@ -97,23 +97,9 @@ add_action( 'after_setup_theme', 'bfi_bootstrap_setup' );
 add_filter('show_admin_bar', '__return_false');
 
 /**
- * Register widget area.
- *
- * @link http://codex.wordpress.org/Function_Reference/register_sidebar
+ * Register Widgets/Sidebars.
  */
-function bfi_bootstrap_widgets_init() {
-	register_sidebar( array(
-		'name'          => __( 'Sidebar', 'bfi_bootstrap' ),
-		'id'            => 'sidebar-1',
-		'description'   => '',
-		'before_widget' => '<aside id="%1$s" class="panel panel-primary widget %2$s">',
-		'after_widget'  => '</section></aside>',
-		'before_title'  => '<header class="panel-heading"><h3 class="panel-title widget-title">',
-		'after_title'   => '</h3></header><section class="panel-body">',
-	) );
-}
-add_action( 'widgets_init', 'bfi_bootstrap_widgets_init' );
-
+require THEME_DIR . '/inc/widgets.php';
 
 /**
  * Enqueue all the necessary css and js files.

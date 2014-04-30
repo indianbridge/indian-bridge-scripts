@@ -36,7 +36,7 @@ function _bootstrap_required_plugins() {
 	 */
 
 	$config = array(
-		'domain'           => '_bootstrap',
+		'domain'           => 'bfi_bootstrap',
 		'default_path'     => '',
 		'parent_menu_slug' => 'themes.php',
 		'parent_url_slug'  => 'themes.php',
@@ -45,10 +45,10 @@ function _bootstrap_required_plugins() {
 		'is_automatic'     => true,
 		'message'          => '',
 		'strings'          => array(
-			'page_title'                      => __( 'Install Required Plugins', '_bootstrap' ),
-			'menu_title'                      => __( 'Install Plugins', '_bootstrap' ),
-			'installing'                      => __( 'Installing Plugin: %s', '_bootstrap' ),
-			'oops'                            => __( 'Something went wrong with the plugin API.', '_bootstrap' ),
+			'page_title'                      => __( 'Install Required Plugins', 'bfi_bootstrap' ),
+			'menu_title'                      => __( 'Install Plugins', 'bfi_bootstrap' ),
+			'installing'                      => __( 'Installing Plugin: %s', 'bfi_bootstrap' ),
+			'oops'                            => __( 'Something went wrong with the plugin API.', 'bfi_bootstrap' ),
 			'notice_can_install_required'     => _n_noop( 'This theme requires the following plugin: %1$s.', 'This theme requires the following plugins: %1$s.' ),
 			'notice_can_install_recommended'  => _n_noop( 'This theme recommends the following plugin: %1$s.', 'This theme recommends the following plugins: %1$s.' ),
 			'notice_cannot_install'           => _n_noop( 'Sorry, but you do not have the correct permissions to install the %s plugin. Contact the administrator of this site for help on getting the plugin installed.', 'Sorry, but you do not have the correct permissions to install the %s plugins. Contact the administrator of this site for help on getting the plugins installed.' ),
@@ -59,9 +59,9 @@ function _bootstrap_required_plugins() {
 			'notice_cannot_update'            => _n_noop( 'Sorry, but you do not have the correct permissions to update the %s plugin. Contact the administrator of this site for help on getting the plugin updated.', 'Sorry, but you do not have the correct permissions to update the %s plugins. Contact the administrator of this site for help on getting the plugins updated.' ),
 			'install_link'                    => _n_noop( 'Begin installing plugin', 'Begin installing plugins' ),
 			'activate_link'                   => _n_noop( 'Activate installed plugin', 'Activate installed plugins' ),
-			'return'                          => __( 'Return to Required Plugins Installer', '_bootstrap' ),
-			'plugin_activated'                => __( 'Plugin activated successfully.', '_bootstrap' ),
-			'complete'                        => __( 'All plugins installed and activated successfully. %s', '_bootstrap' ),
+			'return'                          => __( 'Return to Required Plugins Installer', 'bfi_bootstrap' ),
+			'plugin_activated'                => __( 'Plugin activated successfully.', 'bfi_bootstrap' ),
+			'complete'                        => __( 'All plugins installed and activated successfully. %s', 'bfi_bootstrap' ),
 			'nag_type'                        => 'updated'
 		)
 	);

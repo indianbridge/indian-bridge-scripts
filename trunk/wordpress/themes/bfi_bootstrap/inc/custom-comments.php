@@ -36,8 +36,10 @@ function bootstrap_comment($comment, $args, $depth) {
 		extract($args, EXTR_SKIP);	
 		$add_below = 'comment';
 		$page_name = 'comments';
+		$section_name = 'single-comment';
+		$container_class = bfi_bootstrap_get_container_options( $page_name + '-' + $section_name );		
 	?>         
-	<div id="comment-<?php comment_ID() ?>" class="comment-body media alert alert-info">
+	<div id="comment-<?php comment_ID() ?>" class="comment-body media <?php echo $container_class; ?>">
 		<?php if ($args['avatar_size'] != 0)  { ?>
 	    <span class="pull-left">
 	    	<?php echo get_avatar( $comment, $args['avatar_size'] ); ?>
@@ -47,6 +49,7 @@ function bootstrap_comment($comment, $args, $depth) {
 	    	<h3 class="media-heading" >
 	        	<?php printf(__('<cite class="fn">%s</cite> <span class="says">says:</span>'), get_comment_author_link()) ?>
 	        </h3>
+	        <div class="panel-body">
 			<?php if ($comment->comment_approved == '0') : ?>
 					<em class="comment-awaiting-moderation"><?php _e('Your comment is awaiting moderation.') ?></em>
 					<br />
@@ -63,8 +66,9 @@ function bootstrap_comment($comment, $args, $depth) {
 
 					<div class="reply">
 					<?php comment_reply_link(array_merge( $args, array('add_below' => $add_below, 'depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
-					</div>	       
-	    </div>
+					</div>	
+			</div> 
+			</div>      
 	 </div>
 	 <?php
  }
