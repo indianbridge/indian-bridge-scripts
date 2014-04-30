@@ -8,7 +8,9 @@ function bfi_bootstrap_scripts() {
 	wp_enqueue_style( 'bfi_bootstrap-style', get_stylesheet_uri() );	
 	
 	// Enqueue the bootstrap css
-	$skin = bfi_bootstrap_get_redux_option( 'bootswatch' );
+	$page_name = 'main';
+	$section_name = 'skins';
+	$skin = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'bootswatch' );
 	if ( ! isset( $skin ) ) {
 		$stylesheet = 'http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css';
 	}
@@ -37,7 +39,9 @@ function bfi_bootstrap_scripts() {
 	
 	
 	// Add the padding to body top for fixed navbar
-	$header_alignment = bfi_bootstrap_get_redux_option( 'header-alignment' );
+	$page_name = 'header';
+	$section_name = '';
+	$header_alignment = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'alignment' );
 	if ( $header_alignment === 'fixed' ) {
 		wp_enqueue_script( 'bfi_bootstrap-js-padding-top', THEME_DIR_URI . '/js/jquery.bootstrap.fixed.top.navbar.js', array('jquery'), '20140219', true );
 	}

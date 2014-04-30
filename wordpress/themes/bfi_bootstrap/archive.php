@@ -7,8 +7,16 @@
  * @package bfi_bootstrap
  */
 
-get_header(); ?>
-
+get_header(); 
+$page_name = 'sidebar';
+$section_name = 'widgets';
+$sidebar_location = bfi_bootstrap_get_redux_option( $page_name, $section_name, 'location' );
+?>
+<?php if ( $sidebar_location === 'left' ) { ?>
+<div class="col-sm-4">
+	<?php get_sidebar(); ?>
+</div>
+<?php } ?>
 <div class="col-sm-8">
 	<section id="primary" class="content-area">
 		<main id="main" class="site-main" role="main">
@@ -39,8 +47,10 @@ get_header(); ?>
 
 		</main><!-- #main -->
 	</section><!-- #primary -->
-	</div>
+</div>
+<?php if ( $sidebar_location === 'right' ) { ?>
 <div class="col-sm-4">
 	<?php get_sidebar(); ?>
 </div>
+<?php } ?>
 <?php get_footer(); ?>
