@@ -118,7 +118,7 @@ class bfi_google_calendar_upcoming_events extends WP_Widget {
         <?php
     }
 
-} // class utopian_recent_posts
+} 
 add_action('widgets_init', create_function('', 'return register_widget("bfi_google_calendar_upcoming_events");'));
 
 ?>
