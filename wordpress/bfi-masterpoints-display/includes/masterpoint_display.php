@@ -77,9 +77,12 @@ if (!class_exists('BFI_Masterpoint_Display_Shortcode')) {
 		function showMemberShortcodeContent($current_user, $membership_info) {
 			ob_start();
 			echo $this -> getMemberSummary($current_user);
+			$rank_tableName = $this -> table_prefix . 'rank_master';
+						$rankRow = $this -> bfi_masterpoint_db -> get_row("SELECT * FROM $rank_tableName WHERE min_localpoint <= $membership_info->local_points AND min_fedpoint <= $membership_info->fed_points AND total_min_point <= $membership_info->total_points ORDER BY total_min_point DESC,min_fedpoint DESC,min_localpoint DESC LIMIT 1");
+			$rank = ($rankRow != null) ? $rankRow -> description : "New   Entrant";			
 			echo '<div class="fl" style="padding-right:10px;" title="BFI Member Info">';
 			echo '<span class="ico aut">Member Number: ' . $membership_info -> member_number . '</span><br/>';
-			echo '<span class="ico ranking-icon">Rank: ' . $membership_info -> rank . '</span><br/>';
+			echo '<span class="ico ranking-icon">Rank: ' . $rank . '</span><br/>';
 			echo '<span class="ico map-icon">Zone: ' . $membership_info -> zone . '</span>';
 			echo '</div>';
 			echo '<div class="fl" style="padding-right:10px;" title="BFI Member Points">';
