@@ -97,7 +97,12 @@ if (!class_exists('BFI_Masterpoint_Display')) {
 			if ($numItems < 1) {
 				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item1', 'title' => '<div class="ab-item ab-empty-item">No Information Found!</div>'));
 			} else {
-				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item2', 'title' => '<span class="ico ranking-icon" '.$white_text_color.'>Rank: ' . $rows[0] -> rank . '</span>'));
+				$local_points = $rows[0]->local_points;
+				$fed_points = $rows[0]->fed_points;
+				$total_points = $rows[0]->total_points;
+				$rankRow = $this -> bfi_masterpoint_db -> get_row("SELECT * FROM $rank_tableName WHERE min_localpoint <=  $local_points AND min_fedpoint <=  $fed_points AND total_min_point <=  $total_points ORDER BY total_min_point DESC,min_fedpoint DESC,min_localpoint DESC LIMIT 1");
+				$rank = ($rankRow != null) ? $rankRow -> description : "New   Entrant";				
+				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item2', 'title' => '<span class="ico ranking-icon" '.$white_text_color.'>Rank: ' . $rank . '</span>'));
 				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item3', 'title' => '<span class="ico map-icon" '.$white_text_color.'>Zone: ' . $rows[0] -> zone . '</span>'));
 				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item4', 'title' => '<span class="ico trophy-icon" '.$white_text_color.'>Total Points: ' . $rows[0] -> total_points . '</span>'));
 				$wp_admin_bar -> add_menu(array('parent' => 'my-masterpoint-summary', 'id' => 'masterpoint-summary-list-item5', 'title' => '<span class="ico trophy-silver-icon" '.$white_text_color.'>Fed Points: ' . $rows[0] -> fed_points . '</span>'));
